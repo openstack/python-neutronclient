@@ -1,0 +1,13 @@
+*.pyc
+*.DS_Store
+build/*
+build-stamp
+.coverage
+cover/*
+quantum_client.egg-info/*
+quantum/vcsversion.py
+run_tests.err.log
+run_tests.log
+tests/
+.venv/
+.tox/

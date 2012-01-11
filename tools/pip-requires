@@ -1,0 +1,19 @@
+Paste
+PasteDeploy
+Routes>=1.12.3
+distribute>=0.6.24
+eventlet>=0.9.12
+lxml
+python-gflags
+simplejson
+sqlalchemy
+webob
+
+coverage
+nose
+nosexcover
+pep8==0.6.1
+tissue
+
+-e git+https://review.openstack.org/p/openstack-dev/openstack-nose.git#egg=openstack.nose_plugin
+-e git+https://review.openstack.org/p/openstack/quantum#egg=quantum-dev
