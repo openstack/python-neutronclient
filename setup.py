@@ -49,7 +49,7 @@ version_info = {
 }
 """ % (branch_nick, revid, revno))
 
-Name = 'quantum-client'
+Name = 'python-quantumclient'
 Url = "https://launchpad.net/quantum"
 Version = version.canonical_version_string()
 License = 'Apache License 2.0'
