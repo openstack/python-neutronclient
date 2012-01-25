@@ -1,15 +1,13 @@
+# NOTE(danwent): these paste dependencies are only here because of the weird
+# split of "common" quantum code between quantum-server and quantum-client.
+# Should be removed from here and setup.py once we fix that.
 Paste
 PasteDeploy
-Routes>=1.12.3
+
 distribute>=0.6.24
-eventlet>=0.9.12
-lxml
 python-gflags
-simplejson
-sqlalchemy
 webob
 
-coverage
 nose
 nosexcover
 pep8==0.6.1

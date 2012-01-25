@@ -61,6 +61,10 @@ ShortDescription = Summary
 Description = Summary
 
 requires = [
+    'Paste',
+    'PasteDeploy',
+    'python-gflags',
+    'webob'
 ]
 
 EagerResources = [
