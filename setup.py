@@ -89,7 +89,7 @@ setup(
     scripts=ProjectScripts,
     install_requires=requires,
     include_package_data=False,
-    packages=["quantum.client", "quantum.common"],
+    packages=["quantum", "quantum.client", "quantum.common"],
     package_data=PackageData,
     eager_resources=EagerResources,
     entry_points={
