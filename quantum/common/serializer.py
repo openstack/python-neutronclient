@@ -1,6 +1,6 @@
 from xml.dom import minidom
-import webob.exc
 
+from quantum.common import exceptions as exception
 from quantum.common import utils
 
 
@@ -41,7 +41,8 @@ class Serializer(object):
         try:
             return self.get_deserialize_handler(content_type)(datastring)
         except Exception:
-            raise webob.exc.HTTPBadRequest("Could not deserialize data")
+            raise exception.MalformedResponseBody(
+                    reason="Unable to deserialize response body")
 
     def get_deserialize_handler(self, content_type):
         handlers = {

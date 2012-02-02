@@ -64,7 +64,6 @@ requires = [
     'Paste',
     'PasteDeploy',
     'python-gflags',
-    'webob'
 ]
 
 EagerResources = [

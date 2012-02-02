@@ -130,6 +130,10 @@ class MalformedRequestBody(QuantumException):
     message = _("Malformed request body: %(reason)s")
 
 
+class MalformedResponseBody(QuantumException):
+    message = _("Malformed response body: %(reason)s")
+
+
 class Duplicate(Error):
     pass
 
