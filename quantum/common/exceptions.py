@@ -49,30 +49,6 @@ class QuantumException(Exception):
         return self._error_string
 
 
-class ProcessExecutionError(IOError):
-    def __init__(self, stdout=None, stderr=None, exit_code=None, cmd=None,
-                 description=None):
-        if description is None:
-            description = "Unexpected error while running command."
-        if exit_code is None:
-            exit_code = '-'
-        message = "%s\nCommand: %s\nExit code: %s\nStdout: %r\nStderr: %r" % (
-                  description, cmd, exit_code, stdout, stderr)
-        IOError.__init__(self, message)
-
-
-class Error(Exception):
-    def __init__(self, message=None):
-        super(Error, self).__init__(message)
-
-
-class ApiError(Error):
-    def __init__(self, message='Unknown', code='Unknown'):
-        self.message = message
-        self.code = code
-        super(ApiError, self).__init__('%s: %s' % (code, message))
-
-
 class NotFound(QuantumException):
     pass
 
@@ -111,34 +87,87 @@ class AlreadyAttached(QuantumException):
                 "already plugged into port %(att_port_id)s")
 
 
-# NOTE: on the client side, we often do not know all of the information
-# that is known on the server, thus, we create separate exception for
-# those scenarios
-class PortInUseClient(QuantumException):
-    message = _("Unable to complete operation on port %(port_id)s " \
-                "for network %(net_id)s. An attachment " \
-                "is plugged into the logical port.")
+class QuantumClientException(QuantumException):
+
+    def __init__(self, **kwargs):
+        self.message = kwargs.get('message', "")
+        super(QuantumClientException, self).__init__(**kwargs)
 
 
-class AlreadyAttachedClient(QuantumException):
-    message = _("Unable to plug the attachment %(att_id)s into port " \
-                "%(port_id)s for network %(net_id)s. The attachment is " \
-                "already plugged into another port.")
+# NOTE: on the client side, we use different exception types in order
+# to allow client library users to handle server exceptions in try...except
+# blocks. The actual error message is the one generated on the server side
+class NetworkNotFoundClient(QuantumClientException):
+    pass
 
 
-class MalformedRequestBody(QuantumException):
-    message = _("Malformed request body: %(reason)s")
+class PortNotFoundClient(QuantumClientException):
+    pass
 
 
 class MalformedResponseBody(QuantumException):
     message = _("Malformed response body: %(reason)s")
 
 
-class Duplicate(Error):
+class StateInvalidClient(QuantumClientException):
     pass
 
 
-class NotAuthorized(Error):
+class NetworkInUseClient(QuantumClientException):
+    pass
+
+
+class PortInUseClient(QuantumClientException):
+    pass
+
+
+class AlreadyAttachedClient(QuantumClientException):
+    pass
+
+
+class NotAuthorized(QuantumClientException):
+    pass
+
+
+class QuantumCLIError(QuantumClientException):
+    """ Exception raised when command line parsing fails """
+    pass
+
+
+class BadInputError(Exception):
+    """Error resulting from a client sending bad input to a server"""
+    pass
+
+
+class ProcessExecutionError(IOError):
+    def __init__(self, stdout=None, stderr=None, exit_code=None, cmd=None,
+                 description=None):
+        if description is None:
+            description = "Unexpected error while running command."
+        if exit_code is None:
+            exit_code = '-'
+        message = "%s\nCommand: %s\nExit code: %s\nStdout: %r\nStderr: %r" % (
+                  description, cmd, exit_code, stdout, stderr)
+        IOError.__init__(self, message)
+
+
+class Error(Exception):
+    def __init__(self, message=None):
+        super(Error, self).__init__(message)
+
+
+class ApiError(Error):
+    def __init__(self, message='Unknown', code='Unknown'):
+        self.message = message
+        self.code = code
+        super(ApiError, self).__init__('%s: %s' % (code, message))
+
+
+class MalformedRequestBody(QuantumException):
+    message = _("Malformed request body: %(reason)s")
+
+
+class Duplicate(Error):
     pass
 
 
@@ -152,11 +181,6 @@ class Invalid(Error):
 
 class InvalidContentType(Invalid):
     message = _("Invalid content type %(content_type)s.")
-
-
-class BadInputError(Exception):
-    """Error resulting from a client sending bad input to a server"""
-    pass
 
 
 class MissingArgumentError(Error):

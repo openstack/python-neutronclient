@@ -22,7 +22,6 @@
 
 import ConfigParser
 import datetime
-import exceptions as exception
 import inspect
 import logging
 import os
@@ -42,6 +41,18 @@ import types
 from quantum.common import flags
 from quantum.common import exceptions as exception
 from quantum.common.exceptions import ProcessExecutionError
+
+
+def env(*vars, **kwargs):
+    """
+    returns the first environment variable set
+    if none are non-empty, defaults to '' or keyword arg default
+    """
+    for v in vars:
+        value = os.environ.get(v)
+        if value:
+            return value
+    return kwargs.get('default', '')
 
 
 def import_class(import_str):

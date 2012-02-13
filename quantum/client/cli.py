@@ -1,7 +1,7 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-# Copyright 2011 Nicira Networks, Inc.
-# Copyright 2011 Citrix Systems
+# Copyright 2012 Nicira Networks, Inc.
+# Copyright 2012 Citrix Systems
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -26,6 +26,7 @@ import sys
 
 from optparse import OptionParser
 
+from quantum.common import exceptions
 
 possible_topdir = os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]),
                                    os.pardir,
@@ -37,13 +38,16 @@ gettext.install('quantum', unicode=1)
 
 from quantum.client import cli_lib
 from quantum.client import Client
+from quantum.client import ClientV11
+from quantum.common import utils
 
 #Configure logger for client - cli logger is a child of it
 #NOTE(salvatore-orlando): logger name does not map to package
 #this is deliberate. Simplifies logger configuration
 LOG = logging.getLogger('quantum')
+DEFAULT_QUANTUM_VERSION = '1.1'
 FORMAT = 'json'
-commands = {
+commands_v10 = {
   "list_nets": {
     "func": cli_lib.list_nets,
     "args": ["tenant-id"]},
@@ -81,34 +85,120 @@ commands = {
     "func": cli_lib.unplug_iface,
     "args": ["tenant-id", "net-id", "port-id"]}, }
 
+commands_v11 = commands_v10.copy()
+commands_v11.update({
+  "list_nets": {
+    "func": cli_lib.list_nets_v11,
+    "args": ["tenant-id"],
+    "filters": ["name", "op-status", "port-op-status", "port-state",
+                "has-attachment", "attachment", "port"]},
+  "list_ports": {
+    "func": cli_lib.list_ports_v11,
+    "args": ["tenant-id", "net-id"],
+    "filters": ["name", "op-status", "has-attachment", "attachment"]},
+     })
+commands = {
+    '1.0': commands_v10,
+    '1.1': commands_v11
+    }
+clients = {
+    '1.0': Client,
+    '1.1': ClientV11
+    }
 
-def help():
+
+def help(version):
     print "\nCommands:"
-    for k in commands.keys():
-        print "    %s %s" % (k,
-          " ".join(["<%s>" % y for y in commands[k]["args"]]))
+    cmds = commands[version]
+    for k in cmds.keys():
+        print "    %s %s %s" % (k,
+          " ".join(["<%s>" % y for y in cmds[k]["args"]]),
+          'filters' in cmds[k] and "[filterspec ...]" or "")
+
+
+def print_usage(cmd, version):
+    cmds = commands[version]
+    print "Usage:\n    %s %s" % (cmd,
+      " ".join(["<%s>" % y for y in cmds[cmd]["args"]]))
 
 
 def build_args(cmd, cmdargs, arglist):
-    args = []
-    orig_arglist = arglist[:]
-    try:
-        for x in cmdargs:
-            args.append(arglist[0])
-            del arglist[0]
-    except:
-        LOG.error("Not enough arguments for \"%s\" (expected: %d, got: %d)" % (
-          cmd, len(cmdargs), len(orig_arglist)))
-        print "Usage:\n    %s %s" % (cmd,
-          " ".join(["<%s>" % y for y in commands[cmd]["args"]]))
-        return None
-    if len(arglist) > 0:
-        LOG.error("Too many arguments for \"%s\" (expected: %d, got: %d)" % (
-          cmd, len(cmdargs), len(orig_arglist)))
-        print "Usage:\n    %s %s" % (cmd,
-          " ".join(["<%s>" % y for y in commands[cmd]["args"]]))
-        return None
+    arglist_len = len(arglist)
+    cmdargs_len = len(cmdargs)
+    if arglist_len < cmdargs_len:
+        message = "Not enough arguments for \"%s\" (expected: %d, got: %d)"\
+                   % (cmd, len(cmdargs), arglist_len)
+        raise exceptions.QuantumCLIError(message=message)
+    args = arglist[:cmdargs_len]
     return args
+
+
+def build_filters(cmd, cmd_filters, filter_list, version):
+    filters = {}
+    # Each filter is expected to be in the <key>=<value> format
+    for flt in filter_list:
+        split_filter = flt.split("=")
+        if len(split_filter) != 2:
+            message = "Invalid filter argument detected (%s)" % flt
+            raise exceptions.QuantumCLIError(message=message)
+        filter_key, filter_value = split_filter
+        # Ensure the filter is allowed
+        if not filter_key in cmd_filters:
+            message = "Invalid filter key (%s)" % filter_key
+            raise exceptions.QuantumCLIError(message=message)
+        filters[filter_key] = filter_value
+    return filters
+
+
+def build_cmd(cmd, cmd_args, cmd_filters, arglist, version):
+    """
+    Builds arguments and filters to be passed to the cli library routines
+
+    :param cmd: Command to be executed
+    :param cmd_args: List of arguments required by the command
+    :param cmd_filters: List of filters allowed by the command
+    :param arglist: Command line arguments (includes both arguments and
+                    filter specifications)
+    :param version: API version
+    """
+    arglist_len = len(arglist)
+    try:
+        # Parse arguments
+        args = build_args(cmd, cmd_args, arglist)
+        # Parse filters
+        filters = None
+        if cmd_filters:
+            # Pop consumed arguments
+            arglist = arglist[len(args):]
+            filters = build_filters(cmd, cmd_filters, arglist, version)
+    except exceptions.QuantumCLIError as cli_ex:
+        LOG.error(cli_ex.message)
+        print " Error in command line:%s" % cli_ex.message
+        print_usage(cmd, version)
+        return None, None
+    filter_len = (filters is not None) and len(filters) or 0
+    if len(arglist) - len(args) - filter_len > 0:
+        message = "Too many arguments for \"%s\" (expected: %d, got: %d)"\
+                   % (cmd, len(cmd_args), arglist_len)
+        LOG.error(message)
+        print "Error in command line: %s " % message
+        print "Usage:\n    %s %s" % (cmd,
+          " ".join(["<%s>" % y for y in commands[version][cmd]["args"]]))
+        return None, None
+    # Append version to arguments for cli functions
+    args.append(version)
+    return args, filters
+
+
+def instantiate_client(host, port, ssl, tenant, token, version):
+    client = clients[version](host,
+                              port,
+                              ssl,
+                              tenant,
+                              FORMAT,
+                              auth_token=token,
+                              version=version)
+    return client
 
 
 def main():
@@ -126,13 +216,15 @@ def main():
       type="string", default="syslog", help="log file path")
     parser.add_option("-t", "--token", dest="token",
       type="string", default=None, help="authentication token")
+    parser.add_option('--version',
+        default=utils.env('QUANTUM_VERSION', default=DEFAULT_QUANTUM_VERSION),
+        help='Accepts 1.1 and 1.0, defaults to env[QUANTUM_VERSION].')
     options, args = parser.parse_args()
 
     if options.verbose:
         LOG.setLevel(logging.DEBUG)
     else:
         LOG.setLevel(logging.WARN)
-    #logging.handlers.WatchedFileHandler
 
     if options.logfile == "syslog":
         LOG.addHandler(logging.handlers.SysLogHandler(address='/dev/log'))
@@ -141,29 +233,45 @@ def main():
         # Set permissions on log file
         os.chmod(options.logfile, 0644)
 
+    version = options.version
+    if not version in commands:
+        LOG.error("Unknown API version specified:%s", version)
+        print "Unknown API version: %s" % version
+
     if len(args) < 1:
         parser.print_help()
-        help()
+        help(version)
         sys.exit(1)
 
     cmd = args[0]
-    if cmd not in commands.keys():
+    if cmd not in commands[version].keys():
         LOG.error("Unknown command: %s" % cmd)
-        help()
+        help(version)
         sys.exit(1)
 
-    args = build_args(cmd, commands[cmd]["args"], args[1:])
+    # Build argument list for CLI command
+    # The argument list will include the version number as well
+    args, filters = build_cmd(cmd,
+                              commands[version][cmd]["args"],
+                              commands[version][cmd].get("filters", None),
+                              args[1:],
+                              options.version)
     if not args:
         sys.exit(1)
     LOG.info("Executing command \"%s\" with args: %s" % (cmd, args))
 
-    client = Client(options.host, options.port, options.ssl,
-                    args[0], FORMAT,
-                    auth_token=options.token)
-    commands[cmd]["func"](client, *args)
+    client = instantiate_client(options.host,
+                                options.port,
+                                options.ssl,
+                                args[0],
+                                options.token,
+                                options.version)
+    # append filters to arguments
+    # this will allow for using the same prototype for v10 and v11
+    # TODO: Use **kwargs instead of *args (keyword is better than positional)
+    if filters:
+        args.append(filters)
+    commands[version][cmd]["func"](client, *args)
 
     LOG.info("Command execution completed")
     sys.exit(0)
-
-if __name__ == "__main__":
-    main()

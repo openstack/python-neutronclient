@@ -91,7 +91,7 @@ class CmdOutputTemplate(OutputTemplate):
         Extends OutputTemplate loading a different template for each command.
     """
 
-    _templates = {
+    _templates_v10 = {
         "list_nets":      "Virtual Networks for Tenant %(tenant_id)s\n" +
                           "%(networks|\tNetwork ID: %(id)s)s",
         "show_net":       "Network ID: %(network.id)s\n" +
@@ -130,13 +130,31 @@ class CmdOutputTemplate(OutputTemplate):
                           "on Virtual Network: %(network_id)s\n" +
                           "for Tenant: %(tenant_id)s"}
 
-    def __init__(self, cmd, data):
-        super(CmdOutputTemplate, self).__init__(self._templates[cmd], data)
+    _templates_v11 = _templates_v10.copy()
+    _templates_v11.update({
+        "show_net":       "Network ID: %(network.id)s\n" +
+                          "network Name: %(network.name)s\n" +
+                          "operational Status: %(network.op-status)s",
+        "show_port":      "Logical Port ID: %(port.id)s\n" +
+                          "administrative state: %(port.state)s\n" +
+                          "operational status: %(port.op-status)s\n" +
+                          "interface: %(port.attachment)s\n" +
+                          "on Virtual Network: %(network_id)s\n" +
+                          "for Tenant: %(tenant_id)s",
+        })
+
+    _templates = {
+        '1.0': _templates_v10,
+        '1.1': _templates_v11
+        }
+
+    def __init__(self, cmd, data, version):
+        super(CmdOutputTemplate, self).__init__(
+            self._templates[version][cmd], data)
 
 
 def _handle_exception(ex):
     LOG.exception(sys.exc_info())
-    print "Exception:%s - %s" % (sys.exc_info()[0], sys.exc_info()[1])
     status_code = None
     message = None
     # Retrieve dict at 1st element of tuple at last argument
@@ -149,67 +167,94 @@ def _handle_exception(ex):
         LOG.exception(msg_1 + "-" + msg_2)
         print msg_1
         print msg_2
+    else:
+        print "An unexpected exception occured:%s (%s)" % (sys.exc_info()[1],
+                                                           sys.exc_info()[0])
 
 
-def prepare_output(cmd, tenant_id, response):
-    LOG.debug("Preparing output for response:%s", response)
+def prepare_output(cmd, tenant_id, response, version):
+    LOG.debug("Preparing output for response:%s, version:%s"
+              % (response, version))
     response['tenant_id'] = tenant_id
-    output = str(CmdOutputTemplate(cmd, response))
+    output = str(CmdOutputTemplate(cmd, response, version))
     LOG.debug("Finished preparing output for command:%s", cmd)
     return output
 
 
 def list_nets(client, *args):
-    tenant_id = args[0]
-    res = client.list_networks()
-    LOG.debug("Operation 'list_networks' executed.")
-    output = prepare_output("list_nets", tenant_id, res)
-    print output
+    tenant_id, version = args
+    try:
+        res = client.list_networks()
+        LOG.debug("Operation 'list_networks' executed.")
+        output = prepare_output("list_nets", tenant_id, res, version)
+        print output
+    except Exception as ex:
+        _handle_exception(ex)
+
+
+def list_nets_v11(client, *args):
+    filters = {}
+    tenant_id, version = args[:2]
+    if len(args) > 2:
+        filters = args[2]
+    try:
+        res = client.list_networks(**filters)
+        LOG.debug("Operation 'list_networks' executed.")
+        output = prepare_output("list_nets", tenant_id, res, version)
+        print output
+    except Exception as ex:
+        _handle_exception(ex)
 
 
 def create_net(client, *args):
-    tenant_id, name = args
+    tenant_id, name, version = args
     data = {'network': {'name': name}}
     new_net_id = None
     try:
         res = client.create_network(data)
         new_net_id = res["network"]["id"]
         LOG.debug("Operation 'create_network' executed.")
-        output = prepare_output("create_net", tenant_id,
-                                          dict(network_id=new_net_id))
+        output = prepare_output("create_net",
+                                tenant_id,
+                                dict(network_id=new_net_id),
+                                version)
         print output
     except Exception as ex:
         _handle_exception(ex)
 
 
 def delete_net(client, *args):
-    tenant_id, network_id = args
+    tenant_id, network_id, version = args
     try:
         client.delete_network(network_id)
         LOG.debug("Operation 'delete_network' executed.")
-        output = prepare_output("delete_net", tenant_id,
-                            dict(network_id=network_id))
+        output = prepare_output("delete_net",
+                                tenant_id,
+                                dict(network_id=network_id),
+                                version)
         print output
     except Exception as ex:
         _handle_exception(ex)
 
 
 def show_net(client, *args):
-    tenant_id, network_id = args
+    tenant_id, network_id, version = args
     try:
         #NOTE(salvatore-orlando) changed for returning exclusively
         # output for GET /networks/{net-id} API operation
         res = client.show_network_details(network_id)["network"]
         LOG.debug("Operation 'show_network_details' executed.")
-        output = prepare_output("show_net", tenant_id,
-                                          dict(network=res))
+        output = prepare_output("show_net",
+                                tenant_id,
+                                dict(network=res),
+                                version)
         print output
     except Exception as ex:
         _handle_exception(ex)
 
 
 def update_net(client, *args):
-    tenant_id, network_id, param_data = args
+    tenant_id, network_id, param_data, version = args
     data = {'network': {}}
     for kv in param_data.split(","):
         k, v = kv.split("=")
@@ -219,47 +264,67 @@ def update_net(client, *args):
         client.update_network(network_id, data)
         LOG.debug("Operation 'update_network' executed.")
         # Response has no body. Use data for populating output
-        output = prepare_output("update_net", tenant_id, data)
+        output = prepare_output("update_net", tenant_id, data, version)
         print output
     except Exception as ex:
         _handle_exception(ex)
 
 
 def list_ports(client, *args):
-    tenant_id, network_id = args
+    tenant_id, network_id, version = args
     try:
         ports = client.list_ports(network_id)
         LOG.debug("Operation 'list_ports' executed.")
         data = ports
         data['network_id'] = network_id
-        output = prepare_output("list_ports", tenant_id, data)
+        output = prepare_output("list_ports", tenant_id, data, version)
+        print output
+    except Exception as ex:
+        _handle_exception(ex)
+
+
+def list_ports_v11(client, *args):
+    filters = {}
+    tenant_id, network_id, version = args[:3]
+    if len(args) > 3:
+        filters = args[3]
+    try:
+        ports = client.list_ports(network_id, **filters)
+        LOG.debug("Operation 'list_ports' executed.")
+        data = ports
+        data['network_id'] = network_id
+        output = prepare_output("list_ports", tenant_id, data, version)
         print output
     except Exception as ex:
         _handle_exception(ex)
 
 
 def create_port(client, *args):
-    tenant_id, network_id = args
+    tenant_id, network_id, version = args
     try:
         res = client.create_port(network_id)
         LOG.debug("Operation 'create_port' executed.")
         new_port_id = res["port"]["id"]
-        output = prepare_output("create_port", tenant_id,
+        output = prepare_output("create_port",
+                                tenant_id,
                                 dict(network_id=network_id,
-                                     port_id=new_port_id))
+                                     port_id=new_port_id),
+                                version)
         print output
     except Exception as ex:
         _handle_exception(ex)
 
 
 def delete_port(client, *args):
-    tenant_id, network_id, port_id = args
+    tenant_id, network_id, port_id, version = args
     try:
         client.delete_port(network_id, port_id)
         LOG.debug("Operation 'delete_port' executed.")
-        output = prepare_output("delete_port", tenant_id,
+        output = prepare_output("delete_port",
+                                tenant_id,
                                 dict(network_id=network_id,
-                                     port_id=port_id))
+                                     port_id=port_id),
+                                version)
         print output
     except Exception as ex:
         _handle_exception(ex)
@@ -267,7 +332,7 @@ def delete_port(client, *args):
 
 
 def show_port(client, *args):
-    tenant_id, network_id, port_id = args
+    tenant_id, network_id, port_id, version = args
     try:
         port = client.show_port_details(network_id, port_id)["port"]
         LOG.debug("Operation 'list_port_details' executed.")
@@ -280,16 +345,18 @@ def show_port(client, *args):
             port['attachment'] = attach['id']
         else:
             port['attachment'] = '<none>'
-        output = prepare_output("show_port", tenant_id,
+        output = prepare_output("show_port",
+                                tenant_id,
                                 dict(network_id=network_id,
-                                     port=port))
+                                     port=port),
+                                version)
         print output
     except Exception as ex:
         _handle_exception(ex)
 
 
 def update_port(client, *args):
-    tenant_id, network_id, port_id, param_data = args
+    tenant_id, network_id, port_id, param_data, version = args
     data = {'port': {}}
     for kv in param_data.split(","):
         k, v = kv.split("=")
@@ -300,14 +367,14 @@ def update_port(client, *args):
         client.update_port(network_id, port_id, data)
         LOG.debug("Operation 'udpate_port' executed.")
         # Response has no body. Use data for populating output
-        output = prepare_output("update_port", tenant_id, data)
+        output = prepare_output("update_port", tenant_id, data, version)
         print output
     except Exception as ex:
         _handle_exception(ex)
 
 
 def plug_iface(client, *args):
-    tenant_id, network_id, port_id, attachment = args
+    tenant_id, network_id, port_id, attachment, version = args
     try:
         data = {'attachment': {'id': '%s' % attachment}}
         client.attach_resource(network_id, port_id, data)
@@ -315,20 +382,23 @@ def plug_iface(client, *args):
         output = prepare_output("plug_iface", tenant_id,
                                 dict(network_id=network_id,
                                      port_id=port_id,
-                                     attachment=attachment))
+                                     attachment=attachment),
+                                version)
         print output
     except Exception as ex:
         _handle_exception(ex)
 
 
 def unplug_iface(client, *args):
-    tenant_id, network_id, port_id = args
+    tenant_id, network_id, port_id, version = args
     try:
         client.detach_resource(network_id, port_id)
         LOG.debug("Operation 'detach_resource' executed.")
-        output = prepare_output("unplug_iface", tenant_id,
+        output = prepare_output("unplug_iface",
+                                tenant_id,
                                 dict(network_id=network_id,
-                                     port_id=port_id))
+                                     port_id=port_id),
+                                version)
         print output
     except Exception as ex:
         _handle_exception(ex)

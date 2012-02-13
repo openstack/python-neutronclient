@@ -33,6 +33,7 @@ from quantum.db import api as db
 from quantum.tests.unit.client_tools import stubs as client_stubs
 
 LOG = logging.getLogger('quantum.tests.test_cli')
+API_VERSION = "1.1"
 FORMAT = 'json'
 
 
@@ -49,9 +50,12 @@ class CLITest(unittest.TestCase):
         self.tenant_id = "test_tenant"
         self.network_name_1 = "test_network_1"
         self.network_name_2 = "test_network_2"
+        self.version = API_VERSION
         # Prepare client and plugin manager
-        self.client = Client(tenant=self.tenant_id, format=FORMAT,
-                             testingStub=client_stubs.FakeHTTPConnection)
+        self.client = Client(tenant=self.tenant_id,
+                             format=FORMAT,
+                             testingStub=client_stubs.FakeHTTPConnection,
+                             version=self.version)
         # Redirect stdout
         self.fake_stdout = client_stubs.FakeStdout()
         sys.stdout = self.fake_stdout
@@ -64,10 +68,13 @@ class CLITest(unittest.TestCase):
     def _verify_list_networks(self):
             # Verification - get raw result from db
             nw_list = db.network_list(self.tenant_id)
-            networks = [dict(id=nw.uuid, name=nw.name) for nw in nw_list]
+            networks = [{'id': nw.uuid, 'name': nw.name}
+                         for nw in nw_list]
             # Fill CLI template
-            output = cli.prepare_output('list_nets', self.tenant_id,
-                                        dict(networks=networks))
+            output = cli.prepare_output('list_nets',
+                                        self.tenant_id,
+                                        dict(networks=networks),
+                                        self.version)
             # Verify!
             # Must add newline at the end to match effect of print call
             self.assertEquals(self.fake_stdout.make_string(), output + '\n')
@@ -79,8 +86,10 @@ class CLITest(unittest.TestCase):
                 self.fail("No network created")
             network_id = nw_list[0].uuid
             # Fill CLI template
-            output = cli.prepare_output('create_net', self.tenant_id,
-                                        dict(network_id=network_id))
+            output = cli.prepare_output('create_net',
+                                        self.tenant_id,
+                                        dict(network_id=network_id),
+                                        self.version)
             # Verify!
             # Must add newline at the end to match effect of print call
             self.assertEquals(self.fake_stdout.make_string(), output + '\n')
@@ -91,8 +100,10 @@ class CLITest(unittest.TestCase):
             if len(nw_list) != 0:
                 self.fail("DB should not contain any network")
             # Fill CLI template
-            output = cli.prepare_output('delete_net', self.tenant_id,
-                                        dict(network_id=network_id))
+            output = cli.prepare_output('delete_net',
+                                        self.tenant_id,
+                                        dict(network_id=network_id),
+                                        self.version)
             # Verify!
             # Must add newline at the end to match effect of print call
             self.assertEquals(self.fake_stdout.make_string(), output + '\n')
@@ -101,10 +112,13 @@ class CLITest(unittest.TestCase):
             # Verification - get raw result from db
             nw_list = db.network_list(self.tenant_id)
             network_data = {'id': nw_list[0].uuid,
-                            'name': nw_list[0].name}
+                            'name': nw_list[0].name,
+                            'op-status': nw_list[0].op_status}
             # Fill CLI template
-            output = cli.prepare_output('update_net', self.tenant_id,
-                                        dict(network=network_data))
+            output = cli.prepare_output('update_net',
+                                        self.tenant_id,
+                                        dict(network=network_data),
+                                        self.version)
             # Verify!
             # Must add newline at the end to match effect of print call
             self.assertEquals(self.fake_stdout.make_string(), output + '\n')
@@ -112,10 +126,14 @@ class CLITest(unittest.TestCase):
     def _verify_show_network(self):
             # Verification - get raw result from db
             nw = db.network_list(self.tenant_id)[0]
-            network = dict(id=nw.uuid, name=nw.name)
+            network = {'id': nw.uuid,
+                       'name': nw.name,
+                       'op-status': nw.op_status}
             # Fill CLI template
-            output = cli.prepare_output('show_net', self.tenant_id,
-                                        dict(network=network))
+            output = cli.prepare_output('show_net',
+                                        self.tenant_id,
+                                        dict(network=network),
+                                        self.version)
             # Verify!
             # Must add newline at the end to match effect of print call
             self.assertEquals(self.fake_stdout.make_string(), output + '\n')
@@ -126,9 +144,11 @@ class CLITest(unittest.TestCase):
             ports = [dict(id=port.uuid, state=port.state)
                      for port in port_list]
             # Fill CLI template
-            output = cli.prepare_output('list_ports', self.tenant_id,
+            output = cli.prepare_output('list_ports',
+                                        self.tenant_id,
                                         dict(network_id=network_id,
-                                             ports=ports))
+                                             ports=ports),
+                                        self.version)
             # Verify!
             # Must add newline at the end to match effect of print call
             self.assertEquals(self.fake_stdout.make_string(), output + '\n')
@@ -140,9 +160,11 @@ class CLITest(unittest.TestCase):
                 self.fail("No port created")
             port_id = port_list[0].uuid
             # Fill CLI template
-            output = cli.prepare_output('create_port', self.tenant_id,
+            output = cli.prepare_output('create_port',
+                                        self.tenant_id,
                                         dict(network_id=network_id,
-                                             port_id=port_id))
+                                             port_id=port_id),
+                                        self.version)
             # Verify!
             # Must add newline at the end to match effect of print call
             self.assertEquals(self.fake_stdout.make_string(), output + '\n')
@@ -153,9 +175,11 @@ class CLITest(unittest.TestCase):
             if len(port_list) != 0:
                 self.fail("DB should not contain any port")
             # Fill CLI template
-            output = cli.prepare_output('delete_port', self.tenant_id,
+            output = cli.prepare_output('delete_port',
+                                        self.tenant_id,
                                         dict(network_id=network_id,
-                                             port_id=port_id))
+                                             port_id=port_id),
+                                        self.version)
             # Verify!
             # Must add newline at the end to match effect of print call
             self.assertEquals(self.fake_stdout.make_string(), output + '\n')
@@ -163,11 +187,15 @@ class CLITest(unittest.TestCase):
     def _verify_update_port(self, network_id, port_id):
             # Verification - get raw result from db
             port = db.port_get(port_id, network_id)
-            port_data = {'id': port.uuid, 'state': port.state}
+            port_data = {'id': port.uuid,
+                         'state': port.state,
+                         'op-status': port.op_status}
             # Fill CLI template
-            output = cli.prepare_output('update_port', self.tenant_id,
+            output = cli.prepare_output('update_port',
+                                        self.tenant_id,
                                         dict(network_id=network_id,
-                                             port=port_data))
+                                             port=port_data),
+                                        self.version)
             # Verify!
             # Must add newline at the end to match effect of print call
             self.assertEquals(self.fake_stdout.make_string(), output + '\n')
@@ -177,15 +205,19 @@ class CLITest(unittest.TestCase):
             # TODO(salvatore-orlando): Must resolve this issue with
             # attachment in separate bug fix.
             port = db.port_get(port_id, network_id)
-            port_data = {'id': port.uuid, 'state': port.state,
-                         'attachment': "<none>"}
+            port_data = {'id': port.uuid,
+                         'state': port.state,
+                         'attachment': "<none>",
+                         'op-status': port.op_status}
             if port.interface_id is not None:
                 port_data['attachment'] = port.interface_id
 
             # Fill CLI template
-            output = cli.prepare_output('show_port', self.tenant_id,
+            output = cli.prepare_output('show_port',
+                                        self.tenant_id,
                                         dict(network_id=network_id,
-                                             port=port_data))
+                                             port=port_data),
+                                        self.version)
             # Verify!
             # Must add newline at the end to match effect of print call
             self.assertEquals(self.fake_stdout.make_string(), output + '\n')
@@ -194,10 +226,12 @@ class CLITest(unittest.TestCase):
             # Verification - get raw result from db
             port = db.port_get(port_id, network_id)
             # Fill CLI template
-            output = cli.prepare_output("plug_iface", self.tenant_id,
+            output = cli.prepare_output("plug_iface",
+                                        self.tenant_id,
                                         dict(network_id=network_id,
                                              port_id=port['uuid'],
-                                             attachment=port['interface_id']))
+                                             attachment=port['interface_id']),
+                                        self.version)
             # Verify!
             # Must add newline at the end to match effect of print call
             self.assertEquals(self.fake_stdout.make_string(), output + '\n')
@@ -206,9 +240,11 @@ class CLITest(unittest.TestCase):
             # Verification - get raw result from db
             port = db.port_get(port_id, network_id)
             # Fill CLI template
-            output = cli.prepare_output("unplug_iface", self.tenant_id,
+            output = cli.prepare_output("unplug_iface",
+                                        self.tenant_id,
                                         dict(network_id=network_id,
-                                             port_id=port['uuid']))
+                                             port_id=port['uuid']),
+                                        self.version)
             # Verify!
             # Must add newline at the end to match effect of print call
             self.assertEquals(self.fake_stdout.make_string(), output + '\n')
@@ -219,7 +255,9 @@ class CLITest(unittest.TestCase):
             db.network_create(self.tenant_id, self.network_name_1)
             db.network_create(self.tenant_id, self.network_name_2)
 
-            cli.list_nets(self.client, self.tenant_id)
+            cli.list_nets(self.client,
+                          self.tenant_id,
+                          self.version)
         except:
             LOG.exception("Exception caught: %s", sys.exc_info())
             self.fail("test_list_networks failed due to an exception")
@@ -230,7 +268,10 @@ class CLITest(unittest.TestCase):
 
     def test_create_network(self):
         try:
-            cli.create_net(self.client, self.tenant_id, "test")
+            cli.create_net(self.client,
+                           self.tenant_id,
+                           "test",
+                           self.version)
         except:
             LOG.exception("Exception caught: %s", sys.exc_info())
             self.fail("test_create_network failed due to an exception")
@@ -243,7 +284,10 @@ class CLITest(unittest.TestCase):
         try:
             db.network_create(self.tenant_id, self.network_name_1)
             network_id = db.network_list(self.tenant_id)[0]['uuid']
-            cli.delete_net(self.client, self.tenant_id, network_id)
+            cli.delete_net(self.client,
+                           self.tenant_id,
+                           network_id,
+                           self.version)
         except:
             LOG.exception("Exception caught: %s", sys.exc_info())
             self.fail("test_delete_network failed due to an exception")
@@ -256,7 +300,10 @@ class CLITest(unittest.TestCase):
         try:
             # Load some data into the datbase
             net = db.network_create(self.tenant_id, self.network_name_1)
-            cli.show_net(self.client, self.tenant_id, net['uuid'])
+            cli.show_net(self.client,
+                         self.tenant_id,
+                         net['uuid'],
+                         self.version)
         except:
             LOG.exception("Exception caught: %s", sys.exc_info())
             self.fail("test_detail_network failed due to an exception")
@@ -269,8 +316,11 @@ class CLITest(unittest.TestCase):
         try:
             net = db.network_create(self.tenant_id, self.network_name_1)
             network_id = net['uuid']
-            cli.update_net(self.client, self.tenant_id,
-                           network_id, 'name=%s' % self.network_name_2)
+            cli.update_net(self.client,
+                           self.tenant_id,
+                           network_id,
+                           'name=%s' % self.network_name_2,
+                           self.version)
         except:
             LOG.exception("Exception caught: %s", sys.exc_info())
             self.fail("test_update_network failed due to an exception")
@@ -286,7 +336,10 @@ class CLITest(unittest.TestCase):
             network_id = net['uuid']
             db.port_create(network_id)
             db.port_create(network_id)
-            cli.list_ports(self.client, self.tenant_id, network_id)
+            cli.list_ports(self.client,
+                           self.tenant_id,
+                           network_id,
+                           self.version)
         except:
             LOG.exception("Exception caught: %s", sys.exc_info())
             self.fail("test_list_ports failed due to an exception")
@@ -301,7 +354,10 @@ class CLITest(unittest.TestCase):
             # Pre-populate data for testing using db api
             net = db.network_create(self.tenant_id, self.network_name_1)
             network_id = net['uuid']
-            cli.create_port(self.client, self.tenant_id, network_id)
+            cli.create_port(self.client,
+                            self.tenant_id,
+                            network_id,
+                            self.version)
         except:
             LOG.exception("Exception caught: %s", sys.exc_info())
             self.fail("test_create_port failed due to an exception")
@@ -319,7 +375,11 @@ class CLITest(unittest.TestCase):
             network_id = net['uuid']
             port = db.port_create(network_id)
             port_id = port['uuid']
-            cli.delete_port(self.client, self.tenant_id, network_id, port_id)
+            cli.delete_port(self.client,
+                            self.tenant_id,
+                            network_id,
+                            port_id,
+                            self.version)
         except:
             LOG.exception("Exception caught: %s", sys.exc_info())
             self.fail("test_delete_port failed due to an exception")
@@ -335,8 +395,12 @@ class CLITest(unittest.TestCase):
             port = db.port_create(network_id)
             port_id = port['uuid']
             # Default state is DOWN - change to ACTIVE.
-            cli.update_port(self.client, self.tenant_id, network_id,
-                               port_id, 'state=ACTIVE')
+            cli.update_port(self.client,
+                            self.tenant_id,
+                            network_id,
+                            port_id,
+                            'state=ACTIVE',
+                            self.version)
         except:
             LOG.exception("Exception caught: %s", sys.exc_info())
             self.fail("test_update_port failed due to an exception")
@@ -354,7 +418,11 @@ class CLITest(unittest.TestCase):
             network_id = net['uuid']
             port = db.port_create(network_id)
             port_id = port['uuid']
-            cli.show_port(self.client, self.tenant_id, network_id, port_id)
+            cli.show_port(self.client,
+                          self.tenant_id,
+                          network_id,
+                          port_id,
+                          self.version)
         except:
             LOG.exception("Exception caught: %s", sys.exc_info())
             self.fail("test_show_port_no_attach failed due to an exception")
@@ -374,7 +442,11 @@ class CLITest(unittest.TestCase):
             port = db.port_create(network_id)
             port_id = port['uuid']
             db.port_set_attachment(port_id, network_id, iface_id)
-            cli.show_port(self.client, self.tenant_id, network_id, port_id)
+            cli.show_port(self.client,
+                          self.tenant_id,
+                          network_id,
+                          port_id,
+                          self.version)
         except:
             LOG.exception("Exception caught: %s", sys.exc_info())
             self.fail("test_show_port_with_attach failed due to an exception")
@@ -392,8 +464,12 @@ class CLITest(unittest.TestCase):
             network_id = net['uuid']
             port = db.port_create(net['uuid'])
             port_id = port['uuid']
-            cli.plug_iface(self.client, self.tenant_id, network_id,
-                           port_id, "test_iface_id")
+            cli.plug_iface(self.client,
+                           self.tenant_id,
+                           network_id,
+                           port_id,
+                           "test_iface_id",
+                           self.version)
         except:
             LOG.exception("Exception caught: %s", sys.exc_info())
             self.fail("test_plug_iface failed due to an exception")
@@ -412,7 +488,11 @@ class CLITest(unittest.TestCase):
             port = db.port_create(net['uuid'])
             port_id = port['uuid']
             db.port_set_attachment(port_id, network_id, "test_iface_id")
-            cli.unplug_iface(self.client, self.tenant_id, network_id, port_id)
+            cli.unplug_iface(self.client,
+                             self.tenant_id,
+                             network_id,
+                             port_id,
+                             self.version)
         except:
             LOG.exception("Exception caught: %s", sys.exc_info())
             self.fail("test_plug_iface failed due to an exception")
