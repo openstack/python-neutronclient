@@ -165,3 +165,6 @@ def main():
 
     LOG.info("Command execution completed")
     sys.exit(0)
+
+if __name__ == "__main__":
+    main()
