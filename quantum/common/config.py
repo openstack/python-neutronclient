@@ -27,6 +27,7 @@ import optparse
 import os
 import re
 import sys
+import socket
 
 from paste import deploy
 
@@ -110,6 +111,9 @@ def add_log_options(parser):
                       default=DEFAULT_LOG_DATE_FORMAT,
                       help="Format string for %(asctime)s in log records. "
                            "Default: %default")
+    group.add_option('--use-syslog', default=False,
+                      action="store_true",
+                      help="Output logs to syslog.")
     group.add_option('--log-file', default=None, metavar="PATH",
                       help="(Optional) Name of log file to output to. "
                            "If not set, logging will go to stdout.")
@@ -157,6 +161,21 @@ def setup_logging(options, conf):
     log_format = options.get('log_format', DEFAULT_LOG_FORMAT)
     log_date_format = options.get('log_date_format', DEFAULT_LOG_DATE_FORMAT)
     formatter = logging.Formatter(log_format, log_date_format)
+
+    syslog = options.get('use_syslog')
+    if not syslog:
+        syslog = conf.get('use_syslog')
+
+    if syslog:
+        SysLogHandler = logging.handlers.SysLogHandler
+        try:
+            handler = SysLogHandler(address='/dev/log',
+                                    facility=SysLogHandler.LOG_SYSLOG)
+        except socket.error:
+            handler = SysLogHandler(address='/var/run/syslog',
+                                    facility=SysLogHandler.LOG_SYSLOG)
+        handler.setFormatter(formatter)
+        root_logger.addHandler(handler)
 
     logfile = options.get('log_file')
     if not logfile:
