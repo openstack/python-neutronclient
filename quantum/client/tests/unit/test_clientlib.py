@@ -131,6 +131,37 @@ class APITest(unittest.TestCase):
         LOG.debug("_test_list_networks - tenant:%s "\
                   "- format:%s - END", format, tenant)
 
+    def _test_list_networks_details(self,
+                                    tenant=TENANT_1, format='json',
+                                    status=200):
+        LOG.debug("_test_list_networks_details - tenant:%s "\
+                  "- format:%s - START", format, tenant)
+
+        self._assert_sanity(self.client.list_networks_details,
+                            status,
+                            "GET",
+                            "networks/detail",
+                            data=[],
+                            params={'tenant': tenant, 'format': format})
+
+        LOG.debug("_test_list_networks_details - tenant:%s "\
+                  "- format:%s - END", format, tenant)
+
+    def _test_show_network(self,
+                           tenant=TENANT_1, format='json', status=200):
+        LOG.debug("_test_show_network - tenant:%s "\
+                  "- format:%s - START", format, tenant)
+
+        self._assert_sanity(self.client.show_network,
+                            status,
+                            "GET",
+                            "networks/001",
+                            data=["001"],
+                            params={'tenant': tenant, 'format': format})
+
+        LOG.debug("_test_show_network - tenant:%s "\
+                  "- format:%s - END", format, tenant)
+
     def _test_show_network_details(self,
                                    tenant=TENANT_1, format='json', status=200):
         LOG.debug("_test_show_network_details - tenant:%s "\
@@ -139,7 +170,7 @@ class APITest(unittest.TestCase):
         self._assert_sanity(self.client.show_network_details,
                             status,
                             "GET",
-                            "networks/001",
+                            "networks/001/detail",
                             data=["001"],
                             params={'tenant': tenant, 'format': format})
 
@@ -203,6 +234,35 @@ class APITest(unittest.TestCase):
         LOG.debug("_test_list_ports - tenant:%s "\
                   "- format:%s - END", format, tenant)
 
+    def _test_list_ports_details(self,
+                                 tenant=TENANT_1, format='json', status=200):
+        LOG.debug("_test_list_ports_details - tenant:%s "\
+                  "- format:%s - START", format, tenant)
+
+        self._assert_sanity(self.client.list_ports_details,
+                            status,
+                            "GET",
+                            "networks/001/ports/detail",
+                            data=["001"],
+                            params={'tenant': tenant, 'format': format})
+
+        LOG.debug("_test_list_ports_details - tenant:%s "\
+                  "- format:%s - END", format, tenant)
+
+    def _test_show_port(self, tenant=TENANT_1, format='json', status=200):
+        LOG.debug("_test_show_port - tenant:%s "\
+                  "- format:%s - START", format, tenant)
+
+        self._assert_sanity(self.client.show_port,
+                            status,
+                            "GET",
+                            "networks/001/ports/001",
+                            data=["001", "001"],
+                            params={'tenant': tenant, 'format': format})
+
+        LOG.debug("_test_show_port - tenant:%s "\
+                  "- format:%s - END", format, tenant)
+
     def _test_show_port_details(self,
                                 tenant=TENANT_1, format='json', status=200):
         LOG.debug("_test_show_port_details - tenant:%s "\
@@ -211,7 +271,7 @@ class APITest(unittest.TestCase):
         self._assert_sanity(self.client.show_port_details,
                             status,
                             "GET",
-                            "networks/001/ports/001",
+                            "networks/001/ports/001/detail",
                             data=["001", "001"],
                             params={'tenant': tenant, 'format': format})
 
@@ -345,6 +405,39 @@ class APITest(unittest.TestCase):
     def test_list_networks_error_401(self):
         self._test_list_networks(status=401)
 
+    def test_list_networks_details_json(self):
+        self._test_list_networks_details(format='json')
+
+    def test_list_networks_details_xml(self):
+        self._test_list_networks_details(format='xml')
+
+    def test_list_networks_details_alt_tenant(self):
+        self._test_list_networks_details(tenant=TENANT_2)
+
+    def test_list_networks_details_error_470(self):
+        self._test_list_networks_details(status=470)
+
+    def test_list_networks_details_error_401(self):
+        self._test_list_networks_details(status=401)
+
+    def test_show_network_json(self):
+        self._test_show_network(format='json')
+
+    def test_show_network__xml(self):
+        self._test_show_network(format='xml')
+
+    def test_show_network_alt_tenant(self):
+        self._test_show_network(tenant=TENANT_2)
+
+    def test_show_network_error_470(self):
+        self._test_show_network(status=470)
+
+    def test_show_network_error_401(self):
+        self._test_show_network(status=401)
+
+    def test_show_network_error_420(self):
+        self._test_show_network(status=420)
+
     def test_show_network_details_json(self):
         self._test_show_network_details(format='json')
 
@@ -447,14 +540,53 @@ class APITest(unittest.TestCase):
     def test_list_ports_error_420(self):
         self._test_list_ports(status=420)
 
+    def test_list_ports_details_json(self):
+        self._test_list_ports_details(format='json')
+
+    def test_list_ports_details_xml(self):
+        self._test_list_ports_details(format='xml')
+
+    def test_list_ports_details_alt_tenant(self):
+        self._test_list_ports_details(tenant=TENANT_2)
+
+    def test_list_ports_details_error_470(self):
+        self._test_list_ports_details(status=470)
+
+    def test_list_ports_details_error_401(self):
+        self._test_list_ports_details(status=401)
+
+    def test_list_ports_details_error_420(self):
+        self._test_list_ports_details(status=420)
+
+    def test_show_port_json(self):
+        self._test_show_port(format='json')
+
+    def test_show_port_xml(self):
+        self._test_show_port(format='xml')
+
+    def test_show_port_alt_tenant(self):
+        self._test_show_port(tenant=TENANT_2)
+
+    def test_show_port_error_470(self):
+        self._test_show_port(status=470)
+
+    def test_show_port_error_401(self):
+        self._test_show_port(status=401)
+
+    def test_show_port_error_420(self):
+        self._test_show_port(status=420)
+
+    def test_show_port_error_430(self):
+        self._test_show_port(status=430)
+
     def test_show_port_details_json(self):
-        self._test_list_ports(format='json')
+        self._test_show_port_details(format='json')
 
     def test_show_port_details_xml(self):
-        self._test_list_ports(format='xml')
+        self._test_show_port_details(format='xml')
 
     def test_show_port_details_alt_tenant(self):
-        self._test_list_ports(tenant=TENANT_2)
+        self._test_show_port_details(tenant=TENANT_2)
 
     def test_show_port_details_error_470(self):
         self._test_show_port_details(status=470)

@@ -51,6 +51,9 @@ commands_v10 = {
   "list_nets": {
     "func": cli_lib.list_nets,
     "args": ["tenant-id"]},
+  "list_nets_detail": {
+    "func": cli_lib.list_nets_detail,
+    "args": ["tenant-id"]},
   "create_net": {
     "func": cli_lib.create_net,
     "args": ["tenant-id", "net-name"]},
@@ -60,11 +63,17 @@ commands_v10 = {
   "show_net": {
     "func": cli_lib.show_net,
     "args": ["tenant-id", "net-id"]},
-  "update_net": {
+  "show_net_detail": {
+    "func": cli_lib.show_net_detail,
+    "args": ["tenant-id", "net-id"]},
+   "update_net": {
     "func": cli_lib.update_net,
     "args": ["tenant-id", "net-id", "new-name"]},
   "list_ports": {
     "func": cli_lib.list_ports,
+    "args": ["tenant-id", "net-id"]},
+  "list_ports_detail": {
+    "func": cli_lib.list_ports_detail,
     "args": ["tenant-id", "net-id"]},
   "create_port": {
     "func": cli_lib.create_port,
@@ -78,11 +87,17 @@ commands_v10 = {
   "show_port": {
     "func": cli_lib.show_port,
     "args": ["tenant-id", "net-id", "port-id"]},
+  "show_port_detail": {
+    "func": cli_lib.show_port_detail,
+    "args": ["tenant-id", "net-id", "port-id"]},
   "plug_iface": {
     "func": cli_lib.plug_iface,
     "args": ["tenant-id", "net-id", "port-id", "iface-id"]},
   "unplug_iface": {
     "func": cli_lib.unplug_iface,
+    "args": ["tenant-id", "net-id", "port-id"]},
+  "show_iface": {
+    "func": cli_lib.show_iface,
     "args": ["tenant-id", "net-id", "port-id"]}, }
 
 commands_v11 = commands_v10.copy()
@@ -92,8 +107,17 @@ commands_v11.update({
     "args": ["tenant-id"],
     "filters": ["name", "op-status", "port-op-status", "port-state",
                 "has-attachment", "attachment", "port"]},
+  "list_nets_detail": {
+    "func": cli_lib.list_nets_detail_v11,
+    "args": ["tenant-id"],
+    "filters": ["name", "op-status", "port-op-status", "port-state",
+                "has-attachment", "attachment", "port"]},
   "list_ports": {
     "func": cli_lib.list_ports_v11,
+    "args": ["tenant-id", "net-id"],
+    "filters": ["name", "op-status", "has-attachment", "attachment"]},
+  "list_ports_detail": {
+    "func": cli_lib.list_ports_detail_v11,
     "args": ["tenant-id", "net-id"],
     "filters": ["name", "op-status", "has-attachment", "attachment"]},
      })
@@ -275,3 +299,6 @@ def main():
 
     LOG.info("Command execution completed")
     sys.exit(0)
+
+if __name__ == '__main__':
+    main()

@@ -167,6 +167,7 @@ class Client(object):
     ports_path = "/networks/%s/ports"
     port_path = "/networks/%s/ports/%s"
     attachment_path = "/networks/%s/ports/%s/attachment"
+    detail_path = "/detail"
 
     def __init__(self, host="127.0.0.1", port=9696, use_ssl=False, tenant=None,
                 format="xml", testingStub=None, key_file=None, cert_file=None,
@@ -348,11 +349,26 @@ class Client(object):
         return self.do_request("GET", self.networks_path)
 
     @ApiCall
+    def list_networks_details(self):
+        """
+        Fetches a detailed list of all networks for a tenant
+        """
+        return self.do_request("GET", self.networks_path + self.detail_path)
+
+    @ApiCall
+    def show_network(self, network):
+        """
+        Fetches information of a certain network
+        """
+        return self.do_request("GET", self.network_path % (network))
+
+    @ApiCall
     def show_network_details(self, network):
         """
         Fetches the details of a certain network
         """
-        return self.do_request("GET", self.network_path % (network))
+        return self.do_request("GET", (self.network_path + self.detail_path)
+                               % (network))
 
     @ApiCall
     def create_network(self, body=None):
@@ -383,11 +399,27 @@ class Client(object):
         return self.do_request("GET", self.ports_path % (network))
 
     @ApiCall
+    def list_ports_details(self, network):
+        """
+        Fetches a detailed list of ports on a given network
+        """
+        return self.do_request("GET", (self.ports_path + self.detail_path)
+                               % (network))
+
+    @ApiCall
+    def show_port(self, network, port):
+        """
+        Fetches the information of a certain port
+        """
+        return self.do_request("GET", self.port_path % (network, port))
+
+    @ApiCall
     def show_port_details(self, network, port):
         """
         Fetches the details of a certain port
         """
-        return self.do_request("GET", self.port_path % (network, port))
+        return self.do_request("GET", (self.port_path + self.detail_path)
+                               % (network, port))
 
     @ApiCall
     def create_port(self, network, body=None):
@@ -450,10 +482,27 @@ class ClientV11(Client):
         return self.do_request("GET", self.networks_path, params=filters)
 
     @ApiCall
+    def list_networks_details(self, **filters):
+        """
+        Fetches a detailed list of all networks for a tenant
+        """
+        return self.do_request("GET", self.networks_path + self.detail_path,
+                               params=filters)
+
+    @ApiCall
     def list_ports(self, network, **filters):
         """
         Fetches a list of ports on a given network
         """
         # Pass filters in "params" argument to do_request
         return self.do_request("GET", self.ports_path % (network),
+                               params=filters)
+
+    @ApiCall
+    def list_ports_details(self, network, **filters):
+        """
+        Fetches a detailed list of ports on a given network
+        """
+        return self.do_request("GET", (self.ports_path + self.detail_path)
+                               % (network),
                                params=filters)
