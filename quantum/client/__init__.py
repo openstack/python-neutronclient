@@ -19,6 +19,7 @@
 import logging
 import httplib
 import socket
+import time
 import urllib
 
 from quantum.common import exceptions
@@ -170,10 +171,12 @@ class Client(object):
     detail_path = "/detail"
 
     def __init__(self, host="127.0.0.1", port=9696, use_ssl=False, tenant=None,
-                format="xml", testingStub=None, key_file=None, cert_file=None,
-                auth_token=None, logger=None,
-                version="1.1",
-                uri_prefix="/tenants/{tenant_id}"):
+                 format="xml", testingStub=None, key_file=None, cert_file=None,
+                 auth_token=None, logger=None,
+                 version="1.1",
+                 uri_prefix="/tenants/{tenant_id}",
+                 retries=0,
+                 retry_interval=1):
         """
         Creates a new client to some service.
 
@@ -188,6 +191,8 @@ class Client(object):
         :param auth_token: authentication token to be passed to server
         :param logger: Logger object for the client library
         :param action_prefix: prefix for request URIs
+        :param retries: How many times to retry a failed connection attempt
+        :param retry_interval: The # of seconds between connection attempts
         """
         self.host = host
         self.port = port
@@ -202,6 +207,8 @@ class Client(object):
         self.auth_token = auth_token
         self.version = version
         self.action_prefix = "/v%s%s" % (version, uri_prefix)
+        self.retries = retries
+        self.retry_interval = retry_interval
 
     def _handle_fault_response(self, status_code, response_body):
         # Create exception with HTTP status code and message
@@ -253,7 +260,7 @@ class Client(object):
         :param headers: mapping of key/value pairs to add as headers
         :param params: dictionary of key/value pairs to add to append
                              to action
-
+        :raises: ConnectionFailed
         """
         LOG.debug("Client issuing request: %s", action)
         # Ensure we have a tenant id
@@ -296,9 +303,9 @@ class Client(object):
             else:
                 self._handle_fault_response(status_code, data)
         except (socket.error, IOError), e:
-            msg = "Unable to connect to server. Got error: %s" % e
-            LOG.exception(msg)
-            raise Exception(msg)
+            exc = exceptions.ConnectionFailed(reason=str(e))
+            LOG.exception(exc.message)
+            raise exc
 
     def get_status_code(self, response):
         """
@@ -341,130 +348,162 @@ class Client(object):
             format = self.format
         return "application/%s" % (format)
 
+    def retry_request(self, method, action, body=None,
+                      headers=None, params=None):
+        """
+        Call do_request with the default retry configuration. Only
+        idempotent requests should retry failed connection attempts.
+
+        :raises: ConnectionFailed if the maximum # of retries is exceeded
+        """
+        max_attempts = self.retries + 1
+        for i in xrange(max_attempts):
+            try:
+                return self.do_request(method, action, body=body,
+                                       headers=headers, params=params)
+            except exceptions.ConnectionFailed:
+                # Exception has already been logged by do_request()
+                if i < self.retries:
+                    LOG.debug(_('Retrying connection to quantum service'))
+                    time.sleep(self.retry_interval)
+
+        raise exceptions.ConnectionFailed(reason=_("Maximum attempts reached"))
+
+    def delete(self, action, body=None, headers=None, params=None):
+        return self.retry_request("DELETE", action, body=body,
+                                  headers=headers, params=params)
+
+    def get(self, action, body=None, headers=None, params=None):
+        return self.retry_request("GET", action, body=body,
+                                  headers=headers, params=params)
+
+    def post(self, action, body=None, headers=None, params=None):
+        # Do not retry POST requests to avoid the orphan objects problem.
+        return self.do_request("POST", action, body=body,
+                               headers=headers, params=params)
+
+    def put(self, action, body=None, headers=None, params=None):
+        return self.retry_request("PUT", action, body=body,
+                                  headers=headers, params=params)
+
     @ApiCall
     def list_networks(self):
         """
         Fetches a list of all networks for a tenant
         """
-        return self.do_request("GET", self.networks_path)
+        return self.get(self.networks_path)
 
     @ApiCall
     def list_networks_details(self):
         """
         Fetches a detailed list of all networks for a tenant
         """
-        return self.do_request("GET", self.networks_path + self.detail_path)
+        return self.get(self.networks_path + self.detail_path)
 
     @ApiCall
     def show_network(self, network):
         """
         Fetches information of a certain network
         """
-        return self.do_request("GET", self.network_path % (network))
+        return self.get(self.network_path % (network))
 
     @ApiCall
     def show_network_details(self, network):
         """
         Fetches the details of a certain network
         """
-        return self.do_request("GET", (self.network_path + self.detail_path)
-                               % (network))
+        return self.get((self.network_path + self.detail_path) % (network))
 
     @ApiCall
     def create_network(self, body=None):
         """
         Creates a new network
         """
-        return self.do_request("POST", self.networks_path, body=body)
+        return self.post(self.networks_path, body=body)
 
     @ApiCall
     def update_network(self, network, body=None):
         """
         Updates a network
         """
-        return self.do_request("PUT", self.network_path % (network), body=body)
+        return self.put(self.network_path % (network), body=body)
 
     @ApiCall
     def delete_network(self, network):
         """
         Deletes the specified network
         """
-        return self.do_request("DELETE", self.network_path % (network))
+        return self.delete(self.network_path % (network))
 
     @ApiCall
     def list_ports(self, network):
         """
         Fetches a list of ports on a given network
         """
-        return self.do_request("GET", self.ports_path % (network))
+        return self.get(self.ports_path % (network))
 
     @ApiCall
     def list_ports_details(self, network):
         """
         Fetches a detailed list of ports on a given network
         """
-        return self.do_request("GET", (self.ports_path + self.detail_path)
-                               % (network))
+        return self.get((self.ports_path + self.detail_path) % (network))
 
     @ApiCall
     def show_port(self, network, port):
         """
         Fetches the information of a certain port
         """
-        return self.do_request("GET", self.port_path % (network, port))
+        return self.get(self.port_path % (network, port))
 
     @ApiCall
     def show_port_details(self, network, port):
         """
         Fetches the details of a certain port
         """
-        return self.do_request("GET", (self.port_path + self.detail_path)
-                               % (network, port))
+        return self.get((self.port_path + self.detail_path) % (network, port))
 
     @ApiCall
     def create_port(self, network, body=None):
         """
         Creates a new port on a given network
         """
-        return self.do_request("POST", self.ports_path % (network), body=body)
+        return self.post(self.ports_path % (network), body=body)
 
     @ApiCall
     def delete_port(self, network, port):
         """
         Deletes the specified port from a network
         """
-        return self.do_request("DELETE", self.port_path % (network, port))
+        return self.delete(self.port_path % (network, port))
 
     @ApiCall
     def update_port(self, network, port, body=None):
         """
         Sets the attributes of the specified port
         """
-        return self.do_request("PUT",
-            self.port_path % (network, port), body=body)
+        return self.put(self.port_path % (network, port), body=body)
 
     @ApiCall
     def show_port_attachment(self, network, port):
         """
         Fetches the attachment-id associated with the specified port
         """
-        return self.do_request("GET", self.attachment_path % (network, port))
+        return self.get(self.attachment_path % (network, port))
 
     @ApiCall
     def attach_resource(self, network, port, body=None):
         """
         Sets the attachment-id of the specified port
         """
-        return self.do_request("PUT",
-            self.attachment_path % (network, port), body=body)
+        return self.put(self.attachment_path % (network, port), body=body)
 
     @ApiCall
     def detach_resource(self, network, port):
         """
         Removes the attachment-id of the specified port
         """
-        return self.do_request("DELETE",
-                               self.attachment_path % (network, port))
+        return self.delete(self.attachment_path % (network, port))
 
 
 class ClientV11(Client):
@@ -479,15 +518,14 @@ class ClientV11(Client):
         Fetches a list of all networks for a tenant
         """
         # Pass filters in "params" argument to do_request
-        return self.do_request("GET", self.networks_path, params=filters)
+        return self.get(self.networks_path, params=filters)
 
     @ApiCall
     def list_networks_details(self, **filters):
         """
         Fetches a detailed list of all networks for a tenant
         """
-        return self.do_request("GET", self.networks_path + self.detail_path,
-                               params=filters)
+        return self.get(self.networks_path + self.detail_path, params=filters)
 
     @ApiCall
     def list_ports(self, network, **filters):
@@ -495,14 +533,12 @@ class ClientV11(Client):
         Fetches a list of ports on a given network
         """
         # Pass filters in "params" argument to do_request
-        return self.do_request("GET", self.ports_path % (network),
-                               params=filters)
+        return self.get(self.ports_path % (network), params=filters)
 
     @ApiCall
     def list_ports_details(self, network, **filters):
         """
         Fetches a detailed list of ports on a given network
         """
-        return self.do_request("GET", (self.ports_path + self.detail_path)
-                               % (network),
-                               params=filters)
+        return self.get((self.ports_path + self.detail_path) % (network),
+                        params=filters)

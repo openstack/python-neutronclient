@@ -20,6 +20,7 @@ import logging
 import unittest
 import re
 
+from quantum.common import exceptions
 from quantum.common.serializer import Serializer
 from quantum.client import Client
 
@@ -755,3 +756,13 @@ class APITest(unittest.TestCase):
 
     def test_ssl_certificates(self):
         self._test_ssl_certificates()
+
+    def test_connection_retry_failure(self):
+        self.client = Client(port=55555, tenant=TENANT_1, retries=1,
+                             retry_interval=0)
+        try:
+            self.client.list_networks()
+        except exceptions.ConnectionFailed as exc:
+            self.assertTrue('Maximum attempts reached' in str(exc))
+        else:
+            self.fail('ConnectionFailed not raised')

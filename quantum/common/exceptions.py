@@ -90,7 +90,9 @@ class AlreadyAttached(QuantumException):
 class QuantumClientException(QuantumException):
 
     def __init__(self, **kwargs):
-        self.message = kwargs.get('message', "")
+        message = kwargs.get('message')
+        if message:
+            self.message = message
         super(QuantumClientException, self).__init__(**kwargs)
 
 
@@ -132,6 +134,10 @@ class NotAuthorized(QuantumClientException):
 class QuantumCLIError(QuantumClientException):
     """ Exception raised when command line parsing fails """
     pass
+
+
+class ConnectionFailed(QuantumClientException):
+    message = _("Connection to quantum failed: %(reason)s")
 
 
 class BadInputError(Exception):
