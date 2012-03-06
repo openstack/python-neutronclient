@@ -1,3 +1,4 @@
 include tox.ini
+include LICENSE README
 include version.py
 include tools/*
