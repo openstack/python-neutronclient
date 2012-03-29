@@ -23,6 +23,7 @@
 import logging
 import os
 import sys
+import traceback
 
 FORMAT = "json"
 LOG = logging.getLogger('quantum.client.cli_lib')
@@ -192,7 +193,6 @@ class CmdOutputTemplate(OutputTemplate):
 
 
 def _handle_exception(ex):
-    LOG.exception(sys.exc_info())
     status_code = None
     message = None
     # Retrieve dict at 1st element of tuple at last argument
@@ -202,12 +202,10 @@ def _handle_exception(ex):
         msg_1 = "Command failed with error code: %s" \
                 % (status_code or '<missing>')
         msg_2 = "Error message:%s" % (message or '<missing>')
-        LOG.exception(msg_1 + "-" + msg_2)
         print msg_1
         print msg_2
     else:
-        print "An unexpected exception occured:%s (%s)" % (sys.exc_info()[1],
-                                                           sys.exc_info()[0])
+        traceback.print_exc()
 
 
 def prepare_output(cmd, tenant_id, response, version):

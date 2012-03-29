@@ -115,7 +115,8 @@ def exception_handler_v11(status_code, error_content):
                          message=error_message)],)
         raise ex
     # If we end up here the exception was not a quantum error
-    raise exceptions.QuantumClientException(status_code + "-" + error_content)
+    msg = "%s-%s" % (status_code, error_content)
+    raise exceptions.QuantumClientException(message=msg)
 
 
 EXCEPTION_HANDLERS = {
