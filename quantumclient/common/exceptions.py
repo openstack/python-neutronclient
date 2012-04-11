@@ -16,14 +16,8 @@
 #    under the License.
 
 """
-Quantum base exception handling, including decorator for re-raising
-Quantum-type exceptions. SHOULD include dedicated exception logging.
+Quantum base exception handling.
 """
-
-import logging
-import gettext
-
-gettext.install('quantum', unicode=1)
 
 
 class QuantumException(Exception):
@@ -51,40 +45,6 @@ class QuantumException(Exception):
 
 class NotFound(QuantumException):
     pass
-
-
-class ClassNotFound(NotFound):
-    message = _("Class %(class_name)s could not be found")
-
-
-class NetworkNotFound(NotFound):
-    message = _("Network %(net_id)s could not be found")
-
-
-class PortNotFound(NotFound):
-    message = _("Port %(port_id)s could not be found " \
-                "on network %(net_id)s")
-
-
-class StateInvalid(QuantumException):
-    message = _("Unsupported port state: %(port_state)s")
-
-
-class NetworkInUse(QuantumException):
-    message = _("Unable to complete operation on network %(net_id)s. " \
-                "There is one or more attachments plugged into its ports.")
-
-
-class PortInUse(QuantumException):
-    message = _("Unable to complete operation on port %(port_id)s " \
-                "for network %(net_id)s. The attachment '%(att_id)s" \
-                "is plugged into the logical port.")
-
-
-class AlreadyAttached(QuantumException):
-    message = _("Unable to plug the attachment %(att_id)s into port " \
-                "%(port_id)s for network %(net_id)s. The attachment is " \
-                "already plugged into port %(att_port_id)s")
 
 
 class QuantumClientException(QuantumException):
@@ -145,40 +105,13 @@ class BadInputError(Exception):
     pass
 
 
-class ProcessExecutionError(IOError):
-    def __init__(self, stdout=None, stderr=None, exit_code=None, cmd=None,
-                 description=None):
-        if description is None:
-            description = "Unexpected error while running command."
-        if exit_code is None:
-            exit_code = '-'
-        message = "%s\nCommand: %s\nExit code: %s\nStdout: %r\nStderr: %r" % (
-                  description, cmd, exit_code, stdout, stderr)
-        IOError.__init__(self, message)
-
-
 class Error(Exception):
     def __init__(self, message=None):
         super(Error, self).__init__(message)
 
 
-class ApiError(Error):
-    def __init__(self, message='Unknown', code='Unknown'):
-        self.message = message
-        self.code = code
-        super(ApiError, self).__init__('%s: %s' % (code, message))
-
-
 class MalformedRequestBody(QuantumException):
     message = _("Malformed request body: %(reason)s")
-
-
-class Duplicate(Error):
-    pass
-
-
-class NotEmpty(Error):
-    pass
 
 
 class Invalid(Error):
@@ -187,26 +120,3 @@ class Invalid(Error):
 
 class InvalidContentType(Invalid):
     message = _("Invalid content type %(content_type)s.")
-
-
-class MissingArgumentError(Error):
-    pass
-
-
-class NotImplementedError(Error):
-    pass
-
-
-def wrap_exception(f):
-    def _wrap(*args, **kw):
-        try:
-            return f(*args, **kw)
-        except Exception, e:
-            if not isinstance(e, Error):
-                #exc_type, exc_value, exc_traceback = sys.exc_info()
-                logging.exception('Uncaught exception')
-                #logging.error(traceback.extract_stack(exc_traceback))
-                raise Error(str(e))
-            raise
-    _wrap.func_name = f.func_name
-    return _wrap

@@ -8,6 +8,5 @@ python_quantumclient.egg-info/*
 quantum/vcsversion.py
 run_tests.err.log
 run_tests.log
-tests/
 .venv/
 .tox/

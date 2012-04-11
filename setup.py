@@ -36,9 +36,6 @@ ShortDescription = Summary
 Description = Summary
 
 requires = [
-    'Paste',
-    'PasteDeploy',
-    'python-gflags',
 ]
 
 EagerResources = [
@@ -63,12 +60,12 @@ setup(
     scripts=ProjectScripts,
     install_requires=requires,
     include_package_data=False,
-    packages=["quantum", "quantum.client", "quantum.common"],
+    packages=["quantumclient", "quantumclient.common"],
     package_data=PackageData,
     eager_resources=EagerResources,
     entry_points={
         'console_scripts': [
-            'quantum = quantum.client.cli:main'
+            'quantum = quantumclient.cli:main'
         ]
     },
 )

@@ -21,12 +21,10 @@
 """ Functions providing implementation for CLI commands. """
 
 import logging
-import os
-import sys
 import traceback
 
 FORMAT = "json"
-LOG = logging.getLogger('quantum.client.cli_lib')
+LOG = logging.getLogger('quantumclient.cli_lib')
 
 
 class OutputTemplate(object):

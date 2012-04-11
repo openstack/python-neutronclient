@@ -1,0 +1,7 @@
+coverage
+nose
+nosexcover
+pep8==0.6.1
+
+-e git+https://review.openstack.org/p/openstack-dev/openstack-nose.git#egg=openstack.nose_plugin
+-e git+https://review.openstack.org/p/openstack/quantum#egg=quantum-dev

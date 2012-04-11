@@ -15,7 +15,7 @@
 #    under the License.
 
 try:
-    from quantum.vcsversion import version_info
+    from quantumclient.vcsversion import version_info
 except ImportError:
     version_info = {'branch_nick': u'LOCALBRANCH',
                     'revision_id': 'LOCALREVISION',

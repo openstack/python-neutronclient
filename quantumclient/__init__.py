@@ -17,15 +17,22 @@
 #    @author: Tyler Smith, Cisco Systems
 
 import logging
+import gettext
 import httplib
 import socket
 import time
 import urllib
 
-from quantum.common import exceptions
-from quantum.common.serializer import Serializer
 
-LOG = logging.getLogger('quantum.client')
+# gettext must be initialized before any quantumclient imports
+gettext.install('quantumclient', unicode=1)
+
+
+from quantumclient.common import exceptions
+from quantumclient.common.serializer import Serializer
+
+
+LOG = logging.getLogger('quantumclient')
 AUTH_TOKEN_HEADER = "X-Auth-Token"
 
 

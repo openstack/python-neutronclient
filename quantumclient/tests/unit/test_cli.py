@@ -27,12 +27,13 @@ import sys
 import unittest
 
 from quantum import api as server
-from quantum.client import cli_lib as cli
-from quantum.client import Client
 from quantum.db import api as db
-from quantum.tests.unit.client_tools import stubs as client_stubs
+from quantumclient import cli_lib as cli
+from quantumclient import Client
+from quantumclient.tests.unit import stubs as client_stubs
 
-LOG = logging.getLogger('quantum.tests.test_cli')
+
+LOG = logging.getLogger('quantumclient.tests.test_cli')
 API_VERSION = "1.1"
 FORMAT = 'json'
 

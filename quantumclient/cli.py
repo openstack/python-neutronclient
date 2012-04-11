@@ -18,28 +18,18 @@
 # @author: Brad Hall, Nicira Networks, Inc.
 # @author: Salvatore Orlando, Citrix
 
-import gettext
 import logging
 import logging.handlers
+from optparse import OptionParser
 import os
 import sys
 
-from optparse import OptionParser
+from quantumclient import cli_lib
+from quantumclient import Client
+from quantumclient import ClientV11
+from quantumclient.common import exceptions
+from quantumclient.common import utils
 
-from quantum.common import exceptions
-
-possible_topdir = os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]),
-                                   os.pardir,
-                                   os.pardir))
-if os.path.exists(os.path.join(possible_topdir, 'quantum', '__init__.py')):
-    sys.path.insert(0, possible_topdir)
-
-gettext.install('quantum', unicode=1)
-
-from quantum.client import cli_lib
-from quantum.client import Client
-from quantum.client import ClientV11
-from quantum.common import utils
 
 #Configure logger for client - cli logger is a child of it
 #NOTE(salvatore-orlando): logger name does not map to package

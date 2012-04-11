@@ -20,11 +20,11 @@ import logging
 import unittest
 import re
 
-from quantum.common import exceptions
-from quantum.common.serializer import Serializer
-from quantum.client import Client
+from quantumclient.common import exceptions
+from quantumclient.common.serializer import Serializer
+from quantumclient import Client
 
-LOG = logging.getLogger('quantum.tests.test_api')
+LOG = logging.getLogger('quantumclient.tests.test_api')
 
 # Set a couple tenants to use for testing
 TENANT_1 = 'totore'
