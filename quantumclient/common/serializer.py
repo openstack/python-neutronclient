@@ -43,7 +43,7 @@ class Serializer(object):
             return self.get_deserialize_handler(content_type)(datastring)
         except Exception:
             raise exception.MalformedResponseBody(
-                    reason="Unable to deserialize response body")
+                reason="Unable to deserialize response body")
 
     def get_deserialize_handler(self, content_type):
         handlers = {

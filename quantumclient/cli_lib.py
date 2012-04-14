@@ -23,8 +23,11 @@
 import logging
 import traceback
 
-FORMAT = "json"
+
 LOG = logging.getLogger('quantumclient.cli_lib')
+
+
+FORMAT = "json"
 
 
 class OutputTemplate(object):
@@ -95,90 +98,146 @@ class CmdOutputTemplate(OutputTemplate):
         Extends OutputTemplate loading a different template for each command.
     """
 
-    _templates_v10 = {
-        "list_nets":         "Virtual Networks for Tenant %(tenant_id)s\n" +
-                             "%(networks|\tNetwork ID: %(id)s)s",
-        "list_nets_detail":  "Virtual Networks for Tenant %(tenant_id)s\n" +
-                             "%(networks|\tNetwork %(name)s with ID: %(id)s)s",
-        "show_net":          "Network ID: %(network.id)s\n" +
-                             "Network Name: %(network.name)s",
-        "show_net_detail":   "Network ID: %(network.id)s\n" +
-                             "Network Name: %(network.name)s\n" +
-                             "Ports: %(network.ports|\tID: %(id)s\n" +
-                             "\t\tadministrative state: %(state)s\n" +
-                             "\t\tinterface: %(attachment.id)s)s",
-        "create_net":        "Created a new Virtual Network with ID: " +
-                             "%(network_id)s\n" +
-                             "for Tenant: %(tenant_id)s",
-        "update_net":        "Updated Virtual Network with ID: " +
-                             "%(network.id)s\n" +
-                             "for Tenant: %(tenant_id)s\n",
-        "delete_net":        "Deleted Virtual Network with ID: " +
-                             "%(network_id)s\n" +
-                             "for Tenant %(tenant_id)s",
-        "list_ports":        "Ports on Virtual Network: %(network_id)s\n" +
-                             "for Tenant: %(tenant_id)s\n" +
-                             "%(ports|\tLogical Port: %(id)s)s",
-        "list_ports_detail": "Ports on Virtual Network: %(network_id)s\n" +
-                             "for Tenant: %(tenant_id)s\n" +
-                             "%(ports|\tLogical Port: %(id)s\n" +
-                             "\t\tadministrative State: %(state)s)s",
-        "create_port":       "Created new Logical Port with ID: " +
-                             "%(port_id)s\n" +
-                             "on Virtual Network: %(network_id)s\n" +
-                             "for Tenant: %(tenant_id)s",
-        "show_port":         "Logical Port ID: %(port.id)s\n" +
-                             "administrative State: %(port.state)s\n" +
-                             "on Virtual Network: %(network_id)s\n" +
-                             "for Tenant: %(tenant_id)s",
-        "show_port_detail":  "Logical Port ID: %(port.id)s\n" +
-                             "administrative State: %(port.state)s\n" +
-                             "interface: %(port.attachment.id)s\n" +
-                             "on Virtual Network: %(network_id)s\n" +
-                             "for Tenant: %(tenant_id)s",
-        "update_port":       "Updated Logical Port " +
-                             "with ID: %(port.id)s\n" +
-                             "on Virtual Network: %(network_id)s\n" +
-                             "for tenant: %(tenant_id)s",
-        "delete_port":       "Deleted Logical Port with ID: %(port_id)s\n" +
-                             "on Virtual Network: %(network_id)s\n" +
-                             "for Tenant: %(tenant_id)s",
-        "plug_iface":        "Plugged interface %(attachment)s\n" +
-                             "into Logical Port: %(port_id)s\n" +
-                             "on Virtual Network: %(network_id)s\n" +
-                             "for Tenant: %(tenant_id)s",
-        "unplug_iface":      "Unplugged interface from Logical Port:" +
-                             "%(port_id)s\n" +
-                             "on Virtual Network: %(network_id)s\n" +
-                             "for Tenant: %(tenant_id)s",
-        "show_iface":        "interface: %(iface.id)s\n" +
-                             "plugged in Logical Port ID: %(port_id)s\n" +
-                             "on Virtual Network: %(network_id)s\n" +
-                             "for Tenant: %(tenant_id)s"}
+    _templates_v10 = dict(
+        list_nets="""
+Virtual Networks for Tenant %(tenant_id)s
+%(networks|\tNetwork ID: %(id)s)s
+""".strip(),
+
+        list_nets_detail="""
+Virtual Networks for Tenant %(tenant_id)s
+%(networks|\tNetwork %(name)s with ID: %(id)s)s
+""".strip(),
+
+        show_net="""
+Network ID: %(network.id)s
+Network Name: %(network.name)s
+""".strip(),
+
+        show_net_detail="""
+Network ID: %(network.id)s
+Network Name: %(network.name)s
+Ports: %(network.ports|\tID: %(id)s
+\t\tadministrative state: %(state)s
+\t\tinterface: %(attachment.id)s)s
+""".strip(),
+
+        create_net="""
+Created a new Virtual Network with ID: %(network_id)s
+for Tenant: %(tenant_id)s
+""".strip(),
+
+        update_net="""
+Updated Virtual Network with ID: %(network.id)s
+for Tenant: %(tenant_id)s
+""".strip(),
+
+        delete_net="""
+Deleted Virtual Network with ID: %(network_id)s
+for Tenant %(tenant_id)s
+""".strip(),
+
+        list_ports="""
+Ports on Virtual Network: %(network_id)s
+for Tenant: %(tenant_id)s
+%(ports|\tLogical Port: %(id)s)s
+""".strip(),
+
+        list_ports_detail="""
+Ports on Virtual Network: %(network_id)s
+for Tenant: %(tenant_id)s
+%(ports|\tLogical Port: %(id)s
+\t\tadministrative State: %(state)s)s
+""".strip(),
+
+        create_port="""
+Created new Logical Port with ID: %(port_id)s
+on Virtual Network: %(network_id)s
+for Tenant: %(tenant_id)s
+""".strip(),
+
+        show_port="""
+Logical Port ID: %(port.id)s
+administrative State: %(port.state)s
+on Virtual Network: %(network_id)s
+for Tenant: %(tenant_id)s
+""".strip(),
+
+        show_port_detail="""
+Logical Port ID: %(port.id)s
+administrative State: %(port.state)s
+interface: %(port.attachment.id)s
+on Virtual Network: %(network_id)s
+for Tenant: %(tenant_id)s
+""".strip(),
+
+        update_port="""
+Updated Logical Port with ID: %(port.id)s
+on Virtual Network: %(network_id)s
+for tenant: %(tenant_id)s
+""".strip(),
+
+        delete_port="""
+Deleted Logical Port with ID: %(port_id)s
+on Virtual Network: %(network_id)s
+for Tenant: %(tenant_id)s
+""".strip(),
+
+        plug_iface="""
+Plugged interface %(attachment)s
+into Logical Port: %(port_id)s
+on Virtual Network: %(network_id)s
+for Tenant: %(tenant_id)s
+""".strip(),
+
+        unplug_iface="""
+Unplugged interface from Logical Port: %(port_id)s
+on Virtual Network: %(network_id)s
+for Tenant: %(tenant_id)s
+""".strip(),
+
+        show_iface="""
+interface: %(iface.id)s
+plugged in Logical Port ID: %(port_id)s
+on Virtual Network: %(network_id)s
+for Tenant: %(tenant_id)s
+""".strip(),
+        )
 
     _templates_v11 = _templates_v10.copy()
-    _templates_v11.update({
-        "show_net":          "Network ID: %(network.id)s\n" +
-                             "network Name: %(network.name)s\n" +
-                             "operational Status: %(network.op-status)s",
-        "show_net_detail":   "Network ID: %(network.id)s\n" +
-                             "Network Name: %(network.name)s\n" +
-                             "operational Status: %(network.op-status)s\n" +
-                             "Ports: %(network.ports|\tID: %(id)s\n" +
-                             "\t\tadministrative state: %(state)s\n" +
-                             "\t\tinterface: %(attachment.id)s)s",
-        "show_port":         "Logical Port ID: %(port.id)s\n" +
-                             "administrative state: %(port.state)s\n" +
-                             "operational status: %(port.op-status)s\n" +
-                             "on Virtual Network: %(network_id)s\n" +
-                             "for Tenant: %(tenant_id)s",
-        "show_port_detail":  "Logical Port ID: %(port.id)s\n" +
-                             "administrative State: %(port.state)s\n" +
-                             "operational status: %(port.op-status)s\n" +
-                             "interface: %(port.attachment.id)s\n" +
-                             "on Virtual Network: %(network_id)s\n" +
-                             "for Tenant: %(tenant_id)s",
-        })
+    _templates_v11.update(dict(
+        show_net="""
+Network ID: %(network.id)s
+network Name: %(network.name)s
+operational Status: %(network.op-status)s
+""".strip(),
+
+        show_net_detail="""
+Network ID: %(network.id)s
+Network Name: %(network.name)s
+operational Status: %(network.op-status)s
+Ports: %(network.ports|\tID: %(id)s
+\t\tadministrative state: %(state)s
+\t\tinterface: %(attachment.id)s)s
+""".strip(),
+
+        show_port="""
+Logical Port ID: %(port.id)s
+administrative state: %(port.state)s
+operational status: %(port.op-status)s
+on Virtual Network: %(network_id)s
+for Tenant: %(tenant_id)s
+""".strip(),
+
+        show_port_detail="""
+Logical Port ID: %(port.id)s
+administrative State: %(port.state)s
+operational status: %(port.op-status)s
+interface: %(port.attachment.id)s
+on Virtual Network: %(network_id)s
+for Tenant: %(tenant_id)s
+""".strip(),
+        ))
 
     _templates = {
         '1.0': _templates_v10,
@@ -197,8 +256,8 @@ def _handle_exception(ex):
     if ex.args and isinstance(ex.args[-1][0], dict):
         status_code = ex.args[-1][0].get('status_code', None)
         message = ex.args[-1][0].get('message', None)
-        msg_1 = "Command failed with error code: %s" \
-                % (status_code or '<missing>')
+        msg_1 = ("Command failed with error code: %s" %
+                 (status_code or '<missing>'))
         msg_2 = "Error message:%s" % (message or '<missing>')
         print msg_1
         print msg_2
@@ -207,8 +266,8 @@ def _handle_exception(ex):
 
 
 def prepare_output(cmd, tenant_id, response, version):
-    LOG.debug("Preparing output for response:%s, version:%s"
-              % (response, version))
+    LOG.debug("Preparing output for response:%s, version:%s" %
+              (response, version))
     response['tenant_id'] = tenant_id
     output = str(CmdOutputTemplate(cmd, response, version))
     LOG.debug("Finished preparing output for command:%s", cmd)

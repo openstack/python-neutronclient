@@ -34,90 +34,114 @@ from quantumclient.common import utils
 #Configure logger for client - cli logger is a child of it
 #NOTE(salvatore-orlando): logger name does not map to package
 #this is deliberate. Simplifies logger configuration
-LOG = logging.getLogger('quantum')
+LOG = logging.getLogger('quantumclient')
+
+
 DEFAULT_QUANTUM_VERSION = '1.1'
 FORMAT = 'json'
 commands_v10 = {
-  "list_nets": {
-    "func": cli_lib.list_nets,
-    "args": ["tenant-id"]},
-  "list_nets_detail": {
-    "func": cli_lib.list_nets_detail,
-    "args": ["tenant-id"]},
-  "create_net": {
-    "func": cli_lib.create_net,
-    "args": ["tenant-id", "net-name"]},
-  "delete_net": {
-    "func": cli_lib.delete_net,
-    "args": ["tenant-id", "net-id"]},
-  "show_net": {
-    "func": cli_lib.show_net,
-    "args": ["tenant-id", "net-id"]},
-  "show_net_detail": {
-    "func": cli_lib.show_net_detail,
-    "args": ["tenant-id", "net-id"]},
-   "update_net": {
-    "func": cli_lib.update_net,
-    "args": ["tenant-id", "net-id", "new-name"]},
-  "list_ports": {
-    "func": cli_lib.list_ports,
-    "args": ["tenant-id", "net-id"]},
-  "list_ports_detail": {
-    "func": cli_lib.list_ports_detail,
-    "args": ["tenant-id", "net-id"]},
-  "create_port": {
-    "func": cli_lib.create_port,
-    "args": ["tenant-id", "net-id"]},
-  "delete_port": {
-    "func": cli_lib.delete_port,
-    "args": ["tenant-id", "net-id", "port-id"]},
-  "update_port": {
-    "func": cli_lib.update_port,
-    "args": ["tenant-id", "net-id", "port-id", "params"]},
-  "show_port": {
-    "func": cli_lib.show_port,
-    "args": ["tenant-id", "net-id", "port-id"]},
-  "show_port_detail": {
-    "func": cli_lib.show_port_detail,
-    "args": ["tenant-id", "net-id", "port-id"]},
-  "plug_iface": {
-    "func": cli_lib.plug_iface,
-    "args": ["tenant-id", "net-id", "port-id", "iface-id"]},
-  "unplug_iface": {
-    "func": cli_lib.unplug_iface,
-    "args": ["tenant-id", "net-id", "port-id"]},
-  "show_iface": {
-    "func": cli_lib.show_iface,
-    "args": ["tenant-id", "net-id", "port-id"]}, }
+    "list_nets": {
+        "func": cli_lib.list_nets,
+        "args": ["tenant-id"],
+        },
+    "list_nets_detail": {
+        "func": cli_lib.list_nets_detail,
+        "args": ["tenant-id"],
+        },
+    "create_net": {
+        "func": cli_lib.create_net,
+        "args": ["tenant-id", "net-name"],
+        },
+    "delete_net": {
+        "func": cli_lib.delete_net,
+        "args": ["tenant-id", "net-id"],
+        },
+    "show_net": {
+        "func": cli_lib.show_net,
+        "args": ["tenant-id", "net-id"],
+        },
+    "show_net_detail": {
+        "func": cli_lib.show_net_detail,
+        "args": ["tenant-id", "net-id"],
+        },
+    "update_net": {
+        "func": cli_lib.update_net,
+        "args": ["tenant-id", "net-id", "new-name"],
+        },
+    "list_ports": {
+        "func": cli_lib.list_ports,
+        "args": ["tenant-id", "net-id"],
+        },
+    "list_ports_detail": {
+        "func": cli_lib.list_ports_detail,
+        "args": ["tenant-id", "net-id"],
+        },
+    "create_port": {
+        "func": cli_lib.create_port,
+        "args": ["tenant-id", "net-id"],
+        },
+    "delete_port": {
+        "func": cli_lib.delete_port,
+        "args": ["tenant-id", "net-id", "port-id"],
+        },
+    "update_port": {
+        "func": cli_lib.update_port,
+        "args": ["tenant-id", "net-id", "port-id", "params"],
+        },
+    "show_port": {
+        "func": cli_lib.show_port,
+        "args": ["tenant-id", "net-id", "port-id"],
+        },
+    "show_port_detail": {
+        "func": cli_lib.show_port_detail,
+        "args": ["tenant-id", "net-id", "port-id"],
+        },
+    "plug_iface": {
+        "func": cli_lib.plug_iface,
+        "args": ["tenant-id", "net-id", "port-id", "iface-id"],
+        },
+    "unplug_iface": {
+        "func": cli_lib.unplug_iface,
+        "args": ["tenant-id", "net-id", "port-id"],
+        },
+    "show_iface": {
+        "func": cli_lib.show_iface,
+        "args": ["tenant-id", "net-id", "port-id"],
+        },
+    }
 
 commands_v11 = commands_v10.copy()
 commands_v11.update({
-  "list_nets": {
-    "func": cli_lib.list_nets_v11,
-    "args": ["tenant-id"],
-    "filters": ["name", "op-status", "port-op-status", "port-state",
-                "has-attachment", "attachment", "port"]},
-  "list_nets_detail": {
-    "func": cli_lib.list_nets_detail_v11,
-    "args": ["tenant-id"],
-    "filters": ["name", "op-status", "port-op-status", "port-state",
-                "has-attachment", "attachment", "port"]},
-  "list_ports": {
-    "func": cli_lib.list_ports_v11,
-    "args": ["tenant-id", "net-id"],
-    "filters": ["name", "op-status", "has-attachment", "attachment"]},
-  "list_ports_detail": {
-    "func": cli_lib.list_ports_detail_v11,
-    "args": ["tenant-id", "net-id"],
-    "filters": ["name", "op-status", "has-attachment", "attachment"]},
-     })
+    "list_nets": {
+        "func": cli_lib.list_nets_v11,
+        "args": ["tenant-id"],
+        "filters": ["name", "op-status", "port-op-status", "port-state",
+                    "has-attachment", "attachment", "port"],
+        },
+    "list_nets_detail": {
+        "func": cli_lib.list_nets_detail_v11,
+        "args": ["tenant-id"],
+        "filters": ["name", "op-status", "port-op-status", "port-state",
+                    "has-attachment", "attachment", "port"],
+        },
+    "list_ports": {
+        "func": cli_lib.list_ports_v11,
+        "args": ["tenant-id", "net-id"],
+        "filters": ["name", "op-status", "has-attachment", "attachment"],
+        },
+    "list_ports_detail": {
+        "func": cli_lib.list_ports_detail_v11,
+        "args": ["tenant-id", "net-id"],
+        "filters": ["name", "op-status", "has-attachment", "attachment"],
+        },
+    })
 commands = {
     '1.0': commands_v10,
-    '1.1': commands_v11
+    '1.1': commands_v11,
     }
 clients = {
     '1.0': Client,
-    '1.1': ClientV11
+    '1.1': ClientV11,
     }
 
 
@@ -125,23 +149,24 @@ def help(version):
     print "\nCommands:"
     cmds = commands[version]
     for k in cmds.keys():
-        print "    %s %s %s" % (k,
-          " ".join(["<%s>" % y for y in cmds[k]["args"]]),
-          'filters' in cmds[k] and "[filterspec ...]" or "")
+        print "    %s %s %s" % (
+            k,
+            " ".join(["<%s>" % y for y in cmds[k]["args"]]),
+            'filters' in cmds[k] and "[filterspec ...]" or "")
 
 
 def print_usage(cmd, version):
     cmds = commands[version]
-    print "Usage:\n    %s %s" % (cmd,
-      " ".join(["<%s>" % y for y in cmds[cmd]["args"]]))
+    print "Usage:\n    %s %s" % (
+        cmd, " ".join(["<%s>" % y for y in cmds[cmd]["args"]]))
 
 
 def build_args(cmd, cmdargs, arglist):
     arglist_len = len(arglist)
     cmdargs_len = len(cmdargs)
     if arglist_len < cmdargs_len:
-        message = "Not enough arguments for \"%s\" (expected: %d, got: %d)"\
-                   % (cmd, len(cmdargs), arglist_len)
+        message = ("Not enough arguments for \"%s\" (expected: %d, got: %d)" %
+                   (cmd, len(cmdargs), arglist_len))
         raise exceptions.QuantumCLIError(message=message)
     args = arglist[:cmdargs_len]
     return args
@@ -192,12 +217,13 @@ def build_cmd(cmd, cmd_args, cmd_filters, arglist, version):
         return None, None
     filter_len = (filters is not None) and len(filters) or 0
     if len(arglist) - len(args) - filter_len > 0:
-        message = "Too many arguments for \"%s\" (expected: %d, got: %d)"\
-                   % (cmd, len(cmd_args), arglist_len)
+        message = ("Too many arguments for \"%s\" (expected: %d, got: %d)" %
+                   (cmd, len(cmd_args), arglist_len))
         LOG.error(message)
         print "Error in command line: %s " % message
-        print "Usage:\n    %s %s" % (cmd,
-          " ".join(["<%s>" % y for y in commands[version][cmd]["args"]]))
+        print "Usage:\n    %s %s" % (
+            cmd,
+            " ".join(["<%s>" % y for y in commands[version][cmd]["args"]]))
         return None, None
     # Append version to arguments for cli functions
     args.append(version)
@@ -219,18 +245,21 @@ def main():
     usagestr = "Usage: %prog [OPTIONS] <command> [args]"
     parser = OptionParser(usage=usagestr)
     parser.add_option("-H", "--host", dest="host",
-      type="string", default="127.0.0.1", help="ip address of api host")
+                      type="string", default="127.0.0.1",
+                      help="ip address of api host")
     parser.add_option("-p", "--port", dest="port",
-      type="int", default=9696, help="api poort")
+                      type="int", default=9696, help="api poort")
     parser.add_option("-s", "--ssl", dest="ssl",
-      action="store_true", default=False, help="use ssl")
+                      action="store_true", default=False, help="use ssl")
     parser.add_option("-v", "--verbose", dest="verbose",
-      action="store_true", default=False, help="turn on verbose logging")
+                      action="store_true", default=False,
+                      help="turn on verbose logging")
     parser.add_option("-f", "--logfile", dest="logfile",
-      type="string", default="syslog", help="log file path")
+                      type="string", default="syslog", help="log file path")
     parser.add_option("-t", "--token", dest="token",
-      type="string", default=None, help="authentication token")
-    parser.add_option('--version',
+                      type="string", default=None, help="authentication token")
+    parser.add_option(
+        '--version',
         default=utils.env('QUANTUM_VERSION', default=DEFAULT_QUANTUM_VERSION),
         help='Accepts 1.1 and 1.0, defaults to env[QUANTUM_VERSION].')
     options, args = parser.parse_args()

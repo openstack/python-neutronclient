@@ -16,9 +16,9 @@
 #    under the License.
 #    @author: Tyler Smith, Cisco Systems
 
-import logging
 import gettext
 import httplib
+import logging
 import socket
 import time
 import urllib
@@ -33,6 +33,8 @@ from quantumclient.common.serializer import Serializer
 
 
 LOG = logging.getLogger('quantumclient')
+
+
 AUTH_TOKEN_HEADER = "X-Auth-Token"
 
 
@@ -53,7 +55,7 @@ def exception_handler_v10(status_code, error_content):
         430: 'portNotFound',
         431: 'requestedStateInvalid',
         432: 'portInUse',
-        440: 'alreadyAttached'
+        440: 'alreadyAttached',
         }
 
     quantum_errors = {
@@ -66,7 +68,7 @@ def exception_handler_v10(status_code, error_content):
         431: exceptions.StateInvalidClient,
         432: exceptions.PortInUseClient,
         440: exceptions.AlreadyAttachedClient,
-        501: NotImplementedError
+        501: NotImplementedError,
         }
 
     # Find real error type
@@ -75,8 +77,7 @@ def exception_handler_v10(status_code, error_content):
         error_type = quantum_error_types.get(status_code)
     if error_type:
         error_dict = error_content[error_type]
-        error_message = error_dict['message'] + "\n" +\
-                        error_dict['detail']
+        error_message = error_dict['message'] + "\n" + error_dict['detail']
     else:
         error_message = error_content
     # raise the appropriate error!
@@ -128,7 +129,7 @@ def exception_handler_v11(status_code, error_content):
 
 EXCEPTION_HANDLERS = {
     '1.0': exception_handler_v10,
-    '1.1': exception_handler_v11
+    '1.1': exception_handler_v11,
 }
 
 
@@ -166,9 +167,12 @@ class Client(object):
                 "network": ["id", "name"],
                 "port": ["id", "state"],
                 "attachment": ["id"]},
-            "plurals": {"networks": "network",
-                        "ports": "port"}},
-    }
+            "plurals": {
+                "networks": "network",
+                "ports": "port",
+                },
+            },
+        }
 
     # Action query strings
     networks_path = "/networks"
@@ -249,8 +253,8 @@ class Client(object):
         # Salvatore: Isolating this piece of code in its own method to
         # facilitate stubout for testing
         if self.logger:
-            self.logger.debug("Quantum Client Request:\n" \
-                    + method + " " + action + "\n")
+            self.logger.debug("Quantum Client Request:\n"
+                              + method + " " + action + "\n")
             if body:
                 self.logger.debug(body)
         conn.request(method, action, body, headers)
@@ -286,7 +290,7 @@ class Client(object):
         try:
             connection_type = self.get_connection_type()
             headers = headers or {"Content-Type":
-                                      "application/%s" % self.format}
+                                  "application/%s" % self.format}
             # if available, add authentication token
             if self.auth_token:
                 headers[AUTH_TOKEN_HEADER] = self.auth_token
@@ -301,8 +305,8 @@ class Client(object):
             status_code = self.get_status_code(res)
             data = res.read()
             if self.logger:
-                self.logger.debug("Quantum Client Reply (code = %s) :\n %s" \
-                        % (str(status_code), data))
+                self.logger.debug("Quantum Client Reply (code = %s) :\n %s" %
+                                  (str(status_code), data))
             if status_code in (httplib.OK,
                                httplib.CREATED,
                                httplib.ACCEPTED,
@@ -335,8 +339,8 @@ class Client(object):
         elif type(data) is dict:
             return Serializer().serialize(data, self.content_type())
         else:
-            raise Exception("unable to serialize object of type = '%s'" \
-                                % type(data))
+            raise Exception("unable to serialize object of type = '%s'" %
+                            type(data))
 
     def deserialize(self, data, status_code):
         """
@@ -344,8 +348,8 @@ class Client(object):
         """
         if status_code == 204:
             return data
-        return Serializer(self._serialization_metadata).\
-                    deserialize(data, self.content_type())
+        return Serializer(self._serialization_metadata).deserialize(
+            data, self.content_type())
 
     def content_type(self, format=None):
         """

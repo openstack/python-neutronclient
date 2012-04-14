@@ -21,7 +21,6 @@
 
 """
 
-
 import logging
 import sys
 import unittest
@@ -43,8 +42,8 @@ class CLITest(unittest.TestCase):
     def setUp(self):
         """Prepare the test environment"""
         options = {}
-        options['plugin_provider'] = \
-          'quantum.plugins.sample.SamplePlugin.FakePlugin'
+        options['plugin_provider'] = (
+            'quantum.plugins.sample.SamplePlugin.FakePlugin')
         #TODO: make the version of the API router configurable
         self.api = server.APIRouterV11(options)
 
@@ -160,17 +159,25 @@ class CLITest(unittest.TestCase):
                        'op-status': nw.op_status}
             port_list = db.port_list(nw.uuid)
             if not port_list:
-                network['ports'] = [{'id': '<none>',
-                                     'state': '<none>',
-                                     'attachment': {'id': '<none>'}}]
+                network['ports'] = [
+                    {
+                        'id': '<none>',
+                        'state': '<none>',
+                        'attachment': {
+                            'id': '<none>',
+                            },
+                        },
+                    ]
             else:
                 network['ports'] = []
                 for port in port_list:
-                    network['ports'].append({'id': port.uuid,
-                                             'state': port.state,
-                                             'attachment': {'id':
-                                                            port.interface_id
-                                                            or '<none>'}})
+                    network['ports'].append({
+                        'id': port.uuid,
+                        'state': port.state,
+                        'attachment': {
+                            'id': port.interface_id or '<none>',
+                            },
+                        })
 
             # Fill CLI template
             output = cli.prepare_output('show_net_detail',
