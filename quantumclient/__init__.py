@@ -216,6 +216,8 @@ class Client(object):
         self.key_file = key_file
         self.cert_file = cert_file
         self.logger = logger
+        if not self.logger:
+            self.logger = LOG
         self.auth_token = auth_token
         self.version = version
         self.action_prefix = "/v%s%s" % (version, uri_prefix)
@@ -301,6 +303,11 @@ class Client(object):
                 conn = connection_type(self.host, self.port, **certs)
             else:
                 conn = connection_type(self.host, self.port)
+            # besides HTTP(s)Connection, we still have testConnection
+            if (LOG.isEnabledFor(logging.DEBUG) and
+                isinstance(conn, httplib.HTTPConnection)):
+                conn.set_debuglevel(1)
+
             res = self._send_request(conn, method, action, body, headers)
             status_code = self.get_status_code(res)
             data = res.read()

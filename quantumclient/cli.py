@@ -31,9 +31,10 @@ from quantumclient.common import exceptions
 from quantumclient.common import utils
 
 
-#Configure logger for client - cli logger is a child of it
-#NOTE(salvatore-orlando): logger name does not map to package
-#this is deliberate. Simplifies logger configuration
+# Configure logger for client - cli logger is a child of it
+# NOTE(salvatore-orlando): logger name does not map to package
+# this is deliberate. Simplifies logger configuration
+logging.basicConfig()
 LOG = logging.getLogger('quantumclient')
 
 
@@ -251,9 +252,9 @@ def main():
                       type="int", default=9696, help="api poort")
     parser.add_option("-s", "--ssl", dest="ssl",
                       action="store_true", default=False, help="use ssl")
-    parser.add_option("-v", "--verbose", dest="verbose",
+    parser.add_option("--debug", dest="debug",
                       action="store_true", default=False,
-                      help="turn on verbose logging")
+                      help="print debugging output")
     parser.add_option("-f", "--logfile", dest="logfile",
                       type="string", default="syslog", help="log file path")
     parser.add_option("-t", "--token", dest="token",
@@ -264,7 +265,7 @@ def main():
         help='Accepts 1.1 and 1.0, defaults to env[QUANTUM_VERSION].')
     options, args = parser.parse_args()
 
-    if options.verbose:
+    if options.debug:
         LOG.setLevel(logging.DEBUG)
     else:
         LOG.setLevel(logging.WARN)
