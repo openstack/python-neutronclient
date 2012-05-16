@@ -1,7 +1,11 @@
-coverage
-nose
-nosexcover
-pep8==0.6.1
+distribute>=0.6.24
 
--e git+https://review.openstack.org/p/openstack-dev/openstack-nose.git#egg=openstack.nose_plugin
+mox
+nose
+nose-exclude
+nosexcover
+openstack.nose_plugin
+pep8==0.6.1
+sphinx>=1.1.2
+
 -e git+https://review.openstack.org/p/openstack/quantum#egg=quantum-dev
