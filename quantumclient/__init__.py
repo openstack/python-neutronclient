@@ -30,10 +30,45 @@ gettext.install('quantumclient', unicode=1)
 
 from quantumclient.common import exceptions
 from quantumclient.common.serializer import Serializer
+from quantumclient.common import utils
 
+net_filters_v11_opt = []
+net_filters_v11_opt.append({'--name':
+                            {'help': _('name filter'), }, })
+net_filters_v11_opt.append({'--op-status':
+                            {'help': _('op-status filter'), }, })
+net_filters_v11_opt.append({'--port-op-status':
+                            {'help': _('port-op-status filter'), }, })
+net_filters_v11_opt.append({'--port-state':
+                            {'help': _('port-state filter'), }, })
+net_filters_v11_opt.append({'--has-attachment':
+                            {'help': _('has-attachment filter'), }, })
+net_filters_v11_opt.append({'--attachment':
+                            {'help': _('attachment filter'), }, })
+net_filters_v11_opt.append({'--port':
+                            {'help': _('port filter'), }, })
+
+port_filters_v11_opt = []
+port_filters_v11_opt.append({'--name':
+                             {'help': _('name filter'), }, })
+port_filters_v11_opt.append({'--op-status':
+                             {'help': _('op-status filter'), }, })
+port_filters_v11_opt.append({'--has-attachment':
+                             {'help': _('has-attachment filter'), }, })
+port_filters_v11_opt.append({'--attachement':
+                             {'help': _('attachment filter'), }, })
+
+net_filters_v11 = []
+for arg in net_filters_v11_opt:
+    for key in arg.iterkeys():
+        net_filters_v11.append(key.split('--', 2)[1])
+
+port_filters_v11 = []
+for arg in port_filters_v11_opt:
+    for key in arg.iterkeys():
+        port_filters_v11.append(key.split('--', 2)[1])
 
 LOG = logging.getLogger('quantumclient')
-
 
 AUTH_TOKEN_HEADER = "X-Auth-Token"
 
@@ -55,12 +90,11 @@ def exception_handler_v10(status_code, error_content):
         430: 'portNotFound',
         431: 'requestedStateInvalid',
         432: 'portInUse',
-        440: 'alreadyAttached',
-        }
+        440: 'alreadyAttached', }
 
     quantum_errors = {
         400: exceptions.BadInputError,
-        401: exceptions.NotAuthorized,
+        401: exceptions.Unauthorized,
         404: exceptions.NotFound,
         420: exceptions.NetworkNotFoundClient,
         421: exceptions.NetworkInUseClient,
@@ -68,8 +102,7 @@ def exception_handler_v10(status_code, error_content):
         431: exceptions.StateInvalidClient,
         432: exceptions.PortInUseClient,
         440: exceptions.AlreadyAttachedClient,
-        501: NotImplementedError,
-        }
+        501: NotImplementedError, }
 
     # Find real error type
     error_type = None
@@ -105,7 +138,7 @@ def exception_handler_v11(status_code, error_content):
         'RequestedStateInvalid': exceptions.StateInvalidClient,
         'PortInUse': exceptions.PortInUseClient,
         'AlreadyAttached': exceptions.AlreadyAttachedClient,
-        }
+        'QuantumServiceFault': exceptions.QuantumClientException, }
 
     error_dict = None
     if isinstance(error_content, dict):
@@ -156,6 +189,33 @@ class ApiCall(object):
         return with_params
 
 
+class APIFilterCall(object):
+
+    def __init__(self, filters):
+        self.filters = filters
+
+    def __call__(self, f):
+        def wrapped_f(*args, **kwargs):
+            """
+            Temporarily sets the format and tenant for this request
+            """
+            instance = args[0]
+            (format, tenant) = (instance.format, instance.tenant)
+
+            if 'format' in kwargs:
+                instance.format = kwargs['format']
+                if 'format' not in self.filters:
+                    del kwargs['format']
+            if 'tenant' in kwargs:
+                instance.tenant = kwargs['tenant']
+                if 'tenant' not in self.filters:
+                    del kwargs['tenant']
+            ret = f(*args, **kwargs)
+            (instance.format, instance.tenant) = (format, tenant)
+            return ret
+        return wrapped_f
+
+
 class Client(object):
 
     """A base client class - derived from Glance.BaseClient"""
@@ -166,13 +226,10 @@ class Client(object):
             "attributes": {
                 "network": ["id", "name"],
                 "port": ["id", "state"],
-                "attachment": ["id"]},
+                "attachment": ["id"], },
             "plurals": {
                 "networks": "network",
-                "ports": "port",
-                },
-            },
-        }
+                "ports": "port", }, }, }
 
     # Action query strings
     networks_path = "/networks"
@@ -298,19 +355,18 @@ class Client(object):
                 headers[AUTH_TOKEN_HEADER] = self.auth_token
             # Open connection and send request, handling SSL certs
             certs = {'key_file': self.key_file, 'cert_file': self.cert_file}
-            certs = dict((x, certs[x]) for x in certs if certs[x] != None)
+            certs = dict((x, certs[x]) for x in certs if certs[x] is not None)
             if self.use_ssl and len(certs):
                 conn = connection_type(self.host, self.port, **certs)
             else:
                 conn = connection_type(self.host, self.port)
-            # besides HTTP(s)Connection, we still have testConnection
-            if (LOG.isEnabledFor(logging.DEBUG) and
-                isinstance(conn, httplib.HTTPConnection)):
-                conn.set_debuglevel(1)
-
             res = self._send_request(conn, method, action, body, headers)
             status_code = self.get_status_code(res)
             data = res.read()
+            utils.http_log(LOG, [method, action],
+                           {'body': body,
+                            'headers': headers,
+                            }, res, data)
             if self.logger:
                 self.logger.debug("Quantum Client Reply (code = %s) :\n %s" %
                                   (str(status_code), data))
@@ -531,7 +587,7 @@ class ClientV11(Client):
     features specific to API v1.1 such as filters
     """
 
-    @ApiCall
+    @APIFilterCall(net_filters_v11)
     def list_networks(self, **filters):
         """
         Fetches a list of all networks for a tenant
@@ -539,14 +595,14 @@ class ClientV11(Client):
         # Pass filters in "params" argument to do_request
         return self.get(self.networks_path, params=filters)
 
-    @ApiCall
+    @APIFilterCall(net_filters_v11)
     def list_networks_details(self, **filters):
         """
         Fetches a detailed list of all networks for a tenant
         """
         return self.get(self.networks_path + self.detail_path, params=filters)
 
-    @ApiCall
+    @APIFilterCall(port_filters_v11)
     def list_ports(self, network, **filters):
         """
         Fetches a list of ports on a given network
@@ -554,7 +610,7 @@ class ClientV11(Client):
         # Pass filters in "params" argument to do_request
         return self.get(self.ports_path % (network), params=filters)
 
-    @ApiCall
+    @APIFilterCall(port_filters_v11)
     def list_ports_details(self, network, **filters):
         """
         Fetches a detailed list of ports on a given network

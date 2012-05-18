@@ -22,7 +22,11 @@
 
 import datetime
 import json
+import logging
 import os
+import sys
+
+from quantumclient.common import exceptions
 
 
 def env(*vars, **kwargs):
@@ -38,12 +42,12 @@ def env(*vars, **kwargs):
 
 
 def to_primitive(value):
-    if type(value) is type([]) or type(value) is type((None,)):
+    if isinstance(value, list) or isinstance(value, tuple):
         o = []
         for v in value:
             o.append(to_primitive(v))
         return o
-    elif type(value) is type({}):
+    elif isinstance(value, dict):
         o = {}
         for k, v in value.iteritems():
             o[k] = to_primitive(v)
@@ -68,3 +72,88 @@ def dumps(value):
 
 def loads(s):
     return json.loads(s)
+
+
+def import_class(import_str):
+    """Returns a class from a string including module and class
+
+    :param import_str: a string representation of the class name
+    :rtype: the requested class
+    """
+    mod_str, _sep, class_str = import_str.rpartition('.')
+    __import__(mod_str)
+    return getattr(sys.modules[mod_str], class_str)
+
+
+def get_client_class(api_name, version, version_map):
+    """Returns the client class for the requested API version
+
+    :param api_name: the name of the API, e.g. 'compute', 'image', etc
+    :param version: the requested API version
+    :param version_map: a dict of client classes keyed by version
+    :rtype: a client class for the requested API version
+    """
+    try:
+        client_path = version_map[str(version)]
+    except (KeyError, ValueError):
+        msg = "Invalid %s client version '%s'. must be one of: %s" % (
+              (api_name, version, ', '.join(version_map.keys())))
+        raise exceptions.UnsupportedVersion(msg)
+
+    return import_class(client_path)
+
+
+def get_item_properties(item, fields, mixed_case_fields=[], formatters={}):
+    """Return a tuple containing the item properties.
+
+    :param item: a single item resource (e.g. Server, Tenant, etc)
+    :param fields: tuple of strings with the desired field names
+    :param mixed_case_fields: tuple of field names to preserve case
+    :param formatters: dictionary mapping field names to callables
+       to format the values
+    """
+    row = []
+
+    for field in fields:
+        if field in formatters:
+            row.append(formatters[field](item))
+        else:
+            if field in mixed_case_fields:
+                field_name = field.replace(' ', '_')
+            else:
+                field_name = field.lower().replace(' ', '_')
+            if not hasattr(item, field_name) and isinstance(item, dict):
+                data = item[field_name]
+            else:
+                data = getattr(item, field_name, '')
+            row.append(data)
+    return tuple(row)
+
+
+def __str2bool(strbool):
+    if strbool is None:
+        return None
+    else:
+        return strbool.lower() == 'true'
+
+
+def http_log(_logger, args, kwargs, resp, body):
+        if not _logger.isEnabledFor(logging.DEBUG):
+            return
+
+        string_parts = ['curl -i']
+        for element in args:
+            if element in ('GET', 'POST'):
+                string_parts.append(' -X %s' % element)
+            else:
+                string_parts.append(' %s' % element)
+
+        for element in kwargs['headers']:
+            header = ' -H "%s: %s"' % (element, kwargs['headers'][element])
+            string_parts.append(header)
+
+        _logger.debug("REQ: %s\n" % "".join(string_parts))
+        if 'body' in kwargs and kwargs['body']:
+            _logger.debug("REQ BODY: %s\n" % (kwargs['body']))
+        _logger.debug("RESP:%s\n", resp)
+        _logger.debug("RESP BODY:%s\n", body)

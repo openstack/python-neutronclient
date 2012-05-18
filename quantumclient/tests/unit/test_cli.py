@@ -26,11 +26,11 @@ import sys
 import unittest
 
 from quantum import api as server
-from quantum.db import api as db
+from quantumclient import ClientV11
 from quantumclient import cli_lib as cli
-from quantumclient import Client
+from quantum.db import api as db
+from quantum.openstack.common import cfg
 from quantumclient.tests.unit import stubs as client_stubs
-
 
 LOG = logging.getLogger('quantumclient.tests.test_cli')
 API_VERSION = "1.1"
@@ -41,21 +41,19 @@ class CLITest(unittest.TestCase):
 
     def setUp(self):
         """Prepare the test environment"""
-        options = {}
-        options['plugin_provider'] = (
-            'quantum.plugins.sample.SamplePlugin.FakePlugin')
         #TODO: make the version of the API router configurable
-        self.api = server.APIRouterV11(options)
+        cfg.CONF.core_plugin = 'quantum.plugins.sample.SamplePlugin.FakePlugin'
+        self.api = server.APIRouterV11()
 
         self.tenant_id = "test_tenant"
         self.network_name_1 = "test_network_1"
         self.network_name_2 = "test_network_2"
         self.version = API_VERSION
         # Prepare client and plugin manager
-        self.client = Client(tenant=self.tenant_id,
-                             format=FORMAT,
-                             testingStub=client_stubs.FakeHTTPConnection,
-                             version=self.version)
+        self.client = ClientV11(tenant=self.tenant_id,
+                                format=FORMAT,
+                                testingStub=client_stubs.FakeHTTPConnection,
+                                version=self.version)
         # Redirect stdout
         self.fake_stdout = client_stubs.FakeStdout()
         sys.stdout = self.fake_stdout
@@ -69,7 +67,7 @@ class CLITest(unittest.TestCase):
             # Verification - get raw result from db
             nw_list = db.network_list(self.tenant_id)
             networks = [{'id': nw.uuid, 'name': nw.name}
-                         for nw in nw_list]
+                        for nw in nw_list]
             # Fill CLI template
             output = cli.prepare_output('list_nets',
                                         self.tenant_id,
@@ -83,6 +81,23 @@ class CLITest(unittest.TestCase):
             # Verification - get raw result from db
             nw_list = db.network_list(self.tenant_id)
             networks = [dict(id=nw.uuid, name=nw.name) for nw in nw_list]
+            # Fill CLI template
+            output = cli.prepare_output('list_nets_detail',
+                                        self.tenant_id,
+                                        dict(networks=networks),
+                                        self.version)
+            # Verify!
+            # Must add newline at the end to match effect of print call
+            self.assertEquals(self.fake_stdout.make_string(), output + '\n')
+
+    def _verify_list_networks_details_name_filter(self, name):
+            # Verification - get raw result from db
+            nw_list = db.network_list(self.tenant_id)
+            nw_filtered = []
+            for nw in nw_list:
+                if nw.name == name:
+                    nw_filtered.append(nw)
+            networks = [dict(id=nw.uuid, name=nw.name) for nw in nw_filtered]
             # Fill CLI template
             output = cli.prepare_output('list_nets_detail',
                                         self.tenant_id,
@@ -160,14 +175,10 @@ class CLITest(unittest.TestCase):
             port_list = db.port_list(nw.uuid)
             if not port_list:
                 network['ports'] = [
-                    {
-                        'id': '<none>',
-                        'state': '<none>',
-                        'attachment': {
-                            'id': '<none>',
-                            },
-                        },
-                    ]
+                    {'id': '<none>',
+                     'state': '<none>',
+                     'attachment': {
+                     'id': '<none>', }, }, ]
             else:
                 network['ports'] = []
                 for port in port_list:
@@ -175,9 +186,7 @@ class CLITest(unittest.TestCase):
                         'id': port.uuid,
                         'state': port.state,
                         'attachment': {
-                            'id': port.interface_id or '<none>',
-                            },
-                        })
+                            'id': port.interface_id or '<none>', }, })
 
             # Fill CLI template
             output = cli.prepare_output('show_net_detail',
@@ -415,6 +424,25 @@ class CLITest(unittest.TestCase):
         LOG.debug("Operation completed. Verifying result")
         LOG.debug(self.fake_stdout.content)
         self._verify_list_networks_details()
+
+    def test_list_networks_details_v11_name_filter(self):
+        try:
+            # Pre-populate data for testing using db api
+            db.network_create(self.tenant_id, self.network_name_1)
+            db.network_create(self.tenant_id, self.network_name_2)
+            #TODO: test filters
+            cli.list_nets_detail_v11(self.client,
+                                     self.tenant_id,
+                                     self.version,
+                                     {'name': self.network_name_1, })
+        except:
+            LOG.exception("Exception caught: %s", sys.exc_info())
+            self.fail("test_list_networks_details_v11 failed due to " +
+                      "an exception")
+
+        LOG.debug("Operation completed. Verifying result")
+        LOG.debug(self.fake_stdout.content)
+        self._verify_list_networks_details_name_filter(self.network_name_1)
 
     def test_create_network(self):
         try:

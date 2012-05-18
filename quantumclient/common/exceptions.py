@@ -87,8 +87,31 @@ class AlreadyAttachedClient(QuantumClientException):
     pass
 
 
-class NotAuthorized(QuantumClientException):
+class Unauthorized(QuantumClientException):
+    """
+    HTTP 401 - Unauthorized: bad credentials.
+    """
     pass
+
+
+class Forbidden(QuantumClientException):
+    """
+    HTTP 403 - Forbidden: your credentials don't give you access to this
+    resource.
+    """
+    pass
+
+
+class EndpointNotFound(QuantumClientException):
+    """Could not find Service or Region in Service Catalog."""
+    pass
+
+
+class AmbiguousEndpoints(QuantumClientException):
+    """Found more than one matching endpoint in Service Catalog."""
+
+    def __str__(self):
+        return "AmbiguousEndpoints: %s" % repr(self.message)
 
 
 class QuantumCLIError(QuantumClientException):
@@ -120,3 +143,13 @@ class Invalid(Error):
 
 class InvalidContentType(Invalid):
     message = _("Invalid content type %(content_type)s.")
+
+
+class UnsupportedVersion(Exception):
+    """Indicates that the user is trying to use an unsupported
+       version of the API"""
+    pass
+
+
+class CommandError(Exception):
+    pass

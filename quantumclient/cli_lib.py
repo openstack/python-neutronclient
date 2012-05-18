@@ -201,8 +201,7 @@ interface: %(iface.id)s
 plugged in Logical Port ID: %(port_id)s
 on Virtual Network: %(network_id)s
 for Tenant: %(tenant_id)s
-""".strip(),
-        )
+""".strip(), )
 
     _templates_v11 = _templates_v10.copy()
     _templates_v11.update(dict(
@@ -236,13 +235,11 @@ operational status: %(port.op-status)s
 interface: %(port.attachment.id)s
 on Virtual Network: %(network_id)s
 for Tenant: %(tenant_id)s
-""".strip(),
-        ))
+""".strip(), ))
 
     _templates = {
         '1.0': _templates_v10,
-        '1.1': _templates_v11
-        }
+        '1.1': _templates_v11, }
 
     def __init__(self, cmd, data, version):
         super(CmdOutputTemplate, self).__init__(

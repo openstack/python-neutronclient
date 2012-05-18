@@ -61,12 +61,13 @@ setuptools.setup(
     tests_require=tests_require,
     cmdclass=setup.get_cmdclass(),
     include_package_data=False,
-    packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
+    packages=setuptools.find_packages('.'),
     package_data=PackageData,
     eager_resources=EagerResources,
     entry_points={
         'console_scripts': [
-            'quantum = quantumclient.cli:main'
+            'quantum = quantumclient.cli:main',
+            'quantumv2 = quantumclient.shell:main',
         ]
     },
 )

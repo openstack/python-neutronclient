@@ -349,7 +349,7 @@ class APITest(unittest.TestCase):
                             "PUT",
                             "networks/001/ports/001/attachment",
                             data=["001", "001",
-                                    {'resource': {'id': '1234'}}],
+                                  {'resource': {'id': '1234'}}],
                             params={'tenant': tenant, 'format': format})
 
         LOG.debug("_test_attach_resource - tenant:%s "

@@ -17,6 +17,7 @@
 
 
 from quantum import api as server
+from quantum.openstack.common import cfg
 from quantum.tests.unit import testlib_api
 
 
@@ -40,9 +41,8 @@ class FakeHTTPConnection:
     def __init__(self, _1, _2):
         # Ignore host and port parameters
         self._req = None
-        plugin = 'quantum.plugins.sample.SamplePlugin.FakePlugin'
-        options = dict(plugin_provider=plugin)
-        self._api = server.APIRouterV11(options)
+        cfg.CONF.core_plugin = 'quantum.plugins.sample.SamplePlugin.FakePlugin'
+        self._api = server.APIRouterV11()
 
     def request(self, method, action, body, headers):
         # TODO: remove version prefix from action!

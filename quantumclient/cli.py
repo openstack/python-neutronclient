@@ -29,7 +29,8 @@ from quantumclient import Client
 from quantumclient import ClientV11
 from quantumclient.common import exceptions
 from quantumclient.common import utils
-
+from quantumclient import net_filters_v11
+from quantumclient import port_filters_v11
 
 # Configure logger for client - cli logger is a child of it
 # NOTE(salvatore-orlando): logger name does not map to package
@@ -43,107 +44,80 @@ FORMAT = 'json'
 commands_v10 = {
     "list_nets": {
         "func": cli_lib.list_nets,
-        "args": ["tenant-id"],
-        },
+        "args": ["tenant-id"], },
     "list_nets_detail": {
         "func": cli_lib.list_nets_detail,
-        "args": ["tenant-id"],
-        },
+        "args": ["tenant-id"], },
     "create_net": {
         "func": cli_lib.create_net,
-        "args": ["tenant-id", "net-name"],
-        },
+        "args": ["tenant-id", "net-name"], },
     "delete_net": {
         "func": cli_lib.delete_net,
-        "args": ["tenant-id", "net-id"],
-        },
+        "args": ["tenant-id", "net-id"], },
     "show_net": {
         "func": cli_lib.show_net,
-        "args": ["tenant-id", "net-id"],
-        },
+        "args": ["tenant-id", "net-id"], },
     "show_net_detail": {
         "func": cli_lib.show_net_detail,
-        "args": ["tenant-id", "net-id"],
-        },
+        "args": ["tenant-id", "net-id"], },
     "update_net": {
         "func": cli_lib.update_net,
-        "args": ["tenant-id", "net-id", "new-name"],
-        },
+        "args": ["tenant-id", "net-id", "new-name"], },
     "list_ports": {
         "func": cli_lib.list_ports,
-        "args": ["tenant-id", "net-id"],
-        },
+        "args": ["tenant-id", "net-id"], },
     "list_ports_detail": {
         "func": cli_lib.list_ports_detail,
-        "args": ["tenant-id", "net-id"],
-        },
+        "args": ["tenant-id", "net-id"], },
     "create_port": {
         "func": cli_lib.create_port,
-        "args": ["tenant-id", "net-id"],
-        },
+        "args": ["tenant-id", "net-id"], },
     "delete_port": {
         "func": cli_lib.delete_port,
-        "args": ["tenant-id", "net-id", "port-id"],
-        },
+        "args": ["tenant-id", "net-id", "port-id"], },
     "update_port": {
         "func": cli_lib.update_port,
-        "args": ["tenant-id", "net-id", "port-id", "params"],
-        },
+        "args": ["tenant-id", "net-id", "port-id", "params"], },
     "show_port": {
         "func": cli_lib.show_port,
-        "args": ["tenant-id", "net-id", "port-id"],
-        },
+        "args": ["tenant-id", "net-id", "port-id"], },
     "show_port_detail": {
         "func": cli_lib.show_port_detail,
-        "args": ["tenant-id", "net-id", "port-id"],
-        },
+        "args": ["tenant-id", "net-id", "port-id"], },
     "plug_iface": {
         "func": cli_lib.plug_iface,
-        "args": ["tenant-id", "net-id", "port-id", "iface-id"],
-        },
+        "args": ["tenant-id", "net-id", "port-id", "iface-id"], },
     "unplug_iface": {
         "func": cli_lib.unplug_iface,
-        "args": ["tenant-id", "net-id", "port-id"],
-        },
+        "args": ["tenant-id", "net-id", "port-id"], },
     "show_iface": {
         "func": cli_lib.show_iface,
-        "args": ["tenant-id", "net-id", "port-id"],
-        },
-    }
+        "args": ["tenant-id", "net-id", "port-id"], }, }
 
 commands_v11 = commands_v10.copy()
 commands_v11.update({
     "list_nets": {
         "func": cli_lib.list_nets_v11,
         "args": ["tenant-id"],
-        "filters": ["name", "op-status", "port-op-status", "port-state",
-                    "has-attachment", "attachment", "port"],
-        },
+        "filters": net_filters_v11, },
     "list_nets_detail": {
         "func": cli_lib.list_nets_detail_v11,
         "args": ["tenant-id"],
-        "filters": ["name", "op-status", "port-op-status", "port-state",
-                    "has-attachment", "attachment", "port"],
-        },
+        "filters": net_filters_v11, },
     "list_ports": {
         "func": cli_lib.list_ports_v11,
         "args": ["tenant-id", "net-id"],
-        "filters": ["name", "op-status", "has-attachment", "attachment"],
-        },
+        "filters": port_filters_v11, },
     "list_ports_detail": {
         "func": cli_lib.list_ports_detail_v11,
         "args": ["tenant-id", "net-id"],
-        "filters": ["name", "op-status", "has-attachment", "attachment"],
-        },
-    })
+        "filters": port_filters_v11, }, })
 commands = {
     '1.0': commands_v10,
-    '1.1': commands_v11,
-    }
+    '1.1': commands_v11, }
 clients = {
     '1.0': Client,
-    '1.1': ClientV11,
-    }
+    '1.1': ClientV11, }
 
 
 def help(version):

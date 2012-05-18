@@ -1,11 +1,15 @@
 distribute>=0.6.24
-
+cliff>=0.6.0
+argparse
+httplib2
+prettytable>=0.6.0
+simplejson
 mox
 nose
 nose-exclude
 nosexcover
 openstack.nose_plugin
-pep8==0.6.1
+pep8
 sphinx>=1.1.2
 
 https://github.com/openstack/quantum/zipball/master#egg=quantum

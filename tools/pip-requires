@@ -1,0 +1,7 @@
+cliff>=0.6.0
+argparse
+httplib2
+prettytable>=0.6.0
+simplejson
+
+
