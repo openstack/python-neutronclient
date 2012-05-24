@@ -280,7 +280,8 @@ def main():
     version = options.version
     if not version in commands:
         LOG.error("Unknown API version specified:%s", version)
-        print "Unknown API version: %s" % version
+        parser.print_help()
+        sys.exit(1)
 
     if len(args) < 1:
         parser.print_help()
