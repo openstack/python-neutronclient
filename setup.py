@@ -15,12 +15,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages
+import os
+import sys
+import setuptools
+
+from quantumclient.openstack.common import setup
 
 import version
 
@@ -35,8 +34,8 @@ Summary = 'Client functionalities for Quantum'
 ShortDescription = Summary
 Description = Summary
 
-requires = [
-]
+dependency_links = setup.parse_dependency_links()
+tests_require = setup.parse_requirements(['tools/test-requires'])
 
 EagerResources = [
 ]
@@ -48,7 +47,7 @@ PackageData = {
 }
 
 
-setup(
+setuptools.setup(
     name=Name,
     version=Version,
     url=Url,
@@ -58,9 +57,11 @@ setup(
     long_description=Description,
     license=License,
     scripts=ProjectScripts,
-    install_requires=requires,
+    dependency_links=dependency_links,
+    tests_require=tests_require,
+    cmdclass=setup.get_cmdclass(),
     include_package_data=False,
-    packages=["quantumclient", "quantumclient.common"],
+    packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     package_data=PackageData,
     eager_resources=EagerResources,
     entry_points={

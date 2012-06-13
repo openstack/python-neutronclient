@@ -8,4 +8,4 @@ openstack.nose_plugin
 pep8==0.6.1
 sphinx>=1.1.2
 
--e git+https://review.openstack.org/p/openstack/quantum#egg=quantum-dev
+https://github.com/openstack/quantum/zipball/master#egg=quantum
