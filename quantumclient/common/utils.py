@@ -62,9 +62,9 @@ def to_primitive(value):
         return value
 
 
-def dumps(value):
+def dumps(value, indent=None):
     try:
-        return json.dumps(value)
+        return json.dumps(value, indent=indent)
     except TypeError:
         pass
     return json.dumps(to_primitive(value))
@@ -126,15 +126,26 @@ def get_item_properties(item, fields, mixed_case_fields=[], formatters={}):
                 data = item[field_name]
             else:
                 data = getattr(item, field_name, '')
+            if data is None:
+                data = ''
             row.append(data)
     return tuple(row)
 
 
-def __str2bool(strbool):
+def str2bool(strbool):
     if strbool is None:
         return None
     else:
         return strbool.lower() == 'true'
+
+
+def str2dict(strdict):
+        '''@param strdict: key1=value1,key2=value2'''
+        _info = {}
+        for kv_str in strdict.split(","):
+            k, v = kv_str.split("=", 1)
+            _info.update({k: v})
+        return _info
 
 
 def http_log(_logger, args, kwargs, resp, body):

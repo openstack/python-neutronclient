@@ -17,6 +17,7 @@
 
 import logging
 
+from quantumclient import utils
 from quantumclient.quantum.v2_0 import CreateCommand
 from quantumclient.quantum.v2_0 import DeleteCommand
 from quantumclient.quantum.v2_0 import ListCommand
@@ -26,7 +27,7 @@ from quantumclient.quantum.v2_0 import UpdateCommand
 
 def _format_fixed_ips(port):
     try:
-        return '\n'.join(port['fixed_ips'])
+        return '\n'.join([utils.dumps(ip) for ip in port['fixed_ips']])
     except Exception:
         return ''
 
@@ -75,6 +76,12 @@ class CreatePort(CreateCommand):
             '--device-id',
             help='device id of this port')
         parser.add_argument(
+            '--fixed-ip',
+            action='append',
+            help='desired Ip for this port: '
+            'subnet_id=<id>,ip_address=<ip>, '
+            'can be repeated')
+        parser.add_argument(
             'network_id',
             help='Network id of this port belongs to')
 
@@ -87,6 +94,12 @@ class CreatePort(CreateCommand):
             body['port'].update({'device_id': parsed_args.device_id})
         if parsed_args.tenant_id:
             body['port'].update({'tenant_id': parsed_args.tenant_id})
+        ips = []
+        if parsed_args.fixed_ip:
+            for ip_spec in parsed_args.fixed_ip:
+                ips.append(utils.str2dict(ip_spec))
+        if ips:
+            body['port'].update({'fixed_ips': ips})
         return body
 
 

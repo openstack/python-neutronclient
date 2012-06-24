@@ -70,11 +70,12 @@ def parse_args_to_dict(values_specs):
     current_arg = None
     _values_specs = []
     _value_number = 0
+    _list_flag = False
     current_item = None
     for _item in values_specs:
         if _item.startswith('--'):
             if current_arg is not None:
-                if _value_number > 1:
+                if _value_number > 1 or _list_flag:
                     current_arg.update({'nargs': '+'})
                 elif _value_number == 0:
                     current_arg.update({'action': 'store_true'})
@@ -93,12 +94,16 @@ def parse_args_to_dict(values_specs):
                 _type_str = _item.split('=', 2)[1]
                 current_arg.update({'type': eval(_type_str)})
                 if _type_str == 'bool':
-                    current_arg.update({'type': utils.__str2bool})
+                    current_arg.update({'type': utils.str2bool})
+                elif _type_str == 'dict':
+                    current_arg.update({'type': utils.str2dict})
                 continue
             else:
                 raise exceptions.CommandError(
                     "invalid values_specs %s" % ' '.join(values_specs))
-
+        elif _item == 'list=true':
+            _list_flag = True
+            continue
         if not _item.startswith('--'):
             if not current_item or '=' in current_item:
                 raise exceptions.CommandError(
@@ -110,9 +115,10 @@ def parse_args_to_dict(values_specs):
                 _value_number = 1
             else:
                 _value_number = 0
+            _list_flag = False
         _values_specs.append(_item)
     if current_arg is not None:
-        if _value_number > 1:
+        if _value_number > 1 or _list_flag:
             current_arg.update({'nargs': '+'})
         elif _value_number == 0:
             current_arg.update({'action': 'store_true'})
@@ -188,6 +194,19 @@ class CreateCommand(QuantumCommand, show.ShowOne):
             print >>self.app.stdout, _('Created a new %s:' % self.resource)
         else:
             info = {'': ''}
+        for k, v in info.iteritems():
+            if isinstance(v, list):
+                value = ""
+                for _item in v:
+                    if value:
+                        value += "\n"
+                    if isinstance(_item, dict):
+                        value += utils.dumps(_item)
+                    else:
+                        value += str(_item)
+                info[k] = value
+            elif v is None:
+                info[k] = ''
         return zip(*sorted(info.iteritems()))
 
 
@@ -334,6 +353,19 @@ class ShowCommand(QuantumCommand, show.ShowOne):
                              "show_%s" % self.resource)
         data = obj_showor(parsed_args.id, **params)
         if self.resource in data:
+            for k, v in data[self.resource].iteritems():
+                if isinstance(v, list):
+                    value = ""
+                    for _item in v:
+                        if value:
+                            value += "\n"
+                        if isinstance(_item, dict):
+                            value += utils.dumps(_item)
+                        else:
+                            value += str(_item)
+                    data[self.resource][k] = value
+                elif v is None:
+                    data[self.resource][k] = ''
             return zip(*sorted(data[self.resource].iteritems()))
         else:
             return None

@@ -33,3 +33,9 @@ class OpenStackCommand(Command):
             return
         else:
             return super(OpenStackCommand, self).run(parsed_args)
+
+    def get_data(self, parsed_args):
+        pass
+
+    def take_action(self, parsed_args):
+        return self.get_data(parsed_args)

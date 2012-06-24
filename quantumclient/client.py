@@ -20,6 +20,7 @@ try:
 except ImportError:
     import simplejson as json
 import logging
+import os
 import urlparse
 # Python 2.5 compat fix
 if not hasattr(urlparse, 'parse_qsl'):
@@ -32,6 +33,11 @@ from quantumclient.common import exceptions
 from quantumclient.common import utils
 
 _logger = logging.getLogger(__name__)
+
+if 'QUANTUMCLIENT_DEBUG' in os.environ and os.environ['QUANTUMCLIENT_DEBUG']:
+    ch = logging.StreamHandler()
+    _logger.setLevel(logging.DEBUG)
+    _logger.addHandler(ch)
 
 
 class ServiceCatalog(object):
@@ -86,7 +92,8 @@ class HTTPClient(httplib2.Http):
     def __init__(self, username=None, tenant_name=None,
                  password=None, auth_url=None,
                  token=None, region_name=None, timeout=None,
-                 endpoint_url=None, insecure=False, **kwargs):
+                 endpoint_url=None, insecure=False,
+                 auth_strategy='keystone', **kwargs):
         super(HTTPClient, self).__init__(timeout=timeout)
         self.username = username
         self.tenant_name = tenant_name
@@ -96,6 +103,7 @@ class HTTPClient(httplib2.Http):
         self.auth_token = token
         self.content_type = 'application/json'
         self.endpoint_url = endpoint_url
+        self.auth_strategy = auth_strategy
         # httplib2 overrides
         self.force_exception_to_status_code = True
         self.disable_ssl_certificate_validation = insecure
@@ -126,19 +134,21 @@ class HTTPClient(httplib2.Http):
         return resp, body
 
     def do_request(self, url, method, **kwargs):
-        if not self.endpoint_url or not self.auth_token:
+        if not self.endpoint_url:
             self.authenticate()
 
         # Perform the request once. If we get a 401 back then it
         # might be because the auth token expired, so try to
         # re-authenticate and try again. If it still fails, bail.
         try:
-            kwargs.setdefault('headers', {})['X-Auth-Token'] = self.auth_token
+            if self.auth_token:
+                kwargs.setdefault('headers', {})
+                kwargs['headers']['X-Auth-Token'] = self.auth_token
             resp, body = self._cs_request(self.endpoint_url + url, method,
                                           **kwargs)
             return resp, body
         except exceptions.Unauthorized as ex:
-            if not self.endpoint_url or not self.auth_token:
+            if not self.endpoint_url:
                 self.authenticate()
                 resp, body = self._cs_request(
                     self.management_url + url, method, **kwargs)
@@ -161,6 +171,8 @@ class HTTPClient(httplib2.Http):
             endpoint_type='adminURL')
 
     def authenticate(self):
+        if self.auth_strategy != 'keystone':
+            raise exceptions.Unauthorized(message='unknown auth strategy')
         body = {'auth': {'passwordCredentials':
                          {'username': self.username,
                           'password': self.password, },

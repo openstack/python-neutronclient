@@ -53,6 +53,7 @@ class ClientManager(object):
                  username=None, password=None,
                  region_name=None,
                  api_version=None,
+                 auth_strategy=None
                  ):
         self._token = token
         self._url = url
@@ -64,6 +65,7 @@ class ClientManager(object):
         self._region_name = region_name
         self._api_version = api_version
         self._service_catalog = None
+        self._auth_strategy = auth_strategy
         return
 
     def initialize(self):

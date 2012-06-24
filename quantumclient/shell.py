@@ -198,6 +198,13 @@ class QuantumShell(App):
             help='show tracebacks on errors', )
         # Global arguments
         parser.add_argument(
+            '--os-auth-strategy', metavar='<auth-strategy>',
+            default=env('OS_AUTH_STRATEGY', default='keystone'),
+            help='Authentication strategy (Env: OS_AUTH_STRATEGY'
+            ', default keystone). For now, any other value will'
+            ' disable the authentication')
+
+        parser.add_argument(
             '--os-auth-url', metavar='<auth-url>',
             default=env('OS_AUTH_URL'),
             help='Authentication URL (Env: OS_AUTH_URL)')
@@ -272,40 +279,45 @@ class QuantumShell(App):
         """Make sure the user has provided all of the authentication
         info we need.
         """
+        if self.options.os_auth_strategy == 'keystone':
+            if self.options.os_token or self.options.os_url:
+                # Token flow auth takes priority
+                if not self.options.os_token:
+                    raise exc.CommandError(
+                        "You must provide a token via"
+                        " either --os-token or env[OS_TOKEN]")
 
-        if self.options.os_token or self.options.os_url:
-            # Token flow auth takes priority
-            if not self.options.os_token:
-                raise exc.CommandError(
-                    "You must provide a token via"
-                    " either --os-token or env[OS_TOKEN]")
+                if not self.options.os_url:
+                    raise exc.CommandError(
+                        "You must provide a service URL via"
+                        " either --os-url or env[OS_URL]")
 
+            else:
+                # Validate password flow auth
+                if not self.options.os_username:
+                    raise exc.CommandError(
+                        "You must provide a username via"
+                        " either --os-username or env[OS_USERNAME]")
+
+                if not self.options.os_password:
+                    raise exc.CommandError(
+                        "You must provide a password via"
+                        " either --os-password or env[OS_PASSWORD]")
+
+                if not (self.options.os_tenant_name):
+                    raise exc.CommandError(
+                        "You must provide a tenant_name via"
+                        " either --os-tenant-name or via env[OS_TENANT_NAME]")
+
+                if not self.options.os_auth_url:
+                    raise exc.CommandError(
+                        "You must provide an auth url via"
+                        " either --os-auth-url or via env[OS_AUTH_URL]")
+        else:   # not keystone
             if not self.options.os_url:
                 raise exc.CommandError(
                     "You must provide a service URL via"
                     " either --os-url or env[OS_URL]")
-
-        else:
-            # Validate password flow auth
-            if not self.options.os_username:
-                raise exc.CommandError(
-                    "You must provide a username via"
-                    " either --os-username or env[OS_USERNAME]")
-
-            if not self.options.os_password:
-                raise exc.CommandError(
-                    "You must provide a password via"
-                    " either --os-password or env[OS_PASSWORD]")
-
-            if not (self.options.os_tenant_name):
-                raise exc.CommandError(
-                    "You must provide a tenant_name via"
-                    " either --os-tenant-name or via env[OS_TENANT_NAME]")
-
-            if not self.options.os_auth_url:
-                raise exc.CommandError(
-                    "You must provide an auth url via"
-                    " either --os-auth-url or via env[OS_AUTH_URL]")
 
         self.client_manager = clientmanager.ClientManager(
             token=self.options.os_token,
@@ -315,7 +327,8 @@ class QuantumShell(App):
             username=self.options.os_username,
             password=self.options.os_password,
             region_name=self.options.os_region_name,
-            api_version=self.api_version, )
+            api_version=self.api_version,
+            auth_strategy=self.options.os_auth_strategy, )
         return
 
     def initialize_app(self, argv):
