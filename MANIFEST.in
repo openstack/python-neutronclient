@@ -4,3 +4,4 @@ include version.py
 include tools/*
 include quantumclient/tests/*
 include quantumclient/tests/unit/*
+include quantumclient/versioninfo

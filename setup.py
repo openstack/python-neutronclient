@@ -21,11 +21,9 @@ import setuptools
 
 from quantumclient.openstack.common import setup
 
-import version
-
 Name = 'python-quantumclient'
 Url = "https://launchpad.net/quantum"
-Version = version.canonical_version_string()
+Version = setup.get_post_version('quantumclient')
 License = 'Apache License 2.0'
 Author = 'Netstack'
 AuthorEmail = 'netstack@lists.launchpad.net'
