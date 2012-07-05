@@ -29,7 +29,7 @@ from quantumclient.quantum.v2_0.subnet import DeleteSubnet
 class CLITestV20Subnet(CLITestV20Base):
 
     def test_create_subnet(self):
-        """ create_subnet --gateway gateway netid cidr"""
+        """Create sbunet: --gateway gateway netid cidr."""
         resource = 'subnet'
         cmd = CreateSubnet(MyApp(sys.stdout), None)
         name = 'myname'
@@ -45,14 +45,14 @@ class CLITestV20Subnet(CLITestV20Base):
                                           position_names, position_values)
 
     def test_create_subnet_tenant(self):
-        """create_subnet --tenant-id tenantid netid cidr"""
+        """Create subnet: --tenant_id tenantid netid cidr."""
         resource = 'subnet'
         cmd = CreateSubnet(MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
         cidr = 'prefixvalue'
-        args = ['--tenant-id', 'tenantid', netid, cidr]
+        args = ['--tenant_id', 'tenantid', netid, cidr]
         position_names = ['ip_version', 'network_id', 'cidr']
         position_values = [4, ]
         position_values.extend([netid, cidr])
@@ -61,7 +61,7 @@ class CLITestV20Subnet(CLITestV20Base):
                                           tenant_id='tenantid')
 
     def test_create_subnet_tags(self):
-        """ create_subnet netid cidr --tags a b"""
+        """Create subnet: netid cidr --tags a b."""
         resource = 'subnet'
         cmd = CreateSubnet(MyApp(sys.stdout), None)
         name = 'myname'
@@ -77,32 +77,32 @@ class CLITestV20Subnet(CLITestV20Base):
                                           tags=['a', 'b'])
 
     def test_list_subnets_detail(self):
-        """list_subnets -D"""
+        """List subnets: -D."""
         resources = "subnets"
         cmd = ListSubnet(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_subnets_tags(self):
-        """list_subnets -- --tags a b"""
+        """List subnets: -- --tags a b."""
         resources = "subnets"
         cmd = ListSubnet(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, tags=['a', 'b'])
 
     def test_list_subnets_detail_tags(self):
-        """list_subnets -D -- --tags a b"""
+        """List subnets: -D -- --tags a b."""
         resources = "subnets"
         cmd = ListSubnet(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, detail=True, tags=['a', 'b'])
 
     def test_list_subnets_fields(self):
-        """list_subnets --fields a --fields b -- --fields c d"""
+        """List subnets: --fields a --fields b -- --fields c d."""
         resources = "subnets"
         cmd = ListSubnet(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
                                   fields_1=['a', 'b'], fields_2=['c', 'd'])
 
     def test_update_subnet(self):
-        """ update_subnet myid --name myname --tags a b"""
+        """Update subnet: myid --name myname --tags a b."""
         resource = 'subnet'
         cmd = UpdateSubnet(MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -112,7 +112,7 @@ class CLITestV20Subnet(CLITestV20Base):
                                    )
 
     def test_show_subnet(self):
-        """ show_subnet --fields id --fields name myid """
+        """Show subnet: --fields id --fields name myid."""
         resource = 'subnet'
         cmd = ShowSubnet(MyApp(sys.stdout), None)
         myid = 'myid'
@@ -120,9 +120,7 @@ class CLITestV20Subnet(CLITestV20Base):
         self._test_show_resource(resource, cmd, myid, args, ['id', 'name'])
 
     def test_delete_subnet(self):
-        """
-        delete_subnet myid
-        """
+        """Delete subnet: subnetid."""
         resource = 'subnet'
         cmd = DeleteSubnet(MyApp(sys.stdout), None)
         myid = 'myid'

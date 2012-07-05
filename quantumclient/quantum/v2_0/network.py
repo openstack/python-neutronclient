@@ -32,10 +32,7 @@ def _format_subnets(network):
 
 
 class ListNetwork(ListCommand):
-    """List networks that belong to a given tenant
-
-    Sample: list_nets -D -- --name=test4 --tag a b
-    """
+    """List networks that belong to a given tenant."""
 
     resource = 'network'
     log = logging.getLogger(__name__ + '.ListNetwork')
@@ -43,27 +40,21 @@ class ListNetwork(ListCommand):
 
 
 class ShowNetwork(ShowCommand):
-    """Show information of a given network
-
-    Sample: show_net -D <network_id>
-    """
+    """Show information of a given network."""
 
     resource = 'network'
     log = logging.getLogger(__name__ + '.ShowNetwork')
 
 
 class CreateNetwork(CreateCommand):
-    """Create a network for a given tenant
-
-    Sample create_net --tenant-id xxx --admin-state-down <net_name> --tag x y
-    """
+    """Create a network for a given tenant."""
 
     resource = 'network'
     log = logging.getLogger(__name__ + '.CreateNetwork')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
-            '--admin-state-down',
+            '--admin_state_down',
             default=True, action='store_false',
             help='Set Admin State Up to false')
         parser.add_argument(
@@ -80,20 +71,14 @@ class CreateNetwork(CreateCommand):
 
 
 class DeleteNetwork(DeleteCommand):
-    """Delete a given network
-
-    Sample: delete_net <network_id>
-    """
+    """Delete a given network."""
 
     log = logging.getLogger(__name__ + '.DeleteNetwork')
     resource = 'network'
 
 
 class UpdateNetwork(UpdateCommand):
-    """Update network's information
-
-    Sample: update_net <network_id> --name=test --admin_state_up type=bool True
-    """
+    """Update network's information."""
 
     log = logging.getLogger(__name__ + '.UpdateNetwork')
     resource = 'network'

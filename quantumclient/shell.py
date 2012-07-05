@@ -51,64 +51,64 @@ def env(*vars, **kwargs):
     return kwargs.get('default', '')
 
 COMMAND_V1 = {
-    'list_nets': utils.import_class(
+    'net-list': utils.import_class(
         'quantumclient.quantum.v1_1.network.ListNetwork'),
-    'show_net': utils.import_class(
+    'net-show': utils.import_class(
         'quantumclient.quantum.v1_1.network.ShowNetwork'),
-    'create_net': utils.import_class(
+    'net-create': utils.import_class(
         'quantumclient.quantum.v1_1.network.CreateNetwork'),
-    'delete_net': utils.import_class(
+    'net-delete': utils.import_class(
         'quantumclient.quantum.v1_1.network.DeleteNetwork'),
-    'update_net': utils.import_class(
+    'net-update': utils.import_class(
         'quantumclient.quantum.v1_1.network.UpdateNetwork'),
 
-    'list_ports': utils.import_class(
+    'port-list': utils.import_class(
         'quantumclient.quantum.v1_1.port.ListPort'),
-    'show_port': utils.import_class(
+    'port-show': utils.import_class(
         'quantumclient.quantum.v1_1.port.ShowPort'),
-    'create_port': utils.import_class(
+    'port-create': utils.import_class(
         'quantumclient.quantum.v1_1.port.CreatePort'),
-    'delete_port': utils.import_class(
+    'port-delete': utils.import_class(
         'quantumclient.quantum.v1_1.port.DeletePort'),
-    'update_port': utils.import_class(
+    'port-update': utils.import_class(
         'quantumclient.quantum.v1_1.port.UpdatePort'),
 
-    'plug_iface': utils.import_class(
+    'iface-plugin': utils.import_class(
         'quantumclient.quantum.v1_1.interface.PlugInterface'),
-    'unplug_iface': utils.import_class(
+    'iface-unplug': utils.import_class(
         'quantumclient.quantum.v1_1.interface.UnPlugInterface'),
-    'show_iface': utils.import_class(
+    'iface-show': utils.import_class(
         'quantumclient.quantum.v1_1.interface.ShowInterface'), }
 COMMAND_V2 = {
-    'list_nets': utils.import_class(
+    'net-list': utils.import_class(
         'quantumclient.quantum.v2_0.network.ListNetwork'),
-    'show_net': utils.import_class(
+    'net-show': utils.import_class(
         'quantumclient.quantum.v2_0.network.ShowNetwork'),
-    'create_net': utils.import_class(
+    'net-create': utils.import_class(
         'quantumclient.quantum.v2_0.network.CreateNetwork'),
-    'delete_net': utils.import_class(
+    'net-delete': utils.import_class(
         'quantumclient.quantum.v2_0.network.DeleteNetwork'),
-    'update_net': utils.import_class(
+    'net-update': utils.import_class(
         'quantumclient.quantum.v2_0.network.UpdateNetwork'),
-    'list_subnets': utils.import_class(
+    'subnet-list': utils.import_class(
         'quantumclient.quantum.v2_0.subnet.ListSubnet'),
-    'show_subnet': utils.import_class(
+    'subnet-show': utils.import_class(
         'quantumclient.quantum.v2_0.subnet.ShowSubnet'),
-    'create_subnet': utils.import_class(
+    'subnet-create': utils.import_class(
         'quantumclient.quantum.v2_0.subnet.CreateSubnet'),
-    'delete_subnet': utils.import_class(
+    'subnet-delete': utils.import_class(
         'quantumclient.quantum.v2_0.subnet.DeleteSubnet'),
-    'update_subnet': utils.import_class(
+    'subnet-update': utils.import_class(
         'quantumclient.quantum.v2_0.subnet.UpdateSubnet'),
-    'list_ports': utils.import_class(
+    'port-list': utils.import_class(
         'quantumclient.quantum.v2_0.port.ListPort'),
-    'show_port': utils.import_class(
+    'port-show': utils.import_class(
         'quantumclient.quantum.v2_0.port.ShowPort'),
-    'create_port': utils.import_class(
+    'port-create': utils.import_class(
         'quantumclient.quantum.v2_0.port.CreatePort'),
-    'delete_port': utils.import_class(
+    'port-delete': utils.import_class(
         'quantumclient.quantum.v2_0.port.DeletePort'),
-    'update_port': utils.import_class(
+    'port-update': utils.import_class(
         'quantumclient.quantum.v2_0.port.UpdatePort'), }
 
 COMMANDS = {'1.0': COMMAND_V1,
@@ -198,51 +198,51 @@ class QuantumShell(App):
             help='show tracebacks on errors', )
         # Global arguments
         parser.add_argument(
-            '--os-auth-strategy', metavar='<auth-strategy>',
+            '--os_auth_strategy', metavar='<auth_strategy>',
             default=env('OS_AUTH_STRATEGY', default='keystone'),
             help='Authentication strategy (Env: OS_AUTH_STRATEGY'
             ', default keystone). For now, any other value will'
             ' disable the authentication')
 
         parser.add_argument(
-            '--os-auth-url', metavar='<auth-url>',
+            '--os_auth_url', metavar='<auth_url>',
             default=env('OS_AUTH_URL'),
             help='Authentication URL (Env: OS_AUTH_URL)')
 
         parser.add_argument(
-            '--os-tenant-name', metavar='<auth-tenant-name>',
+            '--os_tenant_name', metavar='<auth_tenant_name>',
             default=env('OS_TENANT_NAME'),
             help='Authentication tenant name (Env: OS_TENANT_NAME)')
 
         parser.add_argument(
-            '--os-username', metavar='<auth-username>',
+            '--os_username', metavar='<auth_username>',
             default=utils.env('OS_USERNAME'),
             help='Authentication username (Env: OS_USERNAME)')
 
         parser.add_argument(
-            '--os-password', metavar='<auth-password>',
+            '--os_password', metavar='<auth_password>',
             default=utils.env('OS_PASSWORD'),
             help='Authentication password (Env: OS_PASSWORD)')
 
         parser.add_argument(
-            '--os-region-name', metavar='<auth-region-name>',
+            '--os_region_name', metavar='<auth_region_name>',
             default=env('OS_REGION_NAME'),
             help='Authentication region name (Env: OS_REGION_NAME)')
 
         parser.add_argument(
-            '--os-quantum-api-version',
-            metavar='<quantum-api-version>',
+            '--os_quantum_api_version',
+            metavar='<quantum_api_version>',
             default=env('OS_QUANTUM_API_VERSION', default='2.0'),
             help='QAUNTUM API version, default=2.0 '
                  '(Env: OS_QUANTUM_API_VERSION)')
 
         parser.add_argument(
-            '--os-token', metavar='<token>',
+            '--os_token', metavar='<token>',
             default=env('OS_TOKEN'),
             help='Defaults to env[OS_TOKEN]')
 
         parser.add_argument(
-            '--os-url', metavar='<url>',
+            '--os_url', metavar='<url>',
             default=env('OS_URL'),
             help='Defaults to env[OS_URL]')
 
@@ -285,39 +285,39 @@ class QuantumShell(App):
                 if not self.options.os_token:
                     raise exc.CommandError(
                         "You must provide a token via"
-                        " either --os-token or env[OS_TOKEN]")
+                        " either --os_token or env[OS_TOKEN]")
 
                 if not self.options.os_url:
                     raise exc.CommandError(
                         "You must provide a service URL via"
-                        " either --os-url or env[OS_URL]")
+                        " either --os_url or env[OS_URL]")
 
             else:
                 # Validate password flow auth
                 if not self.options.os_username:
                     raise exc.CommandError(
                         "You must provide a username via"
-                        " either --os-username or env[OS_USERNAME]")
+                        " either --os_username or env[OS_USERNAME]")
 
                 if not self.options.os_password:
                     raise exc.CommandError(
                         "You must provide a password via"
-                        " either --os-password or env[OS_PASSWORD]")
+                        " either --os_password or env[OS_PASSWORD]")
 
                 if not (self.options.os_tenant_name):
                     raise exc.CommandError(
                         "You must provide a tenant_name via"
-                        " either --os-tenant-name or via env[OS_TENANT_NAME]")
+                        " either --os_tenant_name or via env[OS_TENANT_NAME]")
 
                 if not self.options.os_auth_url:
                     raise exc.CommandError(
                         "You must provide an auth url via"
-                        " either --os-auth-url or via env[OS_AUTH_URL]")
+                        " either --os_auth_url or via env[OS_AUTH_URL]")
         else:   # not keystone
             if not self.options.os_url:
                 raise exc.CommandError(
                     "You must provide a service URL via"
-                    " either --os-url or env[OS_URL]")
+                    " either --os_url or env[OS_URL]")
 
         self.client_manager = clientmanager.ClientManager(
             token=self.options.os_token,
@@ -367,10 +367,10 @@ def main(argv=sys.argv[1:]):
     apiVersion = None
     versionFlag = False
     for argitem in argv:
-        if argitem.startswith('--os-quantum-api-version='):
+        if argitem.startswith('--os_quantum_api_version='):
             apiVersion = argitem.split('=', 2)[1]
             break
-        elif '--os-quantum-api-version' == argitem:
+        elif '--os_quantum_api_version' == argitem:
             versionFlag = True
         elif versionFlag:
             apiVersion = argitem

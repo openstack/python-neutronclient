@@ -29,7 +29,7 @@ from quantumclient.quantum.v2_0.network import DeleteNetwork
 
 class CLITestV20Network(CLITestV20Base):
     def test_create_network(self):
-        """ create_net myname"""
+        """Create net: myname."""
         resource = 'network'
         cmd = CreateNetwork(MyApp(sys.stdout), None)
         name = 'myname'
@@ -41,12 +41,12 @@ class CLITestV20Network(CLITestV20Base):
                                           position_names, position_values)
 
     def test_create_network_tenant(self):
-        """create_net --tenant-id tenantid myname"""
+        """Create net: --tenant_id tenantid myname."""
         resource = 'network'
         cmd = CreateNetwork(MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
-        args = ['--tenant-id', 'tenantid', name]
+        args = ['--tenant_id', 'tenantid', name]
         position_names = ['name', ]
         position_values = [name, ]
         _str = self._test_create_resource(resource, cmd, name, myid, args,
@@ -54,7 +54,7 @@ class CLITestV20Network(CLITestV20Base):
                                           tenant_id='tenantid')
 
     def test_create_network_tags(self):
-        """ create_net myname --tags a b"""
+        """Create net: myname --tags a b."""
         resource = 'network'
         cmd = CreateNetwork(MyApp(sys.stdout), None)
         name = 'myname'
@@ -67,12 +67,12 @@ class CLITestV20Network(CLITestV20Base):
                                           tags=['a', 'b'])
 
     def test_create_network_state(self):
-        """ create_net --admin-state-down myname"""
+        """Create net: --admin_state_down myname."""
         resource = 'network'
         cmd = CreateNetwork(MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
-        args = ['--admin-state-down', name, ]
+        args = ['--admin_state_down', name, ]
         position_names = ['name', ]
         position_values = [name, ]
         _str = self._test_create_resource(resource, cmd, name, myid, args,
@@ -80,39 +80,39 @@ class CLITestV20Network(CLITestV20Base):
                                           admin_state_up=False)
 
     def test_list_nets_detail(self):
-        """list_nets -D"""
+        """list nets: -D."""
         resources = "networks"
         cmd = ListNetwork(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_nets_tags(self):
-        """list_nets -- --tags a b"""
+        """List nets: -- --tags a b."""
         resources = "networks"
         cmd = ListNetwork(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, tags=['a', 'b'])
 
     def test_list_nets_detail_tags(self):
-        """list_nets -D -- --tags a b"""
+        """List nets: -D -- --tags a b."""
         resources = "networks"
         cmd = ListNetwork(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, detail=True, tags=['a', 'b'])
 
     def test_list_nets_fields(self):
-        """list_nets --fields a --fields b -- --fields c d"""
+        """List nets: --fields a --fields b -- --fields c d."""
         resources = "networks"
         cmd = ListNetwork(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
                                   fields_1=['a', 'b'], fields_2=['c', 'd'])
 
     def test_update_network_exception(self):
-        """ update_net myid"""
+        """Update net: myid."""
         resource = 'network'
         cmd = UpdateNetwork(MyApp(sys.stdout), None)
         self.assertRaises(exceptions.CommandError, self._test_update_resource,
                           resource, cmd, 'myid', ['myid'], {})
 
     def test_update_network(self):
-        """ update_net myid --name myname --tags a b"""
+        """Update net: myid --name myname --tags a b."""
         resource = 'network'
         cmd = UpdateNetwork(MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -122,7 +122,7 @@ class CLITestV20Network(CLITestV20Base):
                                    )
 
     def test_show_network(self):
-        """ show_net --fields id --fields name myid """
+        """Show net: --fields id --fields name myid."""
         resource = 'network'
         cmd = ShowNetwork(MyApp(sys.stdout), None)
         myid = 'myid'
@@ -130,9 +130,7 @@ class CLITestV20Network(CLITestV20Base):
         self._test_show_resource(resource, cmd, myid, args, ['id', 'name'])
 
     def test_delete_network(self):
-        """
-        delete_net myid
-        """
+        """Delete net: myid."""
         resource = 'network'
         cmd = DeleteNetwork(MyApp(sys.stdout), None)
         myid = 'myid'

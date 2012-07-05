@@ -28,7 +28,7 @@ from quantumclient.common import utils
 
 def add_show_list_common_argument(parser):
     parser.add_argument(
-        '-D', '--show-details',
+        '-D', '--show_details',
         help='show detailed info',
         action='store_true',
         default=False, )
@@ -145,7 +145,7 @@ class QuantumCommand(command.OpenStackCommand):
     def get_parser(self, prog_name):
         parser = super(QuantumCommand, self).get_parser(prog_name)
         parser.add_argument(
-            '--request-format',
+            '--request_format',
             help=_('the xml or json request format'),
             default='json',
             choices=['json', 'xml', ], )
@@ -165,7 +165,7 @@ class CreateCommand(QuantumCommand, show.ShowOne):
     def get_parser(self, prog_name):
         parser = super(CreateCommand, self).get_parser(prog_name)
         parser.add_argument(
-            '--tenant-id', metavar='tenant-id',
+            '--tenant_id', metavar='tenant_id',
             help=_('the owner tenant ID'), )
         self.add_known_arguments(parser)
         add_extra_argument(parser, 'value_specs',
@@ -221,7 +221,7 @@ class UpdateCommand(QuantumCommand):
     def get_parser(self, prog_name):
         parser = super(UpdateCommand, self).get_parser(prog_name)
         parser.add_argument(
-            'id', metavar='%s-id' % self.resource,
+            'id', metavar='%s_id' % self.resource,
             help='ID of %s to update' % self.resource)
         add_extra_argument(parser, 'value_specs',
                            'new values for the %s' % self.resource)
@@ -257,7 +257,7 @@ class DeleteCommand(QuantumCommand):
     def get_parser(self, prog_name):
         parser = super(DeleteCommand, self).get_parser(prog_name)
         parser.add_argument(
-            'id', metavar='%s-id' % self.resource,
+            'id', metavar='%s_id' % self.resource,
             help='ID of %s to delete' % self.resource)
         return parser
 
@@ -335,7 +335,7 @@ class ShowCommand(QuantumCommand, show.ShowOne):
         parser = super(ShowCommand, self).get_parser(prog_name)
         add_show_list_common_argument(parser)
         parser.add_argument(
-            'id', metavar='%s-id' % self.resource,
+            'id', metavar='%s_id' % self.resource,
             help='ID of %s to look up' % self.resource)
 
         return parser

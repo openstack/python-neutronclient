@@ -33,10 +33,7 @@ def _format_fixed_ips(port):
 
 
 class ListPort(ListCommand):
-    """List networks that belong to a given tenant
-
-    Sample: list_ports -D -- --name=test4 --tag a b
-    """
+    """List networks that belong to a given tenant."""
 
     resource = 'port'
     log = logging.getLogger(__name__ + '.ListPort')
@@ -44,39 +41,31 @@ class ListPort(ListCommand):
 
 
 class ShowPort(ShowCommand):
-    """Show information of a given port
-
-    Sample: show_port -D <port_id>
-    """
+    """Show information of a given port."""
 
     resource = 'port'
     log = logging.getLogger(__name__ + '.ShowPort')
 
 
 class CreatePort(CreateCommand):
-    """Create a port for a given tenant
-
-    Sample create_port --tenant-id xxx --admin-state-down \
-      --mac_address mac --device_id deviceid <network_id>
-
-    """
+    """Create a port for a given tenant."""
 
     resource = 'port'
     log = logging.getLogger(__name__ + '.CreatePort')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
-            '--admin-state-down',
+            '--admin_state_down',
             default=True, action='store_false',
             help='set admin state up to false')
         parser.add_argument(
-            '--mac-address',
+            '--mac_address',
             help='mac address of port')
         parser.add_argument(
-            '--device-id',
+            '--device_id',
             help='device id of this port')
         parser.add_argument(
-            '--fixed-ip',
+            '--fixed_ip',
             action='append',
             help='desired Ip for this port: '
             'subnet_id=<id>,ip_address=<ip>, '
@@ -104,20 +93,14 @@ class CreatePort(CreateCommand):
 
 
 class DeletePort(DeleteCommand):
-    """Delete a given port
-
-    Sample: delete_port <port_id>
-    """
+    """Delete a given port."""
 
     resource = 'port'
     log = logging.getLogger(__name__ + '.DeletePort')
 
 
 class UpdatePort(UpdateCommand):
-    """Update port's information
-
-    Sample: update_port <port_id> --name=test --admin_state_up type=bool True
-    """
+    """Update port's information."""
 
     resource = 'port'
     log = logging.getLogger(__name__ + '.UpdatePort')

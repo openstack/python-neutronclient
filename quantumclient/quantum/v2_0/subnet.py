@@ -25,10 +25,7 @@ from quantumclient.quantum.v2_0 import UpdateCommand
 
 
 class ListSubnet(ListCommand):
-    """List networks that belong to a given tenant
-
-    Sample: list_subnets -D -- --name=test4 --tag a b
-    """
+    """List networks that belong to a given tenant."""
 
     resource = 'subnet'
     log = logging.getLogger(__name__ + '.ListSubnet')
@@ -36,27 +33,20 @@ class ListSubnet(ListCommand):
 
 
 class ShowSubnet(ShowCommand):
-    """Show information of a given subnet
-
-    Sample: show_subnet -D <subnet_id>
-    """
+    """Show information of a given subnet."""
 
     resource = 'subnet'
     log = logging.getLogger(__name__ + '.ShowSubnet')
 
 
 class CreateSubnet(CreateCommand):
-    """Create a subnet for a given tenant
-
-    Sample create_subnet --tenant-id xxx --ip-version 4\
-    <network_id> <cidr> --tag x y --otherfield value
-    """
+    """Create a subnet for a given tenant."""
 
     resource = 'subnet'
     log = logging.getLogger(__name__ + '.CreateSubnet')
 
     def add_known_arguments(self, parser):
-        parser.add_argument('--ip-version', type=int,
+        parser.add_argument('--ip_version', type=int,
                             default=4, choices=[4, 6],
                             help='IP version with default 4')
         parser.add_argument(
@@ -81,21 +71,14 @@ class CreateSubnet(CreateCommand):
 
 
 class DeleteSubnet(DeleteCommand):
-    """Delete a given subnet
-
-    Sample: delete_subnet <subnet-id>
-    """
+    """Delete a given subnet."""
 
     resource = 'subnet'
     log = logging.getLogger(__name__ + '.DeleteSubnet')
 
 
 class UpdateSubnet(UpdateCommand):
-    """Update subnet's information
-
-    Sample:
-    update_subnet <subnet-id> --name=test --admin_state_up type=bool True
-    """
+    """Update subnet's information."""
 
     resource = 'subnet'
     log = logging.getLogger(__name__ + '.UpdateSubnet')

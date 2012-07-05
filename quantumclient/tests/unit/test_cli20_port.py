@@ -29,7 +29,7 @@ from quantumclient.quantum.v2_0.port import DeletePort
 class CLITestV20Port(CLITestV20Base):
 
     def test_create_port(self):
-        """ create_port netid"""
+        """Create port: netid."""
         resource = 'port'
         cmd = CreatePort(MyApp(sys.stdout), None)
         name = 'myname'
@@ -43,26 +43,26 @@ class CLITestV20Port(CLITestV20Base):
                                           position_names, position_values)
 
     def test_create_port_full(self):
-        """ create_port --mac-address mac --device-id deviceid netid"""
+        """Create port: --mac_address mac --device_id deviceid netid."""
         resource = 'port'
         cmd = CreatePort(MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        args = ['--mac-address', 'mac', '--device-id', 'deviceid', netid]
+        args = ['--mac_address', 'mac', '--device_id', 'deviceid', netid]
         position_names = ['network_id', 'mac_address', 'device_id']
         position_values = [netid, 'mac', 'deviceid']
         _str = self._test_create_resource(resource, cmd, name, myid, args,
                                           position_names, position_values)
 
     def test_create_port_tenant(self):
-        """create_port --tenant-id tenantid netid"""
+        """Create port: --tenant_id tenantid netid."""
         resource = 'port'
         cmd = CreatePort(MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        args = ['--tenant-id', 'tenantid', netid, ]
+        args = ['--tenant_id', 'tenantid', netid, ]
         position_names = ['network_id']
         position_values = []
         position_values.extend([netid])
@@ -71,7 +71,7 @@ class CLITestV20Port(CLITestV20Base):
                                           tenant_id='tenantid')
 
     def test_create_port_tags(self):
-        """ create_port netid mac_address device_id --tags a b"""
+        """Create port: netid mac_address device_id --tags a b."""
         resource = 'port'
         cmd = CreatePort(MyApp(sys.stdout), None)
         name = 'myname'
@@ -85,33 +85,33 @@ class CLITestV20Port(CLITestV20Base):
                                           position_names, position_values,
                                           tags=['a', 'b'])
 
-    def test_list_ports_detail(self):
-        """list_ports -D"""
+    def test_list_ports(self):
+        """List ports: -D."""
         resources = "ports"
         cmd = ListPort(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_ports_tags(self):
-        """list_ports -- --tags a b"""
+        """List ports: -- --tags a b."""
         resources = "ports"
         cmd = ListPort(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, tags=['a', 'b'])
 
     def test_list_ports_detail_tags(self):
-        """list_ports -D -- --tags a b"""
+        """List ports: -D -- --tags a b."""
         resources = "ports"
         cmd = ListPort(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, detail=True, tags=['a', 'b'])
 
     def test_list_ports_fields(self):
-        """list_ports --fields a --fields b -- --fields c d"""
+        """List ports: --fields a --fields b -- --fields c d."""
         resources = "ports"
         cmd = ListPort(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
                                   fields_1=['a', 'b'], fields_2=['c', 'd'])
 
     def test_update_port(self):
-        """ update_port myid --name myname --tags a b"""
+        """Update port: myid --name myname --tags a b."""
         resource = 'port'
         cmd = UpdatePort(MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -121,7 +121,7 @@ class CLITestV20Port(CLITestV20Base):
                                    )
 
     def test_show_port(self):
-        """ show_port --fields id --fields name myid """
+        """Show port: --fields id --fields name myid."""
         resource = 'port'
         cmd = ShowPort(MyApp(sys.stdout), None)
         myid = 'myid'
@@ -129,9 +129,7 @@ class CLITestV20Port(CLITestV20Base):
         self._test_show_resource(resource, cmd, myid, args, ['id', 'name'])
 
     def test_delete_port(self):
-        """
-        delete_port myid
-        """
+        """Delete port: myid."""
         resource = 'port'
         cmd = DeletePort(MyApp(sys.stdout), None)
         myid = 'myid'
