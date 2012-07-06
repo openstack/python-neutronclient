@@ -35,50 +35,23 @@ from quantumclient.common import utils
 
 gettext.install('quantum', unicode=1)
 VERSION = '2.0'
+QUANTUM_API_VERSION = '2.0'
 
 
-def env(*vars, **kwargs):
+def env(*_vars, **kwargs):
     """Search for the first defined of possibly many env vars
 
     Returns the first environment variable defined in vars, or
     returns the default defined in kwargs.
 
     """
-    for v in vars:
+    for v in _vars:
         value = os.environ.get(v, None)
         if value:
             return value
     return kwargs.get('default', '')
 
-COMMAND_V1 = {
-    'net-list': utils.import_class(
-        'quantumclient.quantum.v1_1.network.ListNetwork'),
-    'net-show': utils.import_class(
-        'quantumclient.quantum.v1_1.network.ShowNetwork'),
-    'net-create': utils.import_class(
-        'quantumclient.quantum.v1_1.network.CreateNetwork'),
-    'net-delete': utils.import_class(
-        'quantumclient.quantum.v1_1.network.DeleteNetwork'),
-    'net-update': utils.import_class(
-        'quantumclient.quantum.v1_1.network.UpdateNetwork'),
 
-    'port-list': utils.import_class(
-        'quantumclient.quantum.v1_1.port.ListPort'),
-    'port-show': utils.import_class(
-        'quantumclient.quantum.v1_1.port.ShowPort'),
-    'port-create': utils.import_class(
-        'quantumclient.quantum.v1_1.port.CreatePort'),
-    'port-delete': utils.import_class(
-        'quantumclient.quantum.v1_1.port.DeletePort'),
-    'port-update': utils.import_class(
-        'quantumclient.quantum.v1_1.port.UpdatePort'),
-
-    'iface-plugin': utils.import_class(
-        'quantumclient.quantum.v1_1.interface.PlugInterface'),
-    'iface-unplug': utils.import_class(
-        'quantumclient.quantum.v1_1.interface.UnPlugInterface'),
-    'iface-show': utils.import_class(
-        'quantumclient.quantum.v1_1.interface.ShowInterface'), }
 COMMAND_V2 = {
     'net-list': utils.import_class(
         'quantumclient.quantum.v2_0.network.ListNetwork'),
@@ -111,9 +84,7 @@ COMMAND_V2 = {
     'port-update': utils.import_class(
         'quantumclient.quantum.v2_0.port.UpdatePort'), }
 
-COMMANDS = {'1.0': COMMAND_V1,
-            '1.1': COMMAND_V1,
-            '2.0': COMMAND_V2, }
+COMMANDS = {'2.0': COMMAND_V2}
 
 
 class HelpAction(argparse.Action):
@@ -230,13 +201,6 @@ class QuantumShell(App):
             help='Authentication region name (Env: OS_REGION_NAME)')
 
         parser.add_argument(
-            '--os_quantum_api_version',
-            metavar='<quantum_api_version>',
-            default=env('OS_QUANTUM_API_VERSION', default='2.0'),
-            help='QAUNTUM API version, default=2.0 '
-                 '(Env: OS_QUANTUM_API_VERSION)')
-
-        parser.add_argument(
             '--os_token', metavar='<token>',
             default=env('OS_TOKEN'),
             help='Defaults to env[OS_TOKEN]')
@@ -340,8 +304,7 @@ class QuantumShell(App):
 
         super(QuantumShell, self).initialize_app(argv)
 
-        self.api_version = {
-            'network': self.options.os_quantum_api_version, }
+        self.api_version = {'network': self.api_version}
 
         # If the user is not asking for help, make sure they
         # have given us auth.
@@ -364,27 +327,10 @@ def itertools_compressdef(data, selectors):
 
 
 def main(argv=sys.argv[1:]):
-    apiVersion = None
-    versionFlag = False
-    for argitem in argv:
-        if argitem.startswith('--os_quantum_api_version='):
-            apiVersion = argitem.split('=', 2)[1]
-            break
-        elif '--os_quantum_api_version' == argitem:
-            versionFlag = True
-        elif versionFlag:
-            apiVersion = argitem
-            break
-    if apiVersion and apiVersion not in COMMANDS.keys():
-        print ("Invalid API version or API version '%s' is not supported" %
-               apiVersion)
-        sys.exit(1)
-    if not apiVersion:
-        apiVersion = env('OS_QUANTUM_API_VERSION', default='2.0')
     try:
         if not getattr(itertools, 'compress', None):
             setattr(itertools, 'compress', itertools_compressdef)
-        return QuantumShell(apiVersion).run(argv)
+        return QuantumShell(QUANTUM_API_VERSION).run(argv)
     except exc.QuantumClientException:
         return 1
     except Exception as e:

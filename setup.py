@@ -64,8 +64,7 @@ setuptools.setup(
     eager_resources=EagerResources,
     entry_points={
         'console_scripts': [
-            'quantum = quantumclient.cli:main',
-            'quantumv2 = quantumclient.shell:main',
+            'quantum = quantumclient.shell:main',
         ]
     },
 )

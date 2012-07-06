@@ -15,18 +15,12 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-import logging
-import urlparse
-
-
+from quantumclient.common import exceptions
 from quantumclient.common import utils
 
-LOG = logging.getLogger(__name__)
 
 API_NAME = 'network'
 API_VERSIONS = {
-    '1.0': 'quantumclient.Client',
-    '1.1': 'quantumclient.ClientV11',
     '2.0': 'quantumclient.v2_0.client.Client',
 }
 
@@ -42,22 +36,7 @@ def make_client(instance):
     instance.initialize()
     url = instance._url
     url = url.rstrip("/")
-    client_full_name = (quantum_client.__module__ + "." +
-                        quantum_client.__name__)
-    LOG.debug("we are using client: %s", client_full_name)
-    v1x = (client_full_name == API_VERSIONS['1.1'] or
-           client_full_name == API_VERSIONS['1.0'])
-    if v1x:
-        magic_tuple = urlparse.urlsplit(url)
-        scheme, netloc, path, query, frag = magic_tuple
-        host = magic_tuple.hostname
-        port = magic_tuple.port
-        use_ssl = scheme.lower().startswith('https')
-        client = quantum_client(host=host, port=port, use_ssl=use_ssl)
-        client.auth_token = instance._token
-        client.logger = LOG
-        return client
-    else:
+    if '2.0' == instance._api_version[API_NAME]:
         client = quantum_client(username=instance._username,
                                 tenant_name=instance._tenant_name,
                                 password=instance._password,
@@ -67,3 +46,6 @@ def make_client(instance):
                                 token=instance._token,
                                 auth_strategy=instance._auth_strategy)
         return client
+    else:
+        raise exceptions.UnsupportedVersion("API version %s is not supported" %
+                                            instance._api_version[API_NAME])
