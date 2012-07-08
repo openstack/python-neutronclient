@@ -159,8 +159,8 @@ class CLITestV20Base(unittest.TestCase):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
-        self.assertTrue(myid, _str)
-        self.assertTrue(name, _str)
+        self.assertTrue(myid in _str)
+        self.assertTrue(name in _str)
 
     def _test_list_resources(self, resources, cmd, detail=False, tags=[],
                              fields_1=[], fields_2=[]):

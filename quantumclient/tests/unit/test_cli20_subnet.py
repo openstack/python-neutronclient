@@ -39,8 +39,7 @@ class CLITestV20Subnet(CLITestV20Base):
         gateway = 'gatewayvalue'
         args = ['--gateway', gateway, netid, cidr]
         position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
-        position_values = [4, ]
-        position_values.extend([netid, cidr, gateway])
+        position_values = [4, netid, cidr, gateway]
         _str = self._test_create_resource(resource, cmd, name, myid, args,
                                           position_names, position_values)
 
@@ -54,8 +53,7 @@ class CLITestV20Subnet(CLITestV20Base):
         cidr = 'prefixvalue'
         args = ['--tenant_id', 'tenantid', netid, cidr]
         position_names = ['ip_version', 'network_id', 'cidr']
-        position_values = [4, ]
-        position_values.extend([netid, cidr])
+        position_values = [4, netid, cidr]
         _str = self._test_create_resource(resource, cmd, name, myid, args,
                                           position_names, position_values,
                                           tenant_id='tenantid')
@@ -70,11 +68,55 @@ class CLITestV20Subnet(CLITestV20Base):
         cidr = 'prefixvalue'
         args = [netid, cidr, '--tags', 'a', 'b']
         position_names = ['ip_version', 'network_id', 'cidr']
-        position_values = [4, ]
-        position_values.extend([netid, cidr])
+        position_values = [4, netid, cidr]
         _str = self._test_create_resource(resource, cmd, name, myid, args,
                                           position_names, position_values,
                                           tags=['a', 'b'])
+
+    def test_create_subnet_allocation_pool(self):
+        """Create subnet: --tenant_id tenantid <allocation_pool> netid cidr.
+        The <allocation_pool> is --allocation_pool start=1.1.1.10,end=1.1.1.20
+        """
+        resource = 'subnet'
+        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--allocation_pool', 'start=1.1.1.10,end=1.1.1.20',
+                netid, cidr]
+        position_names = ['ip_version', 'allocation_pools', 'network_id',
+                          'cidr']
+        pool = [{'start': '1.1.1.10', 'end': '1.1.1.20'}]
+        position_values = [4, pool, netid, cidr]
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values,
+                                          tenant_id='tenantid')
+
+    def test_create_subnet_allocation_pools(self):
+        """Create subnet: --tenant-id tenantid <pools> netid cidr.
+        The <pools> are --allocation_pool start=1.1.1.10,end=1.1.1.20 and
+        --allocation_pool start=1.1.1.30,end=1.1.1.40
+        """
+        resource = 'subnet'
+        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--allocation_pool', 'start=1.1.1.10,end=1.1.1.20',
+                '--allocation_pool', 'start=1.1.1.30,end=1.1.1.40',
+                netid, cidr]
+        position_names = ['ip_version', 'allocation_pools', 'network_id',
+                          'cidr']
+        pools = [{'start': '1.1.1.10', 'end': '1.1.1.20'},
+                 {'start': '1.1.1.30', 'end': '1.1.1.40'}]
+        position_values = [4, pools, netid, cidr]
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values,
+                                          tenant_id='tenantid')
 
     def test_list_subnets_detail(self):
         """List subnets: -D."""

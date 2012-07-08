@@ -17,6 +17,7 @@
 
 import logging
 
+from quantumclient import utils
 from quantumclient.quantum.v2_0 import CreateCommand
 from quantumclient.quantum.v2_0 import DeleteCommand
 from quantumclient.quantum.v2_0 import ListCommand
@@ -24,12 +25,20 @@ from quantumclient.quantum.v2_0 import ShowCommand
 from quantumclient.quantum.v2_0 import UpdateCommand
 
 
+def _format_allocation_pools(subnet):
+    try:
+        return '\n'.join([utils.dumps(pool) for pool in
+                          subnet['allocation_pools']])
+    except Exception:
+        return ''
+
+
 class ListSubnet(ListCommand):
     """List networks that belong to a given tenant."""
 
     resource = 'subnet'
     log = logging.getLogger(__name__ + '.ListSubnet')
-    _formatters = {}
+    _formatters = {'allocation_pools': _format_allocation_pools, }
 
 
 class ShowSubnet(ShowCommand):
@@ -53,6 +62,12 @@ class CreateSubnet(CreateCommand):
             '--gateway', metavar='gateway',
             help='gateway ip of this subnet')
         parser.add_argument(
+            '--allocation_pool',
+            action='append',
+            help='Allocation pool IP addresses for this subnet: '
+            'start=<ip_address>,end=<ip_address> '
+            'can be repeated')
+        parser.add_argument(
             'network_id',
             help='Network id of this subnet belongs to')
         parser.add_argument(
@@ -67,6 +82,13 @@ class CreateSubnet(CreateCommand):
             body['subnet'].update({'gateway_ip': parsed_args.gateway})
         if parsed_args.tenant_id:
             body['subnet'].update({'tenant_id': parsed_args.tenant_id})
+        ips = []
+        if parsed_args.allocation_pool:
+            for ip_spec in parsed_args.allocation_pool:
+                ips.append(utils.str2dict(ip_spec))
+        if ips:
+            body['subnet'].update({'allocation_pools': ips})
+
         return body
 
 
