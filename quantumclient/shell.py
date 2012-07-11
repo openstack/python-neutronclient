@@ -186,7 +186,7 @@ class QuantumShell(App):
             const=0,
             help='suppress output except warnings and errors', )
         parser.add_argument(
-            '-H', '--Help',
+            '-h', '--help',
             action=HelpAction,
             nargs=0,
             default=self,  # tricky
