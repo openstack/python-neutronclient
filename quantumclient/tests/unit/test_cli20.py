@@ -107,6 +107,8 @@ class MyComparator(Comparator):
 
 class CLITestV20Base(unittest.TestCase):
 
+    test_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+
     def _url(self, path, query=None):
         _url_str = self.endurl + "/v" + API_VERSION + path + "." + FORMAT
         return query and _url_str + "?" + query or _url_str
@@ -242,16 +244,11 @@ class CLITestV20Base(unittest.TestCase):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
-        query = None
-        for field in fields:
-            if query:
-                query += "&fields=" + field
-            else:
-                query = "fields=" + field
-        resnetworks = {resource:
-                       {'id': myid,
+        query = "&".join(["fields=%s" % field for field in fields])
+        expected_res = {resource:
+                        {'id': myid,
                         'name': 'myname', }, }
-        resstr = self.client.serialize(resnetworks)
+        resstr = self.client.serialize(expected_res)
         path = getattr(self.client, resource + "_path")
         self.client.httpclient.request(
             self._url(path % myid, query), 'GET',
@@ -268,6 +265,33 @@ class CLITestV20Base(unittest.TestCase):
         _str = self.fake_stdout.make_string()
         self.assertTrue(myid in _str)
         self.assertTrue('myname' in _str)
+
+    def _test_show_resource_by_name(self, resource, cmd, name,
+                                    args, fields=[]):
+        self.mox.StubOutWithMock(cmd, "get_client")
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        cmd.get_client().MultipleTimes().AndReturn(self.client)
+        query = "&".join(["fields=%s" % field for field in fields])
+        expected_res = {"%ss" % resource:
+                        [{'id': 'some_id',
+                          'name': name, }], }
+        resstr = self.client.serialize(expected_res)
+        list_path = getattr(self.client, resource + "s_path")
+        self.client.httpclient.request(
+            self._url(list_path, "%s&name=%s" % (query, name)), 'GET',
+            body=None,
+            headers=ContainsKeyValue('X-Auth-Token',
+                                     TOKEN)).AndReturn((MyResp(200), resstr))
+        self.mox.ReplayAll()
+        cmd_parser = cmd.get_parser("show_" + resource)
+
+        parsed_args = cmd_parser.parse_args(args)
+        cmd.run(parsed_args)
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
+        _str = self.fake_stdout.make_string()
+        self.assertTrue(name in _str)
+        self.assertTrue('some_id' in _str)
 
     def _test_delete_resource(self, resource, cmd, myid, args):
         self.mox.StubOutWithMock(cmd, "get_client")

@@ -69,7 +69,7 @@ class CreateSubnet(CreateCommand):
             'can be repeated')
         parser.add_argument(
             'network_id',
-            help='Network id of this subnet belongs to')
+            help='Network id this subnet belongs to')
         parser.add_argument(
             'cidr', metavar='cidr',
             help='cidr of subnet to create')

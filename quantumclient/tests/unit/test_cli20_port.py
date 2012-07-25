@@ -124,9 +124,18 @@ class CLITestV20Port(CLITestV20Base):
         """Show port: --fields id --fields name myid."""
         resource = 'port'
         cmd = ShowPort(MyApp(sys.stdout), None)
-        myid = 'myid'
-        args = ['--fields', 'id', '--fields', 'name', myid]
-        self._test_show_resource(resource, cmd, myid, args, ['id', 'name'])
+        args = ['--fields', 'id', '--fields', 'name', self.test_id]
+        self._test_show_resource(resource, cmd, self.test_id,
+                                 args, ['id', 'name'])
+
+    def test_show_port_by_name(self):
+        """Show port: --fields id --fields name myname."""
+        resource = 'port'
+        cmd = ShowPort(MyApp(sys.stdout), None)
+        myname = 'myname'
+        args = ['--fields', 'id', '--fields', 'name', myname]
+        self._test_show_resource_by_name(resource, cmd, myname,
+                                         args, ['id', 'name'])
 
     def test_delete_port(self):
         """Delete port: myid."""

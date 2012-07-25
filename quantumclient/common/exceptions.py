@@ -51,6 +51,7 @@ class QuantumClientException(QuantumException):
 
     def __init__(self, **kwargs):
         message = kwargs.get('message')
+        self.status_code = kwargs.get('status_code', 0)
         if message:
             self.message = message
         super(QuantumClientException, self).__init__(**kwargs)

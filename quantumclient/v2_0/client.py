@@ -78,11 +78,13 @@ def exception_handler_v20(status_code, error_content):
         if isinstance(error_content, dict):
             message = error_content.get('message', None)
         if message:
-            raise exceptions.QuantumClientException(message=message)
+            raise exceptions.QuantumClientException(status_code=status_code,
+                                                    message=message)
 
     # If we end up here the exception was not a quantum error
     msg = "%s-%s" % (status_code, error_content)
-    raise exceptions.QuantumClientException(message=msg)
+    raise exceptions.QuantumClientException(status_code=status_code,
+                                            message=msg)
 
 
 class APIParamsCall(object):

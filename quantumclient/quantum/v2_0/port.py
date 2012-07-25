@@ -72,7 +72,7 @@ class CreatePort(CreateCommand):
             'can be repeated')
         parser.add_argument(
             'network_id',
-            help='Network id of this port belongs to')
+            help='Network id this port belongs to')
 
     def args2body(self, parsed_args):
         body = {'port': {'admin_state_up': parsed_args.admin_state_down,

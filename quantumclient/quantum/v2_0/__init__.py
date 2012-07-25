@@ -17,6 +17,7 @@
 
 import argparse
 import logging
+import re
 
 from cliff import lister
 from cliff import show
@@ -326,7 +327,10 @@ class ShowCommand(QuantumCommand, show.ShowOne):
     """Show information of a given resource
 
     """
-
+    HEX_ELEM = '[0-9A-Fa-f]'
+    UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
+                             HEX_ELEM + '{4}', HEX_ELEM + '{4}',
+                             HEX_ELEM + '{12}'])
     api = 'network'
     resource = None
     log = None
@@ -336,22 +340,70 @@ class ShowCommand(QuantumCommand, show.ShowOne):
         add_show_list_common_argument(parser)
         parser.add_argument(
             'id', metavar='%s_id' % self.resource,
-            help='ID of %s to look up' % self.resource)
-
+            help='ID or name of %s to look up' % self.resource)
         return parser
 
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)' % parsed_args)
         quantum_client = self.get_client()
         quantum_client.format = parsed_args.request_format
+
         params = {}
         if parsed_args.show_details:
             params = {'verbose': 'True'}
         if parsed_args.fields:
             params = {'fields': parsed_args.fields}
-        obj_showor = getattr(quantum_client,
-                             "show_%s" % self.resource)
-        data = obj_showor(parsed_args.id, **params)
+
+        data = None
+        # Error message to be used in case both search by id and name are
+        # unsuccessful (if list by name fails it does not return an error)
+        not_found_message = "Unable to find resource:%s" % parsed_args.id
+
+        # perform search by id only if we are passing a valid UUID
+        match = re.match(self.UUID_PATTERN, parsed_args.id)
+        if match:
+            try:
+                obj_shower = getattr(quantum_client,
+                                     "show_%s" % self.resource)
+                data = obj_shower(parsed_args.id, **params)
+            except exceptions.QuantumClientException as ex:
+                logging.debug("Show operation failed with code:%s",
+                              ex.status_code)
+                not_found_message = ex.message
+                if ex.status_code != 404:
+                    logging.exception("Unable to perform show operation")
+                    raise
+
+        # If data is empty, then we got a 404. Try to interpret Id as a name
+        if not data:
+            logging.debug("Trying to interpret %s as a %s name",
+                          parsed_args.id,
+                          self.resource)
+            # build search_opts for the name
+            search_opts = parse_args_to_dict(["--name=%s" % parsed_args.id])
+            search_opts.update(params)
+            obj_lister = getattr(quantum_client,
+                                 "list_%ss" % self.resource)
+            data = obj_lister(**search_opts)
+            info = []
+            collection = self.resource + "s"
+            if collection in data:
+                info = data[collection]
+                if len(info) > 1:
+                    logging.info("Multiple occurrences found for: %s",
+                                 parsed_args.id)
+                    _columns = ['id']
+                    # put all ids in a single string as formatter for show
+                    # command will print on record only
+                    id_string = "\n".join(utils.get_item_properties(
+                        s, _columns)[0] for s in info)
+                    return (_columns, (id_string, ), )
+                elif len(info) == 0:
+                    #Nothing was found
+                    raise exceptions.QuantumClientException(
+                        message=not_found_message)
+                else:
+                    data = {self.resource: info[0]}
         if self.resource in data:
             for k, v in data[self.resource].iteritems():
                 if isinstance(v, list):
