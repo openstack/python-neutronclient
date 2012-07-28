@@ -18,6 +18,7 @@
 import logging
 
 from quantumclient.common import utils
+from quantumclient.quantum import v2_0 as quantumv20
 from quantumclient.quantum.v2_0 import CreateCommand
 from quantumclient.quantum.v2_0 import DeleteCommand
 from quantumclient.quantum.v2_0 import ListCommand
@@ -55,6 +56,9 @@ class CreateSubnet(CreateCommand):
     log = logging.getLogger(__name__ + '.CreateSubnet')
 
     def add_known_arguments(self, parser):
+        parser.add_argument(
+            '--name',
+            help='name of this subnet')
         parser.add_argument('--ip_version', type=int,
                             default=4, choices=[4, 6],
                             help='IP version with default 4')
@@ -68,20 +72,24 @@ class CreateSubnet(CreateCommand):
             'start=<ip_address>,end=<ip_address> '
             'can be repeated')
         parser.add_argument(
-            'network_id',
-            help='Network id this subnet belongs to')
+            'network_id', metavar='network',
+            help='Network id or name this subnet belongs to')
         parser.add_argument(
             'cidr', metavar='cidr',
             help='cidr of subnet to create')
 
     def args2body(self, parsed_args):
+        _network_id = quantumv20.find_resourceid_by_name_or_id(
+            self.get_client(), 'network', parsed_args.network_id)
         body = {'subnet': {'cidr': parsed_args.cidr,
-                           'network_id': parsed_args.network_id,
+                           'network_id': _network_id,
                            'ip_version': parsed_args.ip_version, }, }
         if parsed_args.gateway:
             body['subnet'].update({'gateway_ip': parsed_args.gateway})
         if parsed_args.tenant_id:
             body['subnet'].update({'tenant_id': parsed_args.tenant_id})
+        if parsed_args.name:
+            body['subnet'].update({'name': parsed_args.name})
         ips = []
         if parsed_args.allocation_pool:
             for ip_spec in parsed_args.allocation_pool:

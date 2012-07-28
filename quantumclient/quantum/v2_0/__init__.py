@@ -26,6 +26,44 @@ from quantumclient.common import command
 from quantumclient.common import exceptions
 from quantumclient.common import utils
 
+HEX_ELEM = '[0-9A-Fa-f]'
+UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
+                         HEX_ELEM + '{4}', HEX_ELEM + '{4}',
+                         HEX_ELEM + '{12}'])
+
+
+def find_resourceid_by_name_or_id(client, resource, name_or_id):
+    obj_lister = getattr(client, "list_%ss" % resource)
+    # perform search by id only if we are passing a valid UUID
+    match = re.match(UUID_PATTERN, name_or_id)
+    collection = resource + "s"
+    if match:
+        data = obj_lister(id=name_or_id, fields='id')
+        if data and data[collection]:
+            return data[collection][0]['id']
+    return _find_resourceid_by_name(client, resource, name_or_id)
+
+
+def _find_resourceid_by_name(client, resource, name):
+    obj_lister = getattr(client, "list_%ss" % resource)
+    data = obj_lister(name=name, fields='id')
+    collection = resource + "s"
+    info = data[collection]
+    if len(info) > 1:
+        msg = (_("Multiple %(resource)s matches found for '%(name)s',"
+               " use an ID to be more specific.") %
+               {'resource': resource, 'name': name})
+        raise exceptions.QuantumClientException(
+            message=msg)
+    elif len(info) == 0:
+        not_found_message = (_("Unable to find %(resource)s with '%(name)s'") %
+                             {'resource': resource, 'name': name})
+        # 404 is used to simulate server side behavior
+        raise exceptions.QuantumClientException(
+            message=not_found_message, status_code=404)
+    else:
+        return info[0]['id']
+
 
 def add_show_list_common_argument(parser):
     parser.add_argument(
@@ -222,8 +260,8 @@ class UpdateCommand(QuantumCommand):
     def get_parser(self, prog_name):
         parser = super(UpdateCommand, self).get_parser(prog_name)
         parser.add_argument(
-            'id', metavar='%s_id' % self.resource,
-            help='ID of %s to update' % self.resource)
+            'id', metavar=self.resource,
+            help='ID or name of %s to update' % self.resource)
         add_extra_argument(parser, 'value_specs',
                            'new values for the %s' % self.resource)
         return parser
@@ -237,9 +275,12 @@ class UpdateCommand(QuantumCommand):
             raise exceptions.CommandError(
                 "Must specify new values to update %s" % self.resource)
         data = {self.resource: parse_args_to_dict(value_specs)}
+        _id = find_resourceid_by_name_or_id(quantum_client,
+                                            self.resource,
+                                            parsed_args.id)
         obj_updator = getattr(quantum_client,
                               "update_%s" % self.resource)
-        obj_updator(parsed_args.id, data)
+        obj_updator(_id, data)
         print >>self.app.stdout, (
             _('Updated %(resource)s: %(id)s') %
             {'id': parsed_args.id, 'resource': self.resource})
@@ -258,8 +299,8 @@ class DeleteCommand(QuantumCommand):
     def get_parser(self, prog_name):
         parser = super(DeleteCommand, self).get_parser(prog_name)
         parser.add_argument(
-            'id', metavar='%s_id' % self.resource,
-            help='ID of %s to delete' % self.resource)
+            'id', metavar=self.resource,
+            help='ID or name of %s to delete' % self.resource)
         return parser
 
     def run(self, parsed_args):
@@ -268,7 +309,10 @@ class DeleteCommand(QuantumCommand):
         quantum_client.format = parsed_args.request_format
         obj_deleter = getattr(quantum_client,
                               "delete_%s" % self.resource)
-        obj_deleter(parsed_args.id)
+        _id = find_resourceid_by_name_or_id(quantum_client,
+                                            self.resource,
+                                            parsed_args.id)
+        obj_deleter(_id)
         print >>self.app.stdout, (_('Deleted %(resource)s: %(id)s')
                                   % {'id': parsed_args.id,
                                      'resource': self.resource})
@@ -327,10 +371,7 @@ class ShowCommand(QuantumCommand, show.ShowOne):
     """Show information of a given resource
 
     """
-    HEX_ELEM = '[0-9A-Fa-f]'
-    UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
-                             HEX_ELEM + '{4}', HEX_ELEM + '{4}',
-                             HEX_ELEM + '{12}'])
+
     api = 'network'
     resource = None
     log = None
@@ -339,7 +380,7 @@ class ShowCommand(QuantumCommand, show.ShowOne):
         parser = super(ShowCommand, self).get_parser(prog_name)
         add_show_list_common_argument(parser)
         parser.add_argument(
-            'id', metavar='%s_id' % self.resource,
+            'id', metavar=self.resource,
             help='ID or name of %s to look up' % self.resource)
         return parser
 
@@ -353,57 +394,10 @@ class ShowCommand(QuantumCommand, show.ShowOne):
             params = {'verbose': 'True'}
         if parsed_args.fields:
             params = {'fields': parsed_args.fields}
-
-        data = None
-        # Error message to be used in case both search by id and name are
-        # unsuccessful (if list by name fails it does not return an error)
-        not_found_message = "Unable to find resource:%s" % parsed_args.id
-
-        # perform search by id only if we are passing a valid UUID
-        match = re.match(self.UUID_PATTERN, parsed_args.id)
-        if match:
-            try:
-                obj_shower = getattr(quantum_client,
-                                     "show_%s" % self.resource)
-                data = obj_shower(parsed_args.id, **params)
-            except exceptions.QuantumClientException as ex:
-                logging.debug("Show operation failed with code:%s",
-                              ex.status_code)
-                not_found_message = ex.message
-                if ex.status_code != 404:
-                    logging.exception("Unable to perform show operation")
-                    raise
-
-        # If data is empty, then we got a 404. Try to interpret Id as a name
-        if not data:
-            logging.debug("Trying to interpret %s as a %s name",
-                          parsed_args.id,
-                          self.resource)
-            # build search_opts for the name
-            search_opts = parse_args_to_dict(["--name=%s" % parsed_args.id])
-            search_opts.update(params)
-            obj_lister = getattr(quantum_client,
-                                 "list_%ss" % self.resource)
-            data = obj_lister(**search_opts)
-            info = []
-            collection = self.resource + "s"
-            if collection in data:
-                info = data[collection]
-                if len(info) > 1:
-                    logging.info("Multiple occurrences found for: %s",
-                                 parsed_args.id)
-                    _columns = ['id']
-                    # put all ids in a single string as formatter for show
-                    # command will print on record only
-                    id_string = "\n".join(utils.get_item_properties(
-                        s, _columns)[0] for s in info)
-                    return (_columns, (id_string, ), )
-                elif len(info) == 0:
-                    #Nothing was found
-                    raise exceptions.QuantumClientException(
-                        message=not_found_message)
-                else:
-                    data = {self.resource: info[0]}
+        _id = find_resourceid_by_name_or_id(quantum_client, self.resource,
+                                            parsed_args.id)
+        obj_shower = getattr(quantum_client, "show_%s" % self.resource)
+        data = obj_shower(_id, **params)
         if self.resource in data:
             for k, v in data[self.resource].iteritems():
                 if isinstance(v, list):

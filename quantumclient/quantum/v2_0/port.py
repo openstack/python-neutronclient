@@ -18,6 +18,7 @@
 import logging
 
 from quantumclient.common import utils
+from quantumclient.quantum import v2_0 as quantumv20
 from quantumclient.quantum.v2_0 import CreateCommand
 from quantumclient.quantum.v2_0 import DeleteCommand
 from quantumclient.quantum.v2_0 import ListCommand
@@ -55,38 +56,51 @@ class CreatePort(CreateCommand):
 
     def add_known_arguments(self, parser):
         parser.add_argument(
+            '--name',
+            help='name of this port')
+        parser.add_argument(
             '--admin_state_down',
             default=True, action='store_false',
             help='set admin state up to false')
         parser.add_argument(
             '--mac_address',
-            help='mac address of port')
+            help='mac address of this port')
         parser.add_argument(
             '--device_id',
             help='device id of this port')
         parser.add_argument(
             '--fixed_ip',
             action='append',
-            help='desired Ip for this port: '
-            'subnet_id=<id>,ip_address=<ip>, '
+            help='desired IP for this port: '
+            'subnet_id=<name_or_id>,ip_address=<ip>, '
             'can be repeated')
         parser.add_argument(
-            'network_id',
-            help='Network id this port belongs to')
+            'network_id', metavar='network',
+            help='Network id or name this port belongs to')
 
     def args2body(self, parsed_args):
+        _network_id = quantumv20.find_resourceid_by_name_or_id(
+            self.get_client(), 'network', parsed_args.network_id)
         body = {'port': {'admin_state_up': parsed_args.admin_state_down,
-                         'network_id': parsed_args.network_id, }, }
+                         'network_id': _network_id, }, }
         if parsed_args.mac_address:
             body['port'].update({'mac_address': parsed_args.mac_address})
         if parsed_args.device_id:
             body['port'].update({'device_id': parsed_args.device_id})
         if parsed_args.tenant_id:
             body['port'].update({'tenant_id': parsed_args.tenant_id})
+        if parsed_args.name:
+            body['port'].update({'name': parsed_args.name})
         ips = []
         if parsed_args.fixed_ip:
             for ip_spec in parsed_args.fixed_ip:
-                ips.append(utils.str2dict(ip_spec))
+                ip_dict = utils.str2dict(ip_spec)
+                if 'subnet_id' in ip_dict:
+                    subnet_name_id = ip_dict['subnet_id']
+                    _subnet_id = quantumv20.find_resourceid_by_name_or_id(
+                        self.get_client(), 'subnet', subnet_name_id)
+                    ip_dict['subnet_id'] = _subnet_id
+                ips.append(ip_dict)
         if ips:
             body['port'].update({'fixed_ips': ips})
         return body

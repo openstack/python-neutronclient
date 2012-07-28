@@ -161,15 +161,6 @@ class CLITestV20Subnet(CLITestV20Base):
         self._test_show_resource(resource, cmd, self.test_id,
                                  args, ['id', 'name'])
 
-    def test_show_subnet_by_name(self):
-        """Show subnet: --fields id --fields name myname."""
-        resource = 'subnet'
-        cmd = ShowSubnet(MyApp(sys.stdout), None)
-        myname = 'myname'
-        args = ['--fields', 'id', '--fields', 'name', myname]
-        self._test_show_resource_by_name(resource, cmd, myname,
-                                         args, ['id', 'name'])
-
     def test_delete_subnet(self):
         """Delete subnet: subnetid."""
         resource = 'subnet'

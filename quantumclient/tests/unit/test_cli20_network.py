@@ -129,15 +129,6 @@ class CLITestV20Network(CLITestV20Base):
         self._test_show_resource(resource, cmd, self.test_id, args,
                                  ['id', 'name'])
 
-    def test_show_network_by_name(self):
-        """Show net: --fields id --fields name myname."""
-        resource = 'network'
-        cmd = ShowNetwork(MyApp(sys.stdout), None)
-        myname = 'myname'
-        args = ['--fields', 'id', '--fields', 'name', myname]
-        self._test_show_resource_by_name(resource, cmd, myname,
-                                         args, ['id', 'name'])
-
     def test_delete_network(self):
         """Delete net: myid."""
         resource = 'network'
