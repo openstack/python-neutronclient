@@ -82,7 +82,16 @@ COMMAND_V2 = {
     'port-delete': utils.import_class(
         'quantumclient.quantum.v2_0.port.DeletePort'),
     'port-update': utils.import_class(
-        'quantumclient.quantum.v2_0.port.UpdatePort'), }
+        'quantumclient.quantum.v2_0.port.UpdatePort'),
+    'quota-list': utils.import_class(
+        'quantumclient.quantum.v2_0.quota.ListQuota'),
+    'quota-show': utils.import_class(
+        'quantumclient.quantum.v2_0.quota.ShowQuota'),
+    'quota-delete': utils.import_class(
+        'quantumclient.quantum.v2_0.quota.DeleteQuota'),
+    'quota-update': utils.import_class(
+        'quantumclient.quantum.v2_0.quota.UpdateQuota'),
+}
 
 COMMANDS = {'2.0': COMMAND_V2}
 

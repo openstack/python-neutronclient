@@ -100,7 +100,7 @@ class APIParamsCall(object):
             if 'format' in kwargs:
                 instance.format = kwargs['format']
             ret = self.function(instance, *args, **kwargs)
-            instance.forma = _format
+            instance.format = _format
             return ret
         return with_params
 
@@ -154,6 +154,34 @@ class Client(object):
     port_path = "/ports/%s"
     subnets_path = "/subnets"
     subnet_path = "/subnets/%s"
+    quotas_path = "/quotas"
+    quota_path = "/quotas/%s"
+
+    @APIParamsCall
+    def get_quotas_tenant(self, **_params):
+        """Fetch tenant info in server's context for
+        following quota operation."""
+        return self.get(self.quota_path % 'tenant', params=_params)
+
+    @APIParamsCall
+    def list_quotas(self, **_params):
+        """Fetch all tenants' quotas."""
+        return self.get(self.quotas_path, params=_params)
+
+    @APIParamsCall
+    def show_quota(self, tenant_id, **_params):
+        """Fetch information of a certain tenant's quotas."""
+        return self.get(self.quota_path % (tenant_id), params=_params)
+
+    @APIParamsCall
+    def update_quota(self, tenant_id, body=None):
+        """Update a tenant's quotas."""
+        return self.put(self.quota_path % (tenant_id), body=body)
+
+    @APIParamsCall
+    def delete_quota(self, tenant_id):
+        """Delete the specified tenant's quota values."""
+        return self.delete(self.quota_path % (tenant_id))
 
     @APIParamsCall
     def list_ports(self, **_params):
