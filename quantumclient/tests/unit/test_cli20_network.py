@@ -18,6 +18,7 @@
 import sys
 
 from quantumclient.common import exceptions
+from quantumclient.tests.unit import test_cli20
 from quantumclient.tests.unit.test_cli20 import CLITestV20Base
 from quantumclient.tests.unit.test_cli20 import MyApp
 from quantumclient.quantum.v2_0.network import CreateNetwork
@@ -78,6 +79,35 @@ class CLITestV20Network(CLITestV20Base):
         _str = self._test_create_resource(resource, cmd, name, myid, args,
                                           position_names, position_values,
                                           admin_state_up=False)
+
+    def test_lsit_nets_empty_with_column(self):
+        resources = "networks"
+        cmd = ListNetwork(MyApp(sys.stdout), None)
+        self.mox.StubOutWithMock(cmd, "get_client")
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        cmd.get_client().MultipleTimes().AndReturn(self.client)
+        reses = {resources: []}
+        resstr = self.client.serialize(reses)
+        # url method body
+        query = "id=myfakeid"
+        args = ['-c', 'id', '--', '--id', 'myfakeid']
+        path = getattr(self.client, resources + "_path")
+        self.client.httpclient.request(
+            test_cli20.end_url(path, query), 'GET',
+            body=None,
+            headers=test_cli20.ContainsKeyValue(
+                'X-Auth-Token',
+                test_cli20.TOKEN)).AndReturn(
+                    (test_cli20.MyResp(200), resstr))
+        self.mox.ReplayAll()
+        cmd_parser = cmd.get_parser("list_" + resources)
+
+        parsed_args = cmd_parser.parse_args(args)
+        cmd.run(parsed_args)
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
+        _str = self.fake_stdout.make_string()
+        self.assertEquals('\n', _str)
 
     def test_list_nets_detail(self):
         """list nets: -D."""

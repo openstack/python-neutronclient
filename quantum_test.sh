@@ -32,6 +32,8 @@ quantum net-show $network_id ||  die "fail to show network $network_id"
 quantum  net-update $network --admin_state_up False  ||  die "fail to update network $network"
 quantum  net-update $network_id --admin_state_up True  ||  die "fail to update network $network_id"
 
+quantum net-list -c id -- --id fakeid  || die "fail to list networks with column selection on empty list"
+
 # test the CRUD of subnet
 subnet=mysubnet1
 cidr=10.0.1.3/24
