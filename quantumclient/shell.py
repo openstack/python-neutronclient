@@ -109,8 +109,8 @@ class HelpAction(argparse.Action):
 
 class QuantumShell(App):
 
-    CONSOLE_MESSAGE_FORMAT = '%(levelname)s: %(name)s %(message)s'
-
+    CONSOLE_MESSAGE_FORMAT = '%(message)s'
+    DEBUG_MESSAGE_FORMAT = '%(levelname)s: %(name)s %(message)s'
     log = logging.getLogger(__name__)
 
     def __init__(self, apiversion):
@@ -319,6 +319,29 @@ class QuantumShell(App):
         self.log.debug('clean_up %s', cmd.__class__.__name__)
         if err:
             self.log.debug('got an error: %s', err)
+
+    def configure_logging(self):
+        """Create logging handlers for any log output.
+        """
+        root_logger = logging.getLogger('')
+
+        # Set up logging to a file
+        root_logger.setLevel(logging.DEBUG)
+
+        # Send higher-level messages to the console via stderr
+        console = logging.StreamHandler(self.stderr)
+        console_level = {0: logging.WARNING,
+                         1: logging.INFO,
+                         2: logging.DEBUG,
+                         }.get(self.options.verbose_level, logging.DEBUG)
+        console.setLevel(console_level)
+        if logging.DEBUG == console_level:
+            formatter = logging.Formatter(self.DEBUG_MESSAGE_FORMAT)
+        else:
+            formatter = logging.Formatter(self.CONSOLE_MESSAGE_FORMAT)
+        console.setFormatter(formatter)
+        root_logger.addHandler(console)
+        return
 
 
 def itertools_compressdef(data, selectors):
