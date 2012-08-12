@@ -362,6 +362,8 @@ class ListCommand(QuantumCommand, lister.Lister):
         if collection in data:
             info = data[collection]
         _columns = len(info) > 0 and sorted(info[0].keys()) or []
+        if not _columns:
+            parsed_args.columns = []
         return (_columns, (utils.get_item_properties(
             s, _columns, formatters=self._formatters, )
             for s in info), )
