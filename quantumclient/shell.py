@@ -219,6 +219,19 @@ class QuantumShell(App):
         :paramtype argv: list of str
         """
         try:
+            index = 0
+            command_pos = -1
+            help_pos = -1
+            for arg in argv:
+                if arg in COMMANDS[self.api_version]:
+                    if command_pos == -1:
+                        command_pos = index
+                elif arg in ('-h', '--help'):
+                    if help_pos == -1:
+                        help_pos = index
+                index = index + 1
+            if command_pos > -1 and help_pos > command_pos:
+                argv = ['help', argv[command_pos]]
             self.options, remainder = self.parser.parse_known_args(argv)
             self.configure_logging()
             self.interactive_mode = not remainder
