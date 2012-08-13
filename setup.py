@@ -25,10 +25,10 @@ Name = 'python-quantumclient'
 Url = "https://launchpad.net/quantum"
 Version = setup.get_post_version('quantumclient')
 License = 'Apache License 2.0'
-Author = 'Netstack'
-AuthorEmail = 'netstack@lists.launchpad.net'
+Author = 'OpenStack Quantum Project'
+AuthorEmail = 'openstack-dev@lists.launchpad.net'
 Maintainer = ''
-Summary = 'Client functionalities for Quantum'
+Summary = 'CLI and python client library for OpenStack Quantum'
 ShortDescription = Summary
 Description = Summary
 
