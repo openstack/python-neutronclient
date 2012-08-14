@@ -29,7 +29,7 @@ from quantumclient.quantum.v2_0.subnet import DeleteSubnet
 class CLITestV20Subnet(CLITestV20Base):
 
     def test_create_subnet(self):
-        """Create sbunet: --gateway gateway netid cidr."""
+        """Create subnet: --gateway gateway netid cidr."""
         resource = 'subnet'
         cmd = CreateSubnet(MyApp(sys.stdout), None)
         name = 'myname'
@@ -42,6 +42,39 @@ class CLITestV20Subnet(CLITestV20Base):
         position_values = [4, netid, cidr, gateway]
         _str = self._test_create_resource(resource, cmd, name, myid, args,
                                           position_names, position_values)
+
+    def test_create_subnet_with_no_gateway(self):
+        """Create subnet: --no-gateway netid cidr"""
+        resource = 'subnet'
+        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'cidrvalue'
+        args = ['--no-gateway',  netid, cidr]
+        position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
+        position_values = [4, netid, cidr, None]
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values)
+
+    def test_create_subnet_with_bad_gateway_option(self):
+        """Create sbunet: --no-gateway netid cidr"""
+        resource = 'subnet'
+        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'cidrvalue'
+        gateway = 'gatewayvalue'
+        args = ['--gateway',  gateway, '--no-gateway',  netid, cidr]
+        position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
+        position_values = [4, netid, cidr, None]
+        try:
+            _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                              position_names, position_values)
+        except:
+            return
+        self.fail('No exception for bad gateway option')
 
     def test_create_subnet_tenant(self):
         """Create subnet: --tenant_id tenantid netid cidr."""

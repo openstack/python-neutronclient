@@ -66,6 +66,10 @@ class CreateSubnet(CreateCommand):
             '--gateway', metavar='gateway',
             help='gateway ip of this subnet')
         parser.add_argument(
+            '--no-gateway',
+            default=False, action='store_true',
+            help='No distribution of gateway')
+        parser.add_argument(
             '--allocation_pool',
             action='append',
             help='Allocation pool IP addresses for this subnet: '
@@ -84,6 +88,13 @@ class CreateSubnet(CreateCommand):
         body = {'subnet': {'cidr': parsed_args.cidr,
                            'network_id': _network_id,
                            'ip_version': parsed_args.ip_version, }, }
+
+        if parsed_args.gateway and parsed_args.no_gateway:
+            raise exceptions.CommandError("--gateway option and "
+                                          "--no-gateway option can "
+                                          "not be used same time")
+        if parsed_args.no_gateway:
+            body['subnet'].update({'gateway_ip': None})
         if parsed_args.gateway:
             body['subnet'].update({'gateway_ip': parsed_args.gateway})
         if parsed_args.tenant_id:
