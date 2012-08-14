@@ -101,6 +101,7 @@ class HTTPClient(httplib2.Http):
         self.auth_url = auth_url.rstrip('/') if auth_url else None
         self.region_name = region_name
         self.auth_token = token
+        self.token_retrieved = False
         self.content_type = 'application/json'
         self.endpoint_url = endpoint_url
         self.auth_strategy = auth_strategy
@@ -148,10 +149,13 @@ class HTTPClient(httplib2.Http):
                                           **kwargs)
             return resp, body
         except exceptions.Unauthorized as ex:
-            if not self.endpoint_url:
+            if not self.endpoint_url or self.token_retrieved:
                 self.authenticate()
+                if self.auth_token:
+                    kwargs.setdefault('headers', {})
+                    kwargs['headers']['X-Auth-Token'] = self.auth_token
                 resp, body = self._cs_request(
-                    self.management_url + url, method, **kwargs)
+                    self.endpoint_url + url, method, **kwargs)
                 return resp, body
             else:
                 raise ex
@@ -164,6 +168,7 @@ class HTTPClient(httplib2.Http):
             self.auth_token = sc['id']
             self.auth_tenant_id = sc.get('tenant_id')
             self.auth_user_id = sc.get('user_id')
+            self.token_retrieved = True
         except KeyError:
             raise exceptions.Unauthorized()
         self.endpoint_url = self.service_catalog.url_for(
