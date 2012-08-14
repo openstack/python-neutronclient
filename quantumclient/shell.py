@@ -91,6 +91,10 @@ COMMAND_V2 = {
         'quantumclient.quantum.v2_0.quota.DeleteQuota'),
     'quota-update': utils.import_class(
         'quantumclient.quantum.v2_0.quota.UpdateQuota'),
+    'ext-list': utils.import_class(
+        'quantumclient.quantum.v2_0.extension.ListExt'),
+    'ext-show': utils.import_class(
+        'quantumclient.quantum.v2_0.extension.ShowExt'),
 }
 
 COMMANDS = {'2.0': COMMAND_V2}

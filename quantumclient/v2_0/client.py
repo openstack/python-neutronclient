@@ -156,6 +156,8 @@ class Client(object):
     subnet_path = "/subnets/%s"
     quotas_path = "/quotas"
     quota_path = "/quotas/%s"
+    exts_path = "/extensions"
+    ext_path = "/extensions/%s"
 
     @APIParamsCall
     def get_quotas_tenant(self, **_params):
@@ -182,6 +184,16 @@ class Client(object):
     def delete_quota(self, tenant_id):
         """Delete the specified tenant's quota values."""
         return self.delete(self.quota_path % (tenant_id))
+
+    @APIParamsCall
+    def list_extensions(self, **_params):
+        """Fetch a list of all exts on server side."""
+        return self.get(self.exts_path, params=_params)
+
+    @APIParamsCall
+    def show_extension(self, ext_alias, **_params):
+        """Fetch a list of all exts on server side."""
+        return self.get(self.ext_path % ext_alias, params=_params)
 
     @APIParamsCall
     def list_ports(self, **_params):
