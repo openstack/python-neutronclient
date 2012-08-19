@@ -56,6 +56,7 @@ setuptools.setup(
     license=License,
     scripts=ProjectScripts,
     dependency_links=dependency_links,
+    install_requires=setup.parse_requirements(),
     tests_require=tests_require,
     cmdclass=setup.get_cmdclass(),
     include_package_data=False,
