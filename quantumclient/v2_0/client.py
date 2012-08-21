@@ -158,6 +158,10 @@ class Client(object):
     quota_path = "/quotas/%s"
     exts_path = "/extensions"
     ext_path = "/extensions/%s"
+    routers_path = "/routers"
+    router_path = "/routers/%s"
+    floatingips_path = "/floatingips"
+    floatingip_path = "/floatingips/%s"
 
     @APIParamsCall
     def get_quotas_tenant(self, **_params):
@@ -301,6 +305,110 @@ class Client(object):
         Deletes the specified subnet
         """
         return self.delete(self.subnet_path % (subnet))
+
+    @APIParamsCall
+    def list_routers(self, **_params):
+        """
+        Fetches a list of all routers for a tenant
+        """
+        # Pass filters in "params" argument to do_request
+        return self.get(self.routers_path, params=_params)
+
+    @APIParamsCall
+    def show_router(self, router, **_params):
+        """
+        Fetches information of a certain router
+        """
+        return self.get(self.router_path % (router), params=_params)
+
+    @APIParamsCall
+    def create_router(self, body=None):
+        """
+        Creates a new router
+        """
+        return self.post(self.routers_path, body=body)
+
+    @APIParamsCall
+    def update_router(self, router, body=None):
+        """
+        Updates a router
+        """
+        return self.put(self.router_path % (router), body=body)
+
+    @APIParamsCall
+    def delete_router(self, router):
+        """
+        Deletes the specified router
+        """
+        return self.delete(self.router_path % (router))
+
+    @APIParamsCall
+    def add_interface_router(self, router, body=None):
+        """
+        Adds an internal network interface to the specified router
+        """
+        return self.put((self.router_path % router) + "/add_router_interface",
+                        body=body)
+
+    @APIParamsCall
+    def remove_interface_router(self, router, body=None):
+        """
+        Removes an internal network interface from the specified router
+        """
+        return self.put((self.router_path % router) +
+                        "/remove_router_interface", body=body)
+
+    @APIParamsCall
+    def add_gateway_router(self, router, body=None):
+        """
+        Adds an external network gateway to the specified router
+        """
+        return self.put((self.router_path % router),
+                        body={'router': {'external_gateway_info': body}})
+
+    @APIParamsCall
+    def remove_gateway_router(self, router):
+        """
+        Removes an external network gateway from the specified router
+        """
+        return self.put((self.router_path % router),
+                        body={'router': {'external_gateway_info': {}}})
+
+    @APIParamsCall
+    def list_floatingips(self, **_params):
+        """
+        Fetches a list of all floatingips for a tenant
+        """
+        # Pass filters in "params" argument to do_request
+        return self.get(self.floatingips_path, params=_params)
+
+    @APIParamsCall
+    def show_floatingip(self, floatingip, **_params):
+        """
+        Fetches information of a certain floatingip
+        """
+        return self.get(self.floatingip_path % (floatingip), params=_params)
+
+    @APIParamsCall
+    def create_floatingip(self, body=None):
+        """
+        Creates a new floatingip
+        """
+        return self.post(self.floatingips_path, body=body)
+
+    @APIParamsCall
+    def update_floatingip(self, floatingip, body=None):
+        """
+        Updates a floatingip
+        """
+        return self.put(self.floatingip_path % (floatingip), body=body)
+
+    @APIParamsCall
+    def delete_floatingip(self, floatingip):
+        """
+        Deletes the specified floatingip
+        """
+        return self.delete(self.floatingip_path % (floatingip))
 
     def __init__(self, **kwargs):
         """ Initialize a new client for the Quantum v2.0 API. """

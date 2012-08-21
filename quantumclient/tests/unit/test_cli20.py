@@ -140,7 +140,7 @@ class CLITestV20Base(unittest.TestCase):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
-        if resource == 'subnet':
+        if (resource == 'subnet' or resource == 'floatingip'):
             body = {resource: {}, }
         else:
             body = {resource: {'admin_state_up': admin_state_up, }, }
@@ -286,6 +286,28 @@ class CLITestV20Base(unittest.TestCase):
                                      TOKEN)).AndReturn((MyResp(204), None))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("delete_" + resource)
+
+        parsed_args = cmd_parser.parse_args(args)
+        cmd.run(parsed_args)
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
+        _str = self.fake_stdout.make_string()
+        self.assertTrue(myid in _str)
+
+    def _test_update_resource_action(self, resource, cmd, myid, action, args,
+                                     body):
+        self.mox.StubOutWithMock(cmd, "get_client")
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        cmd.get_client().MultipleTimes().AndReturn(self.client)
+        path = getattr(self.client, resource + "_path")
+        path_action = '%s/%s' % (myid, action)
+        self.client.httpclient.request(
+            end_url(path % path_action), 'PUT',
+            body=MyComparator(body, self.client),
+            headers=ContainsKeyValue('X-Auth-Token',
+                                     TOKEN)).AndReturn((MyResp(204), None))
+        self.mox.ReplayAll()
+        cmd_parser = cmd.get_parser("update_" + resource)
 
         parsed_args = cmd_parser.parse_args(args)
         cmd.run(parsed_args)
