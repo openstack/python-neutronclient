@@ -15,6 +15,7 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+import argparse
 import logging
 
 from quantumclient.common import utils
@@ -59,21 +60,35 @@ class CreatePort(CreateCommand):
             '--name',
             help='name of this port')
         parser.add_argument(
-            '--admin_state_down',
+            '--admin-state-down',
             default=True, action='store_false',
             help='set admin state up to false')
         parser.add_argument(
-            '--mac_address',
+            '--admin_state_down',
+            action='store_false',
+            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--mac-address',
             help='mac address of this port')
         parser.add_argument(
-            '--device_id',
+            '--mac_address',
+            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--device-id',
             help='device id of this port')
         parser.add_argument(
-            '--fixed_ip',
+            '--device_id',
+            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--fixed-ip',
             action='append',
             help='desired IP for this port: '
             'subnet_id=<name_or_id>,ip_address=<ip>, '
             'can be repeated')
+        parser.add_argument(
+            '--fixed_ip',
+            action='append',
+            help=argparse.SUPPRESS)
         parser.add_argument(
             'network_id', metavar='network',
             help='Network id or name this port belongs to')

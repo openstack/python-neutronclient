@@ -55,6 +55,12 @@ class CLITestV20Port(CLITestV20Base):
         _str = self._test_create_resource(resource, cmd, name, myid, args,
                                           position_names, position_values)
 
+        # Test dashed options
+        args = ['--mac-address', 'mac', '--device-id', 'deviceid', netid]
+        position_names = ['network_id', 'mac_address', 'device_id']
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values)
+
     def test_create_port_tenant(self):
         """Create port: --tenant_id tenantid netid."""
         resource = 'port'
@@ -66,6 +72,12 @@ class CLITestV20Port(CLITestV20Base):
         position_names = ['network_id']
         position_values = []
         position_values.extend([netid])
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values,
+                                          tenant_id='tenantid')
+
+        # Test dashed options
+        args = ['--tenant-id', 'tenantid', netid, ]
         _str = self._test_create_resource(resource, cmd, name, myid, args,
                                           position_names, position_values,
                                           tenant_id='tenantid')

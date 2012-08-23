@@ -15,6 +15,7 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+import argparse
 import logging
 
 from quantumclient.common import utils
@@ -59,9 +60,16 @@ class CreateSubnet(CreateCommand):
         parser.add_argument(
             '--name',
             help='name of this subnet')
-        parser.add_argument('--ip_version', type=int,
-                            default=4, choices=[4, 6],
-                            help='IP version with default 4')
+        parser.add_argument(
+            '--ip-version',
+            type=int,
+            default=4, choices=[4, 6],
+            help='IP version with default 4')
+        parser.add_argument(
+            '--ip_version',
+            type=int,
+            choices=[4, 6],
+            help=argparse.SUPPRESS)
         parser.add_argument(
             '--gateway', metavar='gateway',
             help='gateway ip of this subnet')
@@ -70,11 +78,15 @@ class CreateSubnet(CreateCommand):
             default=False, action='store_true',
             help='No distribution of gateway')
         parser.add_argument(
-            '--allocation_pool',
+            '--allocation-pool',
             action='append',
             help='Allocation pool IP addresses for this subnet: '
             'start=<ip_address>,end=<ip_address> '
             'can be repeated')
+        parser.add_argument(
+            '--allocation_pool',
+            action='append',
+            help=argparse.SUPPRESS)
         parser.add_argument(
             'network_id', metavar='network',
             help='Network id or name this subnet belongs to')

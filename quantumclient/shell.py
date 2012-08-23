@@ -212,46 +212,70 @@ class QuantumShell(App):
             help='show tracebacks on errors', )
         # Global arguments
         parser.add_argument(
-            '--os_auth_strategy', metavar='<auth_strategy>',
+            '--os-auth-strategy', metavar='<auth-strategy>',
             default=env('OS_AUTH_STRATEGY', default='keystone'),
             help='Authentication strategy (Env: OS_AUTH_STRATEGY'
             ', default keystone). For now, any other value will'
             ' disable the authentication')
+        parser.add_argument(
+            '--os_auth_strategy',
+            help=argparse.SUPPRESS)
 
         parser.add_argument(
-            '--os_auth_url', metavar='<auth_url>',
+            '--os-auth-url', metavar='<auth-url>',
             default=env('OS_AUTH_URL'),
             help='Authentication URL (Env: OS_AUTH_URL)')
+        parser.add_argument(
+            '--os_auth_url',
+            help=argparse.SUPPRESS)
 
         parser.add_argument(
-            '--os_tenant_name', metavar='<auth_tenant_name>',
+            '--os-tenant-name', metavar='<auth-tenant-name>',
             default=env('OS_TENANT_NAME'),
             help='Authentication tenant name (Env: OS_TENANT_NAME)')
+        parser.add_argument(
+            '--os_tenant_name',
+            help=argparse.SUPPRESS)
 
         parser.add_argument(
-            '--os_username', metavar='<auth_username>',
+            '--os-username', metavar='<auth-username>',
             default=utils.env('OS_USERNAME'),
             help='Authentication username (Env: OS_USERNAME)')
+        parser.add_argument(
+            '--os_username',
+            help=argparse.SUPPRESS)
 
         parser.add_argument(
-            '--os_password', metavar='<auth_password>',
+            '--os-password', metavar='<auth-password>',
             default=utils.env('OS_PASSWORD'),
             help='Authentication password (Env: OS_PASSWORD)')
+        parser.add_argument(
+            '--os_password',
+            help=argparse.SUPPRESS)
 
         parser.add_argument(
-            '--os_region_name', metavar='<auth_region_name>',
+            '--os-region-name', metavar='<auth-region-name>',
             default=env('OS_REGION_NAME'),
             help='Authentication region name (Env: OS_REGION_NAME)')
+        parser.add_argument(
+            '--os_region_name',
+            help=argparse.SUPPRESS)
 
         parser.add_argument(
-            '--os_token', metavar='<token>',
+            '--os-token', metavar='<token>',
             default=env('OS_TOKEN'),
             help='Defaults to env[OS_TOKEN]')
+        parser.add_argument(
+            '--os_token',
+            help=argparse.SUPPRESS)
 
         parser.add_argument(
-            '--os_url', metavar='<url>',
+            '--os-url', metavar='<url>',
             default=env('OS_URL'),
             help='Defaults to env[OS_URL]')
+        parser.add_argument(
+            '--os_url',
+            help=argparse.SUPPRESS)
 
         return parser
 
@@ -305,39 +329,39 @@ class QuantumShell(App):
                 if not self.options.os_token:
                     raise exc.CommandError(
                         "You must provide a token via"
-                        " either --os_token or env[OS_TOKEN]")
+                        " either --os-token or env[OS_TOKEN]")
 
                 if not self.options.os_url:
                     raise exc.CommandError(
                         "You must provide a service URL via"
-                        " either --os_url or env[OS_URL]")
+                        " either --os-url or env[OS_URL]")
 
             else:
                 # Validate password flow auth
                 if not self.options.os_username:
                     raise exc.CommandError(
                         "You must provide a username via"
-                        " either --os_username or env[OS_USERNAME]")
+                        " either --os-username or env[OS_USERNAME]")
 
                 if not self.options.os_password:
                     raise exc.CommandError(
                         "You must provide a password via"
-                        " either --os_password or env[OS_PASSWORD]")
+                        " either --os-password or env[OS_PASSWORD]")
 
                 if not (self.options.os_tenant_name):
                     raise exc.CommandError(
                         "You must provide a tenant_name via"
-                        " either --os_tenant_name or via env[OS_TENANT_NAME]")
+                        " either --os-tenant-name or via env[OS_TENANT_NAME]")
 
                 if not self.options.os_auth_url:
                     raise exc.CommandError(
                         "You must provide an auth url via"
-                        " either --os_auth_url or via env[OS_AUTH_URL]")
+                        " either --os-auth-url or via env[OS_AUTH_URL]")
         else:   # not keystone
             if not self.options.os_url:
                 raise exc.CommandError(
                     "You must provide a service URL via"
-                    " either --os_url or env[OS_URL]")
+                    " either --os-url or env[OS_URL]")
 
         self.client_manager = clientmanager.ClientManager(
             token=self.options.os_token,

@@ -15,6 +15,7 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+import argparse
 import logging
 
 from quantumclient.common import utils
@@ -56,9 +57,13 @@ class CreateRouter(CreateCommand):
 
     def add_known_arguments(self, parser):
         parser.add_argument(
-            '--admin_state_down',
+            '--admin-state-down',
             default=True, action='store_false',
             help='Set Admin State Up to false')
+        parser.add_argument(
+            '--admin_state_down',
+            action='store_false',
+            help=argparse.SUPPRESS)
         parser.add_argument(
             'name', metavar='name',
             help='Name of router to create')
@@ -96,10 +101,10 @@ class RouterInterfaceCommand(QuantumCommand):
     def get_parser(self, prog_name):
         parser = super(RouterInterfaceCommand, self).get_parser(prog_name)
         parser.add_argument(
-            'router_id', metavar='router_id',
+            'router_id', metavar='router-id',
             help='ID of the router')
         parser.add_argument(
-            'subnet_id', metavar='subnet_id',
+            'subnet_id', metavar='subnet-id',
             help='ID of the internal subnet for the interface')
         return parser
 
@@ -145,10 +150,10 @@ class SetGatewayRouter(QuantumCommand):
     def get_parser(self, prog_name):
         parser = super(SetGatewayRouter, self).get_parser(prog_name)
         parser.add_argument(
-            'router_id', metavar='router_id',
+            'router_id', metavar='router-id',
             help='ID of the router')
         parser.add_argument(
-            'external_network_id', metavar='external_network_id',
+            'external_network_id', metavar='external-network-id',
             help='ID of the external network for the gateway')
         return parser
 
@@ -173,7 +178,7 @@ class RemoveGatewayRouter(QuantumCommand):
     def get_parser(self, prog_name):
         parser = super(RemoveGatewayRouter, self).get_parser(prog_name)
         parser.add_argument(
-            'router_id', metavar='router_id',
+            'router_id', metavar='router-id',
             help='ID of the router')
         return parser
 

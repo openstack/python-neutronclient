@@ -15,6 +15,7 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+import argparse
 import logging
 
 from cliff import lister
@@ -41,8 +42,11 @@ class DeleteQuota(QuantumCommand):
     def get_parser(self, prog_name):
         parser = super(DeleteQuota, self).get_parser(prog_name)
         parser.add_argument(
-            '--tenant_id', metavar='tenant_id',
+            '--tenant-id', metavar='tenant-id',
             help='the owner tenant ID')
+        parser.add_argument(
+            '--tenant_id',
+            help=argparse.SUPPRESS)
         return parser
 
     def run(self, parsed_args):
@@ -101,8 +105,11 @@ class ShowQuota(QuantumCommand, show.ShowOne):
     def get_parser(self, prog_name):
         parser = super(ShowQuota, self).get_parser(prog_name)
         parser.add_argument(
-            '--tenant_id', metavar='tenant_id',
+            '--tenant-id', metavar='tenant-id',
             help='the owner tenant ID')
+        parser.add_argument(
+            '--tenant_id',
+            help=argparse.SUPPRESS)
         return parser
 
     def get_data(self, parsed_args):
@@ -143,8 +150,11 @@ class UpdateQuota(QuantumCommand, show.ShowOne):
     def get_parser(self, prog_name):
         parser = super(UpdateQuota, self).get_parser(prog_name)
         parser.add_argument(
-            '--tenant_id', metavar='tenant_id',
+            '--tenant-id', metavar='tenant-id',
             help='the owner tenant ID')
+        parser.add_argument(
+            '--tenant_id',
+            help=argparse.SUPPRESS)
         parser.add_argument(
             '--network', metavar='networks',
             help='the limit of network quota')

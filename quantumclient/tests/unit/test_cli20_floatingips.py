@@ -55,6 +55,12 @@ class CLITestV20FloatingIps(CLITestV20Base):
         _str = self._test_create_resource(resource, cmd, name, myid, args,
                                           position_names, position_values)
 
+        # Test dashed options
+        args = [name, '--port-id', pid]
+        position_names = ['floating_network_id', 'port-id']
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values)
+
     def test_list_floatingips(self):
         """list floatingips: -D."""
         resources = 'floatingips'

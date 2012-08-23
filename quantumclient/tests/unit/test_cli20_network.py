@@ -54,6 +54,12 @@ class CLITestV20Network(CLITestV20Base):
                                           position_names, position_values,
                                           tenant_id='tenantid')
 
+        # Test dashed options
+        args = ['--tenant-id', 'tenantid', name]
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values,
+                                          tenant_id='tenantid')
+
     def test_create_network_tags(self):
         """Create net: myname --tags a b."""
         resource = 'network'
@@ -76,6 +82,12 @@ class CLITestV20Network(CLITestV20Base):
         args = ['--admin_state_down', name, ]
         position_names = ['name', ]
         position_values = [name, ]
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values,
+                                          admin_state_up=False)
+
+        # Test dashed options
+        args = ['--admin-state-down', name, ]
         _str = self._test_create_resource(resource, cmd, name, myid, args,
                                           position_names, position_values,
                                           admin_state_up=False)

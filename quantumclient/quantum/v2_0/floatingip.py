@@ -15,6 +15,7 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+import argparse
 import logging
 
 from quantumclient.quantum.v2_0 import CreateCommand
@@ -50,12 +51,18 @@ class CreateFloatingIP(CreateCommand):
             'floating_network_id',
             help='Network to allocate floating IP from')
         parser.add_argument(
-            '--port_id',
+            '--port-id',
             help='ID of the port to be associated with the floatingip')
         parser.add_argument(
-            '--fixed_ip_address',
+            '--port_id',
+            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--fixed-ip-address',
             help=('IP address on the port (only required if port has multiple'
                   'IPs)'))
+        parser.add_argument(
+            '--fixed_ip_address',
+            help=argparse.SUPPRESS)
 
     def args2body(self, parsed_args):
         body = {'floatingip': {
@@ -82,15 +89,18 @@ class AssociateFloatingIP(QuantumCommand):
     def get_parser(self, prog_name):
         parser = super(AssociateFloatingIP, self).get_parser(prog_name)
         parser.add_argument(
-            'floatingip_id', metavar='floatingip_id',
+            'floatingip_id', metavar='floatingip-id',
             help='IP address of the floating IP to associate')
         parser.add_argument(
             'port_id',
             help='ID of the port to be associated with the floatingip')
         parser.add_argument(
-            '--fixed_ip_address',
+            '--fixed-ip-address',
             help=('IP address on the port (only required if port has multiple'
                   'IPs)'))
+        parser.add_argument(
+            '--fixed_ip_address',
+            help=argparse.SUPPRESS)
         return parser
 
     def run(self, parsed_args):
@@ -119,7 +129,7 @@ class DisassociateFloatingIP(QuantumCommand):
     def get_parser(self, prog_name):
         parser = super(DisassociateFloatingIP, self).get_parser(prog_name)
         parser.add_argument(
-            'floatingip_id', metavar='floatingip_id',
+            'floatingip_id', metavar='floatingip-id',
             help='IP address of the floating IP to associate')
         return parser
 

@@ -64,7 +64,7 @@ class ShowExt(QuantumCommand, show.ShowOne):
     def get_parser(self, prog_name):
         parser = super(ShowExt, self).get_parser(prog_name)
         parser.add_argument(
-            'ext_alias', metavar='ext_alias',
+            'ext_alias', metavar='ext-alias',
             help='the extension alias')
         return parser
 

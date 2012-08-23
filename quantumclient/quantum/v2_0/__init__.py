@@ -67,10 +67,14 @@ def _find_resourceid_by_name(client, resource, name):
 
 def add_show_list_common_argument(parser):
     parser.add_argument(
-        '-D', '--show_details',
+        '-D', '--show-details',
         help='show detailed info',
         action='store_true',
         default=False, )
+    parser.add_argument(
+        '--show_details',
+        action='store_true',
+        help=argparse.SUPPRESS)
     parser.add_argument(
         '-F', '--fields',
         help='specify the field(s) to be returned by server,'
@@ -184,10 +188,14 @@ class QuantumCommand(command.OpenStackCommand):
     def get_parser(self, prog_name):
         parser = super(QuantumCommand, self).get_parser(prog_name)
         parser.add_argument(
-            '--request_format',
+            '--request-format',
             help=_('the xml or json request format'),
             default='json',
             choices=['json', 'xml', ], )
+        parser.add_argument(
+            '--request_format',
+            choices=['json', 'xml', ],
+            help=argparse.SUPPRESS)
 
         return parser
 
@@ -204,8 +212,11 @@ class CreateCommand(QuantumCommand, show.ShowOne):
     def get_parser(self, prog_name):
         parser = super(CreateCommand, self).get_parser(prog_name)
         parser.add_argument(
-            '--tenant_id', metavar='tenant_id',
+            '--tenant-id', metavar='tenant-id',
             help=_('the owner tenant ID'), )
+        parser.add_argument(
+            '--tenant_id',
+            help=argparse.SUPPRESS)
         self.add_known_arguments(parser)
         add_extra_argument(parser, 'value_specs',
                            'new values for the %s' % self.resource)

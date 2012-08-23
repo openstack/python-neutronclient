@@ -15,6 +15,7 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+import argparse
 import logging
 
 from quantumclient.quantum.v2_0 import CreateCommand
@@ -54,9 +55,13 @@ class CreateNetwork(CreateCommand):
 
     def add_known_arguments(self, parser):
         parser.add_argument(
-            '--admin_state_down',
+            '--admin-state-down',
             default=True, action='store_false',
             help='Set Admin State Up to false')
+        parser.add_argument(
+            '--admin_state_down',
+            action='store_false',
+            help=argparse.SUPPRESS)
         parser.add_argument(
             'name', metavar='name',
             help='Name of network to create')
