@@ -95,6 +95,36 @@ COMMAND_V2 = {
         'quantumclient.quantum.v2_0.extension.ListExt'),
     'ext-show': utils.import_class(
         'quantumclient.quantum.v2_0.extension.ShowExt'),
+    'router-list': utils.import_class(
+        'quantumclient.quantum.v2_0.router.ListRouter'),
+    'router-show': utils.import_class(
+        'quantumclient.quantum.v2_0.router.ShowRouter'),
+    'router-create': utils.import_class(
+        'quantumclient.quantum.v2_0.router.CreateRouter'),
+    'router-delete': utils.import_class(
+        'quantumclient.quantum.v2_0.router.DeleteRouter'),
+    'router-update': utils.import_class(
+        'quantumclient.quantum.v2_0.router.UpdateRouter'),
+    'router-interface-add': utils.import_class(
+        'quantumclient.quantum.v2_0.router.AddInterfaceRouter'),
+    'router-interface-delete': utils.import_class(
+        'quantumclient.quantum.v2_0.router.RemoveInterfaceRouter'),
+    'router-gateway-set': utils.import_class(
+        'quantumclient.quantum.v2_0.router.SetGatewayRouter'),
+    'router-gateway-clear': utils.import_class(
+        'quantumclient.quantum.v2_0.router.RemoveGatewayRouter'),
+    'floatingip-list': utils.import_class(
+        'quantumclient.quantum.v2_0.floatingip.ListFloatingIP'),
+    'floatingip-show': utils.import_class(
+        'quantumclient.quantum.v2_0.floatingip.ShowFloatingIP'),
+    'floatingip-create': utils.import_class(
+        'quantumclient.quantum.v2_0.floatingip.CreateFloatingIP'),
+    'floatingip-delete': utils.import_class(
+        'quantumclient.quantum.v2_0.floatingip.DeleteFloatingIP'),
+    'floatingip-associate': utils.import_class(
+        'quantumclient.quantum.v2_0.floatingip.AssociateFloatingIP'),
+    'floatingip-disassociate': utils.import_class(
+        'quantumclient.quantum.v2_0.floatingip.DisassociateFloatingIP'),
 }
 
 COMMANDS = {'2.0': COMMAND_V2}
@@ -116,7 +146,7 @@ class HelpAction(argparse.Action):
             factory = ep.load()
             cmd = factory(self, None)
             one_liner = cmd.get_description().split('\n')[0]
-            app.stdout.write('  %-13s  %s\n' % (name, one_liner))
+            app.stdout.write('  %-25s  %s\n' % (name, one_liner))
         sys.exit(0)
 
 

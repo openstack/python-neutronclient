@@ -412,6 +412,9 @@ class ShowCommand(QuantumCommand, show.ShowOne):
                         else:
                             value += str(_item)
                     data[self.resource][k] = value
+                elif isinstance(v, dict):
+                    value = utils.dumps(v)
+                    data[self.resource][k] = value
                 elif v is None:
                     data[self.resource][k] = ''
             return zip(*sorted(data[self.resource].iteritems()))
