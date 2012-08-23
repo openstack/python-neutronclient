@@ -9,6 +9,7 @@ nose
 nose-exclude
 nosexcover
 openstack.nose_plugin
+nosehtmloutput
 pep8
 sphinx>=1.1.2
 
