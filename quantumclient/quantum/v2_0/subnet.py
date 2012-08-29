@@ -35,12 +35,30 @@ def _format_allocation_pools(subnet):
         return ''
 
 
+def _format_dns_nameservers(subnet):
+    try:
+        return '\n'.join([utils.dumps(server) for server in
+                          subnet['dns_nameservers']])
+    except Exception:
+        return ''
+
+
+def _format_host_routes(subnet):
+    try:
+        return '\n'.join([utils.dumps(route) for route in
+                          subnet['host_routes']])
+    except Exception:
+        return ''
+
+
 class ListSubnet(ListCommand):
     """List networks that belong to a given tenant."""
 
     resource = 'subnet'
     log = logging.getLogger(__name__ + '.ListSubnet')
-    _formatters = {'allocation_pools': _format_allocation_pools, }
+    _formatters = {'allocation_pools': _format_allocation_pools,
+                   'dns_nameservers': _format_dns_nameservers,
+                   'host_routes': _format_host_routes, }
 
 
 class ShowSubnet(ShowCommand):
