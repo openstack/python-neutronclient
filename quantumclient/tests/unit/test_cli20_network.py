@@ -18,6 +18,7 @@
 import sys
 
 from quantumclient.common import exceptions
+from quantumclient.common import utils
 from quantumclient.tests.unit import test_cli20
 from quantumclient.tests.unit.test_cli20 import CLITestV20Base
 from quantumclient.tests.unit.test_cli20 import MyApp
@@ -92,7 +93,7 @@ class CLITestV20Network(CLITestV20Base):
                                           position_names, position_values,
                                           admin_state_up=False)
 
-    def test_lsit_nets_empty_with_column(self):
+    def test_list_nets_empty_with_column(self):
         resources = "networks"
         cmd = ListNetwork(MyApp(sys.stdout), None)
         self.mox.StubOutWithMock(cmd, "get_client")
@@ -145,6 +146,38 @@ class CLITestV20Network(CLITestV20Base):
         cmd = ListNetwork(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
                                   fields_1=['a', 'b'], fields_2=['c', 'd'])
+
+    def test_list_nets_defined_column(self):
+        resources = 'networks'
+        cmd = ListNetwork(MyApp(sys.stdout), None)
+        returned_body = {"networks": [{"name": "buildname3",
+                                       "id": "id3",
+                                       "tenant_id": "tenant_3",
+                                       "subnets": []}]}
+        self._test_list_columns(cmd, resources, returned_body,
+                                args=['-f', 'json', '-c', 'id'])
+        _str = self.fake_stdout.make_string()
+        returned_networks = utils.loads(_str)
+        self.assertEquals(1, len(returned_networks))
+        network = returned_networks[0]
+        self.assertEquals(1, len(network))
+        self.assertEquals("id", network.keys()[0])
+
+    def test_list_nets_with_default_column(self):
+        resources = 'networks'
+        cmd = ListNetwork(MyApp(sys.stdout), None)
+        returned_body = {"networks": [{"name": "buildname3",
+                                       "id": "id3",
+                                       "tenant_id": "tenant_3",
+                                       "subnets": []}]}
+        self._test_list_columns(cmd, resources, returned_body)
+        _str = self.fake_stdout.make_string()
+        returned_networks = utils.loads(_str)
+        self.assertEquals(1, len(returned_networks))
+        network = returned_networks[0]
+        self.assertEquals(4, len(network))
+        self.assertEquals(0, len(set(network) ^
+                                 set(cmd.list_columns)))
 
     def test_update_network_exception(self):
         """Update net: myid."""

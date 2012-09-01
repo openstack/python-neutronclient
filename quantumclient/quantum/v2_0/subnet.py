@@ -18,6 +18,7 @@
 import argparse
 import logging
 
+from quantumclient.common import exceptions
 from quantumclient.common import utils
 from quantumclient.quantum import v2_0 as quantumv20
 from quantumclient.quantum.v2_0 import CreateCommand
@@ -59,6 +60,7 @@ class ListSubnet(ListCommand):
     _formatters = {'allocation_pools': _format_allocation_pools,
                    'dns_nameservers': _format_dns_nameservers,
                    'host_routes': _format_host_routes, }
+    list_columns = ['id', 'name', 'cidr', 'allocation_pools']
 
 
 class ShowSubnet(ShowCommand):

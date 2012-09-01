@@ -1,9 +1,5 @@
 distribute>=0.6.24
-cliff>=0.6.0
-argparse
-httplib2
-prettytable>=0.6.0
-simplejson
+cliff-tablib>=1.0
 mox
 nose
 nose-exclude

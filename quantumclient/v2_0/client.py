@@ -439,7 +439,7 @@ class Client(object):
         # Add format and tenant_id
         action += ".%s" % self.format
         action = self.action_prefix + action
-        if type(params) is dict:
+        if type(params) is dict and params:
             action += '?' + urllib.urlencode(params, doseq=1)
         if body:
             body = self.serialize(body)

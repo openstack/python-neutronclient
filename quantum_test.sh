@@ -74,11 +74,11 @@ tenant_id=tenant_a
 tenant_id_b=tenant_b
 quantum quota-update --tenant_id $tenant_id --network 30 || die "fail to update quota for tenant $tenant_id"
 quantum quota-update --tenant_id $tenant_id_b --network 20 || die "fail to update quota for tenant $tenant_id"
-networks=`quantum quota-list | grep $tenant_id | awk '{print $2}'`
+networks=`quantum quota-list -c network -c tenant_id | grep $tenant_id | awk '{print $2}'`
 if [ $networks -ne 30 ]; then
    die "networks quota should be 30"
 fi
-networks=`quantum quota-list | grep $tenant_id_b | awk '{print $2}'`
+networks=`quantum quota-list -c network -c tenant_id | grep $tenant_id_b | awk '{print $2}'`
 if [ $networks -ne 20 ]; then
    die "networks quota should be 20"
 fi
@@ -100,7 +100,7 @@ if [ "t$NOAUTH" = "t" ]; then
        die "ports quota should be 99"
     fi
     
-    ports=`quantum quota-list | grep 99 | awk '{print $4}'`
+    ports=`quantum quota-list -c port | grep 99 | awk '{print $2}'`
     if [ $ports -ne 99 ]; then
        die "ports quota should be 99"
     fi

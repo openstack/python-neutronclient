@@ -1,4 +1,4 @@
-cliff>=0.6.0
+cliff>=1.2.1
 argparse
 httplib2
 prettytable>=0.6.0

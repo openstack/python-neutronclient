@@ -20,7 +20,6 @@ Command-line interface to the Quantum APIs
 """
 import argparse
 import gettext
-import itertools
 import logging
 import os
 import sys
@@ -424,15 +423,8 @@ class QuantumShell(App):
         return
 
 
-def itertools_compressdef(data, selectors):
-    # patch 2.6 compress('ABCDEF', [1,0,1,0,1,1]) --> A C E F
-    return (d for d, s in itertools.izip(data, selectors) if s)
-
-
 def main(argv=sys.argv[1:]):
     try:
-        if not getattr(itertools, 'compress', None):
-            setattr(itertools, 'compress', itertools_compressdef)
         return QuantumShell(QUANTUM_API_VERSION).run(argv)
     except exc.QuantumClientException:
         return 1

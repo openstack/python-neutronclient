@@ -25,6 +25,7 @@ from mox import Comparator
 from quantumclient.quantum import v2_0 as quantumv20
 from quantumclient.v2_0.client import Client
 
+
 API_VERSION = "2.0"
 FORMAT = 'json'
 TOKEN = 'testtoken'
@@ -171,6 +172,27 @@ class CLITestV20Base(unittest.TestCase):
         _str = self.fake_stdout.make_string()
         self.assertTrue(myid in _str)
         self.assertTrue(name in _str)
+
+    def _test_list_columns(self, cmd, resources_collection,
+                           resources_out, args=['-f', 'json']):
+        self.mox.StubOutWithMock(cmd, "get_client")
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        cmd.get_client().MultipleTimes().AndReturn(self.client)
+        resstr = self.client.serialize(resources_out)
+
+        path = getattr(self.client, resources_collection + "_path")
+        self.client.httpclient.request(
+            end_url(path), 'GET',
+            body=None,
+            headers=ContainsKeyValue('X-Auth-Token',
+                                     TOKEN)).AndReturn((MyResp(200), resstr))
+        self.mox.ReplayAll()
+        cmd_parser = cmd.get_parser("list_" + resources_collection)
+
+        parsed_args = cmd_parser.parse_args(args)
+        cmd.run(parsed_args)
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
 
     def _test_list_resources(self, resources, cmd, detail=False, tags=[],
                              fields_1=[], fields_2=[]):

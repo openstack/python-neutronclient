@@ -40,6 +40,7 @@ class ListPort(ListCommand):
     resource = 'port'
     log = logging.getLogger(__name__ + '.ListPort')
     _formatters = {'fixed_ips': _format_fixed_ips, }
+    list_columns = ['id', 'name', 'mac_address', 'fixed_ips']
 
 
 class ShowPort(ShowCommand):

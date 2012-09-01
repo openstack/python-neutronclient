@@ -339,6 +339,7 @@ class ListCommand(QuantumCommand, lister.Lister):
     resource = None
     log = None
     _formatters = None
+    list_columns = []
 
     def get_parser(self, prog_name):
         parser = super(ListCommand, self).get_parser(prog_name)
@@ -374,7 +375,13 @@ class ListCommand(QuantumCommand, lister.Lister):
             info = data[collection]
         _columns = len(info) > 0 and sorted(info[0].keys()) or []
         if not _columns:
+            # clean the parsed_args.columns so that cliff will not break
             parsed_args.columns = []
+        elif not parsed_args.columns and self.list_columns:
+            # if no -c(s) by user and list_columns, we use columns in
+            # both list_columns and returned resource.
+            # Also Keep their order the same as in list_columns
+            _columns = [x for x in self.list_columns if x in _columns]
         return (_columns, (utils.get_item_properties(
             s, _columns, formatters=self._formatters, )
             for s in info), )
