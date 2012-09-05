@@ -50,13 +50,14 @@ def _find_resourceid_by_name(client, resource, name):
     collection = resource + "s"
     info = data[collection]
     if len(info) > 1:
-        msg = (_("Multiple %(resource)s matches found for '%(name)s',"
+        msg = (_("Multiple %(resource)s matches found for name '%(name)s',"
                " use an ID to be more specific.") %
                {'resource': resource, 'name': name})
         raise exceptions.QuantumClientException(
             message=msg)
     elif len(info) == 0:
-        not_found_message = (_("Unable to find %(resource)s with '%(name)s'") %
+        not_found_message = (_("Unable to find %(resource)s with name "
+                               "'%(name)s'") %
                              {'resource': resource, 'name': name})
         # 404 is used to simulate server side behavior
         raise exceptions.QuantumClientException(
