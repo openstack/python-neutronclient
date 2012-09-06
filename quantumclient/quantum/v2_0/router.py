@@ -19,6 +19,7 @@ import argparse
 import logging
 
 from quantumclient.common import utils
+from quantumclient.quantum import v2_0 as quantumv20
 from quantumclient.quantum.v2_0 import CreateCommand
 from quantumclient.quantum.v2_0 import DeleteCommand
 from quantumclient.quantum.v2_0 import ListCommand
@@ -117,9 +118,12 @@ class AddInterfaceRouter(RouterInterfaceCommand):
         quantum_client = self.get_client()
         quantum_client.format = parsed_args.request_format
         #TODO(danwent): handle passing in port-id
-        quantum_client.add_interface_router(parsed_args.router_id,
-                                            {'subnet_id':
-                                             parsed_args.subnet_id})
+        _router_id = quantumv20.find_resourceid_by_name_or_id(
+            quantum_client, self.resource, parsed_args.router_id)
+        _subnet_id = quantumv20.find_resourceid_by_name_or_id(
+            quantum_client, 'subnet', parsed_args.subnet_id)
+        quantum_client.add_interface_router(_router_id,
+                                            {'subnet_id': _subnet_id})
         #TODO(danwent): print port ID that is added
         print >>self.app.stdout, (
             _('Added interface to router %s') % parsed_args.router_id)
@@ -133,9 +137,12 @@ class RemoveInterfaceRouter(RouterInterfaceCommand):
         quantum_client = self.get_client()
         quantum_client.format = parsed_args.request_format
         #TODO(danwent): handle passing in port-id
-        quantum_client.remove_interface_router(parsed_args.router_id,
-                                               {'subnet_id':
-                                                parsed_args.subnet_id})
+        _router_id = quantumv20.find_resourceid_by_name_or_id(
+            quantum_client, self.resource, parsed_args.router_id)
+        _subnet_id = quantumv20.find_resourceid_by_name_or_id(
+            quantum_client, 'subnet', parsed_args.subnet_id)
+        quantum_client.remove_interface_router(_router_id,
+                                               {'subnet_id': _subnet_id})
         print >>self.app.stdout, (
             _('Removed interface from router %s') % parsed_args.router_id)
 
@@ -161,9 +168,12 @@ class SetGatewayRouter(QuantumCommand):
         self.log.debug('run(%s)' % parsed_args)
         quantum_client = self.get_client()
         quantum_client.format = parsed_args.request_format
-        quantum_client.add_gateway_router(parsed_args.router_id,
-                                          {'network_id':
-                                           parsed_args.external_network_id})
+        _router_id = quantumv20.find_resourceid_by_name_or_id(
+            quantum_client, self.resource, parsed_args.router_id)
+        _ext_net_id = quantumv20.find_resourceid_by_name_or_id(
+            quantum_client, 'network', parsed_args.external_network_id)
+        quantum_client.add_gateway_router(_router_id,
+                                          {'network_id': _ext_net_id})
         print >>self.app.stdout, (
             _('Set gateway for router %s') % parsed_args.router_id)
 
@@ -186,6 +196,8 @@ class RemoveGatewayRouter(QuantumCommand):
         self.log.debug('run(%s)' % parsed_args)
         quantum_client = self.get_client()
         quantum_client.format = parsed_args.request_format
-        quantum_client.remove_gateway_router(parsed_args.router_id)
+        _router_id = quantumv20.find_resourceid_by_name_or_id(
+            quantum_client, self.resource, parsed_args.router_id)
+        quantum_client.remove_gateway_router(_router_id)
         print >>self.app.stdout, (
             _('Removed gateway from router %s') % parsed_args.router_id)

@@ -18,6 +18,7 @@
 import argparse
 import logging
 
+from quantumclient.quantum import v2_0 as quantumv20
 from quantumclient.quantum.v2_0 import CreateCommand
 from quantumclient.quantum.v2_0 import DeleteCommand
 from quantumclient.quantum.v2_0 import ListCommand
@@ -65,8 +66,10 @@ class CreateFloatingIP(CreateCommand):
             help=argparse.SUPPRESS)
 
     def args2body(self, parsed_args):
+        _network_id = quantumv20.find_resourceid_by_name_or_id(
+            self.get_client(), 'network', parsed_args.floating_network_id)
         body = {'floatingip': {
-            'floating_network_id': parsed_args.floating_network_id}}
+            'floating_network_id': _network_id}}
         if parsed_args.tenant_id:
             body['floatingip'].update({'tenant_id': parsed_args.tenant_id})
         return body
