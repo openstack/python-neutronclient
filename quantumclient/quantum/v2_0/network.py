@@ -38,7 +38,7 @@ class ListNetwork(ListCommand):
     resource = 'network'
     log = logging.getLogger(__name__ + '.ListNetwork')
     _formatters = {'subnets': _format_subnets, }
-    list_columns = ['id', 'name', 'tenant_id', 'subnets']
+    list_columns = ['id', 'name', 'subnets']
 
 
 class ShowNetwork(ShowCommand):

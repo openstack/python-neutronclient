@@ -175,7 +175,7 @@ class CLITestV20Network(CLITestV20Base):
         returned_networks = utils.loads(_str)
         self.assertEquals(1, len(returned_networks))
         network = returned_networks[0]
-        self.assertEquals(4, len(network))
+        self.assertEquals(3, len(network))
         self.assertEquals(0, len(set(network) ^
                                  set(cmd.list_columns)))
 
