@@ -307,12 +307,17 @@ class DeleteCommand(QuantumCommand):
     api = 'network'
     resource = None
     log = None
+    allow_names = True
 
     def get_parser(self, prog_name):
         parser = super(DeleteCommand, self).get_parser(prog_name)
+        if self.allow_names:
+            help_str = 'ID or name of %s to delete'
+        else:
+            help_str = 'ID of %s to delete'
         parser.add_argument(
             'id', metavar=self.resource,
-            help='ID or name of %s to delete' % self.resource)
+            help=help_str % self.resource)
         return parser
 
     def run(self, parsed_args):
@@ -321,9 +326,11 @@ class DeleteCommand(QuantumCommand):
         quantum_client.format = parsed_args.request_format
         obj_deleter = getattr(quantum_client,
                               "delete_%s" % self.resource)
-        _id = find_resourceid_by_name_or_id(quantum_client,
-                                            self.resource,
-                                            parsed_args.id)
+        if self.allow_names:
+            _id = find_resourceid_by_name_or_id(quantum_client, self.resource,
+                                                parsed_args.id)
+        else:
+            _id = parsed_args.id
         obj_deleter(_id)
         print >>self.app.stdout, (_('Deleted %(resource)s: %(id)s')
                                   % {'id': parsed_args.id,
@@ -396,13 +403,18 @@ class ShowCommand(QuantumCommand, show.ShowOne):
     api = 'network'
     resource = None
     log = None
+    allow_names = True
 
     def get_parser(self, prog_name):
         parser = super(ShowCommand, self).get_parser(prog_name)
         add_show_list_common_argument(parser)
+        if self.allow_names:
+            help_str = 'ID or name of %s to look up'
+        else:
+            help_str = 'ID of %s to look up'
         parser.add_argument(
             'id', metavar=self.resource,
-            help='ID or name of %s to look up' % self.resource)
+            help=help_str % self.resource)
         return parser
 
     def get_data(self, parsed_args):
@@ -415,8 +427,12 @@ class ShowCommand(QuantumCommand, show.ShowOne):
             params = {'verbose': 'True'}
         if parsed_args.fields:
             params = {'fields': parsed_args.fields}
-        _id = find_resourceid_by_name_or_id(quantum_client, self.resource,
-                                            parsed_args.id)
+        if self.allow_names:
+            _id = find_resourceid_by_name_or_id(quantum_client, self.resource,
+                                                parsed_args.id)
+        else:
+            _id = parsed_args.id
+
         obj_shower = getattr(quantum_client, "show_%s" % self.resource)
         data = obj_shower(_id, **params)
         if self.resource in data:

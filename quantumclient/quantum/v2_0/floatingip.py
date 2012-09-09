@@ -39,6 +39,7 @@ class ShowFloatingIP(ShowCommand):
 
     resource = 'floatingip'
     log = logging.getLogger(__name__ + '.ShowFloatingIP')
+    allow_names = False
 
 
 class CreateFloatingIP(CreateCommand):
@@ -80,6 +81,7 @@ class DeleteFloatingIP(DeleteCommand):
 
     log = logging.getLogger(__name__ + '.DeleteFloatingIP')
     resource = 'floatingip'
+    allow_names = False
 
 
 class AssociateFloatingIP(QuantumCommand):
