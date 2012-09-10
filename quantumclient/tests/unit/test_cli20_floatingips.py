@@ -61,6 +61,25 @@ class CLITestV20FloatingIps(CLITestV20Base):
         _str = self._test_create_resource(resource, cmd, name, myid, args,
                                           position_names, position_values)
 
+    def test_create_floatingip_and_port_and_address(self):
+        """Create floatingip: fip1 with a given port and address"""
+        resource = 'floatingip'
+        cmd = CreateFloatingIP(MyApp(sys.stdout), None)
+        name = 'fip1'
+        myid = 'myid'
+        pid = 'mypid'
+        addr = '10.0.0.99'
+        args = [name, '--port_id', pid, '--fixed_ip_address', addr]
+        position_names = ['floating_network_id', 'port_id', 'fixed_ip_address']
+        position_values = [name, pid, addr]
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values)
+        # Test dashed options
+        args = [name, '--port-id', pid, '--fixed-ip-address', addr]
+        position_names = ['floating_network_id', 'port-id', 'fixed-ip-address']
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values)
+
     def test_list_floatingips(self):
         """list floatingips: -D."""
         resources = 'floatingips'

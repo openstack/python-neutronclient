@@ -69,10 +69,14 @@ class CreateFloatingIP(CreateCommand):
     def args2body(self, parsed_args):
         _network_id = quantumv20.find_resourceid_by_name_or_id(
             self.get_client(), 'network', parsed_args.floating_network_id)
-        body = {'floatingip': {
-            'floating_network_id': _network_id}}
+        body = {self.resource: {'floating_network_id': _network_id}}
+        if parsed_args.port_id:
+            body[self.resource].update({'port_id': parsed_args.port_id})
         if parsed_args.tenant_id:
-            body['floatingip'].update({'tenant_id': parsed_args.tenant_id})
+            body[self.resource].update({'tenant_id': parsed_args.tenant_id})
+        if parsed_args.fixed_ip_address:
+            body[self.resource].update({'fixed_ip_address':
+                                        parsed_args.fixed_ip_address})
         return body
 
 
