@@ -64,15 +64,22 @@ class CreateNetwork(CreateCommand):
             action='store_false',
             help=argparse.SUPPRESS)
         parser.add_argument(
+            '--shared',
+            action='store_true',
+            default=argparse.SUPPRESS,
+            help='Set the network as shared')
+        parser.add_argument(
             'name', metavar='name',
             help='Name of network to create')
 
     def args2body(self, parsed_args):
         body = {'network': {
             'name': parsed_args.name,
-            'admin_state_up': parsed_args.admin_state_down, }, }
+            'admin_state_up': parsed_args.admin_state_down}, }
         if parsed_args.tenant_id:
             body['network'].update({'tenant_id': parsed_args.tenant_id})
+        if hasattr(parsed_args, 'shared'):
+            body['network'].update({'shared': parsed_args.shared})
         return body
 
 
