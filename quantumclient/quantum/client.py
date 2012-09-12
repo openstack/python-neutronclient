@@ -26,7 +26,7 @@ API_VERSIONS = {
 
 
 def make_client(instance):
-    """Returns an identity service client.
+    """Returns an quantum client.
     """
     quantum_client = utils.get_client_class(
         API_NAME,
@@ -49,3 +49,15 @@ def make_client(instance):
     else:
         raise exceptions.UnsupportedVersion("API version %s is not supported" %
                                             instance._api_version[API_NAME])
+
+
+def Client(api_version, *args, **kwargs):
+    """Return an quantum client.
+    @param api_version: only 2.0 is supported now
+    """
+    quantum_client = utils.get_client_class(
+        API_NAME,
+        api_version,
+        API_VERSIONS,
+    )
+    return quantum_client(*args, **kwargs)
