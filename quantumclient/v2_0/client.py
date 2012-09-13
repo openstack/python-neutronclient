@@ -479,7 +479,7 @@ class Client(object):
 
     def deserialize(self, data, status_code):
         """
-        Deserializes a an xml or json string into a dictionary
+        Deserializes an xml or json string into a dictionary
         """
         if status_code == 204:
             return data
