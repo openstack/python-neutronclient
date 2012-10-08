@@ -278,6 +278,24 @@ class QuantumShell(App):
 
         return parser
 
+    def _bash_completion(self):
+        """
+        Prints all of the commands and options to stdout so that the
+        quantum's bash-completion script doesn't have to hard code them.
+        """
+        commands = set()
+        options = set()
+        for option, _action in self.parser._option_string_actions.items():
+            options.add(option)
+        for command_name, command in self.command_manager:
+            commands.add(command_name)
+            cmd_factory = command.load()
+            cmd = cmd_factory(self, None)
+            cmd_parser = cmd.get_parser('')
+            for option, _action in cmd_parser._option_string_actions.items():
+                options.add(option)
+        print ' '.join(commands | options)
+
     def run(self, argv):
         """Equivalent to the main program for the application.
 
@@ -289,6 +307,9 @@ class QuantumShell(App):
             command_pos = -1
             help_pos = -1
             for arg in argv:
+                if arg == 'bash-completion':
+                    self._bash_completion()
+                    return 0
                 if arg in COMMANDS[self.api_version]:
                     if command_pos == -1:
                         command_pos = index
