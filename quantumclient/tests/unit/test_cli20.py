@@ -141,7 +141,9 @@ class CLITestV20Base(unittest.TestCase):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
-        if (resource == 'subnet' or resource == 'floatingip'):
+        non_admin_status_resources = ['subnet', 'floatingip', 'security_group',
+                                      'security_group_rule']
+        if (resource in non_admin_status_resources):
             body = {resource: {}, }
         else:
             body = {resource: {'admin_state_up': admin_state_up, }, }
@@ -155,8 +157,9 @@ class CLITestV20Base(unittest.TestCase):
         for i in xrange(len(position_names)):
             body[resource].update({position_names[i]: position_values[i]})
         ress = {resource:
-                {'id': myid,
-                 'name': name, }, }
+                {'id': myid}, }
+        if name:
+            ress[resource].update({'name': name})
         resstr = self.client.serialize(ress)
         # url method body
         path = getattr(self.client, resource + "s_path")
@@ -174,7 +177,8 @@ class CLITestV20Base(unittest.TestCase):
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
         self.assertTrue(myid in _str)
-        self.assertTrue(name in _str)
+        if name:
+            self.assertTrue(name in _str)
 
     def _test_list_columns(self, cmd, resources_collection,
                            resources_out, args=['-f', 'json']):

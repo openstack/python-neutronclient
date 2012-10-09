@@ -162,6 +162,10 @@ class Client(object):
     router_path = "/routers/%s"
     floatingips_path = "/floatingips"
     floatingip_path = "/floatingips/%s"
+    security_groups_path = "/security-groups"
+    security_group_path = "/security-groups/%s"
+    security_group_rules_path = "/security-group-rules"
+    security_group_rule_path = "/security-group-rules/%s"
 
     @APIParamsCall
     def get_quotas_tenant(self, **_params):
@@ -409,6 +413,65 @@ class Client(object):
         Deletes the specified floatingip
         """
         return self.delete(self.floatingip_path % (floatingip))
+
+    @APIParamsCall
+    def create_security_group(self, body=None):
+        """
+        Creates a new security group
+        """
+        return self.post(self.security_groups_path, body=body)
+
+    @APIParamsCall
+    def list_security_groups(self, **_params):
+        """
+        Fetches a list of all security groups for a tenant
+        """
+        return self.get(self.security_groups_path, params=_params)
+
+    @APIParamsCall
+    def show_security_group(self, security_group, **_params):
+        """
+        Fetches information of a certain security group
+        """
+        return self.get(self.security_group_path % (security_group),
+                        params=_params)
+
+    @APIParamsCall
+    def delete_security_group(self, security_group):
+        """
+        Deletes the specified security group
+        """
+        return self.delete(self.security_group_path % (security_group))
+
+    @APIParamsCall
+    def create_security_group_rule(self, body=None):
+        """
+        Creates a new security group rule
+        """
+        return self.post(self.security_group_rules_path, body=body)
+
+    @APIParamsCall
+    def delete_security_group_rule(self, security_group_rule):
+        """
+        Deletes the specified security group rule
+        """
+        return self.delete(self.security_group_rule_path %
+                           (security_group_rule))
+
+    @APIParamsCall
+    def list_security_group_rules(self, **_params):
+        """
+        Fetches a list of all security group rules for a tenant
+        """
+        return self.get(self.security_group_rules_path, params=_params)
+
+    @APIParamsCall
+    def show_security_group_rule(self, security_group_rule, **_params):
+        """
+        Fetches information of a certain security group rule
+        """
+        return self.get(self.security_group_rule_path % (security_group_rule),
+                        params=_params)
 
     def __init__(self, **kwargs):
         """ Initialize a new client for the Quantum v2.0 API. """

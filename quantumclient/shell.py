@@ -124,6 +124,22 @@ COMMAND_V2 = {
         'quantumclient.quantum.v2_0.floatingip.AssociateFloatingIP'),
     'floatingip-disassociate': utils.import_class(
         'quantumclient.quantum.v2_0.floatingip.DisassociateFloatingIP'),
+    'security-group-list': utils.import_class(
+        'quantumclient.quantum.v2_0.securitygroup.ListSecurityGroup'),
+    'security-group-show': utils.import_class(
+        'quantumclient.quantum.v2_0.securitygroup.ShowSecurityGroup'),
+    'security-group-create': utils.import_class(
+        'quantumclient.quantum.v2_0.securitygroup.CreateSecurityGroup'),
+    'security-group-delete': utils.import_class(
+        'quantumclient.quantum.v2_0.securitygroup.DeleteSecurityGroup'),
+    'security-group-rule-list': utils.import_class(
+        'quantumclient.quantum.v2_0.securitygroup.ListSecurityGroupRule'),
+    'security-group-rule-show': utils.import_class(
+        'quantumclient.quantum.v2_0.securitygroup.ShowSecurityGroupRule'),
+    'security-group-rule-create': utils.import_class(
+        'quantumclient.quantum.v2_0.securitygroup.CreateSecurityGroupRule'),
+    'security-group-rule-delete': utils.import_class(
+        'quantumclient.quantum.v2_0.securitygroup.DeleteSecurityGroupRule'),
 }
 
 COMMANDS = {'2.0': COMMAND_V2}
