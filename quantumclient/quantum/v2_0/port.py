@@ -35,12 +35,39 @@ def _format_fixed_ips(port):
 
 
 class ListPort(ListCommand):
-    """List networks that belong to a given tenant."""
+    """List ports that belong to a given tenant."""
 
     resource = 'port'
     log = logging.getLogger(__name__ + '.ListPort')
     _formatters = {'fixed_ips': _format_fixed_ips, }
     list_columns = ['id', 'name', 'mac_address', 'fixed_ips']
+
+
+class ListRouterPort(ListCommand):
+    """List ports that belong to a given tenant, with specified router"""
+
+    resource = 'port'
+    log = logging.getLogger(__name__ + '.ListRouterPort')
+    _formatters = {'fixed_ips': _format_fixed_ips, }
+    list_columns = ['id', 'name', 'mac_address', 'fixed_ips']
+
+    def get_parser(self, prog_name):
+        parser = super(ListCommand, self).get_parser(prog_name)
+        quantumv20.add_show_list_common_argument(parser)
+        parser.add_argument(
+            'id', metavar='router',
+            help='ID or name of router to look up')
+        quantumv20.add_extra_argument(parser, 'filter_specs',
+                                      'filters options')
+        return parser
+
+    def get_data(self, parsed_args):
+        quantum_client = self.get_client()
+        quantum_client.format = parsed_args.request_format
+        _id = quantumv20.find_resourceid_by_name_or_id(
+            quantum_client, 'router', parsed_args.id)
+        parsed_args.filter_specs.append('--device_id=%s' % _id)
+        return super(ListRouterPort, self).get_data(parsed_args)
 
 
 class ShowPort(ShowCommand):

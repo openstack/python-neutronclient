@@ -41,6 +41,21 @@ class ListNetwork(ListCommand):
     list_columns = ['id', 'name', 'subnets']
 
 
+class ListExternalNetwork(ListCommand):
+    """List external networks that belong to a given tenant"""
+
+    resource = 'network'
+    log = logging.getLogger(__name__ + '.ListExternalNetwork')
+    _formatters = {'subnets': _format_subnets, }
+    list_colums = ['id', 'name', 'subnets']
+
+    def get_data(self, parsed_args):
+        if '--' not in parsed_args.filter_specs:
+            parsed_args.filter_specs.append('--')
+        parsed_args.filter_specs.append('--router:external=True')
+        return super(ListExternalNetwork, self).get_data(parsed_args)
+
+
 class ShowNetwork(ShowCommand):
     """Show information of a given network."""
 
