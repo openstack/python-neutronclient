@@ -200,6 +200,20 @@ class QuantumCommand(command.OpenStackCommand):
 
         return parser
 
+    def format_output_data(self, data):
+        # Modify data to make it more readable
+        if self.resource in data:
+            for k, v in data[self.resource].iteritems():
+                if isinstance(v, list):
+                    value = '\n'.join(utils.dumps(i) if isinstance(i, dict)
+                                      else str(i) for i in v)
+                    data[self.resource][k] = value
+                elif isinstance(v, dict):
+                    value = utils.dumps(v)
+                    data[self.resource][k] = value
+                elif v is None:
+                    data[self.resource][k] = ''
+
 
 class CreateCommand(QuantumCommand, show.ShowOne):
     """Create a resource for a given tenant
@@ -239,25 +253,13 @@ class CreateCommand(QuantumCommand, show.ShowOne):
         obj_creator = getattr(quantum_client,
                               "create_%s" % self.resource)
         data = obj_creator(body)
+        self.format_output_data(data)
         # {u'network': {u'id': u'e9424a76-6db4-4c93-97b6-ec311cd51f19'}}
         info = self.resource in data and data[self.resource] or None
         if info:
             print >>self.app.stdout, _('Created a new %s:' % self.resource)
         else:
             info = {'': ''}
-        for k, v in info.iteritems():
-            if isinstance(v, list):
-                value = ""
-                for _item in v:
-                    if value:
-                        value += "\n"
-                    if isinstance(_item, dict):
-                        value += utils.dumps(_item)
-                    else:
-                        value += str(_item)
-                info[k] = value
-            elif v is None:
-                info[k] = ''
         return zip(*sorted(info.iteritems()))
 
 
@@ -435,23 +437,9 @@ class ShowCommand(QuantumCommand, show.ShowOne):
 
         obj_shower = getattr(quantum_client, "show_%s" % self.resource)
         data = obj_shower(_id, **params)
+        self.format_output_data(data)
+        resource = data[self.resource]
         if self.resource in data:
-            for k, v in data[self.resource].iteritems():
-                if isinstance(v, list):
-                    value = ""
-                    for _item in v:
-                        if value:
-                            value += "\n"
-                        if isinstance(_item, dict):
-                            value += utils.dumps(_item)
-                        else:
-                            value += str(_item)
-                    data[self.resource][k] = value
-                elif isinstance(v, dict):
-                    value = utils.dumps(v)
-                    data[self.resource][k] = value
-                elif v is None:
-                    data[self.resource][k] = ''
-            return zip(*sorted(data[self.resource].iteritems()))
+            return zip(*sorted(resource.iteritems()))
         else:
             return None

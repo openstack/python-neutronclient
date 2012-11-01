@@ -56,6 +56,7 @@ class CreateRouter(CreateCommand):
 
     resource = 'router'
     log = logging.getLogger(__name__ + '.CreateRouter')
+    _formatters = {'external_gateway_info': _format_external_gateway_info, }
 
     def add_known_arguments(self, parser):
         parser.add_argument(
