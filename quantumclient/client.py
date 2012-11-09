@@ -123,10 +123,9 @@ class HTTPClient(httplib2.Http):
 
         if 'body' in kwargs:
             kargs['body'] = kwargs['body']
-
+        utils.http_log_req(_logger, args, kargs)
         resp, body = self.request(*args, **kargs)
-
-        utils.http_log(_logger, args, kargs, resp, body)
+        utils.http_log_resp(_logger, resp, body)
         status_code = self.get_status_code(resp)
         if status_code == 401:
             raise exceptions.Unauthorized(message=body)

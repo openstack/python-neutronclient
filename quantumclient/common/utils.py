@@ -148,23 +148,27 @@ def str2dict(strdict):
         return _info
 
 
-def http_log(_logger, args, kwargs, resp, body):
-        if not _logger.isEnabledFor(logging.DEBUG):
-            return
+def http_log_req(_logger, args, kwargs):
+    if not _logger.isEnabledFor(logging.DEBUG):
+        return
 
-        string_parts = ['curl -i']
-        for element in args:
-            if element in ('GET', 'POST'):
-                string_parts.append(' -X %s' % element)
-            else:
-                string_parts.append(' %s' % element)
+    string_parts = ['curl -i']
+    for element in args:
+        if element in ('GET', 'POST', 'DELETE', 'PUT'):
+            string_parts.append(' -X %s' % element)
+        else:
+            string_parts.append(' %s' % element)
 
-        for element in kwargs['headers']:
-            header = ' -H "%s: %s"' % (element, kwargs['headers'][element])
-            string_parts.append(header)
+    for element in kwargs['headers']:
+        header = ' -H "%s: %s"' % (element, kwargs['headers'][element])
+        string_parts.append(header)
 
-        _logger.debug("REQ: %s\n" % "".join(string_parts))
-        if 'body' in kwargs and kwargs['body']:
-            _logger.debug("REQ BODY: %s\n" % (kwargs['body']))
-        _logger.debug("RESP:%s\n", resp)
-        _logger.debug("RESP BODY:%s\n", body)
+    if 'body' in kwargs and kwargs['body']:
+        string_parts.append(" -d '%s'" % (kwargs['body']))
+    _logger.debug("\nREQ: %s\n" % "".join(string_parts))
+
+
+def http_log_resp(_logger, resp, body):
+    if not _logger.isEnabledFor(logging.DEBUG):
+        return
+    _logger.debug("RESP:%s %s\n", resp, body)
