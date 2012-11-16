@@ -54,6 +54,8 @@ def env(*_vars, **kwargs):
 COMMAND_V2 = {
     'net-list': utils.import_class(
         'quantumclient.quantum.v2_0.network.ListNetwork'),
+    'net-external-list': utils.import_class(
+        'quantumclient.quantum.v2_0.network.ListExternalNetwork'),
     'net-show': utils.import_class(
         'quantumclient.quantum.v2_0.network.ShowNetwork'),
     'net-create': utils.import_class(
@@ -96,6 +98,8 @@ COMMAND_V2 = {
         'quantumclient.quantum.v2_0.extension.ShowExt'),
     'router-list': utils.import_class(
         'quantumclient.quantum.v2_0.router.ListRouter'),
+    'router-port-list': utils.import_class(
+        'quantumclient.quantum.v2_0.port.ListRouterPort'),
     'router-show': utils.import_class(
         'quantumclient.quantum.v2_0.router.ShowRouter'),
     'router-create': utils.import_class(
