@@ -220,6 +220,21 @@ COMMAND_V2 = {
         'quantumclient.quantum.v2_0.agent.DeleteAgent'),
     'agent-update': utils.import_class(
         'quantumclient.quantum.v2_0.agent.UpdateAgent'),
+    'net-gateway-create': utils.import_class(
+        'quantumclient.quantum.v2_0.nvpnetworkgateway.CreateNetworkGateway'),
+    'net-gateway-update': utils.import_class(
+        'quantumclient.quantum.v2_0.nvpnetworkgateway.UpdateNetworkGateway'),
+    'net-gateway-delete': utils.import_class(
+        'quantumclient.quantum.v2_0.nvpnetworkgateway.DeleteNetworkGateway'),
+    'net-gateway-show': utils.import_class(
+        'quantumclient.quantum.v2_0.nvpnetworkgateway.ShowNetworkGateway'),
+    'net-gateway-list': utils.import_class(
+        'quantumclient.quantum.v2_0.nvpnetworkgateway.ListNetworkGateway'),
+    'net-gateway-connect': utils.import_class(
+        'quantumclient.quantum.v2_0.nvpnetworkgateway.ConnectNetworkGateway'),
+    'net-gateway-disconnect': utils.import_class(
+        'quantumclient.quantum.v2_0.nvpnetworkgateway.'
+        'DisconnectNetworkGateway')
 }
 
 COMMANDS = {'2.0': COMMAND_V2}

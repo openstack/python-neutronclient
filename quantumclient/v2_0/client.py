@@ -174,6 +174,8 @@ class Client(object):
     qos_queue_path = "/qos-queues/%s"
     agents_path = "/agents"
     agent_path = "/agents/%s"
+    network_gateways_path = "/network-gateways"
+    network_gateway_path = "/network-gateways/%s"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -734,6 +736,57 @@ class Client(object):
         Deletes the specified agent
         """
         return self.delete(self.agent_path % (agent))
+
+    @APIParamsCall
+    def list_network_gateways(self, **_params):
+        """
+        Retrieve network gateways
+        """
+        return self.get(self.network_gateways_path, params=_params)
+
+    @APIParamsCall
+    def show_network_gateway(self, gateway_id, **_params):
+        """
+        Fetch a network gateway
+        """
+        return self.get(self.network_gateway_path % gateway_id, params=_params)
+
+    @APIParamsCall
+    def create_network_gateway(self, body=None):
+        """
+        Create a new network gateway
+        """
+        return self.post(self.network_gateways_path, body=body)
+
+    @APIParamsCall
+    def update_network_gateway(self, gateway_id, body=None):
+        """
+        Update a network gateway
+        """
+        return self.put(self.network_gateway_path % gateway_id, body=body)
+
+    @APIParamsCall
+    def delete_network_gateway(self, gateway_id):
+        """
+        Delete the specified network gateway
+        """
+        return self.delete(self.network_gateway_path % gateway_id)
+
+    @APIParamsCall
+    def connect_network_gateway(self, gateway_id, body=None):
+        """
+        Connect a network gateway to the specified network
+        """
+        base_uri = self.network_gateway_path % gateway_id
+        return self.put("%s/connect_network" % base_uri, body=body)
+
+    @APIParamsCall
+    def disconnect_network_gateway(self, gateway_id, body=None):
+        """
+        Disconnect a network from the specified gateway
+        """
+        base_uri = self.network_gateway_path % gateway_id
+        return self.put("%s/disconnect_network" % base_uri, body=body)
 
     def __init__(self, **kwargs):
         """ Initialize a new client for the Quantum v2.0 API. """

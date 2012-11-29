@@ -159,12 +159,13 @@ class CLITestV20Base(testtools.TestCase):
                               name, myid, args,
                               position_names, position_values, tenant_id=None,
                               tags=None, admin_state_up=True, shared=False,
-                              extra_body=None):
+                              extra_body=None, **kwargs):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
         non_admin_status_resources = ['subnet', 'floatingip', 'security_group',
-                                      'security_group_rule', 'qos_queue']
+                                      'security_group_rule', 'qos_queue',
+                                      'network_gateway']
         if (resource in non_admin_status_resources):
             body = {resource: {}, }
         else:
@@ -177,6 +178,7 @@ class CLITestV20Base(testtools.TestCase):
             body[resource].update({'shared': shared})
         if extra_body:
             body[resource].update(extra_body)
+        body[resource].update(kwargs)
 
         for i in xrange(len(position_names)):
             body[resource].update({position_names[i]: position_values[i]})
