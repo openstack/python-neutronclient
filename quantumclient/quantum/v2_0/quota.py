@@ -164,6 +164,12 @@ class UpdateQuota(QuantumCommand, show.ShowOne):
         parser.add_argument(
             '--port', metavar='ports',
             help='the limit of port quota')
+        parser.add_argument(
+            '--router', metavar='routers',
+            help='the limit of router quota')
+        parser.add_argument(
+            '--floatingip', metavar='floatingips',
+            help='the limit of floating IP quota')
         quantumv20.add_extra_argument(
             parser, 'value_specs',
             'new values for the %s' % self.resource)
@@ -183,7 +189,7 @@ class UpdateQuota(QuantumCommand, show.ShowOne):
         quantum_client = self.get_client()
         quantum_client.format = parsed_args.request_format
         quota = {}
-        for resource in ('network', 'subnet', 'port'):
+        for resource in ('network', 'subnet', 'port', 'router', 'floatingip'):
             if getattr(parsed_args, resource):
                 quota[resource] = self._validate_int(
                     resource,
