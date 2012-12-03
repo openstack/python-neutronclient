@@ -387,7 +387,9 @@ class ListCommand(QuantumCommand, lister.Lister):
         if not _columns:
             # clean the parsed_args.columns so that cliff will not break
             parsed_args.columns = []
-        elif not parsed_args.columns and self.list_columns:
+        elif parsed_args.columns:
+            _columns = [x for x in parsed_args.columns if x in _columns]
+        elif self.list_columns:
             # if no -c(s) by user and list_columns, we use columns in
             # both list_columns and returned resource.
             # Also Keep their order the same as in list_columns
