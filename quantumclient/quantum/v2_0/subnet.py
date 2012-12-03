@@ -98,15 +98,27 @@ class CreateSubnet(CreateCommand):
             default=False, action='store_true',
             help='No distribution of gateway')
         parser.add_argument(
-            '--allocation-pool',
-            action='append',
-            help='Allocation pool IP addresses for this subnet: '
-            'start=<ip_address>,end=<ip_address> '
-            'can be repeated')
+            '--allocation-pool', metavar='start=IP_ADDR,end=IP_ADDR',
+            action='append', dest='allocation_pools', type=utils.str2dict,
+            help='Allocation pool IP addresses for this subnet '
+            '(This option can be repeated)')
         parser.add_argument(
             '--allocation_pool',
-            action='append',
+            action='append', dest='allocation_pools', type=utils.str2dict,
             help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--host-route', metavar='destination=CIDR,nexthop=IP_ADDR',
+            action='append', dest='host_routes', type=utils.str2dict,
+            help='Additional route (This option can be repeated)')
+        parser.add_argument(
+            '--dns-nameserver', metavar='DNS_NAMESERVER',
+            action='append', dest='dns_nameservers',
+            help='DNS name server for this subnet '
+            '(This option can be repeated)')
+        parser.add_argument(
+            '--disable-dhcp',
+            action='store_true',
+            help='Disable DHCP for this subnet')
         parser.add_argument(
             'network_id', metavar='network',
             help='Network id or name this subnet belongs to')
@@ -133,12 +145,14 @@ class CreateSubnet(CreateCommand):
             body['subnet'].update({'tenant_id': parsed_args.tenant_id})
         if parsed_args.name:
             body['subnet'].update({'name': parsed_args.name})
-        ips = []
-        if parsed_args.allocation_pool:
-            for ip_spec in parsed_args.allocation_pool:
-                ips.append(utils.str2dict(ip_spec))
-        if ips:
-            body['subnet'].update({'allocation_pools': ips})
+        if parsed_args.disable_dhcp:
+            body['subnet'].update({'enable_dhcp': False})
+        if parsed_args.allocation_pools:
+            body['subnet']['allocation_pools'] = parsed_args.allocation_pools
+        if parsed_args.host_routes:
+            body['subnet']['host_routes'] = parsed_args.host_routes
+        if parsed_args.dns_nameservers:
+            body['subnet']['dns_nameservers'] = parsed_args.dns_nameservers
 
         return body
 
