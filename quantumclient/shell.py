@@ -157,6 +157,8 @@ class HelpAction(argparse.Action):
     instance, passed in as the "default" value for the action.
     """
     def __call__(self, parser, namespace, values, option_string=None):
+        outputs = []
+        max_len = 0
         app = self.default
         parser.print_help(app.stdout)
         app.stdout.write('\nCommands for API v%s:\n' % app.api_version)
@@ -165,7 +167,10 @@ class HelpAction(argparse.Action):
             factory = ep.load()
             cmd = factory(self, None)
             one_liner = cmd.get_description().split('\n')[0]
-            app.stdout.write('  %-25s  %s\n' % (name, one_liner))
+            outputs.append((name, one_liner))
+            max_len = max(len(name), max_len)
+        for (name, one_liner) in outputs:
+            app.stdout.write('  %s  %s\n' % (name.ljust(max_len), one_liner))
         sys.exit(0)
 
 
