@@ -9,7 +9,7 @@ _quantum()
 	prev="${COMP_WORDS[COMP_CWORD-1]}"
 
 	if [ "x$_quantum_opts" == "x" ] ; then
-		nbc="`quantum bash-completion | sed -e "s/\s-h\s/\s/"`"
+		nbc="`quantum bash-completion`"
 		_quantum_opts="`echo "$nbc" | sed -e "s/--[a-z0-9_-]*//g" -e "s/\s\s*/ /g"`"
 		_quantum_flags="`echo " $nbc" | sed -e "s/ [^-][^-][a-z0-9_-]*//g" -e "s/\s\s*/ /g"`"
 		_quantum_opts_exp="`echo "$_quantum_opts" | sed -e "s/\s/|/g"`"
