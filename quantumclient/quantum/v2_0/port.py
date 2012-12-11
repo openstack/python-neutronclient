@@ -112,7 +112,7 @@ class CreatePort(CreateCommand):
             action='append',
             help='desired IP for this port: '
             'subnet_id=<name_or_id>,ip_address=<ip>, '
-            'can be repeated')
+            '(This option can be repeated.)')
         parser.add_argument(
             '--fixed_ip',
             action='append',
@@ -123,7 +123,7 @@ class CreatePort(CreateCommand):
             help='security group associated with the port '
             '(This option can be repeated)')
         parser.add_argument(
-            'network_id', metavar='network',
+            'network_id', metavar='NETWORK',
             help='Network id or name this port belongs to')
 
     def args2body(self, parsed_args):

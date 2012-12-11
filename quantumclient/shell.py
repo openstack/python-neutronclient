@@ -365,6 +365,46 @@ class QuantumShell(App):
             result = self.run_subcommand(remainder)
         return result
 
+    def run_subcommand(self, argv):
+        subcommand = self.command_manager.find_command(argv)
+        cmd_factory, cmd_name, sub_argv = subcommand
+        cmd = cmd_factory(self, self.options)
+        err = None
+        result = 1
+        try:
+            self.prepare_to_run_command(cmd)
+            full_name = (cmd_name
+                         if self.interactive_mode
+                         else ' '.join([self.NAME, cmd_name])
+                         )
+            cmd_parser = cmd.get_parser(full_name)
+            known_args, values_specs = cmd_parser.parse_known_args(sub_argv)
+            cmd.values_specs = values_specs
+            result = cmd.run(known_args)
+        except Exception as err:
+            if self.options.debug:
+                self.log.exception(err)
+            else:
+                self.log.error(err)
+            try:
+                self.clean_up(cmd, result, err)
+            except Exception as err2:
+                if self.options.debug:
+                    self.log.exception(err2)
+                else:
+                    self.log.error('Could not clean up: %s', err2)
+            if self.options.debug:
+                raise
+        else:
+            try:
+                self.clean_up(cmd, result, None)
+            except Exception as err3:
+                if self.options.debug:
+                    self.log.exception(err3)
+                else:
+                    self.log.error('Could not clean up: %s', err3)
+        return result
+
     def authenticate_user(self):
         """Make sure the user has provided all of the authentication
         info we need.

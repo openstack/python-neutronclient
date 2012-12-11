@@ -84,7 +84,7 @@ class CreateNetwork(CreateCommand):
             default=argparse.SUPPRESS,
             help='Set the network as shared')
         parser.add_argument(
-            'name', metavar='name',
+            'name', metavar='NAME',
             help='Name of network to create')
 
     def args2body(self, parsed_args):

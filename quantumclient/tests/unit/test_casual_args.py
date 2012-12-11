@@ -35,7 +35,7 @@ class CLITestArgs(unittest.TestCase):
     def test_bool_true(self):
         _specs = ['--my-bool', 'type=bool', 'true',  '--arg1', 'value1']
         _mydict = quantumV20.parse_args_to_dict(_specs)
-        self.assertTrue(_mydict['my-bool'])
+        self.assertTrue(_mydict['my_bool'])
 
     def test_bool_false(self):
         _specs = ['--my_bool', 'type=bool', 'false',  '--arg1', 'value1']

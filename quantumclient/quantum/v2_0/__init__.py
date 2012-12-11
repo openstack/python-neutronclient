@@ -77,11 +77,17 @@ def add_show_list_common_argument(parser):
         action='store_true',
         help=argparse.SUPPRESS)
     parser.add_argument(
-        '-F', '--fields',
+        '--fields',
+        help=argparse.SUPPRESS,
+        action='append',
+        default=[])
+    parser.add_argument(
+        '-F', '--field',
+        dest='fields', metavar='FIELD',
         help='specify the field(s) to be returned by server,'
         ' can be repeated',
         action='append',
-        default=[], )
+        default=[])
 
 
 def add_extra_argument(parser, name, _help):
@@ -108,15 +114,16 @@ def parse_args_to_dict(values_specs):
 
     '''
     # -- is a pseudo argument
-    if values_specs and values_specs[0] == '--':
-        del values_specs[0]
+    values_specs_copy = values_specs[:]
+    if values_specs_copy and values_specs_copy[0] == '--':
+        del values_specs_copy[0]
     _options = {}
     current_arg = None
     _values_specs = []
     _value_number = 0
     _list_flag = False
     current_item = None
-    for _item in values_specs:
+    for _item in values_specs_copy:
         if _item.startswith('--'):
             if current_arg is not None:
                 if _value_number > 1 or _list_flag:
@@ -166,22 +173,49 @@ def parse_args_to_dict(values_specs):
             current_arg.update({'nargs': '+'})
         elif _value_number == 0:
             current_arg.update({'action': 'store_true'})
-    _parser = argparse.ArgumentParser(add_help=False)
-    for opt, optspec in _options.iteritems():
-        _parser.add_argument(opt, **optspec)
-    _args = _parser.parse_args(_values_specs)
+    _args = None
+    if _values_specs:
+        _parser = argparse.ArgumentParser(add_help=False)
+        for opt, optspec in _options.iteritems():
+            _parser.add_argument(opt, **optspec)
+        _args = _parser.parse_args(_values_specs)
     result_dict = {}
-    for opt in _options.iterkeys():
-        _opt = opt.split('--', 2)[1]
-        _value = getattr(_args, _opt.replace('-', '_'))
-        if _value is not None:
-            result_dict.update({_opt: _value})
+    if _args:
+        for opt in _options.iterkeys():
+            _opt = opt.split('--', 2)[1]
+            _opt = _opt.replace('-', '_')
+            _value = getattr(_args, _opt)
+            if _value is not None:
+                result_dict.update({_opt: _value})
     return result_dict
+
+
+def _merge_args(qCmd, parsed_args, _extra_values, value_specs):
+    """Merge arguments from _extra_values into parsed_args.
+
+    If an argument value are provided in both and it is a list,
+    the values in _extra_values will be merged into parsed_args.
+
+    @param parsed_args: the parsed args from known options
+    @param _extra_values: the other parsed arguments in unknown parts
+    @param values_specs: the unparsed unknown parts
+    """
+    temp_values = _extra_values.copy()
+    for key, value in temp_values.iteritems():
+        if hasattr(parsed_args, key):
+            arg_value = getattr(parsed_args, key)
+            if arg_value is not None and value is not None:
+                if isinstance(arg_value, list):
+                    if value and isinstance(value, list):
+                        if type(arg_value[0]) == type(value[0]):
+                            arg_value.extend(value)
+                            _extra_values.pop(key)
 
 
 class QuantumCommand(command.OpenStackCommand):
     api = 'network'
     log = logging.getLogger(__name__ + '.QuantumCommand')
+    values_specs = []
 
     def get_client(self):
         return self.app.client_manager.quantum
@@ -227,14 +261,12 @@ class CreateCommand(QuantumCommand, show.ShowOne):
     def get_parser(self, prog_name):
         parser = super(CreateCommand, self).get_parser(prog_name)
         parser.add_argument(
-            '--tenant-id', metavar='tenant-id',
+            '--tenant-id', metavar='TENANT_ID',
             help=_('the owner tenant ID'), )
         parser.add_argument(
             '--tenant_id',
             help=argparse.SUPPRESS)
         self.add_known_arguments(parser)
-        add_extra_argument(parser, 'value_specs',
-                           'new values for the %s' % self.resource)
         return parser
 
     def add_known_arguments(self, parser):
@@ -247,8 +279,10 @@ class CreateCommand(QuantumCommand, show.ShowOne):
         self.log.debug('get_data(%s)' % parsed_args)
         quantum_client = self.get_client()
         quantum_client.format = parsed_args.request_format
+        _extra_values = parse_args_to_dict(self.values_specs)
+        _merge_args(self, parsed_args, _extra_values,
+                    self.values_specs)
         body = self.args2body(parsed_args)
-        _extra_values = parse_args_to_dict(parsed_args.value_specs)
         body[self.resource].update(_extra_values)
         obj_creator = getattr(quantum_client,
                               "create_%s" % self.resource)

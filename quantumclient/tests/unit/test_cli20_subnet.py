@@ -239,6 +239,67 @@ class CLITestV20Subnet(CLITestV20Base):
                                           position_names, position_values,
                                           tenant_id='tenantid')
 
+    def test_create_subnet_merge_single_plurar(self):
+        resource = 'subnet'
+        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--allocation-pool', 'start=1.1.1.10,end=1.1.1.20',
+                netid, cidr,
+                '--allocation-pools', 'list=true', 'type=dict',
+                'start=1.1.1.30,end=1.1.1.40']
+        position_names = ['ip_version', 'allocation_pools', 'network_id',
+                          'cidr']
+        pools = [{'start': '1.1.1.10', 'end': '1.1.1.20'},
+                 {'start': '1.1.1.30', 'end': '1.1.1.40'}]
+        position_values = [4, pools, netid, cidr]
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values,
+                                          tenant_id='tenantid')
+
+    def test_create_subnet_merge_plurar(self):
+        resource = 'subnet'
+        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                netid, cidr,
+                '--allocation-pools', 'list=true', 'type=dict',
+                'start=1.1.1.30,end=1.1.1.40']
+        position_names = ['ip_version', 'allocation_pools', 'network_id',
+                          'cidr']
+        pools = [{'start': '1.1.1.30', 'end': '1.1.1.40'}]
+        position_values = [4, pools, netid, cidr]
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values,
+                                          tenant_id='tenantid')
+
+    def test_create_subnet_merge_single_single(self):
+        resource = 'subnet'
+        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--allocation-pool', 'start=1.1.1.10,end=1.1.1.20',
+                netid, cidr,
+                '--allocation-pool',
+                'start=1.1.1.30,end=1.1.1.40']
+        position_names = ['ip_version', 'allocation_pools', 'network_id',
+                          'cidr']
+        pools = [{'start': '1.1.1.10', 'end': '1.1.1.20'},
+                 {'start': '1.1.1.30', 'end': '1.1.1.40'}]
+        position_values = [4, pools, netid, cidr]
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values,
+                                          tenant_id='tenantid')
+
     def test_list_subnets_detail(self):
         """List subnets: -D."""
         resources = "subnets"

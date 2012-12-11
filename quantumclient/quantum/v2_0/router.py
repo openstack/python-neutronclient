@@ -68,7 +68,7 @@ class CreateRouter(CreateCommand):
             action='store_false',
             help=argparse.SUPPRESS)
         parser.add_argument(
-            'name', metavar='name',
+            'name', metavar='NAME',
             help='Name of router to create')
 
     def args2body(self, parsed_args):

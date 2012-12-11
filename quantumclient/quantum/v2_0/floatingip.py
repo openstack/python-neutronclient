@@ -52,8 +52,8 @@ class CreateFloatingIP(CreateCommand):
 
     def add_known_arguments(self, parser):
         parser.add_argument(
-            'floating_network_id',
-            help='Network to allocate floating IP from')
+            'floating_network_id', metavar='FLOATING_NETWORK',
+            help='Network name or id to allocate floating IP from')
         parser.add_argument(
             '--port-id',
             help='ID of the port to be associated with the floatingip')

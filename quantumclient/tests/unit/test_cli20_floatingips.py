@@ -57,7 +57,7 @@ class CLITestV20FloatingIps(CLITestV20Base):
 
         # Test dashed options
         args = [name, '--port-id', pid]
-        position_names = ['floating_network_id', 'port-id']
+        position_names = ['floating_network_id', 'port_id']
         _str = self._test_create_resource(resource, cmd, name, myid, args,
                                           position_names, position_values)
 
@@ -76,7 +76,7 @@ class CLITestV20FloatingIps(CLITestV20Base):
                                           position_names, position_values)
         # Test dashed options
         args = [name, '--port-id', pid, '--fixed-ip-address', addr]
-        position_names = ['floating_network_id', 'port-id', 'fixed-ip-address']
+        position_names = ['floating_network_id', 'port_id', 'fixed_ip_address']
         _str = self._test_create_resource(resource, cmd, name, myid, args,
                                           position_names, position_values)
 

@@ -171,8 +171,9 @@ class CLITestV20Base(unittest.TestCase):
                                                         resstr))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser('create_' + resource)
-        parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
+        known_args, values_specs = cmd_parser.parse_known_args(args)
+        cmd.values_specs = values_specs
+        cmd.run(known_args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()

@@ -46,7 +46,7 @@ class CreateSecurityGroup(quantumv20.CreateCommand):
 
     def add_known_arguments(self, parser):
         parser.add_argument(
-            'name', metavar='name',
+            'name', metavar='NAME',
             help='Name of security group')
         parser.add_argument(
             '--description',
@@ -97,8 +97,8 @@ class CreateSecurityGroupRule(quantumv20.CreateCommand):
 
     def add_known_arguments(self, parser):
         parser.add_argument(
-            'security_group_id', metavar='security_group_id',
-            help='Security group to add rule.')
+            'security_group_id', metavar='SECURITY_GROUP',
+            help='Security group name or id to add rule.')
         parser.add_argument(
             '--direction',
             default='ingress', choices=['ingress', 'egress'],
@@ -129,8 +129,8 @@ class CreateSecurityGroupRule(quantumv20.CreateCommand):
             '--source_ip_prefix',
             help=argparse.SUPPRESS)
         parser.add_argument(
-            '--source-group-id',
-            help='source security group to apply rule')
+            '--source-group-id', metavar='SOURCE_GROUP',
+            help='source security group name or id to apply rule')
         parser.add_argument(
             '--source_group_id',
             help=argparse.SUPPRESS)

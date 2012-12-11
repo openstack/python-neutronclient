@@ -91,7 +91,7 @@ class CreateSubnet(CreateCommand):
             choices=[4, 6],
             help=argparse.SUPPRESS)
         parser.add_argument(
-            '--gateway', metavar='gateway',
+            '--gateway', metavar='GATEWAY_IP',
             help='gateway ip of this subnet')
         parser.add_argument(
             '--no-gateway',
@@ -120,10 +120,10 @@ class CreateSubnet(CreateCommand):
             action='store_true',
             help='Disable DHCP for this subnet')
         parser.add_argument(
-            'network_id', metavar='network',
-            help='Network id or name this subnet belongs to')
+            'network_id', metavar='NETWORK',
+            help='network id or name this subnet belongs to')
         parser.add_argument(
-            'cidr', metavar='cidr',
+            'cidr', metavar='CIDR',
             help='cidr of subnet to create')
 
     def args2body(self, parsed_args):
