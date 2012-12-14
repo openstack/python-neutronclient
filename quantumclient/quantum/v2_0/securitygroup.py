@@ -15,6 +15,7 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+import argparse
 import logging
 
 from quantumclient.quantum import v2_0 as quantumv20
@@ -100,7 +101,7 @@ class CreateSecurityGroupRule(quantumv20.CreateCommand):
             help='Security group to add rule.')
         parser.add_argument(
             '--direction',
-            default='ingress',
+            default='ingress', choices=['ingress', 'egress'],
             help='direction of traffic: ingress/egress')
         parser.add_argument(
             '--ethertype',
@@ -110,17 +111,29 @@ class CreateSecurityGroupRule(quantumv20.CreateCommand):
             '--protocol',
             help='protocol of packet')
         parser.add_argument(
-            '--port_range_min',
+            '--port-range-min',
             help='starting port range')
         parser.add_argument(
-            '--port_range_max',
+            '--port_range_min',
+            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--port-range-max',
             help='ending port range')
         parser.add_argument(
-            '--source_ip_prefix',
+            '--port_range_max',
+            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--source-ip-prefix',
             help='cidr to match on')
         parser.add_argument(
-            '--source_group_id',
+            '--source_ip_prefix',
+            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--source-group-id',
             help='source security group to apply rule')
+        parser.add_argument(
+            '--source_group_id',
+            help=argparse.SUPPRESS)
 
     def args2body(self, parsed_args):
         _security_group_id = quantumv20.find_resourceid_by_name_or_id(
@@ -142,8 +155,11 @@ class CreateSecurityGroupRule(quantumv20.CreateCommand):
             body['security_group_rule'].update(
                 {'source_ip_prefix': parsed_args.source_ip_prefix})
         if parsed_args.source_group_id:
+            _source_group_id = quantumv20.find_resourceid_by_name_or_id(
+                self.get_client(), 'security_group',
+                parsed_args.source_group_id)
             body['security_group_rule'].update(
-                {'source_group_id': parsed_args.source_group_id})
+                {'source_group_id': _source_group_id})
         if parsed_args.tenant_id:
             body['security_group_rule'].update(
                 {'tenant_id': parsed_args.tenant_id})
