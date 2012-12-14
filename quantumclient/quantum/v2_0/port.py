@@ -118,6 +118,11 @@ class CreatePort(CreateCommand):
             action='append',
             help=argparse.SUPPRESS)
         parser.add_argument(
+            '--security-group', metavar='SECURITY_GROUP',
+            default=[], action='append', dest='security_groups',
+            help='security group associated with the port '
+            '(This option can be repeated)')
+        parser.add_argument(
             'network_id', metavar='network',
             help='Network id or name this port belongs to')
 
@@ -146,6 +151,14 @@ class CreatePort(CreateCommand):
                 ips.append(ip_dict)
         if ips:
             body['port'].update({'fixed_ips': ips})
+
+        _sgids = []
+        for sg in parsed_args.security_groups:
+            _sgids.append(quantumv20.find_resourceid_by_name_or_id(
+                self.get_client(), 'security_group', sg))
+        if _sgids:
+            body['port']['security_groups'] = _sgids
+
         return body
 
 
