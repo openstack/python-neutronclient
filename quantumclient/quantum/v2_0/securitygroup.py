@@ -79,6 +79,55 @@ class ListSecurityGroupRule(quantumv20.ListCommand):
     _formatters = {}
     list_columns = ['id', 'security_group_id', 'direction', 'protocol',
                     'source_ip_prefix', 'source_group_id']
+    replace_rules = {'security_group_id': 'security_group',
+                     'source_group_id': 'source_group'}
+
+    def get_parser(self, prog_name):
+        parser = super(ListSecurityGroupRule, self).get_parser(prog_name)
+        parser.add_argument(
+            '--no-nameconv', action='store_true',
+            help='Do not convert security group ID to its name')
+        return parser
+
+    @staticmethod
+    def replace_columns(cols, rules, reverse=False):
+        if reverse:
+            rules = dict((rules[k], k) for k in rules.keys())
+        return [rules.get(col, col) for col in cols]
+
+    def retrieve_list(self, parsed_args):
+        parsed_args.fields = self.replace_columns(parsed_args.fields,
+                                                  self.replace_rules,
+                                                  reverse=True)
+        return super(ListSecurityGroupRule, self).retrieve_list(parsed_args)
+
+    def extend_list(self, data, parsed_args):
+        if parsed_args.no_nameconv:
+            return
+        quantum_client = self.get_client()
+        search_opts = {'fields': ['id', 'name']}
+        secgroups = quantum_client.list_security_groups(**search_opts)
+        secgroups = secgroups.get('security_groups', [])
+        sg_dict = dict([(sg['id'], sg['name'])
+                        for sg in secgroups if sg['name']])
+        for rule in data:
+            for key in self.replace_rules:
+                rule[key] = sg_dict.get(rule[key], rule[key])
+
+    def setup_columns(self, info, parsed_args):
+        parsed_args.columns = self.replace_columns(parsed_args.columns,
+                                                   self.replace_rules,
+                                                   reverse=True)
+        # NOTE(amotoki): 2nd element of the tuple returned by setup_columns()
+        # is a generator, so if you need to create a look using the generator
+        # object, you need to recreate a generator to show a list expectedly.
+        info = super(ListSecurityGroupRule, self).setup_columns(info,
+                                                                parsed_args)
+        cols = info[0]
+        if not parsed_args.no_nameconv:
+            cols = self.replace_columns(info[0], self.replace_rules)
+            parsed_args.columns = cols
+        return (cols, info[1])
 
 
 class ShowSecurityGroupRule(quantumv20.ShowCommand):
