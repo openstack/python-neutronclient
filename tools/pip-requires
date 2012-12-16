@@ -3,4 +3,4 @@ argparse
 httplib2
 prettytable>=0.6.0
 simplejson
-pyparsing
+pyparsing>=1.5.6,<2.0
