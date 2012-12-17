@@ -151,6 +151,94 @@ class CLITestV20Subnet(CLITestV20Base):
                                           position_names, position_values,
                                           tenant_id='tenantid')
 
+    def test_create_subnet_host_route(self):
+        """Create subnet: --tenant_id tenantid <host_route> netid cidr.
+        The <host_route> is
+        --host-route destination=172.16.1.0/24,nexthop=1.1.1.20
+        """
+        resource = 'subnet'
+        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--host-route', 'destination=172.16.1.0/24,nexthop=1.1.1.20',
+                netid, cidr]
+        position_names = ['ip_version', 'host_routes', 'network_id',
+                          'cidr']
+        route = [{'destination': '172.16.1.0/24', 'nexthop': '1.1.1.20'}]
+        position_values = [4, route, netid, cidr]
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values,
+                                          tenant_id='tenantid')
+
+    def test_create_subnet_host_routes(self):
+        """Create subnet: --tenant-id tenantid <host_routes> netid cidr.
+        The <host_routes> are
+        --host-route destination=172.16.1.0/24,nexthop=1.1.1.20 and
+        --host-route destination=172.17.7.0/24,nexthop=1.1.1.40
+        """
+        resource = 'subnet'
+        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--host-route', 'destination=172.16.1.0/24,nexthop=1.1.1.20',
+                '--host-route', 'destination=172.17.7.0/24,nexthop=1.1.1.40',
+                netid, cidr]
+        position_names = ['ip_version', 'host_routes', 'network_id',
+                          'cidr']
+        routes = [{'destination': '172.16.1.0/24', 'nexthop': '1.1.1.20'},
+                  {'destination': '172.17.7.0/24', 'nexthop': '1.1.1.40'}]
+        position_values = [4, routes, netid, cidr]
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values,
+                                          tenant_id='tenantid')
+
+    def test_create_subnet_dns_nameservers(self):
+        """Create subnet: --tenant-id tenantid <dns-nameservers> netid cidr.
+        The <dns-nameservers> are
+        --dns-nameserver 1.1.1.20 and --dns-nameserver 1.1.1.40
+        """
+        resource = 'subnet'
+        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--dns-nameserver', '1.1.1.20',
+                '--dns-nameserver', '1.1.1.40',
+                netid, cidr]
+        position_names = ['ip_version', 'dns_nameservers', 'network_id',
+                          'cidr']
+        nameservers = ['1.1.1.20', '1.1.1.40']
+        position_values = [4, nameservers, netid, cidr]
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values,
+                                          tenant_id='tenantid')
+
+    def test_create_subnet_with_disable_dhcp(self):
+        """Create subnet: --tenant-id tenantid --disable-dhcp netid cidr."""
+        resource = 'subnet'
+        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--disable-dhcp',
+                netid, cidr]
+        position_names = ['ip_version', 'enable_dhcp', 'network_id',
+                          'cidr']
+        position_values = [4, False, netid, cidr]
+        _str = self._test_create_resource(resource, cmd, name, myid, args,
+                                          position_names, position_values,
+                                          tenant_id='tenantid')
+
     def test_list_subnets_detail(self):
         """List subnets: -D."""
         resources = "subnets"
