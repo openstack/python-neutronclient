@@ -145,6 +145,53 @@ COMMAND_V2 = {
         'quantumclient.quantum.v2_0.securitygroup.CreateSecurityGroupRule'),
     'security-group-rule-delete': utils.import_class(
         'quantumclient.quantum.v2_0.securitygroup.DeleteSecurityGroupRule'),
+    'lb-vip-list': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.vip.ListVip'),
+    'lb-vip-show': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.vip.ShowVip'),
+    'lb-vip-create': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.vip.CreateVip'),
+    'lb-vip-update': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.vip.UpdateVip'),
+    'lb-vip-delete': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.vip.DeleteVip'),
+    'lb-pool-list': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.pool.ListPool'),
+    'lb-pool-show': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.pool.ShowPool'),
+    'lb-pool-create': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.pool.CreatePool'),
+    'lb-pool-update': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.pool.UpdatePool'),
+    'lb-pool-delete': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.pool.DeletePool'),
+    'lb-pool-stats': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.pool.RetrievePoolStats'),
+    'lb-member-list': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.member.ListMember'),
+    'lb-member-show': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.member.ShowMember'),
+    'lb-member-create': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.member.CreateMember'),
+    'lb-member-update': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.member.UpdateMember'),
+    'lb-member-delete': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.member.DeleteMember'),
+    'lb-healthmonitor-list': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.healthmonitor.ListHealthMonitor'),
+    'lb-healthmonitor-show': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.healthmonitor.ShowHealthMonitor'),
+    'lb-healthmonitor-create': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.healthmonitor.CreateHealthMonitor'),
+    'lb-healthmonitor-update': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.healthmonitor.UpdateHealthMonitor'),
+    'lb-healthmonitor-delete': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.healthmonitor.DeleteHealthMonitor'),
+    'lb-healthmonitor-associate': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.healthmonitor.AssociateHealthMonitor'),
+    'lb-healthmonitor-disassociate': utils.import_class(
+        'quantumclient.quantum.v2_0.lb.healthmonitor'
+        '.DisassociateHealthMonitor'),
 }
 
 COMMANDS = {'2.0': COMMAND_V2}

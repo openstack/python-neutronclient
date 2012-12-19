@@ -135,7 +135,8 @@ class CLITestV20Base(testtools.TestCase):
     def _test_create_resource(self, resource, cmd,
                               name, myid, args,
                               position_names, position_values, tenant_id=None,
-                              tags=None, admin_state_up=True, shared=False):
+                              tags=None, admin_state_up=True, shared=False,
+                              extra_body=None):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
@@ -151,6 +152,8 @@ class CLITestV20Base(testtools.TestCase):
             body[resource].update({'tags': tags})
         if shared:
             body[resource].update({'shared': shared})
+        if extra_body:
+            body[resource].update(extra_body)
 
         for i in xrange(len(position_names)):
             body[resource].update({position_names[i]: position_values[i]})

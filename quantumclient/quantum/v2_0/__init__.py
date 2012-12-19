@@ -141,7 +141,10 @@ def parse_args_to_dict(values_specs):
             current_arg = _options[_item]
             _item = _temp
         elif _item.startswith('type='):
-            if current_arg is not None:
+            if current_arg is None:
+                raise exceptions.CommandError(
+                    "invalid values_specs %s" % ' '.join(values_specs))
+            if 'type' not in current_arg:
                 _type_str = _item.split('=', 2)[1]
                 current_arg.update({'type': eval(_type_str)})
                 if _type_str == 'bool':
@@ -149,9 +152,6 @@ def parse_args_to_dict(values_specs):
                 elif _type_str == 'dict':
                     current_arg.update({'type': utils.str2dict})
                 continue
-            else:
-                raise exceptions.CommandError(
-                    "invalid values_specs %s" % ' '.join(values_specs))
         elif _item == 'list=true':
             _list_flag = True
             continue
@@ -210,6 +210,12 @@ def _merge_args(qCmd, parsed_args, _extra_values, value_specs):
                         if type(arg_value[0]) == type(value[0]):
                             arg_value.extend(value)
                             _extra_values.pop(key)
+
+
+def update_dict(obj, dict, attributes):
+    for attribute in attributes:
+        if hasattr(obj, attribute) and getattr(obj, attribute):
+            dict[attribute] = getattr(obj, attribute)
 
 
 class QuantumCommand(command.OpenStackCommand):

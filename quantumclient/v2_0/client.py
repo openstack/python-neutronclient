@@ -168,6 +168,18 @@ class Client(object):
     security_group_path = "/security-groups/%s"
     security_group_rules_path = "/security-group-rules"
     security_group_rule_path = "/security-group-rules/%s"
+    vips_path = "/lb/vips"
+    vip_path = "/lb/vips/%s"
+    pools_path = "/lb/pools"
+    pool_path = "/lb/pools/%s"
+    pool_path_stats = "/lb/pools/%s/stats"
+    members_path = "/lb/members"
+    member_path = "/lb/members/%s"
+    health_monitors_path = "/lb/health_monitors"
+    health_monitor_path = "/lb/health_monitors/%s"
+    associate_pool_health_monitors_path = "/lb/pools/%s/health_monitors"
+    disassociate_pool_health_monitors_path = (
+        "/lb/pools/%(pool)s/health_monitors/%(health_monitor)s")
 
     @APIParamsCall
     def get_quotas_tenant(self, **_params):
@@ -474,6 +486,175 @@ class Client(object):
         """
         return self.get(self.security_group_rule_path % (security_group_rule),
                         params=_params)
+
+    @APIParamsCall
+    def list_vips(self, **_params):
+        """
+        Fetches a list of all load balancer vips for a tenant
+        """
+        # Pass filters in "params" argument to do_request
+        return self.get(self.vips_path, params=_params)
+
+    @APIParamsCall
+    def show_vip(self, vip, **_params):
+        """
+        Fetches information of a certain load balancer vip
+        """
+        return self.get(self.vip_path % (vip), params=_params)
+
+    @APIParamsCall
+    def create_vip(self, body=None):
+        """
+        Creates a new load balancer vip
+        """
+        return self.post(self.vips_path, body=body)
+
+    @APIParamsCall
+    def update_vip(self, vip, body=None):
+        """
+        Updates a load balancer vip
+        """
+        return self.put(self.vip_path % (vip), body=body)
+
+    @APIParamsCall
+    def delete_vip(self, vip):
+        """
+        Deletes the specified load balancer vip
+        """
+        return self.delete(self.vip_path % (vip))
+
+    @APIParamsCall
+    def list_pools(self, **_params):
+        """
+        Fetches a list of all load balancer pools for a tenant
+        """
+        # Pass filters in "params" argument to do_request
+        return self.get(self.pools_path, params=_params)
+
+    @APIParamsCall
+    def show_pool(self, pool, **_params):
+        """
+        Fetches information of a certain load balancer pool
+        """
+        return self.get(self.pool_path % (pool), params=_params)
+
+    @APIParamsCall
+    def create_pool(self, body=None):
+        """
+        Creates a new load balancer pool
+        """
+        return self.post(self.pools_path, body=body)
+
+    @APIParamsCall
+    def update_pool(self, pool, body=None):
+        """
+        Updates a load balancer pool
+        """
+        return self.put(self.pool_path % (pool), body=body)
+
+    @APIParamsCall
+    def delete_pool(self, pool):
+        """
+        Deletes the specified load balancer pool
+        """
+        return self.delete(self.pool_path % (pool))
+
+    @APIParamsCall
+    def retrieve_pool_stats(self, pool, **_params):
+        """
+        Retrieves stats for a certain load balancer pool
+        """
+        return self.get(self.pool_path_stats % (pool), params=_params)
+
+    @APIParamsCall
+    def list_members(self, **_params):
+        """
+        Fetches a list of all load balancer members for a tenant
+        """
+        # Pass filters in "params" argument to do_request
+        return self.get(self.members_path, params=_params)
+
+    @APIParamsCall
+    def show_member(self, member, **_params):
+        """
+        Fetches information of a certain load balancer member
+        """
+        return self.get(self.member_path % (member), params=_params)
+
+    @APIParamsCall
+    def create_member(self, body=None):
+        """
+        Creates a new load balancer member
+        """
+        return self.post(self.members_path, body=body)
+
+    @APIParamsCall
+    def update_member(self, member, body=None):
+        """
+        Updates a load balancer member
+        """
+        return self.put(self.member_path % (member), body=body)
+
+    @APIParamsCall
+    def delete_member(self, member):
+        """
+        Deletes the specified load balancer member
+        """
+        return self.delete(self.member_path % (member))
+
+    @APIParamsCall
+    def list_health_monitors(self, **_params):
+        """
+        Fetches a list of all load balancer health monitors for a tenant
+        """
+        # Pass filters in "params" argument to do_request
+        return self.get(self.health_monitors_path, params=_params)
+
+    @APIParamsCall
+    def show_health_monitor(self, health_monitor, **_params):
+        """
+        Fetches information of a certain load balancer health monitor
+        """
+        return self.get(self.health_monitor_path % (health_monitor),
+                        params=_params)
+
+    @APIParamsCall
+    def create_health_monitor(self, body=None):
+        """
+        Creates a new load balancer health monitor
+        """
+        return self.post(self.health_monitors_path, body=body)
+
+    @APIParamsCall
+    def update_health_monitor(self, health_monitor, body=None):
+        """
+        Updates a load balancer health monitor
+        """
+        return self.put(self.health_monitor_path % (health_monitor), body=body)
+
+    @APIParamsCall
+    def delete_health_monitor(self, health_monitor):
+        """
+        Deletes the specified load balancer health monitor
+        """
+        return self.delete(self.health_monitor_path % (health_monitor))
+
+    @APIParamsCall
+    def associate_health_monitor(self, pool, body):
+        """
+        Associate  specified load balancer health monitor and pool
+        """
+        return self.post(self.associate_pool_health_monitors_path % (pool),
+                         body=body)
+
+    @APIParamsCall
+    def disassociate_health_monitor(self, pool, health_monitor):
+        """
+        Disassociate specified load balancer health monitor and pool
+        """
+        path = (self.disassociate_pool_health_monitors_path %
+                {'pool': pool, 'health_monitor': health_monitor})
+        return self.delete(path)
 
     def __init__(self, **kwargs):
         """ Initialize a new client for the Quantum v2.0 API. """

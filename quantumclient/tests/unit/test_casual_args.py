@@ -53,6 +53,16 @@ class CLITestArgs(testtools.TestCase):
         self.assertRaises(exceptions.CommandError,
                           quantumV20.parse_args_to_dict, _specs)
 
+    def test_badarg_duplicate(self):
+        _specs = ['--tag=t', '--arg1', 'value1', '--arg1', 'value1']
+        self.assertRaises(exceptions.CommandError,
+                          quantumV20.parse_args_to_dict, _specs)
+
+    def test_badarg_early_type_specification(self):
+        _specs = ['type=dict', 'key=value']
+        self.assertRaises(exceptions.CommandError,
+                          quantumV20.parse_args_to_dict, _specs)
+
     def test_arg(self):
         _specs = ['--tag=t', '--arg1', 'value1']
         self.assertEqual('value1',
@@ -62,6 +72,12 @@ class CLITestArgs(testtools.TestCase):
         _specs = ['--tag=t', '--arg1', 'type=dict', 'key1=value1,key2=value2']
         arg1 = quantumV20.parse_args_to_dict(_specs)['arg1']
         self.assertEqual('value1', arg1['key1'])
+        self.assertEqual('value2', arg1['key2'])
+
+    def test_dict_arg_with_attribute_named_type(self):
+        _specs = ['--tag=t', '--arg1', 'type=dict', 'type=value1,key2=value2']
+        arg1 = quantumV20.parse_args_to_dict(_specs)['arg1']
+        self.assertEqual('value1', arg1['type'])
         self.assertEqual('value2', arg1['key2'])
 
     def test_list_of_dict_arg(self):
