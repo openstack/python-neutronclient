@@ -332,6 +332,7 @@ class QuantumShell(App):
             index = 0
             command_pos = -1
             help_pos = -1
+            help_command_pos = -1
             for arg in argv:
                 if arg == 'bash-completion':
                     self._bash_completion()
@@ -342,9 +343,14 @@ class QuantumShell(App):
                 elif arg in ('-h', '--help'):
                     if help_pos == -1:
                         help_pos = index
+                elif arg == 'help':
+                    if help_command_pos == -1:
+                        help_command_pos = index
                 index = index + 1
             if command_pos > -1 and help_pos > command_pos:
                 argv = ['help', argv[command_pos]]
+            if help_command_pos > -1 and command_pos == -1:
+                argv[help_command_pos] = '--help'
             self.options, remainder = self.parser.parse_known_args(argv)
             self.configure_logging()
             self.interactive_mode = not remainder
