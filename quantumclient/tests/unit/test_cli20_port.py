@@ -100,6 +100,38 @@ class CLITestV20Port(CLITestV20Base):
                                    position_names, position_values,
                                    tags=['a', 'b'])
 
+    def test_create_port_secgroup(self):
+        """Create port: --security-group sg1_id netid"""
+        resource = 'port'
+        cmd = CreatePort(MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        args = ['--security-group', 'sg1_id', netid]
+        position_names = ['network_id', 'security_groups']
+        position_values = [netid, ['sg1_id']]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
+    def test_create_port_secgroups(self):
+        """Create port: <security_groups> netid
+
+        The <security_groups> are
+        --security-group sg1_id --security-group sg2_id
+        """
+        resource = 'port'
+        cmd = CreatePort(MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        args = ['--security-group', 'sg1_id',
+                '--security-group', 'sg2_id',
+                netid]
+        position_names = ['network_id', 'security_groups']
+        position_values = [netid, ['sg1_id', 'sg2_id']]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_list_ports(self):
         """List ports: -D."""
         resources = "ports"
