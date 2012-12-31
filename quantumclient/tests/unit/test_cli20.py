@@ -19,8 +19,8 @@ import sys
 import unittest
 
 import mox
-from mox import ContainsKeyValue
 from mox import Comparator
+from mox import ContainsKeyValue
 
 from quantumclient.quantum import v2_0 as quantumv20
 from quantumclient.v2_0.client import Client

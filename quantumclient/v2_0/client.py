@@ -24,6 +24,7 @@ from quantumclient.client import HTTPClient
 from quantumclient.common import exceptions
 from quantumclient.common.serializer import Serializer
 
+
 _logger = logging.getLogger(__name__)
 
 
@@ -595,17 +596,3 @@ class Client(object):
     def put(self, action, body=None, headers=None, params=None):
         return self.retry_request("PUT", action, body=body,
                                   headers=headers, params=params)
-
-#if __name__ == '__main__':
-#
-#    client20 = Client(username='admin',
-#                      password='password',
-#                      auth_url='http://localhost:5000/v2.0',
-#                      tenant_name='admin')
-#    client20 = Client(token='ec796583fcad4aa690b723bc0b25270e',
-#                      endpoint_url='http://localhost:9696')
-#
-#    client20.tenant = 'default'
-#    client20.format = 'json'
-#    nets = client20.list_networks()
-#    print nets

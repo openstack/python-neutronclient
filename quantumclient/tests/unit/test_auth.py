@@ -15,16 +15,16 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-import mox
-from mox import ContainsKeyValue, IsA, StrContains
-import unittest
-
 import httplib2
 import json
+import unittest
 import uuid
 
-from quantumclient.common import exceptions
+import mox
+from mox import ContainsKeyValue, IsA, StrContains
+
 from quantumclient.client import HTTPClient
+from quantumclient.common import exceptions
 
 
 USERNAME = 'testuser'

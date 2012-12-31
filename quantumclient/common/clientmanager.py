@@ -20,10 +20,11 @@
 
 import logging
 
-from quantumclient.common import exceptions as exc
-
-from quantumclient.quantum import client as quantum_client
 from quantumclient.client import HTTPClient
+from quantumclient.common import exceptions as exc
+from quantumclient.quantum import client as quantum_client
+
+
 LOG = logging.getLogger(__name__)
 
 

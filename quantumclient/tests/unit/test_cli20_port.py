@@ -16,17 +16,18 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import sys
+
 from mox import ContainsKeyValue
 
+from quantumclient.quantum.v2_0.port import CreatePort
+from quantumclient.quantum.v2_0.port import DeletePort
+from quantumclient.quantum.v2_0.port import ListPort
+from quantumclient.quantum.v2_0.port import ListRouterPort
+from quantumclient.quantum.v2_0.port import ShowPort
+from quantumclient.quantum.v2_0.port import UpdatePort
+from quantumclient.tests.unit import test_cli20
 from quantumclient.tests.unit.test_cli20 import CLITestV20Base
 from quantumclient.tests.unit.test_cli20 import MyApp
-from quantumclient.tests.unit import test_cli20
-from quantumclient.quantum.v2_0.port import CreatePort
-from quantumclient.quantum.v2_0.port import ListPort
-from quantumclient.quantum.v2_0.port import UpdatePort
-from quantumclient.quantum.v2_0.port import ShowPort
-from quantumclient.quantum.v2_0.port import DeletePort
-from quantumclient.quantum.v2_0.port import ListRouterPort
 
 
 class CLITestV20Port(CLITestV20Base):

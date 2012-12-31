@@ -21,8 +21,8 @@ import logging
 from quantumclient.quantum.v2_0 import CreateCommand
 from quantumclient.quantum.v2_0 import DeleteCommand
 from quantumclient.quantum.v2_0 import ListCommand
-from quantumclient.quantum.v2_0 import UpdateCommand
 from quantumclient.quantum.v2_0 import ShowCommand
+from quantumclient.quantum.v2_0 import UpdateCommand
 
 
 def _format_subnets(network):

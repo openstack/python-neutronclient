@@ -18,6 +18,7 @@
 """
 Command-line interface to the Quantum APIs
 """
+
 import argparse
 import gettext
 import logging
