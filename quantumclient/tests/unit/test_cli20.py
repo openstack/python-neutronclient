@@ -16,11 +16,12 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import sys
-import unittest
 
+import fixtures
 import mox
 from mox import Comparator
 from mox import ContainsKeyValue
+import testtools
 
 from quantumclient.quantum import v2_0 as quantumv20
 from quantumclient.v2_0.client import Client
@@ -112,7 +113,7 @@ class MyComparator(Comparator):
         return str(self.lhs)
 
 
-class CLITestV20Base(unittest.TestCase):
+class CLITestV20Base(testtools.TestCase):
 
     test_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
 
@@ -121,18 +122,15 @@ class CLITestV20Base(unittest.TestCase):
 
     def setUp(self):
         """Prepare the test environment"""
+        super(CLITestV20Base, self).setUp()
         self.mox = mox.Mox()
         self.endurl = ENDURL
         self.client = Client(token=TOKEN, endpoint_url=self.endurl)
         self.fake_stdout = FakeStdout()
-        sys.stdout = self.fake_stdout
-        self.old_find_resourceid = quantumv20.find_resourceid_by_name_or_id
-        quantumv20.find_resourceid_by_name_or_id = self._find_resourceid
-
-    def tearDown(self):
-        """Clear the test environment"""
-        sys.stdout = sys.__stdout__
-        quantumv20.find_resourceid_by_name_or_id = self.old_find_resourceid
+        self.useFixture(fixtures.MonkeyPatch('sys.stdout', self.fake_stdout))
+        self.useFixture(fixtures.MonkeyPatch(
+            'quantumclient.quantum.v2_0.find_resourceid_by_name_or_id',
+            self._find_resourceid))
 
     def _test_create_resource(self, resource, cmd,
                               name, myid, args,

@@ -15,13 +15,13 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-import unittest
+import testtools
 
 from quantumclient.common import exceptions
 from quantumclient.quantum import v2_0 as quantumV20
 
 
-class CLITestArgs(unittest.TestCase):
+class CLITestArgs(testtools.TestCase):
 
     def test_empty(self):
         _mydict = quantumV20.parse_args_to_dict([])

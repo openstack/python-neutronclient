@@ -19,7 +19,7 @@ import uuid
 
 import mox
 from mox import ContainsKeyValue
-import unittest
+import testtools
 
 from quantumclient.common import exceptions
 from quantumclient.quantum import v2_0 as quantumv20
@@ -27,18 +27,16 @@ from quantumclient.tests.unit import test_cli20
 from quantumclient.v2_0.client import Client
 
 
-class CLITestNameorID(unittest.TestCase):
+class CLITestNameorID(testtools.TestCase):
 
     def setUp(self):
         """Prepare the test environment"""
+        super(CLITestNameorID, self).setUp()
         self.mox = mox.Mox()
         self.endurl = test_cli20.ENDURL
         self.client = Client(token=test_cli20.TOKEN, endpoint_url=self.endurl)
-
-    def tearDown(self):
-        """Clear the test environment"""
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+        self.addCleanup(self.mox.VerifyAll)
+        self.addCleanup(self.mox.UnsetStubs)
 
     def test_get_id_from_id(self):
         _id = str(uuid.uuid4())

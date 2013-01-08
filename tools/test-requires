@@ -1,5 +1,6 @@
 distribute>=0.6.24
 cliff-tablib>=1.0
+fixtures>=0.3.12
 mox
 nose
 nose-exclude
@@ -8,4 +9,4 @@ openstack.nose_plugin
 nosehtmloutput
 pep8
 sphinx>=1.1.2
-
+testtools
