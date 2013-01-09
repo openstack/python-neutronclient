@@ -341,7 +341,7 @@ class DeleteCommand(QuantumCommand):
 
 
 class ListCommand(QuantumCommand, lister.Lister):
-    """List resourcs that belong to a given tenant
+    """List resources that belong to a given tenant
 
     """
 
@@ -357,11 +357,10 @@ class ListCommand(QuantumCommand, lister.Lister):
         add_extra_argument(parser, 'filter_specs', 'filters options')
         return parser
 
-    def get_data(self, parsed_args):
-        self.log.debug('get_data(%s)' % parsed_args)
+    def retrieve_list(self, parsed_args):
+        """Retrieve a list of resources from Quantum server"""
         quantum_client = self.get_client()
         search_opts = parse_args_to_dict(parsed_args.filter_specs)
-
         self.log.debug('search options: %s', search_opts)
         quantum_client.format = parsed_args.request_format
         fields = parsed_args.fields
@@ -377,12 +376,21 @@ class ListCommand(QuantumCommand, lister.Lister):
             search_opts.update({'verbose': 'True'})
         obj_lister = getattr(quantum_client,
                              "list_%ss" % self.resource)
-
         data = obj_lister(**search_opts)
-        info = []
+
         collection = self.resource + "s"
-        if collection in data:
-            info = data[collection]
+        return data.get(collection, [])
+
+    def extend_list(self, data, parsed_args):
+        """Update a retrieved list.
+
+        This method provides a way to modify a original list returned from
+        the quantum server. For example, you can add subnet cidr information
+        to a list network.
+        """
+        pass
+
+    def setup_columns(self, info, parsed_args):
         _columns = len(info) > 0 and sorted(info[0].keys()) or []
         if not _columns:
             # clean the parsed_args.columns so that cliff will not break
@@ -397,6 +405,12 @@ class ListCommand(QuantumCommand, lister.Lister):
         return (_columns, (utils.get_item_properties(
             s, _columns, formatters=self._formatters, )
             for s in info), )
+
+    def get_data(self, parsed_args):
+        self.log.debug('get_data(%s)' % parsed_args)
+        data = self.retrieve_list(parsed_args)
+        self.extend_list(data, parsed_args)
+        return self.setup_columns(data, parsed_args)
 
 
 class ShowCommand(QuantumCommand, show.ShowOne):
