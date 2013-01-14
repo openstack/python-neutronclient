@@ -17,7 +17,8 @@
 
 import sys
 
-from mox import ContainsKeyValue
+import mox
+from mox import (ContainsKeyValue, IgnoreArg, IsA)
 
 from quantumclient.common import exceptions
 from quantumclient.common import utils
@@ -101,6 +102,8 @@ class CLITestV20Network(CLITestV20Base):
         cmd = ListNetwork(MyApp(sys.stdout), None)
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
+        self.mox.StubOutWithMock(ListNetwork, "extend_list")
+        ListNetwork.extend_list(IsA(list), IgnoreArg())
         cmd.get_client().MultipleTimes().AndReturn(self.client)
         reses = {resources: []}
         resstr = self.client.serialize(reses)
@@ -125,40 +128,109 @@ class CLITestV20Network(CLITestV20Base):
         _str = self.fake_stdout.make_string()
         self.assertEquals('\n', _str)
 
+    def _test_list_networks(self, cmd, detail=False, tags=[],
+                            fields_1=[], fields_2=[]):
+        resources = "networks"
+        self.mox.StubOutWithMock(ListNetwork, "extend_list")
+        ListNetwork.extend_list(IsA(list), IgnoreArg())
+        self._test_list_resources(resources, cmd, detail, tags,
+                                  fields_1, fields_2)
+
     def test_list_nets_detail(self):
         """list nets: -D."""
-        resources = "networks"
         cmd = ListNetwork(MyApp(sys.stdout), None)
-        self._test_list_resources(resources, cmd, True)
+        self._test_list_networks(cmd, True)
 
     def test_list_nets_tags(self):
         """List nets: -- --tags a b."""
-        resources = "networks"
         cmd = ListNetwork(MyApp(sys.stdout), None)
-        self._test_list_resources(resources, cmd, tags=['a', 'b'])
+        self._test_list_networks(cmd, tags=['a', 'b'])
 
     def test_list_nets_detail_tags(self):
         """List nets: -D -- --tags a b."""
         resources = "networks"
         cmd = ListNetwork(MyApp(sys.stdout), None)
-        self._test_list_resources(resources, cmd, detail=True, tags=['a', 'b'])
+        self._test_list_networks(cmd, detail=True, tags=['a', 'b'])
+
+    def _test_list_nets_extend_subnets(self, data, expected):
+        def setup_list_stub(resources, data, query):
+            reses = {resources: data}
+            resstr = self.client.serialize(reses)
+            resp = (test_cli20.MyResp(200), resstr)
+            path = getattr(self.client, resources + '_path')
+            self.client.httpclient.request(
+                test_cli20.end_url(path, query), 'GET',
+                body=None,
+                headers=ContainsKeyValue(
+                    'X-Auth-Token', test_cli20.TOKEN)).AndReturn(resp)
+
+        resources = "networks"
+        cmd = ListNetwork(test_cli20.MyApp(sys.stdout), None)
+        self.mox.StubOutWithMock(cmd, 'get_client')
+        self.mox.StubOutWithMock(self.client.httpclient, 'request')
+        cmd.get_client().AndReturn(self.client)
+        setup_list_stub('networks', data, '')
+        cmd.get_client().AndReturn(self.client)
+        setup_list_stub('subnets',
+                        [{'id': 'mysubid1', 'cidr': '192.168.1.0/24'},
+                         {'id': 'mysubid2', 'cidr': '172.16.0.0/24'},
+                         {'id': 'mysubid3', 'cidr': '10.1.1.0/24'}],
+                        query='fields=id&fields=cidr')
+        self.mox.ReplayAll()
+
+        args = []
+        cmd_parser = cmd.get_parser('list_networks')
+        parsed_args = cmd_parser.parse_args(args)
+        result = cmd.get_data(parsed_args)
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
+        _result = [x for x in result[1]]
+        self.assertEqual(len(_result), len(expected))
+        for res, exp in zip(_result, expected):
+            self.assertEqual(len(res), len(exp))
+            for a, b in zip(res, exp):
+                self.assertEqual(a, b)
+
+    def test_list_nets_extend_subnets(self):
+        data = [{'id': 'netid1', 'name': 'net1', 'subnets': ['mysubid1']},
+                {'id': 'netid2', 'name': 'net2', 'subnets': ['mysubid2',
+                                                             'mysubid3']}]
+        #             id,   name,   subnets
+        expected = [('netid1', 'net1', 'mysubid1 192.168.1.0/24'),
+                    ('netid2', 'net2',
+                     'mysubid2 172.16.0.0/24\nmysubid3 10.1.1.0/24')]
+        self._test_list_nets_extend_subnets(data, expected)
+
+    def test_list_nets_extend_subnets_no_subnet(self):
+        data = [{'id': 'netid1', 'name': 'net1', 'subnets': ['mysubid1']},
+                {'id': 'netid2', 'name': 'net2', 'subnets': ['mysubid4']}]
+        #             id,   name,   subnets
+        expected = [('netid1', 'net1', 'mysubid1 192.168.1.0/24'),
+                    ('netid2', 'net2', 'mysubid4 ')]
+        self._test_list_nets_extend_subnets(data, expected)
 
     def test_list_nets_fields(self):
         """List nets: --fields a --fields b -- --fields c d."""
         resources = "networks"
         cmd = ListNetwork(MyApp(sys.stdout), None)
-        self._test_list_resources(resources, cmd,
-                                  fields_1=['a', 'b'], fields_2=['c', 'd'])
+        self._test_list_networks(cmd,
+                                 fields_1=['a', 'b'], fields_2=['c', 'd'])
+
+    def _test_list_nets_columns(self, cmd, returned_body,
+                                args=['-f', 'json']):
+        resources = 'networks'
+        self.mox.StubOutWithMock(ListNetwork, "extend_list")
+        ListNetwork.extend_list(IsA(list), IgnoreArg())
+        self._test_list_columns(cmd, resources, returned_body, args=args)
 
     def test_list_nets_defined_column(self):
-        resources = 'networks'
         cmd = ListNetwork(MyApp(sys.stdout), None)
         returned_body = {"networks": [{"name": "buildname3",
                                        "id": "id3",
                                        "tenant_id": "tenant_3",
                                        "subnets": []}]}
-        self._test_list_columns(cmd, resources, returned_body,
-                                args=['-f', 'json', '-c', 'id'])
+        self._test_list_nets_columns(cmd, returned_body,
+                                     args=['-f', 'json', '-c', 'id'])
         _str = self.fake_stdout.make_string()
         returned_networks = utils.loads(_str)
         self.assertEquals(1, len(returned_networks))
@@ -167,13 +239,12 @@ class CLITestV20Network(CLITestV20Base):
         self.assertEquals("id", network.keys()[0])
 
     def test_list_nets_with_default_column(self):
-        resources = 'networks'
         cmd = ListNetwork(MyApp(sys.stdout), None)
         returned_body = {"networks": [{"name": "buildname3",
                                        "id": "id3",
                                        "tenant_id": "tenant_3",
                                        "subnets": []}]}
-        self._test_list_columns(cmd, resources, returned_body)
+        self._test_list_nets_columns(cmd, returned_body)
         _str = self.fake_stdout.make_string()
         returned_networks = utils.loads(_str)
         self.assertEquals(1, len(returned_networks))
@@ -187,6 +258,8 @@ class CLITestV20Network(CLITestV20Base):
         cmd = ListExternalNetwork(MyApp(sys.stdout), None)
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
+        self.mox.StubOutWithMock(ListNetwork, "extend_list")
+        ListNetwork.extend_list(IsA(list), IgnoreArg())
         cmd.get_client().MultipleTimes().AndReturn(self.client)
         reses = {resources: []}
         resstr = self.client.serialize(reses)
@@ -217,6 +290,8 @@ class CLITestV20Network(CLITestV20Base):
                                  fields_1=[], fields_2=[]):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
+        self.mox.StubOutWithMock(ListNetwork, "extend_list")
+        ListNetwork.extend_list(IsA(list), IgnoreArg())
         cmd.get_client().MultipleTimes().AndReturn(self.client)
         reses = {resources: [{'id': 'myid1', },
                              {'id': 'myid2', }, ], }
