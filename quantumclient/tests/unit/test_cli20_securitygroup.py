@@ -18,6 +18,8 @@
 
 import sys
 
+import mox
+
 from quantumclient.quantum.v2_0 import securitygroup
 from quantumclient.tests.unit import test_cli20
 
@@ -137,6 +139,10 @@ class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):
         resources = "security_group_rules"
         cmd = securitygroup.ListSecurityGroupRule(
             test_cli20.MyApp(sys.stdout), None)
+        self.mox.StubOutWithMock(securitygroup.ListSecurityGroupRule,
+                                 "extend_list")
+        securitygroup.ListSecurityGroupRule.extend_list(mox.IsA(list),
+                                                        mox.IgnoreArg())
         self._test_list_resources(resources, cmd, True)
 
     def test_show_security_group_rule(self):
@@ -146,3 +152,97 @@ class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):
         args = ['--fields', 'id', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id,
                                  args, ['id'])
+
+    def _test_list_security_group_rules_extend(self, data=None, expected=None,
+                                               args=[], conv=True,
+                                               query_field=False):
+        def setup_list_stub(resources, data, query):
+            reses = {resources: data}
+            resstr = self.client.serialize(reses)
+            resp = (test_cli20.MyResp(200), resstr)
+            path = getattr(self.client, resources + '_path')
+            self.client.httpclient.request(
+                test_cli20.end_url(path, query), 'GET',
+                body=None,
+                headers=mox.ContainsKeyValue(
+                    'X-Auth-Token', test_cli20.TOKEN)).AndReturn(resp)
+
+        # Setup the default data
+        _data = {'cols': ['id', 'security_group_id', 'source_group_id'],
+                 'data': [('ruleid1', 'myid1', 'myid1'),
+                          ('ruleid2', 'myid2', 'myid3'),
+                          ('ruleid3', 'myid2', 'myid2')]}
+        _expected = {'cols': ['id', 'security_group', 'source_group'],
+                     'data': [('ruleid1', 'group1', 'group1'),
+                              ('ruleid2', 'group2', 'group3'),
+                              ('ruleid3', 'group2', 'group2')]}
+        if data is None:
+            data = _data
+        list_data = [dict(zip(data['cols'], d)) for d in data['data']]
+        if expected is None:
+            expected = {}
+        expected['cols'] = expected.get('cols', _expected['cols'])
+        expected['data'] = expected.get('data', _expected['data'])
+
+        resources = "security_group_rules"
+        cmd = securitygroup.ListSecurityGroupRule(
+            test_cli20.MyApp(sys.stdout), None)
+        self.mox.StubOutWithMock(cmd, 'get_client')
+        self.mox.StubOutWithMock(self.client.httpclient, 'request')
+        cmd.get_client().AndReturn(self.client)
+        query = ''
+        if query_field:
+            query = '&'.join(['fields=' + f for f in data['cols']])
+        setup_list_stub('security_group_rules', list_data, query)
+        if conv:
+            cmd.get_client().AndReturn(self.client)
+            setup_list_stub('security_groups',
+                            [{'id': 'myid1', 'name': 'group1'},
+                             {'id': 'myid2', 'name': 'group2'},
+                             {'id': 'myid3', 'name': 'group3'}],
+                            query='fields=id&fields=name')
+        self.mox.ReplayAll()
+
+        cmd_parser = cmd.get_parser('list_security_group_rules')
+        parsed_args = cmd_parser.parse_args(args)
+        result = cmd.get_data(parsed_args)
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
+        # Check columns
+        self.assertEqual(result[0], expected['cols'])
+        # Check data
+        _result = [x for x in result[1]]
+        self.assertEqual(len(_result), len(expected['data']))
+        for res, exp in zip(_result, expected['data']):
+            self.assertEqual(len(res), len(exp))
+            self.assertEqual(res, exp)
+
+    def test_list_security_group_rules_extend_source_id(self):
+        self._test_list_security_group_rules_extend()
+
+    def test_list_security_group_rules_extend_no_nameconv(self):
+        expected = {'cols': ['id', 'security_group_id', 'source_group_id'],
+                    'data': [('ruleid1', 'myid1', 'myid1'),
+                             ('ruleid2', 'myid2', 'myid3'),
+                             ('ruleid3', 'myid2', 'myid2')]}
+        args = ['--no-nameconv']
+        self._test_list_security_group_rules_extend(expected=expected,
+                                                    args=args, conv=False)
+
+    def test_list_security_group_rules_extend_with_columns(self):
+        args = '-c id -c security_group_id -c source_group_id'.split()
+        self._test_list_security_group_rules_extend(args=args)
+
+    def test_list_security_group_rules_extend_with_columns_no_id(self):
+        args = '-c id -c security_group -c source_group'.split()
+        self._test_list_security_group_rules_extend(args=args)
+
+    def test_list_security_group_rules_extend_with_fields(self):
+        args = '-F id -F security_group_id -F source_group_id'.split()
+        self._test_list_security_group_rules_extend(args=args,
+                                                    query_field=True)
+
+    def test_list_security_group_rules_extend_with_fields_no_id(self):
+        args = '-F id -F security_group -F source_group'.split()
+        self._test_list_security_group_rules_extend(args=args,
+                                                    query_field=True)
