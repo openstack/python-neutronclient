@@ -61,6 +61,8 @@ class ListSubnet(ListCommand):
                    'dns_nameservers': _format_dns_nameservers,
                    'host_routes': _format_host_routes, }
     list_columns = ['id', 'name', 'cidr', 'allocation_pools']
+    pagination_support = True
+    sorting_support = True
 
 
 class ShowSubnet(ShowCommand):

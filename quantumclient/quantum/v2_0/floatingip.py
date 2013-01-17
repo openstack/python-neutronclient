@@ -34,6 +34,8 @@ class ListFloatingIP(ListCommand):
     _formatters = {}
     list_columns = ['id', 'fixed_ip_address', 'floating_ip_address',
                     'port_id']
+    pagination_support = True
+    sorting_support = True
 
 
 class ShowFloatingIP(ShowCommand):

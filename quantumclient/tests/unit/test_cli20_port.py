@@ -140,6 +140,27 @@ class CLITestV20Port(CLITestV20Base):
         cmd = ListPort(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
+    def test_list_ports_pagination(self):
+        resources = "ports"
+        cmd = ListPort(MyApp(sys.stdout), None)
+        self._test_list_resources_with_pagination(resources, cmd)
+
+    def test_list_ports_sort(self):
+        """list ports: --sort-key name --sort-key id --sort-key asc
+        --sort-key desc
+        """
+        resources = "ports"
+        cmd = ListPort(MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd,
+                                  sort_key=["name", "id"],
+                                  sort_dir=["asc", "desc"])
+
+    def test_list_ports_limit(self):
+        """list ports: -P"""
+        resources = "ports"
+        cmd = ListPort(MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd, page_size=1000)
+
     def test_list_ports_tags(self):
         """List ports: -- --tags a b."""
         resources = "ports"

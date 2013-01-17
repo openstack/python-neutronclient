@@ -86,6 +86,27 @@ class CLITestV20FloatingIps(CLITestV20Base):
         cmd = ListFloatingIP(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
+    def test_list_floatingips_pagination(self):
+        resources = 'floatingips'
+        cmd = ListFloatingIP(MyApp(sys.stdout), None)
+        self._test_list_resources_with_pagination(resources, cmd)
+
+    def test_list_floatingips_sort(self):
+        """list floatingips: --sort-key name --sort-key id --sort-key asc
+        --sort-key desc
+        """
+        resources = 'floatingips'
+        cmd = ListFloatingIP(MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd,
+                                  sort_key=["name", "id"],
+                                  sort_dir=["asc", "desc"])
+
+    def test_list_floatingips_limit(self):
+        """list floatingips: -P."""
+        resources = 'floatingips'
+        cmd = ListFloatingIP(MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd, page_size=1000)
+
     def test_delete_floatingip(self):
         """Delete floatingip: fip1"""
         resource = 'floatingip'

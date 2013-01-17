@@ -42,6 +42,8 @@ class ListRouter(ListCommand):
     log = logging.getLogger(__name__ + '.ListRouter')
     _formatters = {'external_gateway_info': _format_external_gateway_info, }
     list_columns = ['id', 'name', 'external_gateway_info']
+    pagination_support = True
+    sorting_support = True
 
 
 class ShowRouter(ShowCommand):

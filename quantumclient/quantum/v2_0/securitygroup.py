@@ -28,6 +28,8 @@ class ListSecurityGroup(quantumv20.ListCommand):
     log = logging.getLogger(__name__ + '.ListSecurityGroup')
     _formatters = {}
     list_columns = ['id', 'name', 'description']
+    pagination_support = True
+    sorting_support = True
 
 
 class ShowSecurityGroup(quantumv20.ShowCommand):
@@ -81,6 +83,8 @@ class ListSecurityGroupRule(quantumv20.ListCommand):
                     'source_ip_prefix', 'source_group_id']
     replace_rules = {'security_group_id': 'security_group',
                      'source_group_id': 'source_group'}
+    pagination_support = True
+    sorting_support = True
 
     def get_parser(self, prog_name):
         parser = super(ListSecurityGroupRule, self).get_parser(prog_name)
@@ -106,6 +110,15 @@ class ListSecurityGroupRule(quantumv20.ListCommand):
             return
         quantum_client = self.get_client()
         search_opts = {'fields': ['id', 'name']}
+        if self.pagination_support:
+            page_size = parsed_args.page_size
+            if page_size:
+                search_opts.update({'limit': page_size})
+        sec_group_ids = set()
+        for rule in data:
+            for key in self.replace_rules:
+                sec_group_ids.add(rule[key])
+        search_opts.update({"id": sec_group_ids})
         secgroups = quantum_client.list_security_groups(**search_opts)
         secgroups = secgroups.get('security_groups', [])
         sg_dict = dict([(sg['id'], sg['name'])

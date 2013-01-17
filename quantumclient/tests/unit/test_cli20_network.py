@@ -128,12 +128,47 @@ class CLITestV20Network(CLITestV20Base):
         self.assertEquals('\n', _str)
 
     def _test_list_networks(self, cmd, detail=False, tags=[],
-                            fields_1=[], fields_2=[]):
+                            fields_1=[], fields_2=[], page_size=None,
+                            sort_key=[], sort_dir=[]):
         resources = "networks"
         self.mox.StubOutWithMock(ListNetwork, "extend_list")
         ListNetwork.extend_list(IsA(list), IgnoreArg())
         self._test_list_resources(resources, cmd, detail, tags,
-                                  fields_1, fields_2)
+                                  fields_1, fields_2, page_size=page_size,
+                                  sort_key=sort_key, sort_dir=sort_dir)
+
+    def test_list_nets_pagination(self):
+        cmd = ListNetwork(MyApp(sys.stdout), None)
+        self.mox.StubOutWithMock(ListNetwork, "extend_list")
+        ListNetwork.extend_list(IsA(list), IgnoreArg())
+        self._test_list_resources_with_pagination("networks", cmd)
+
+    def test_list_nets_sort(self):
+        """list nets: --sort-key name --sort-key id --sort-dir asc
+        --sort-dir desc
+        """
+        cmd = ListNetwork(MyApp(sys.stdout), None)
+        self._test_list_networks(cmd, sort_key=['name', 'id'],
+                                 sort_dir=['asc', 'desc'])
+
+    def test_list_nets_sort_with_keys_more_than_dirs(self):
+        """list nets: --sort-key name --sort-key id --sort-dir desc
+        """
+        cmd = ListNetwork(MyApp(sys.stdout), None)
+        self._test_list_networks(cmd, sort_key=['name', 'id'],
+                                 sort_dir=['desc'])
+
+    def test_list_nets_sort_with_dirs_more_than_keys(self):
+        """list nets: --sort-key name --sort-dir desc --sort-dir asc
+        """
+        cmd = ListNetwork(MyApp(sys.stdout), None)
+        self._test_list_networks(cmd, sort_key=['name'],
+                                 sort_dir=['desc', 'asc'])
+
+    def test_list_nets_limit(self):
+        """list nets: -P"""
+        cmd = ListNetwork(MyApp(sys.stdout), None)
+        self._test_list_networks(cmd, page_size=1000)
 
     def test_list_nets_detail(self):
         """list nets: -D."""
@@ -170,11 +205,15 @@ class CLITestV20Network(CLITestV20Base):
         cmd.get_client().AndReturn(self.client)
         setup_list_stub('networks', data, '')
         cmd.get_client().AndReturn(self.client)
+        filters = ''
+        for n in data:
+            for s in n['subnets']:
+                filters = filters + "&id=%s" % s
         setup_list_stub('subnets',
                         [{'id': 'mysubid1', 'cidr': '192.168.1.0/24'},
                          {'id': 'mysubid2', 'cidr': '172.16.0.0/24'},
                          {'id': 'mysubid3', 'cidr': '10.1.1.0/24'}],
-                        query='fields=id&fields=cidr')
+                        query='fields=id&fields=cidr' + filters)
         self.mox.ReplayAll()
 
         args = []

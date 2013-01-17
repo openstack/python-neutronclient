@@ -30,6 +30,8 @@ class ListPool(quantumv20.ListCommand):
     list_columns = ['id', 'name', 'lb_method', 'protocol',
                     'admin_state_up', 'status']
     _formatters = {}
+    pagination_support = True
+    sorting_support = True
 
 
 class ShowPool(quantumv20.ShowCommand):

@@ -22,6 +22,8 @@ XSI_NIL_ATTR = "xmlns:xsi"
 TYPE_XMLNS = "xmlns:quantum"
 TYPE_ATTR = "quantum:type"
 VIRTUAL_ROOT_KEY = "_v_root"
+ATOM_NAMESPACE = "http://www.w3.org/2005/Atom"
+ATOM_LINK_NOTATION = "{%s}link" % ATOM_NAMESPACE
 
 TYPE_BOOL = "bool"
 TYPE_INT = "int"

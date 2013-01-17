@@ -19,6 +19,7 @@ import httplib
 import logging
 import time
 import urllib
+import urlparse
 
 from quantumclient.client import HTTPClient
 from quantumclient.common import _
@@ -245,12 +246,13 @@ class Client(object):
         return self.get(self.ext_path % ext_alias, params=_params)
 
     @APIParamsCall
-    def list_ports(self, **_params):
+    def list_ports(self, retrieve_all=True, **_params):
         """
         Fetches a list of all networks for a tenant
         """
         # Pass filters in "params" argument to do_request
-        return self.get(self.ports_path, params=_params)
+        return self.list('ports', self.ports_path, retrieve_all,
+                         **_params)
 
     @APIParamsCall
     def show_port(self, port, **_params):
@@ -281,12 +283,13 @@ class Client(object):
         return self.delete(self.port_path % (port))
 
     @APIParamsCall
-    def list_networks(self, **_params):
+    def list_networks(self, retrieve_all=True, **_params):
         """
         Fetches a list of all networks for a tenant
         """
         # Pass filters in "params" argument to do_request
-        return self.get(self.networks_path, params=_params)
+        return self.list('networks', self.networks_path, retrieve_all,
+                         **_params)
 
     @APIParamsCall
     def show_network(self, network, **_params):
@@ -317,11 +320,12 @@ class Client(object):
         return self.delete(self.network_path % (network))
 
     @APIParamsCall
-    def list_subnets(self, **_params):
+    def list_subnets(self, retrieve_all=True, **_params):
         """
         Fetches a list of all networks for a tenant
         """
-        return self.get(self.subnets_path, params=_params)
+        return self.list('subnets', self.subnets_path, retrieve_all,
+                         **_params)
 
     @APIParamsCall
     def show_subnet(self, subnet, **_params):
@@ -352,12 +356,13 @@ class Client(object):
         return self.delete(self.subnet_path % (subnet))
 
     @APIParamsCall
-    def list_routers(self, **_params):
+    def list_routers(self, retrieve_all=True, **_params):
         """
         Fetches a list of all routers for a tenant
         """
         # Pass filters in "params" argument to do_request
-        return self.get(self.routers_path, params=_params)
+        return self.list('routers', self.routers_path, retrieve_all,
+                         **_params)
 
     @APIParamsCall
     def show_router(self, router, **_params):
@@ -420,12 +425,13 @@ class Client(object):
                         body={'router': {'external_gateway_info': {}}})
 
     @APIParamsCall
-    def list_floatingips(self, **_params):
+    def list_floatingips(self, retrieve_all=True, **_params):
         """
         Fetches a list of all floatingips for a tenant
         """
         # Pass filters in "params" argument to do_request
-        return self.get(self.floatingips_path, params=_params)
+        return self.list('floatingips', self.floatingips_path, retrieve_all,
+                         **_params)
 
     @APIParamsCall
     def show_floatingip(self, floatingip, **_params):
@@ -463,11 +469,12 @@ class Client(object):
         return self.post(self.security_groups_path, body=body)
 
     @APIParamsCall
-    def list_security_groups(self, **_params):
+    def list_security_groups(self, retrieve_all=True, **_params):
         """
         Fetches a list of all security groups for a tenant
         """
-        return self.get(self.security_groups_path, params=_params)
+        return self.list('security_groups', self.security_groups_path,
+                         retrieve_all, **_params)
 
     @APIParamsCall
     def show_security_group(self, security_group, **_params):
@@ -500,11 +507,13 @@ class Client(object):
                            (security_group_rule))
 
     @APIParamsCall
-    def list_security_group_rules(self, **_params):
+    def list_security_group_rules(self, retrieve_all=True, **_params):
         """
         Fetches a list of all security group rules for a tenant
         """
-        return self.get(self.security_group_rules_path, params=_params)
+        return self.list('security_group_rules',
+                         self.security_group_rules_path,
+                         retrieve_all, **_params)
 
     @APIParamsCall
     def show_security_group_rule(self, security_group_rule, **_params):
@@ -515,12 +524,13 @@ class Client(object):
                         params=_params)
 
     @APIParamsCall
-    def list_vips(self, **_params):
+    def list_vips(self, retrieve_all=True, **_params):
         """
         Fetches a list of all load balancer vips for a tenant
         """
         # Pass filters in "params" argument to do_request
-        return self.get(self.vips_path, params=_params)
+        return self.list('vips', self.vips_path, retrieve_all,
+                         **_params)
 
     @APIParamsCall
     def show_vip(self, vip, **_params):
@@ -551,12 +561,13 @@ class Client(object):
         return self.delete(self.vip_path % (vip))
 
     @APIParamsCall
-    def list_pools(self, **_params):
+    def list_pools(self, retrieve_all=True, **_params):
         """
         Fetches a list of all load balancer pools for a tenant
         """
         # Pass filters in "params" argument to do_request
-        return self.get(self.pools_path, params=_params)
+        return self.list('pools', self.pools_path, retrieve_all,
+                         **_params)
 
     @APIParamsCall
     def show_pool(self, pool, **_params):
@@ -594,12 +605,13 @@ class Client(object):
         return self.get(self.pool_path_stats % (pool), params=_params)
 
     @APIParamsCall
-    def list_members(self, **_params):
+    def list_members(self, retrieve_all=True, **_params):
         """
         Fetches a list of all load balancer members for a tenant
         """
         # Pass filters in "params" argument to do_request
-        return self.get(self.members_path, params=_params)
+        return self.list('members', self.members_path, retrieve_all,
+                         **_params)
 
     @APIParamsCall
     def show_member(self, member, **_params):
@@ -630,12 +642,13 @@ class Client(object):
         return self.delete(self.member_path % (member))
 
     @APIParamsCall
-    def list_health_monitors(self, **_params):
+    def list_health_monitors(self, retrieve_all=True, **_params):
         """
         Fetches a list of all load balancer health monitors for a tenant
         """
         # Pass filters in "params" argument to do_request
-        return self.get(self.health_monitors_path, params=_params)
+        return self.list('health_monitors', self.health_monitors_path,
+                         retrieve_all, **_params)
 
     @APIParamsCall
     def show_health_monitor(self, health_monitor, **_params):
@@ -976,3 +989,32 @@ class Client(object):
     def put(self, action, body=None, headers=None, params=None):
         return self.retry_request("PUT", action, body=body,
                                   headers=headers, params=params)
+
+    def list(self, collection, path, retrieve_all=True, **params):
+        if retrieve_all:
+            res = []
+            for r in self._pagination(collection, path, **params):
+                res.extend(r[collection])
+            return {collection: res}
+        else:
+            return self._pagination(collection, path, **params)
+
+    def _pagination(self, collection, path, **params):
+        if params.get('page_reverse', False):
+            linkrel = 'previous'
+        else:
+            linkrel = 'next'
+        next = True
+        while next:
+            res = self.get(path, params=params)
+            yield res
+            next = False
+            try:
+                for link in res['%s_links' % collection]:
+                    if link['rel'] == linkrel:
+                        query_str = urlparse.urlparse(link['href']).query
+                        params = urlparse.parse_qs(query_str)
+                        next = True
+                        break
+            except KeyError:
+                break

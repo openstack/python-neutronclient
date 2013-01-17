@@ -76,6 +76,27 @@ class CLITestV20Router(CLITestV20Base):
         cmd = ListRouter(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
+    def test_list_routers_pagination(self):
+        resources = "routers"
+        cmd = ListRouter(MyApp(sys.stdout), None)
+        self._test_list_resources_with_pagination(resources, cmd)
+
+    def test_list_routers_sort(self):
+        """list routers: --sort-key name --sort-key id --sort-key asc
+        --sort-key desc
+        """
+        resources = "routers"
+        cmd = ListRouter(MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd,
+                                  sort_key=["name", "id"],
+                                  sort_dir=["asc", "desc"])
+
+    def test_list_routers_limit(self):
+        """list routers: -P"""
+        resources = "routers"
+        cmd = ListRouter(MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd, page_size=1000)
+
     def test_update_router_exception(self):
         """Update router: myid."""
         resource = 'router'

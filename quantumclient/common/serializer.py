@@ -245,18 +245,33 @@ class XMLDeserializer(TextDeserializer):
         else:
             return tag
 
+    def _get_links(self, root_tag, node):
+        link_nodes = node.findall(constants.ATOM_LINK_NOTATION)
+        root_tag = self._get_key(node.tag)
+        link_key = "%s_links" % root_tag
+        link_list = []
+        for link in link_nodes:
+            link_list.append({'rel': link.get('rel'),
+                              'href': link.get('href')})
+            # Remove link node in order to avoid link node being
+            # processed as an item in _from_xml_node
+            node.remove(link)
+        return link_list and {link_key: link_list} or {}
+
     def _from_xml(self, datastring):
         if datastring is None:
             return None
         plurals = set(self.metadata.get('plurals', {}))
         try:
             node = etree.fromstring(datastring)
-            result = self._from_xml_node(node, plurals)
             root_tag = self._get_key(node.tag)
+            links = self._get_links(root_tag, node)
+            result = self._from_xml_node(node, plurals)
+            # There is no case where root_tag = constants.VIRTUAL_ROOT_KEY
+            # and links is not None because of the way data are serialized
             if root_tag == constants.VIRTUAL_ROOT_KEY:
                 return result
-            else:
-                return {root_tag: result}
+            return dict({root_tag: result}, **links)
         except Exception as e:
             parseError = False
             # Python2.7

@@ -125,6 +125,28 @@ class CLITestV20LbVip(test_cli20.CLITestV20Base):
         cmd = vip.ListVip(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
+    def test_list_vips_pagination(self):
+        """lb-vip-list"""
+        resources = "vips"
+        cmd = vip.ListVip(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources_with_pagination(resources, cmd)
+
+    def test_list_vips_sort(self):
+        """lb-vip-list --sort-key name --sort-key id --sort-key asc
+        --sort-key desc
+        """
+        resources = "vips"
+        cmd = vip.ListVip(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd,
+                                  sort_key=["name", "id"],
+                                  sort_dir=["asc", "desc"])
+
+    def test_list_vips_limit(self):
+        """lb-vip-list -P"""
+        resources = "vips"
+        cmd = vip.ListVip(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd, page_size=1000)
+
     def test_show_vip_id(self):
         """lb-vip-show test_id"""
         resource = 'vip'

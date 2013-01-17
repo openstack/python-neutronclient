@@ -41,6 +41,8 @@ class ListPort(ListCommand):
     log = logging.getLogger(__name__ + '.ListPort')
     _formatters = {'fixed_ips': _format_fixed_ips, }
     list_columns = ['id', 'name', 'mac_address', 'fixed_ips']
+    pagination_support = True
+    sorting_support = True
 
 
 class ListRouterPort(ListCommand):
@@ -50,6 +52,8 @@ class ListRouterPort(ListCommand):
     log = logging.getLogger(__name__ + '.ListRouterPort')
     _formatters = {'fixed_ips': _format_fixed_ips, }
     list_columns = ['id', 'name', 'mac_address', 'fixed_ips']
+    pagination_support = True
+    sorting_support = True
 
     def get_parser(self, prog_name):
         parser = super(ListRouterPort, self).get_parser(prog_name)

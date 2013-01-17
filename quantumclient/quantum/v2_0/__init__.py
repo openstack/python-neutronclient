@@ -90,6 +90,35 @@ def add_show_list_common_argument(parser):
         default=[])
 
 
+def add_pagination_argument(parser):
+    parser.add_argument(
+        '-P', '--page-size',
+        dest='page_size', metavar='SIZE', type=int,
+        help=("specify retrieve unit of each request, then split one request "
+              "to several requests"),
+        default=None)
+
+
+def add_sorting_argument(parser):
+    parser.add_argument(
+        '--sort-key',
+        dest='sort_key', metavar='FIELD',
+        action='append',
+        help=("sort list by specified fields (This option can be repeated), "
+              "The number of sort_dir and sort_key should match each other, "
+              "more sort_dir specified will be omitted, less will be filled "
+              "with asc as default direction "),
+        default=[])
+    parser.add_argument(
+        '--sort-dir',
+        dest='sort_dir', metavar='{asc,desc}',
+        help=("sort list in specified directions "
+              "(This option can be repeated)"),
+        action='append',
+        default=[],
+        choices=['asc', 'desc'])
+
+
 def add_extra_argument(parser, name, _help):
     parser.add_argument(
         name,
@@ -411,12 +440,18 @@ class ListCommand(QuantumCommand, lister.Lister):
     _formatters = {}
     list_columns = []
     unknown_parts_flag = True
+    pagination_support = False
+    sorting_support = False
 
     def get_parser(self, prog_name):
         parser = super(ListCommand, self).get_parser(prog_name)
         add_show_list_common_argument(parser)
         if self.unknown_parts_flag:
             add_extra_argument(parser, 'filter_specs', 'filters options')
+        if self.pagination_support:
+            add_pagination_argument(parser)
+        if self.sorting_support:
+            add_sorting_argument(parser)
         return parser
 
     def args2search_opts(self, parsed_args):
@@ -445,6 +480,22 @@ class ListCommand(QuantumCommand, lister.Lister):
                     self.values_specs)
         search_opts = self.args2search_opts(parsed_args)
         search_opts.update(_extra_values)
+        if self.pagination_support:
+            page_size = parsed_args.page_size
+            if page_size:
+                search_opts.update({'limit': page_size})
+        if self.sorting_support:
+            keys = parsed_args.sort_key
+            if keys:
+                search_opts.update({'sort_key': keys})
+            dirs = parsed_args.sort_dir
+            len_diff = len(keys) - len(dirs)
+            if len_diff > 0:
+                dirs += ['asc'] * len_diff
+            elif len_diff < 0:
+                dirs = dirs[:len(keys)]
+            if dirs:
+                search_opts.update({'sort_dir': dirs})
         data = self.call_server(quantum_client, search_opts, parsed_args)
         collection = self.resource + "s"
         return data.get(collection, [])

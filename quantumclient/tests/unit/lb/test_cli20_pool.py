@@ -80,6 +80,28 @@ class CLITestV20LbPool(test_cli20.CLITestV20Base):
         cmd = pool.ListPool(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
+    def test_list_pools_pagination(self):
+        """lb-pool-list"""
+        resources = "pools"
+        cmd = pool.ListPool(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources_with_pagination(resources, cmd)
+
+    def test_list_pools_sort(self):
+        """lb-pool-list --sort-key name --sort-key id --sort-key asc
+        --sort-key desc
+        """
+        resources = "pools"
+        cmd = pool.ListPool(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd,
+                                  sort_key=["name", "id"],
+                                  sort_dir=["asc", "desc"])
+
+    def test_list_pools_limit(self):
+        """lb-pool-list -P"""
+        resources = "pools"
+        cmd = pool.ListPool(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd, page_size=1000)
+
     def test_show_pool_id(self):
         """lb-pool-show test_id"""
         resource = 'pool'

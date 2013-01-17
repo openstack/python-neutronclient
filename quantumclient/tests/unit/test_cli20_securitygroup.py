@@ -73,6 +73,26 @@ class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):
             test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
+    def test_list_security_groups_pagination(self):
+        resources = "security_groups"
+        cmd = securitygroup.ListSecurityGroup(
+            test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources_with_pagination(resources, cmd)
+
+    def test_list_security_groups_sort(self):
+        resources = "security_groups"
+        cmd = securitygroup.ListSecurityGroup(
+            test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd,
+                                  sort_key=["name", "id"],
+                                  sort_dir=["asc", "desc"])
+
+    def test_list_security_groups_limit(self):
+        resources = "security_groups"
+        cmd = securitygroup.ListSecurityGroup(
+            test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd, page_size=1000)
+
     def test_show_security_group_id(self):
         resource = 'security_group'
         cmd = securitygroup.ShowSecurityGroup(
@@ -145,6 +165,38 @@ class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):
                                                         mox.IgnoreArg())
         self._test_list_resources(resources, cmd, True)
 
+    def test_list_security_group_rules_pagination(self):
+        resources = "security_group_rules"
+        cmd = securitygroup.ListSecurityGroupRule(
+            test_cli20.MyApp(sys.stdout), None)
+        self.mox.StubOutWithMock(securitygroup.ListSecurityGroupRule,
+                                 "extend_list")
+        securitygroup.ListSecurityGroupRule.extend_list(mox.IsA(list),
+                                                        mox.IgnoreArg())
+        self._test_list_resources_with_pagination(resources, cmd)
+
+    def test_list_security_group_rules_sort(self):
+        resources = "security_group_rules"
+        cmd = securitygroup.ListSecurityGroupRule(
+            test_cli20.MyApp(sys.stdout), None)
+        self.mox.StubOutWithMock(securitygroup.ListSecurityGroupRule,
+                                 "extend_list")
+        securitygroup.ListSecurityGroupRule.extend_list(mox.IsA(list),
+                                                        mox.IgnoreArg())
+        self._test_list_resources(resources, cmd,
+                                  sort_key=["name", "id"],
+                                  sort_dir=["asc", "desc"])
+
+    def test_list_security_group_rules_limit(self):
+        resources = "security_group_rules"
+        cmd = securitygroup.ListSecurityGroupRule(
+            test_cli20.MyApp(sys.stdout), None)
+        self.mox.StubOutWithMock(securitygroup.ListSecurityGroupRule,
+                                 "extend_list")
+        securitygroup.ListSecurityGroupRule.extend_list(mox.IsA(list),
+                                                        mox.IgnoreArg())
+        self._test_list_resources(resources, cmd, page_size=1000)
+
     def test_show_security_group_rule(self):
         resource = 'security_group_rule'
         cmd = securitygroup.ShowSecurityGroupRule(
@@ -196,11 +248,18 @@ class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):
         setup_list_stub('security_group_rules', list_data, query)
         if conv:
             cmd.get_client().AndReturn(self.client)
+            sec_ids = set()
+            for n in data['data']:
+                sec_ids.add(n[1])
+                sec_ids.add(n[2])
+            filters = ''
+            for id in sec_ids:
+                filters = filters + "&id=%s" % id
             setup_list_stub('security_groups',
                             [{'id': 'myid1', 'name': 'group1'},
                              {'id': 'myid2', 'name': 'group2'},
                              {'id': 'myid3', 'name': 'group3'}],
-                            query='fields=id&fields=name')
+                            query='fields=id&fields=name' + filters)
         self.mox.ReplayAll()
 
         cmd_parser = cmd.get_parser('list_security_group_rules')

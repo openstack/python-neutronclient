@@ -41,11 +41,22 @@ class ListNetwork(ListCommand):
     log = logging.getLogger(__name__ + '.ListNetwork')
     _formatters = {'subnets': _format_subnets, }
     list_columns = ['id', 'name', 'subnets']
+    pagination_support = True
+    sorting_support = True
 
     def extend_list(self, data, parsed_args):
         """Add subnet information to a network list"""
         quantum_client = self.get_client()
         search_opts = {'fields': ['id', 'cidr']}
+        if self.pagination_support:
+            page_size = parsed_args.page_size
+            if page_size:
+                search_opts.update({'limit': page_size})
+        subnet_ids = []
+        for n in data:
+            if 'subnets' in n:
+                subnet_ids.extend(n['subnets'])
+        search_opts.update({'id': subnet_ids})
         subnets = quantum_client.list_subnets(**search_opts).get('subnets', [])
         subnet_dict = dict([(s['id'], s) for s in subnets])
         for n in data:
@@ -58,6 +69,8 @@ class ListExternalNetwork(ListNetwork):
     """List external networks that belong to a given tenant"""
 
     log = logging.getLogger(__name__ + '.ListExternalNetwork')
+    pagination_support = True
+    sorting_support = True
 
     def retrieve_list(self, parsed_args):
         external = '--router:external=True'

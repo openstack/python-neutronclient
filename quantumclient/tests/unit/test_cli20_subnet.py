@@ -331,6 +331,27 @@ class CLITestV20Subnet(CLITestV20Base):
         self._test_list_resources(resources, cmd,
                                   fields_1=['a', 'b'], fields_2=['c', 'd'])
 
+    def test_list_subnets_pagination(self):
+        resources = "subnets"
+        cmd = ListSubnet(MyApp(sys.stdout), None)
+        self._test_list_resources_with_pagination(resources, cmd)
+
+    def test_list_subnets_sort(self):
+        """List subnets: --sort-key name --sort-key id --sort-key asc
+        --sort-key desc
+        """
+        resources = "subnets"
+        cmd = ListSubnet(MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd,
+                                  sort_key=["name", "id"],
+                                  sort_dir=["asc", "desc"])
+
+    def test_list_subnets_limit(self):
+        """List subnets: -P."""
+        resources = "subnets"
+        cmd = ListSubnet(MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd, page_size=1000)
+
     def test_update_subnet(self):
         """Update subnet: myid --name myname --tags a b."""
         resource = 'subnet'

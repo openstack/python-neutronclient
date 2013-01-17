@@ -225,7 +225,8 @@ class CLITestV20Base(testtools.TestCase):
         self.mox.UnsetStubs()
 
     def _test_list_resources(self, resources, cmd, detail=False, tags=[],
-                             fields_1=[], fields_2=[]):
+                             fields_1=[], fields_2=[], page_size=None,
+                             sort_key=[], sort_dir=[]):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
@@ -263,6 +264,32 @@ class CLITestV20Base(testtools.TestCase):
                 query += "&fields=" + field
             else:
                 query = "fields=" + field
+        if page_size:
+            args.append("--page-size")
+            args.append(str(page_size))
+            if query:
+                query += "&limit=%s" % page_size
+            else:
+                query = "limit=%s" % page_size
+        if sort_key:
+            for key in sort_key:
+                args.append('--sort-key')
+                args.append(key)
+                if query:
+                    query += '&'
+                query += 'sort_key=%s' % key
+        if sort_dir:
+            len_diff = len(sort_key) - len(sort_dir)
+            if len_diff > 0:
+                sort_dir += ['asc'] * len_diff
+            elif len_diff < 0:
+                sort_dir = sort_dir[:len(sort_key)]
+            for dir in sort_dir:
+                args.append('--sort-dir')
+                args.append(dir)
+                if query:
+                    query += '&'
+                query += 'sort_dir=%s' % dir
         path = getattr(self.client, resources + "_path")
         self.client.httpclient.request(
             MyUrlComparator(end_url(path, query), self.client), 'GET',
@@ -276,6 +303,38 @@ class CLITestV20Base(testtools.TestCase):
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
         self.assertTrue('myid1' in _str)
+
+    def _test_list_resources_with_pagination(self, resources, cmd):
+        self.mox.StubOutWithMock(cmd, "get_client")
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        cmd.get_client().MultipleTimes().AndReturn(self.client)
+        path = getattr(self.client, resources + "_path")
+        fake_query = "marker=myid2&limit=2"
+        reses1 = {resources: [{'id': 'myid1', },
+                              {'id': 'myid2', }],
+                  '%s_links' % resources: [{'href': end_url(path, fake_query),
+                                            'rel': 'next'}]}
+        reses2 = {resources: [{'id': 'myid3', },
+                              {'id': 'myid4', }]}
+        resstr1 = self.client.serialize(reses1)
+        resstr2 = self.client.serialize(reses2)
+        self.client.httpclient.request(
+            end_url(path, ""), 'GET',
+            body=None,
+            headers=ContainsKeyValue('X-Auth-Token',
+                                     TOKEN)).AndReturn((MyResp(200), resstr1))
+        self.client.httpclient.request(
+            end_url(path, fake_query), 'GET',
+            body=None,
+            headers=ContainsKeyValue('X-Auth-Token',
+                                     TOKEN)).AndReturn((MyResp(200), resstr2))
+        self.mox.ReplayAll()
+        cmd_parser = cmd.get_parser("list_" + resources)
+
+        parsed_args = cmd_parser.parse_args("")
+        cmd.run(parsed_args)
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
 
     def _test_update_resource(self, resource, cmd, myid, args, extrafields):
         self.mox.StubOutWithMock(cmd, "get_client")

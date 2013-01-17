@@ -72,6 +72,28 @@ class CLITestV20LbMember(test_cli20.CLITestV20Base):
         cmd = member.ListMember(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
+    def test_list_members_pagination(self):
+        """lb-member-list"""
+        resources = "members"
+        cmd = member.ListMember(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources_with_pagination(resources, cmd)
+
+    def test_list_members_sort(self):
+        """lb-member-list --sort-key name --sort-key id --sort-key asc
+        --sort-key desc
+        """
+        resources = "members"
+        cmd = member.ListMember(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd,
+                                  sort_key=["name", "id"],
+                                  sort_dir=["asc", "desc"])
+
+    def test_list_members_limit(self):
+        """lb-member-list -P"""
+        resources = "members"
+        cmd = member.ListMember(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd, page_size=1000)
+
     def test_show_member_id(self):
         """lb-member-show test_id"""
         resource = 'member'

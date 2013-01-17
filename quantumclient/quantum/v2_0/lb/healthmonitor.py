@@ -29,6 +29,8 @@ class ListHealthMonitor(quantumv20.ListCommand):
     log = logging.getLogger(__name__ + '.ListHealthMonitor')
     list_columns = ['id', 'type', 'admin_state_up', 'status']
     _formatters = {}
+    pagination_support = True
+    sorting_support = True
 
 
 class ShowHealthMonitor(quantumv20.ShowCommand):

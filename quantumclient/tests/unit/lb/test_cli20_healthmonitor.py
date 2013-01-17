@@ -92,6 +92,31 @@ class CLITestV20LbHealthmonitor(test_cli20.CLITestV20Base):
                                               None)
         self._test_list_resources(resources, cmd, True)
 
+    def test_list_healthmonitors_pagination(self):
+        """lb-healthmonitor-list"""
+        resources = "health_monitors"
+        cmd = healthmonitor.ListHealthMonitor(test_cli20.MyApp(sys.stdout),
+                                              None)
+        self._test_list_resources_with_pagination(resources, cmd)
+
+    def test_list_healthmonitors_sort(self):
+        """lb-healthmonitor-list --sort-key name --sort-key id --sort-key asc
+        --sort-key desc
+        """
+        resources = "health_monitors"
+        cmd = healthmonitor.ListHealthMonitor(test_cli20.MyApp(sys.stdout),
+                                              None)
+        self._test_list_resources(resources, cmd,
+                                  sort_key=["name", "id"],
+                                  sort_dir=["asc", "desc"])
+
+    def test_list_healthmonitors_limit(self):
+        """lb-healthmonitor-list -P"""
+        resources = "health_monitors"
+        cmd = healthmonitor.ListHealthMonitor(test_cli20.MyApp(sys.stdout),
+                                              None)
+        self._test_list_resources(resources, cmd, page_size=1000)
+
     def test_show_healthmonitor_id(self):
         """lb-healthmonitor-show test_id"""
         resource = 'health_monitor'
