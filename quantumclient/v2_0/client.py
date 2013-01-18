@@ -22,8 +22,9 @@ import urllib
 
 from quantumclient.client import HTTPClient
 from quantumclient.common import _
+from quantumclient.common import constants
 from quantumclient.common import exceptions
-from quantumclient.common.serializer import Serializer
+from quantumclient.common import serializer
 
 
 _logger = logging.getLogger(__name__)
@@ -139,18 +140,6 @@ class Client(object):
 
     """
 
-    #Metadata for deserializing xml
-    _serialization_metadata = {
-        "application/xml": {
-            "attributes": {
-                "network": ["id", "name"],
-                "port": ["id", "mac_address"],
-                "subnet": ["id", "prefix"]},
-            "plurals": {
-                "networks": "network",
-                "ports": "port",
-                "subnets": "subnet", }, }, }
-
     networks_path = "/networks"
     network_path = "/networks/%s"
     ports_path = "/ports"
@@ -181,6 +170,33 @@ class Client(object):
     associate_pool_health_monitors_path = "/lb/pools/%s/health_monitors"
     disassociate_pool_health_monitors_path = (
         "/lb/pools/%(pool)s/health_monitors/%(health_monitor)s")
+
+    # API has no way to report plurals, so we have to hard code them
+    EXTED_PLURALS = {'routers': 'router',
+                     'floatingips': 'floatingip',
+                     'service_types': 'service_type',
+                     'service_definitions': 'service_definition',
+                     'security_groups': 'security_group',
+                     'security_group_rules': 'security_group_rule',
+                     'vips': 'vip',
+                     'pools': 'pool',
+                     'members': 'member',
+                     'health_monitors': 'health_monitor',
+                     'quotas': 'quota',
+                     }
+
+    def get_attr_metadata(self):
+        if self.format == 'json':
+            return {}
+        old_request_format = self.format
+        self.format = 'json'
+        exts = self.list_extensions()['extensions']
+        self.format = old_request_format
+        ns = dict([(ext['alias'], ext['namespace']) for ext in exts])
+        self.EXTED_PLURALS.update(constants.PLURALS)
+        return {'plurals': self.EXTED_PLURALS,
+                'xmlns': constants.XML_NS_V20,
+                constants.EXT_NS: ns}
 
     @APIParamsCall
     def get_quotas_tenant(self, **_params):
@@ -669,16 +685,14 @@ class Client(object):
 
     def _handle_fault_response(self, status_code, response_body):
         # Create exception with HTTP status code and message
-        error_message = response_body
-        _logger.debug("Error message: %s", error_message)
+        _logger.debug("Error message: %s", response_body)
         # Add deserialized error message to exception arguments
         try:
-            des_error_body = Serializer().deserialize(error_message,
-                                                      self.content_type())
+            des_error_body = self.deserialize(response_body, status_code)
         except:
             # If unable to deserialized body it is probably not a
             # Quantum error
-            des_error_body = {'message': error_message}
+            des_error_body = {'message': response_body}
         # Raise the appropriate exception
         exception_handler_v20(status_code, des_error_body)
 
@@ -719,7 +733,8 @@ class Client(object):
         if data is None:
             return None
         elif type(data) is dict:
-            return Serializer().serialize(data, self.content_type())
+            return serializer.Serializer(
+                self.get_attr_metadata()).serialize(data, self.content_type())
         else:
             raise Exception("unable to serialize object of type = '%s'" %
                             type(data))
@@ -730,17 +745,16 @@ class Client(object):
         """
         if status_code == 204:
             return data
-        return Serializer(self._serialization_metadata).deserialize(
-            data, self.content_type())
+        return serializer.Serializer(self.get_attr_metadata()).deserialize(
+            data, self.content_type())['body']
 
-    def content_type(self, format=None):
+    def content_type(self, _format=None):
         """
         Returns the mime-type for either 'xml' or 'json'.  Defaults to the
         currently set format
         """
-        if not format:
-            format = self.format
-        return "application/%s" % (format)
+        _format = _format or self.format
+        return "application/%s" % (_format)
 
     def retry_request(self, method, action, body=None,
                       headers=None, params=None):

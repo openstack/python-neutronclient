@@ -1,6 +1,7 @@
-cliff>=1.2.1
 argparse
+cliff>=1.2.1
 httplib2
+iso8601
 prettytable>=0.6.0
-simplejson
 pyparsing>=1.5.6,<2.0
+simplejson
