@@ -14,3 +14,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 # @author: Somik Behera, Nicira Networks, Inc.
+
+import gettext
+
+t = gettext.translation('quantumclient', fallback=True)
+
+
+def _(msg):
+    return t.ugettext(msg)
