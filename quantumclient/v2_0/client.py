@@ -132,7 +132,7 @@ class Client(object):
                                      tenant_name=TENANT_NAME,
                                      auth_url=KEYSTONE_URL)
 
-        >>> nets = quantum.list_nets()
+        >>> nets = quantum.list_networks()
         ...
 
     """
