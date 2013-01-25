@@ -73,7 +73,8 @@ def exception_handler_v20(status_code, error_content):
             if ex:
                 raise ex
         else:
-            raise exceptions.QuantumClientException(message=error_dict)
+            raise exceptions.QuantumClientException(status_code=status_code,
+                                                    message=error_dict)
     else:
         message = None
         if isinstance(error_content, dict):
