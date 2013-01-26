@@ -108,7 +108,7 @@ class CLITestV20FloatingIps(CLITestV20Base):
         cmd = DisassociateFloatingIP(MyApp(sys.stdout), None)
         args = ['myid']
         self._test_update_resource(resource, cmd, 'myid',
-                                   args,  {"port_id": None}
+                                   args, {"port_id": None}
                                    )
 
     def test_associate_ip(self):
@@ -117,5 +117,5 @@ class CLITestV20FloatingIps(CLITestV20Base):
         cmd = AssociateFloatingIP(MyApp(sys.stdout), None)
         args = ['myid', 'portid']
         self._test_update_resource(resource, cmd, 'myid',
-                                   args,  {"port_id": "portid"}
+                                   args, {"port_id": "portid"}
                                    )

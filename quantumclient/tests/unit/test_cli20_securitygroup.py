@@ -61,7 +61,7 @@ class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):
         name = 'webservers'
         description = 'my webservers'
         myid = 'myid'
-        args = [name,  '--description', description]
+        args = [name, '--description', description]
         position_names = ['name', 'description']
         position_values = [name, description]
         self._test_create_resource(resource, cmd, name, myid, args,
