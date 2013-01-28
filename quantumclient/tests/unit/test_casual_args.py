@@ -53,6 +53,17 @@ class CLITestArgs(testtools.TestCase):
         self.assertRaises(exceptions.CommandError,
                           quantumV20.parse_args_to_dict, _specs)
 
+    def test_badarg_with_minus(self):
+        _specs = ['--arg1', 'value1', '-D']
+        self.assertRaises(exceptions.CommandError,
+                          quantumV20.parse_args_to_dict, _specs)
+
+    def test_goodarg_with_minus_number(self):
+        _specs = ['--arg1', 'value1', '-1', '-1.0']
+        _mydict = quantumV20.parse_args_to_dict(_specs)
+        self.assertEqual(['value1', '-1', '-1.0'],
+                         _mydict['arg1'])
+
     def test_badarg_duplicate(self):
         _specs = ['--tag=t', '--arg1', 'value1', '--arg1', 'value1']
         self.assertRaises(exceptions.CommandError,

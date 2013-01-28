@@ -98,6 +98,18 @@ def add_extra_argument(parser, name, _help):
                      '[--key2 [type=int|bool|...] value ...]')
 
 
+def is_number(s):
+    try:
+        float(s)  # for int, long and float
+    except ValueError:
+        try:
+            complex(s)  # for complex
+        except ValueError:
+            return False
+
+    return True
+
+
 def parse_args_to_dict(values_specs):
     '''It is used to analyze the extra command options to command.
 
@@ -156,7 +168,8 @@ def parse_args_to_dict(values_specs):
             _list_flag = True
             continue
         if not _item.startswith('--'):
-            if not current_item or '=' in current_item:
+            if (not current_item or '=' in current_item or
+                _item.startswith('-') and not is_number(_item)):
                 raise exceptions.CommandError(
                     "Invalid values_specs %s" % ' '.join(values_specs))
             _value_number += 1
@@ -316,8 +329,6 @@ class UpdateCommand(QuantumCommand):
         parser.add_argument(
             'id', metavar=self.resource,
             help='ID or name of %s to update' % self.resource)
-        add_extra_argument(parser, 'value_specs',
-                           'new values for the %s' % self.resource)
         self.add_known_arguments(parser)
         return parser
 
@@ -325,11 +336,14 @@ class UpdateCommand(QuantumCommand):
         self.log.debug('run(%s)' % parsed_args)
         quantum_client = self.get_client()
         quantum_client.format = parsed_args.request_format
-        value_specs = parsed_args.value_specs
-        dict_args = self.args2body(parsed_args).get(self.resource, {})
-        dict_specs = parse_args_to_dict(value_specs)
-        body = {self.resource: dict(dict_args.items() +
-                                    dict_specs.items())}
+        _extra_values = parse_args_to_dict(self.values_specs)
+        _merge_args(self, parsed_args, _extra_values,
+                    self.values_specs)
+        body = self.args2body(parsed_args)
+        if self.resource in body:
+            body[self.resource].update(_extra_values)
+        else:
+            body[self.resource] = _extra_values
         if not body[self.resource]:
             raise exceptions.CommandError(
                 "Must specify new values to update %s" % self.resource)
@@ -398,30 +412,29 @@ class ListCommand(QuantumCommand, lister.Lister):
     def get_parser(self, prog_name):
         parser = super(ListCommand, self).get_parser(prog_name)
         add_show_list_common_argument(parser)
-        add_extra_argument(parser, 'filter_specs', 'filters options')
         return parser
+
+    def args2search_opts(self, parsed_args):
+        search_opts = {}
+        fields = parsed_args.fields
+        if parsed_args.fields:
+            search_opts.update({'fields': fields})
+        if parsed_args.show_details:
+            search_opts.update({'verbose': 'True'})
+        return search_opts
 
     def retrieve_list(self, parsed_args):
         """Retrieve a list of resources from Quantum server"""
         quantum_client = self.get_client()
-        search_opts = parse_args_to_dict(parsed_args.filter_specs)
-        self.log.debug('search options: %s', search_opts)
         quantum_client.format = parsed_args.request_format
-        fields = parsed_args.fields
-        extra_fields = search_opts.get('fields', [])
-        if extra_fields:
-            if isinstance(extra_fields, list):
-                fields.extend(extra_fields)
-            else:
-                fields.append(extra_fields)
-        if fields:
-            search_opts.update({'fields': fields})
-        if parsed_args.show_details:
-            search_opts.update({'verbose': 'True'})
+        _extra_values = parse_args_to_dict(self.values_specs)
+        _merge_args(self, parsed_args, _extra_values,
+                    self.values_specs)
+        search_opts = self.args2search_opts(parsed_args)
+        search_opts.update(_extra_values)
         obj_lister = getattr(quantum_client,
                              "list_%ss" % self.resource)
         data = obj_lister(**search_opts)
-
         collection = self.resource + "s"
         return data.get(collection, [])
 

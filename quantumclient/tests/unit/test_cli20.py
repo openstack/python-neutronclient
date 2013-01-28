@@ -15,15 +15,13 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-import sys
-
 import fixtures
 import mox
 from mox import Comparator
 from mox import ContainsKeyValue
 import testtools
 
-from quantumclient.quantum import v2_0 as quantumv20
+from quantumclient import shell
 from quantumclient.v2_0.client import Client
 
 
@@ -61,6 +59,31 @@ class MyApp(object):
 def end_url(path, query=None):
     _url_str = ENDURL + "/v" + API_VERSION + path + "." + FORMAT
     return query and _url_str + "?" + query or _url_str
+
+
+class MyUrlComparator(Comparator):
+    def __init__(self, lhs, client):
+        self.lhs = lhs
+        self.client = client
+
+    def equals(self, rhs):
+        return str(self) == rhs
+
+    def __str__(self):
+        if self.client and self.client.format != FORMAT:
+            lhs_parts = self.lhs.split("?", 1)
+            if len(lhs_parts) == 2:
+                lhs = ("%s%s?%s" % (lhs_parts[0][:-4],
+                                    self.client.format,
+                                    lhs_parts[1]))
+            else:
+                lhs = ("%s%s" % (lhs_parts[0][:-4],
+                                 self.client.format))
+            return lhs
+        return self.lhs
+
+    def __repr__(self):
+        return str(self)
 
 
 class MyComparator(Comparator):
@@ -172,9 +195,7 @@ class CLITestV20Base(testtools.TestCase):
                                                         resstr))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser('create_' + resource)
-        known_args, values_specs = cmd_parser.parse_known_args(args)
-        cmd.values_specs = values_specs
-        cmd.run(known_args)
+        shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
@@ -197,9 +218,7 @@ class CLITestV20Base(testtools.TestCase):
                                      TOKEN)).AndReturn((MyResp(200), resstr))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("list_" + resources_collection)
-
-        parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
+        shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
 
@@ -244,15 +263,13 @@ class CLITestV20Base(testtools.TestCase):
                 query = "fields=" + field
         path = getattr(self.client, resources + "_path")
         self.client.httpclient.request(
-            end_url(path, query), 'GET',
+            MyUrlComparator(end_url(path, query), self.client), 'GET',
             body=None,
             headers=ContainsKeyValue('X-Auth-Token',
                                      TOKEN)).AndReturn((MyResp(200), resstr))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("list_" + resources)
-
-        parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
+        shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
@@ -265,15 +282,13 @@ class CLITestV20Base(testtools.TestCase):
         body = {resource: extrafields}
         path = getattr(self.client, resource + "_path")
         self.client.httpclient.request(
-            end_url(path % myid), 'PUT',
+            MyUrlComparator(end_url(path % myid), self.client), 'PUT',
             body=MyComparator(body, self.client),
             headers=ContainsKeyValue('X-Auth-Token',
                                      TOKEN)).AndReturn((MyResp(204), None))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("update_" + resource)
-
-        parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
+        shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
@@ -296,9 +311,7 @@ class CLITestV20Base(testtools.TestCase):
                                      TOKEN)).AndReturn((MyResp(200), resstr))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("show_" + resource)
-
-        parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
+        shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
@@ -317,9 +330,7 @@ class CLITestV20Base(testtools.TestCase):
                                      TOKEN)).AndReturn((MyResp(204), None))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("delete_" + resource)
-
-        parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
+        shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
@@ -338,10 +349,8 @@ class CLITestV20Base(testtools.TestCase):
             headers=ContainsKeyValue('X-Auth-Token',
                                      TOKEN)).AndReturn((MyResp(204), None))
         self.mox.ReplayAll()
-        cmd_parser = cmd.get_parser("update_" + resource)
-
-        parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
+        cmd_parser = cmd.get_parser("delete_" + resource)
+        shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()

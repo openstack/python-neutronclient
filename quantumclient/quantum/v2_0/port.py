@@ -52,13 +52,10 @@ class ListRouterPort(ListCommand):
     list_columns = ['id', 'name', 'mac_address', 'fixed_ips']
 
     def get_parser(self, prog_name):
-        parser = super(ListCommand, self).get_parser(prog_name)
-        quantumv20.add_show_list_common_argument(parser)
+        parser = super(ListRouterPort, self).get_parser(prog_name)
         parser.add_argument(
             'id', metavar='router',
             help='ID or name of router to look up')
-        quantumv20.add_extra_argument(parser, 'filter_specs',
-                                      'filters options')
         return parser
 
     def get_data(self, parsed_args):
@@ -66,7 +63,7 @@ class ListRouterPort(ListCommand):
         quantum_client.format = parsed_args.request_format
         _id = quantumv20.find_resourceid_by_name_or_id(
             quantum_client, 'router', parsed_args.id)
-        parsed_args.filter_specs.append('--device_id=%s' % _id)
+        self.values_specs.append('--device_id=%s' % _id)
         return super(ListRouterPort, self).get_data(parsed_args)
 
 

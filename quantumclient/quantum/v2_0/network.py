@@ -60,9 +60,9 @@ class ListExternalNetwork(ListNetwork):
     log = logging.getLogger(__name__ + '.ListExternalNetwork')
 
     def retrieve_list(self, parsed_args):
-        if '--' not in parsed_args.filter_specs:
-            parsed_args.filter_specs.append('--')
-        parsed_args.filter_specs.append('--router:external=True')
+        external = '--router:external=True'
+        if external not in self.values_specs:
+            self.values_specs.append('--router:external=True')
         return super(ListExternalNetwork, self).retrieve_list(parsed_args)
 
 
