@@ -174,3 +174,15 @@ class UpdatePort(UpdateCommand):
 
     resource = 'port'
     log = logging.getLogger(__name__ + '.UpdatePort')
+
+    def add_known_arguments(self, parser):
+        parser.add_argument(
+            '--no-security-groups',
+            default=False, action='store_true',
+            help='remove security groups from port')
+
+    def args2body(self, parsed_args):
+        body = {'port': {}}
+        if parsed_args.no_security_groups:
+            body['port'].update({'security_groups': None})
+        return body

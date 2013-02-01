@@ -262,6 +262,14 @@ class CLITestV20Port(CLITestV20Base):
                                    {'name': 'myname', 'tags': ['a', 'b'], }
                                    )
 
+    def test_update_port_security_group_off(self):
+        """Update port: --no-security-groups myid."""
+        resource = 'port'
+        cmd = UpdatePort(MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['--no-security-groups', 'myid'],
+                                   {'security_groups': None})
+
     def test_show_port(self):
         """Show port: --fields id --fields name myid."""
         resource = 'port'
