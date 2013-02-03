@@ -222,6 +222,7 @@ class QuantumCommand(command.OpenStackCommand):
     api = 'network'
     log = logging.getLogger(__name__ + '.QuantumCommand')
     values_specs = []
+    json_indent = None
 
     def get_client(self):
         return self.app.client_manager.quantum
@@ -245,11 +246,12 @@ class QuantumCommand(command.OpenStackCommand):
         if self.resource in data:
             for k, v in data[self.resource].iteritems():
                 if isinstance(v, list):
-                    value = '\n'.join(utils.dumps(i) if isinstance(i, dict)
-                                      else str(i) for i in v)
+                    value = '\n'.join(utils.dumps(
+                        i, indent=self.json_indent) if isinstance(i, dict)
+                        else str(i) for i in v)
                     data[self.resource][k] = value
                 elif isinstance(v, dict):
-                    value = utils.dumps(v)
+                    value = utils.dumps(v, indent=self.json_indent)
                     data[self.resource][k] = value
                 elif v is None:
                     data[self.resource][k] = ''
