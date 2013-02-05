@@ -33,7 +33,6 @@ from quantumclient.common import exceptions as exc
 from quantumclient.common import utils
 
 
-gettext.install('quantum', unicode=1)
 VERSION = '2.0'
 QUANTUM_API_VERSION = '2.0'
 
@@ -564,6 +563,7 @@ class QuantumShell(App):
 
 
 def main(argv=sys.argv[1:]):
+    gettext.install('quantumclient', unicode=1)
     try:
         return QuantumShell(QUANTUM_API_VERSION).run(argv)
     except exc.QuantumClientException:

@@ -15,6 +15,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from quantumclient.common import _
+
 """
 Quantum base exception handling.
 """

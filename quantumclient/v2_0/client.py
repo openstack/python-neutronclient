@@ -21,6 +21,7 @@ import time
 import urllib
 
 from quantumclient.client import HTTPClient
+from quantumclient.common import _
 from quantumclient.common import exceptions
 from quantumclient.common.serializer import Serializer
 

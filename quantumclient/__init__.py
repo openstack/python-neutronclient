@@ -15,9 +15,3 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #    @author: Tyler Smith, Cisco Systems
-
-import gettext
-
-
-# gettext must be initialized before any quantumclient imports
-gettext.install('quantumclient', unicode=1)
