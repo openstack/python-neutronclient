@@ -177,6 +177,10 @@ class Client(object):
     network_gateways_path = "/network-gateways"
     network_gateway_path = "/network-gateways/%s"
 
+    DHCP_NETS = '/dhcp-networks'
+    DHCP_AGENTS = '/dhcp-agents'
+    L3_ROUTERS = '/l3-routers'
+    L3_AGENTS = '/l3-agents'
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
                      'floatingips': 'floatingip',
@@ -787,6 +791,70 @@ class Client(object):
         """
         base_uri = self.network_gateway_path % gateway_id
         return self.put("%s/disconnect_network" % base_uri, body=body)
+
+    @APIParamsCall
+    def list_dhcp_agent_hosting_networks(self, network, **_params):
+        """
+        Fetches a list of dhcp agents hosting a network.
+        """
+        return self.get((self.network_path + self.DHCP_AGENTS) % network,
+                        params=_params)
+
+    @APIParamsCall
+    def list_networks_on_dhcp_agent(self, dhcp_agent, **_params):
+        """
+        Fetches a list of dhcp agents hosting a network.
+        """
+        return self.get((self.agent_path + self.DHCP_NETS) % dhcp_agent,
+                        params=_params)
+
+    @APIParamsCall
+    def add_network_to_dhcp_agent(self, dhcp_agent, body=None):
+        """
+        Adds a network to dhcp agent.
+        """
+        return self.post((self.agent_path + self.DHCP_NETS) % dhcp_agent,
+                         body=body)
+
+    @APIParamsCall
+    def remove_network_from_dhcp_agent(self, dhcp_agent, network_id):
+        """
+        Remove a network from dhcp agent.
+        """
+        return self.delete((self.agent_path + self.DHCP_NETS + "/%s") % (
+            dhcp_agent, network_id))
+
+    @APIParamsCall
+    def list_l3_agent_hosting_routers(self, router, **_params):
+        """
+        Fetches a list of L3 agents hosting a router.
+        """
+        return self.get((self.router_path + self.L3_AGENTS) % router,
+                        params=_params)
+
+    @APIParamsCall
+    def list_routers_on_l3_agent(self, l3_agent, **_params):
+        """
+        Fetches a list of L3 agents hosting a router.
+        """
+        return self.get((self.agent_path + self.L3_ROUTERS) % l3_agent,
+                        params=_params)
+
+    @APIParamsCall
+    def add_router_to_l3_agent(self, l3_agent, body):
+        """
+        Adds a router to L3 agent.
+        """
+        return self.post((self.agent_path + self.L3_ROUTERS) % l3_agent,
+                         body=body)
+
+    @APIParamsCall
+    def remove_router_from_l3_agent(self, l3_agent, router_id):
+        """
+        Remove a router from l3 agent.
+        """
+        return self.delete((self.agent_path + self.L3_ROUTERS + "/%s") % (
+            l3_agent, router_id))
 
     def __init__(self, **kwargs):
         """ Initialize a new client for the Quantum v2.0 API. """

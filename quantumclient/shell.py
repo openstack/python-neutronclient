@@ -234,7 +234,26 @@ COMMAND_V2 = {
         'quantumclient.quantum.v2_0.nvpnetworkgateway.ConnectNetworkGateway'),
     'net-gateway-disconnect': utils.import_class(
         'quantumclient.quantum.v2_0.nvpnetworkgateway.'
-        'DisconnectNetworkGateway')
+        'DisconnectNetworkGateway'),
+    'dhcp-agent-network-add': utils.import_class(
+        'quantumclient.quantum.v2_0.agentscheduler.AddNetworkToDhcpAgent'),
+    'dhcp-agent-network-remove': utils.import_class(
+        'quantumclient.quantum.v2_0.agentscheduler.'
+        'RemoveNetworkFromDhcpAgent'),
+    'net-list-on-dhcp-agent': utils.import_class(
+        'quantumclient.quantum.v2_0.agentscheduler.'
+        'ListNetworksOnDhcpAgent'),
+    'dhcp-agent-list-hosting-net': utils.import_class(
+        'quantumclient.quantum.v2_0.agentscheduler.'
+        'ListDhcpAgentsHostingNetwork'),
+    'l3-agent-router-add': utils.import_class(
+        'quantumclient.quantum.v2_0.agentscheduler.AddRouterToL3Agent'),
+    'l3-agent-router-remove': utils.import_class(
+        'quantumclient.quantum.v2_0.agentscheduler.RemoveRouterFromL3Agent'),
+    'router-list-on-l3-agent': utils.import_class(
+        'quantumclient.quantum.v2_0.agentscheduler.ListRoutersOnL3Agent'),
+    'l3-agent-list-hosting-router': utils.import_class(
+        'quantumclient.quantum.v2_0.agentscheduler.ListL3AgentsHostingRouter'),
 }
 
 COMMANDS = {'2.0': COMMAND_V2}

@@ -408,22 +408,33 @@ class ListCommand(QuantumCommand, lister.Lister):
     api = 'network'
     resource = None
     log = None
-    _formatters = None
+    _formatters = {}
     list_columns = []
+    unknown_parts_flag = True
 
     def get_parser(self, prog_name):
         parser = super(ListCommand, self).get_parser(prog_name)
         add_show_list_common_argument(parser)
+        if self.unknown_parts_flag:
+            add_extra_argument(parser, 'filter_specs', 'filters options')
         return parser
 
     def args2search_opts(self, parsed_args):
         search_opts = {}
+        if self.unknown_parts_flag:
+            search_opts = parse_args_to_dict(parsed_args.filter_specs)
         fields = parsed_args.fields
         if parsed_args.fields:
             search_opts.update({'fields': fields})
         if parsed_args.show_details:
             search_opts.update({'verbose': 'True'})
         return search_opts
+
+    def call_server(self, quantum_client, search_opts, parsed_args):
+        obj_lister = getattr(quantum_client,
+                             "list_%ss" % self.resource)
+        data = obj_lister(**search_opts)
+        return data
 
     def retrieve_list(self, parsed_args):
         """Retrieve a list of resources from Quantum server"""
@@ -434,9 +445,7 @@ class ListCommand(QuantumCommand, lister.Lister):
                     self.values_specs)
         search_opts = self.args2search_opts(parsed_args)
         search_opts.update(_extra_values)
-        obj_lister = getattr(quantum_client,
-                             "list_%ss" % self.resource)
-        data = obj_lister(**search_opts)
+        data = self.call_server(quantum_client, search_opts, parsed_args)
         collection = self.resource + "s"
         return data.get(collection, [])
 
