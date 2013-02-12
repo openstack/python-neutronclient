@@ -1,0 +1,7 @@
+[run]
+branch = True
+source = quantumclient
+omit = quantumclient/openstack/*
+
+[report]
+ignore-errors = True
