@@ -232,7 +232,8 @@ class QuantumShell(App):
             description=__doc__.strip(),
             version=VERSION,
             command_manager=CommandManager('quantum.cli'), )
-        for k, v in COMMANDS[apiversion].items():
+        self.commands = COMMANDS
+        for k, v in self.commands[apiversion].items():
             self.command_manager.add_command(k, v)
 
         # This is instantiated in initialize_app() only when using
@@ -383,7 +384,7 @@ class QuantumShell(App):
                 if arg == 'bash-completion':
                     self._bash_completion()
                     return 0
-                if arg in COMMANDS[self.api_version]:
+                if arg in self.commands[self.api_version]:
                     if command_pos == -1:
                         command_pos = index
                 elif arg in ('-h', '--help'):
