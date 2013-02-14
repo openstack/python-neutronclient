@@ -94,7 +94,7 @@ class Unauthorized(QuantumClientException):
     """
     HTTP 401 - Unauthorized: bad credentials.
     """
-    pass
+    message = _("Unauthorized: bad credentials.")
 
 
 class Forbidden(QuantumClientException):
@@ -102,12 +102,13 @@ class Forbidden(QuantumClientException):
     HTTP 403 - Forbidden: your credentials don't give you access to this
     resource.
     """
-    pass
+    message = _("Forbidden: your credentials don't give you access to this "
+                "resource.")
 
 
 class EndpointNotFound(QuantumClientException):
     """Could not find Service or Region in Service Catalog."""
-    pass
+    message = _("Could not find Service or Region in Service Catalog.")
 
 
 class AmbiguousEndpoints(QuantumClientException):
