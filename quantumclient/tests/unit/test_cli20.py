@@ -141,7 +141,7 @@ class CLITestV20Base(testtools.TestCase):
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
         non_admin_status_resources = ['subnet', 'floatingip', 'security_group',
-                                      'security_group_rule']
+                                      'security_group_rule', 'qos_queue']
         if (resource in non_admin_status_resources):
             body = {resource: {}, }
         else:

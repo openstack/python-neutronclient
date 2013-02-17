@@ -170,6 +170,8 @@ class Client(object):
     associate_pool_health_monitors_path = "/lb/pools/%s/health_monitors"
     disassociate_pool_health_monitors_path = (
         "/lb/pools/%(pool)s/health_monitors/%(health_monitor)s")
+    qos_queues_path = "/qos-queues"
+    qos_queue_path = "/qos-queues/%s"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -672,6 +674,35 @@ class Client(object):
         path = (self.disassociate_pool_health_monitors_path %
                 {'pool': pool, 'health_monitor': health_monitor})
         return self.delete(path)
+
+    @APIParamsCall
+    def create_qos_queue(self, body=None):
+        """
+        Creates a new queue
+        """
+        return self.post(self.qos_queues_path, body=body)
+
+    @APIParamsCall
+    def list_qos_queues(self, **_params):
+        """
+        Fetches a list of all queues for a tenant
+        """
+        return self.get(self.qos_queues_path, params=_params)
+
+    @APIParamsCall
+    def show_qos_queue(self, queue, **_params):
+        """
+        Fetches information of a certain queue
+        """
+        return self.get(self.qos_queue_path % (queue),
+                        params=_params)
+
+    @APIParamsCall
+    def delete_qos_queue(self, queue):
+        """
+        Deletes the specified queue
+        """
+        return self.delete(self.qos_queue_path % (queue))
 
     def __init__(self, **kwargs):
         """ Initialize a new client for the Quantum v2.0 API. """

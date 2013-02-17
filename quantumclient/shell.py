@@ -191,6 +191,14 @@ COMMAND_V2 = {
     'lb-healthmonitor-disassociate': utils.import_class(
         'quantumclient.quantum.v2_0.lb.healthmonitor'
         '.DisassociateHealthMonitor'),
+    'queue-create': utils.import_class(
+        'quantumclient.quantum.v2_0.nvp_qos_queue.CreateQoSQueue'),
+    'queue-delete': utils.import_class(
+        'quantumclient.quantum.v2_0.nvp_qos_queue.DeleteQoSQueue'),
+    'queue-show': utils.import_class(
+        'quantumclient.quantum.v2_0.nvp_qos_queue.ShowQoSQueue'),
+    'queue-list': utils.import_class(
+        'quantumclient.quantum.v2_0.nvp_qos_queue.ListQoSQueue'),
 }
 
 COMMANDS = {'2.0': COMMAND_V2}
