@@ -20,7 +20,7 @@
 import sys
 
 from quantumclient.quantum.v2_0.lb import member
-from quantumclient.tests.unit import test_cli20
+from tests.unit import test_cli20
 
 
 class CLITestV20LbMember(test_cli20.CLITestV20Base):

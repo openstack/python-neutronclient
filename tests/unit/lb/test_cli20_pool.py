@@ -22,7 +22,7 @@ import sys
 from mox import ContainsKeyValue
 
 from quantumclient.quantum.v2_0.lb import pool
-from quantumclient.tests.unit import test_cli20
+from tests.unit import test_cli20
 
 
 class CLITestV20LbPool(test_cli20.CLITestV20Base):

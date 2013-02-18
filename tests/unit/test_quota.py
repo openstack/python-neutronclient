@@ -19,7 +19,7 @@ import sys
 
 from quantumclient.common import exceptions
 from quantumclient.quantum.v2_0 import quota as test_quota
-from quantumclient.tests.unit import test_cli20
+from tests.unit import test_cli20
 
 
 class CLITestV20Quota(test_cli20.CLITestV20Base):

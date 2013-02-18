@@ -27,8 +27,8 @@ from quantumclient.quantum.v2_0.router import RemoveInterfaceRouter
 from quantumclient.quantum.v2_0.router import SetGatewayRouter
 from quantumclient.quantum.v2_0.router import ShowRouter
 from quantumclient.quantum.v2_0.router import UpdateRouter
-from quantumclient.tests.unit.test_cli20 import CLITestV20Base
-from quantumclient.tests.unit.test_cli20 import MyApp
+from tests.unit.test_cli20 import CLITestV20Base
+from tests.unit.test_cli20 import MyApp
 
 
 class CLITestV20Router(CLITestV20Base):

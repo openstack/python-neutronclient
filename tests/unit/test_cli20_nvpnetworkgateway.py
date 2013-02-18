@@ -19,8 +19,8 @@ import sys
 
 from quantumclient.common import exceptions
 from quantumclient.quantum.v2_0 import nvpnetworkgateway
-from quantumclient.tests.unit.test_cli20 import CLITestV20Base
-from quantumclient.tests.unit.test_cli20 import MyApp
+from tests.unit.test_cli20 import CLITestV20Base
+from tests.unit.test_cli20 import MyApp
 
 
 class CLITestV20NetworkGateway(CLITestV20Base):

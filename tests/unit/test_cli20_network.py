@@ -29,9 +29,9 @@ from quantumclient.quantum.v2_0.network import ListNetwork
 from quantumclient.quantum.v2_0.network import ShowNetwork
 from quantumclient.quantum.v2_0.network import UpdateNetwork
 from quantumclient import shell
-from quantumclient.tests.unit import test_cli20
-from quantumclient.tests.unit.test_cli20 import CLITestV20Base
-from quantumclient.tests.unit.test_cli20 import MyApp
+from tests.unit import test_cli20
+from tests.unit.test_cli20 import CLITestV20Base
+from tests.unit.test_cli20 import MyApp
 
 
 class CLITestV20Network(CLITestV20Base):
