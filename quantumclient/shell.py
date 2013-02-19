@@ -199,6 +199,14 @@ COMMAND_V2 = {
         'quantumclient.quantum.v2_0.nvp_qos_queue.ShowQoSQueue'),
     'queue-list': utils.import_class(
         'quantumclient.quantum.v2_0.nvp_qos_queue.ListQoSQueue'),
+    'agent-list': utils.import_class(
+        'quantumclient.quantum.v2_0.agent.ListAgent'),
+    'agent-show': utils.import_class(
+        'quantumclient.quantum.v2_0.agent.ShowAgent'),
+    'agent-delete': utils.import_class(
+        'quantumclient.quantum.v2_0.agent.DeleteAgent'),
+    'agent-update': utils.import_class(
+        'quantumclient.quantum.v2_0.agent.UpdateAgent'),
 }
 
 COMMANDS = {'2.0': COMMAND_V2}
