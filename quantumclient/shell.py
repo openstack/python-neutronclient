@@ -37,6 +37,19 @@ VERSION = '2.0'
 QUANTUM_API_VERSION = '2.0'
 
 
+def run_command(cmd, cmd_parser, sub_argv):
+    _argv = sub_argv
+    index = -1
+    values_specs = []
+    if '--' in sub_argv:
+        index = sub_argv.index('--')
+        _argv = sub_argv[:index]
+        values_specs = sub_argv[index:]
+    known_args, _values_specs = cmd_parser.parse_known_args(_argv)
+    cmd.values_specs = (index == -1 and _values_specs or values_specs)
+    return cmd.run(known_args)
+
+
 def env(*_vars, **kwargs):
     """Search for the first defined of possibly many env vars
 
@@ -447,9 +460,7 @@ class QuantumShell(App):
                          else ' '.join([self.NAME, cmd_name])
                          )
             cmd_parser = cmd.get_parser(full_name)
-            known_args, values_specs = cmd_parser.parse_known_args(sub_argv)
-            cmd.values_specs = values_specs
-            result = cmd.run(known_args)
+            return run_command(cmd, cmd_parser, sub_argv)
         except Exception as err:
             if self.options.debug:
                 self.log.exception(err)

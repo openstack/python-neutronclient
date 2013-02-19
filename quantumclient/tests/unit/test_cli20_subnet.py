@@ -312,6 +312,12 @@ class CLITestV20Subnet(CLITestV20Base):
         cmd = ListSubnet(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, tags=['a', 'b'])
 
+    def test_list_subnets_known_option_after_unknown(self):
+        """List subnets: -- --tags a b --request-format xml."""
+        resources = "subnets"
+        cmd = ListSubnet(MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd, tags=['a', 'b'])
+
     def test_list_subnets_detail_tags(self):
         """List subnets: -D -- --tags a b."""
         resources = "subnets"
@@ -333,6 +339,28 @@ class CLITestV20Subnet(CLITestV20Base):
                                    ['myid', '--name', 'myname',
                                     '--tags', 'a', 'b'],
                                    {'name': 'myname', 'tags': ['a', 'b'], }
+                                   )
+
+    def test_update_subnet_known_option_before_id(self):
+        """Update subnet: --request-format json myid --name myname."""
+        # --request-format xml is known option
+        resource = 'subnet'
+        cmd = UpdateSubnet(MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['--request-format', 'json',
+                                    'myid', '--name', 'myname'],
+                                   {'name': 'myname', }
+                                   )
+
+    def test_update_subnet_known_option_after_id(self):
+        """Update subnet: myid --name myname --request-format json."""
+        # --request-format xml is known option
+        resource = 'subnet'
+        cmd = UpdateSubnet(MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--name', 'myname',
+                                    '--request-format', 'json'],
+                                   {'name': 'myname', }
                                    )
 
     def test_show_subnet(self):

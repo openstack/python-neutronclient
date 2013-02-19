@@ -19,6 +19,7 @@ import sys
 
 from mox import ContainsKeyValue
 
+from quantumclient import shell
 from quantumclient.quantum.v2_0.port import CreatePort
 from quantumclient.quantum.v2_0.port import DeletePort
 from quantumclient.quantum.v2_0.port import ListPort
@@ -213,10 +214,7 @@ class CLITestV20Port(CLITestV20Base):
                                     (test_cli20.MyResp(200), resstr))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("list_" + resources)
-
-        parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
-
+        shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()

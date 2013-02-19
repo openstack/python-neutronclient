@@ -28,6 +28,7 @@ from quantumclient.quantum.v2_0.network import ListExternalNetwork
 from quantumclient.quantum.v2_0.network import ListNetwork
 from quantumclient.quantum.v2_0.network import ShowNetwork
 from quantumclient.quantum.v2_0.network import UpdateNetwork
+from quantumclient import shell
 from quantumclient.tests.unit import test_cli20
 from quantumclient.tests.unit.test_cli20 import CLITestV20Base
 from quantumclient.tests.unit.test_cli20 import MyApp
@@ -120,9 +121,7 @@ class CLITestV20Network(CLITestV20Base):
                     (test_cli20.MyResp(200), resstr))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("list_" + resources)
-
-        parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
+        shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
@@ -276,10 +275,7 @@ class CLITestV20Network(CLITestV20Base):
                     (test_cli20.MyResp(200), resstr))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("list_" + resources)
-
-        parsed_args = cmd_parser.parse_args(args)
-
-        cmd.run(parsed_args)
+        shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
@@ -343,10 +339,7 @@ class CLITestV20Network(CLITestV20Base):
                                     (test_cli20.MyResp(200), resstr))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("list_" + resources)
-
-        parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
-
+        shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
