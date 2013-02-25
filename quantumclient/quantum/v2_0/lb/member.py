@@ -27,7 +27,9 @@ class ListMember(quantumv20.ListCommand):
 
     resource = 'member'
     log = logging.getLogger(__name__ + '.ListMember')
-    list_columns = ['id', 'address', 'port', 'admin_state_up', 'status']
+    list_columns = [
+        'id', 'address', 'protocol_port', 'admin_state_up', 'status'
+    ]
     _formatters = {}
 
 
@@ -57,7 +59,7 @@ class CreateMember(quantumv20.CreateCommand):
             default=True, action='store_false',
             help='set admin state up to false')
         parser.add_argument(
-            '--port',
+            '--protocol-port',
             required=True,
             help='port on which the pool member listens for requests or '
                  'connections. ')
@@ -74,8 +76,11 @@ class CreateMember(quantumv20.CreateCommand):
                 'admin_state_up': parsed_args.admin_state_down,
             },
         }
-        quantumv20.update_dict(parsed_args, body[self.resource],
-                               ['address', 'port', 'weight', 'tenant_id'])
+        quantumv20.update_dict(
+            parsed_args,
+            body[self.resource],
+            ['address', 'protocol_port', 'weight', 'tenant_id']
+        )
         return body
 
 

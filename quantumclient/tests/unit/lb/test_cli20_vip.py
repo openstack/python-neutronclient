@@ -31,19 +31,19 @@ class CLITestV20LbVip(test_cli20.CLITestV20Base):
         pool_id = 'my-pool-id'
         name = 'my-name'
         subnet_id = 'subnet-id'
-        port = '1000'
+        protocol_port = '1000'
         protocol = 'tcp'
         tenant_id = 'my-tenant'
         my_id = 'my-id'
         args = ['--name', name,
-                '--port', port,
+                '--protocol-port', protocol_port,
                 '--protocol', protocol,
                 '--subnet-id', subnet_id,
                 '--tenant-id', tenant_id,
                 pool_id]
-        position_names = ['pool_id', 'name', 'port', 'protocol',
+        position_names = ['pool_id', 'name', 'protocol_port', 'protocol',
                           'subnet_id', 'tenant_id']
-        position_values = [pool_id, name, port, protocol,
+        position_values = [pool_id, name, protocol_port, protocol,
                            subnet_id, tenant_id]
         self._test_create_resource(resource, cmd, name, my_id, args,
                                    position_names, position_values,
@@ -60,7 +60,7 @@ class CLITestV20LbVip(test_cli20.CLITestV20Base):
         admin_state = False
         connection_limit = '1000'
         subnet_id = 'subnet-id'
-        port = '80'
+        protocol_port = '80'
         protocol = 'tcp'
         tenant_id = 'my-tenant'
         my_id = 'my-id'
@@ -69,17 +69,17 @@ class CLITestV20LbVip(test_cli20.CLITestV20Base):
                 '--address', address,
                 '--admin-state-down',
                 '--connection-limit', connection_limit,
-                '--port', port,
+                '--protocol-port', protocol_port,
                 '--protocol', protocol,
                 '--subnet-id', subnet_id,
                 '--tenant-id', tenant_id,
                 pool_id]
         position_names = ['pool_id', 'name', 'description', 'address',
-                          'admin_state_up', 'connection_limit', 'port',
-                          'protocol', 'subnet_id',
+                          'admin_state_up', 'connection_limit',
+                          'protocol_port', 'protocol', 'subnet_id',
                           'tenant_id']
         position_values = [pool_id, name, description, address,
-                           admin_state, connection_limit, port,
+                           admin_state, connection_limit, protocol_port,
                            protocol, subnet_id,
                            tenant_id]
         self._test_create_resource(resource, cmd, name, my_id, args,
@@ -92,12 +92,12 @@ class CLITestV20LbVip(test_cli20.CLITestV20Base):
         pool_id = 'my-pool-id'
         name = 'my-name'
         subnet_id = 'subnet-id'
-        port = '1000'
+        protocol_port = '1000'
         protocol = 'tcp'
         tenant_id = 'my-tenant'
         my_id = 'my-id'
         args = ['--name', name,
-                '--port', port,
+                '--protocol-port', protocol_port,
                 '--protocol', protocol,
                 '--subnet-id', subnet_id,
                 '--tenant-id', tenant_id,
@@ -105,9 +105,9 @@ class CLITestV20LbVip(test_cli20.CLITestV20Base):
                 '--session-persistence', 'type=dict',
                 'type=cookie,cookie_name=pie',
                 '--optional-param', 'any']
-        position_names = ['pool_id', 'name', 'port', 'protocol',
+        position_names = ['pool_id', 'name', 'protocol_port', 'protocol',
                           'subnet_id', 'tenant_id', 'optional_param']
-        position_values = [pool_id, name, port, protocol,
+        position_values = [pool_id, name, protocol_port, protocol,
                            subnet_id, tenant_id, 'any']
         extra_body = {
             'session_persistence': {

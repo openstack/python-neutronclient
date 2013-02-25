@@ -27,7 +27,7 @@ class ListVip(quantumv20.ListCommand):
 
     resource = 'vip'
     log = logging.getLogger(__name__ + '.ListVip')
-    list_columns = ['id', 'name', 'algorithm', 'protocol',
+    list_columns = ['id', 'name', 'algorithm', 'address', 'protocol',
                     'admin_state_up', 'status']
     _formatters = {}
 
@@ -68,7 +68,7 @@ class CreateVip(quantumv20.CreateCommand):
             required=True,
             help='name of the vip')
         parser.add_argument(
-            '--port',
+            '--protocol-port',
             required=True,
             help='TCP port on which to listen for client traffic that is '
                  'associated with the vip address')
@@ -92,8 +92,8 @@ class CreateVip(quantumv20.CreateCommand):
         }
         quantumv20.update_dict(parsed_args, body[self.resource],
                                ['address', 'connection_limit', 'description',
-                                'name', 'port', 'protocol', 'subnet_id',
-                                'tenant_id'])
+                                'name', 'protocol_port', 'protocol',
+                                'subnet_id', 'tenant_id'])
         return body
 
 

@@ -33,12 +33,11 @@ class CLITestV20LbMember(test_cli20.CLITestV20Base):
         tenant_id = 'my-tenant'
         my_id = 'my-id'
         pool_id = 'pool-id'
-        args = ['--address', address, '--port', port,
+        args = ['--address', address, '--protocol-port', port,
                 '--tenant-id', tenant_id, pool_id]
-        position_names = ['address', 'port', 'tenant_id', 'pool_id',
+        position_names = ['address', 'protocol_port', 'tenant_id', 'pool_id',
                           'admin_state_up']
-        position_values = [address, port, tenant_id, pool_id,
-                           True]
+        position_values = [address, port, tenant_id, pool_id, True]
         self._test_create_resource(resource, cmd, None, my_id, args,
                                    position_names, position_values,
                                    admin_state_up=None)
@@ -55,10 +54,12 @@ class CLITestV20LbMember(test_cli20.CLITestV20Base):
         my_id = 'my-id'
         pool_id = 'pool-id'
         args = ['--address', address, '--admin-state-down',
-                '--port', port, '--weight', weight,
+                '--protocol-port', port, '--weight', weight,
                 '--tenant-id', tenant_id, pool_id]
-        position_names = ['address', 'admin_state_up', 'port', 'weight',
-                          'tenant_id', 'pool_id']
+        position_names = [
+            'address', 'admin_state_up', 'protocol_port', 'weight',
+            'tenant_id', 'pool_id'
+        ]
         position_values = [address, admin_state_up, port, weight,
                            tenant_id, pool_id]
         self._test_create_resource(resource, cmd, None, my_id, args,
