@@ -27,7 +27,6 @@ class ListNetworkGateway(quantumv20.ListCommand):
     """List network gateways for a given tenant."""
 
     resource = RESOURCE
-    _formatters = {}
     log = logging.getLogger(__name__ + '.ListNetworkGateway')
     list_columns = ['id', 'name']
 

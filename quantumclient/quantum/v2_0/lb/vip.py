@@ -29,7 +29,6 @@ class ListVip(quantumv20.ListCommand):
     log = logging.getLogger(__name__ + '.ListVip')
     list_columns = ['id', 'name', 'algorithm', 'address', 'protocol',
                     'admin_state_up', 'status']
-    _formatters = {}
     pagination_support = True
     sorting_support = True
 

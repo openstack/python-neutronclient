@@ -145,6 +145,7 @@ class CLITestV20Base(testtools.TestCase):
 
     format = 'json'
     test_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+    id_field = 'id'
 
     def _find_resourceid(self, client, resource, name_or_id):
         return name_or_id
@@ -206,7 +207,7 @@ class CLITestV20Base(testtools.TestCase):
         for i in xrange(len(position_names)):
             body[resource].update({position_names[i]: position_values[i]})
         ress = {resource:
-                {'id': myid}, }
+                {self.id_field: myid}, }
         if name:
             ress[resource].update({'name': name})
         self.client.format = self.format
@@ -253,12 +254,16 @@ class CLITestV20Base(testtools.TestCase):
 
     def _test_list_resources(self, resources, cmd, detail=False, tags=[],
                              fields_1=[], fields_2=[], page_size=None,
-                             sort_key=[], sort_dir=[]):
+                             sort_key=[], sort_dir=[], response_contents=None):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
-        reses = {resources: [{'id': 'myid1', },
-                             {'id': 'myid2', }, ], }
+        if response_contents is None:
+            contents = [{self.id_field: 'myid1', },
+                        {self.id_field: 'myid2', }, ]
+        else:
+            contents = response_contents
+        reses = {resources: contents}
         self.client.format = self.format
         resstr = self.client.serialize(reses)
         # url method body
@@ -335,7 +340,9 @@ class CLITestV20Base(testtools.TestCase):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
-        self.assertTrue('myid1' in _str)
+        if response_contents is None:
+            self.assertTrue('myid1' in _str)
+        return _str
 
     def _test_list_resources_with_pagination(self, resources, cmd):
         self.mox.StubOutWithMock(cmd, "get_client")
@@ -399,8 +406,8 @@ class CLITestV20Base(testtools.TestCase):
         cmd.get_client().MultipleTimes().AndReturn(self.client)
         query = "&".join(["fields=%s" % field for field in fields])
         expected_res = {resource:
-                        {'id': myid,
-                        'name': 'myname', }, }
+                        {self.id_field: myid,
+                         'name': 'myname', }, }
         self.client.format = self.format
         resstr = self.client.serialize(expected_res)
         path = getattr(self.client, resource + "_path")
