@@ -129,19 +129,19 @@ class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):
         protocol = 'tcp'
         port_range_min = '22'
         port_range_max = '22'
-        source_ip_prefix = '10.0.0.0/24'
+        remote_ip_prefix = '10.0.0.0/24'
         security_group_id = '1'
-        source_group_id = '1'
-        args = ['--source_ip_prefix', source_ip_prefix, '--direction',
+        remote_group_id = '1'
+        args = ['--remote_ip_prefix', remote_ip_prefix, '--direction',
                 direction, '--ethertype', ethertype, '--protocol', protocol,
                 '--port_range_min', port_range_min, '--port_range_max',
-                port_range_max, '--source_group_id', source_group_id,
+                port_range_max, '--remote_group_id', remote_group_id,
                 security_group_id]
-        position_names = ['source_ip_prefix', 'direction', 'ethertype',
+        position_names = ['remote_ip_prefix', 'direction', 'ethertype',
                           'protocol', 'port_range_min', 'port_range_max',
-                          'source_group_id', 'security_group_id']
-        position_values = [source_ip_prefix, direction, ethertype, protocol,
-                           port_range_min, port_range_max, source_group_id,
+                          'remote_group_id', 'security_group_id']
+        position_values = [remote_ip_prefix, direction, ethertype, protocol,
+                           port_range_min, port_range_max, remote_group_id,
                            security_group_id]
         self._test_create_resource(resource, cmd, None, myid, args,
                                    position_names, position_values)
@@ -220,11 +220,11 @@ class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):
                     'X-Auth-Token', test_cli20.TOKEN)).AndReturn(resp)
 
         # Setup the default data
-        _data = {'cols': ['id', 'security_group_id', 'source_group_id'],
+        _data = {'cols': ['id', 'security_group_id', 'remote_group_id'],
                  'data': [('ruleid1', 'myid1', 'myid1'),
                           ('ruleid2', 'myid2', 'myid3'),
                           ('ruleid3', 'myid2', 'myid2')]}
-        _expected = {'cols': ['id', 'security_group', 'source_group'],
+        _expected = {'cols': ['id', 'security_group', 'remote_group'],
                      'data': [('ruleid1', 'group1', 'group1'),
                               ('ruleid2', 'group2', 'group3'),
                               ('ruleid3', 'group2', 'group2')]}
@@ -280,7 +280,7 @@ class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):
         self._test_list_security_group_rules_extend()
 
     def test_list_security_group_rules_extend_no_nameconv(self):
-        expected = {'cols': ['id', 'security_group_id', 'source_group_id'],
+        expected = {'cols': ['id', 'security_group_id', 'remote_group_id'],
                     'data': [('ruleid1', 'myid1', 'myid1'),
                              ('ruleid2', 'myid2', 'myid3'),
                              ('ruleid3', 'myid2', 'myid2')]}
@@ -289,19 +289,19 @@ class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):
                                                     args=args, conv=False)
 
     def test_list_security_group_rules_extend_with_columns(self):
-        args = '-c id -c security_group_id -c source_group_id'.split()
+        args = '-c id -c security_group_id -c remote_group_id'.split()
         self._test_list_security_group_rules_extend(args=args)
 
     def test_list_security_group_rules_extend_with_columns_no_id(self):
-        args = '-c id -c security_group -c source_group'.split()
+        args = '-c id -c security_group -c remote_group'.split()
         self._test_list_security_group_rules_extend(args=args)
 
     def test_list_security_group_rules_extend_with_fields(self):
-        args = '-F id -F security_group_id -F source_group_id'.split()
+        args = '-F id -F security_group_id -F remote_group_id'.split()
         self._test_list_security_group_rules_extend(args=args,
                                                     query_field=True)
 
     def test_list_security_group_rules_extend_with_fields_no_id(self):
-        args = '-F id -F security_group -F source_group'.split()
+        args = '-F id -F security_group -F remote_group'.split()
         self._test_list_security_group_rules_extend(args=args,
                                                     query_field=True)
