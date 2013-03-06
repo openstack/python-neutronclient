@@ -157,19 +157,25 @@ class UpdateQuota(QuantumCommand, show.ShowOne):
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--network', metavar='networks',
-            help='the limit of network quota')
+            help='the limit of networks')
         parser.add_argument(
             '--subnet', metavar='subnets',
-            help='the limit of subnet quota')
+            help='the limit of subnets')
         parser.add_argument(
             '--port', metavar='ports',
-            help='the limit of port quota')
+            help='the limit of ports')
         parser.add_argument(
             '--router', metavar='routers',
-            help='the limit of router quota')
+            help='the limit of routers')
         parser.add_argument(
             '--floatingip', metavar='floatingips',
-            help='the limit of floating IP quota')
+            help='the limit of floating IPs')
+        parser.add_argument(
+            '--security-group', metavar='security_groups',
+            help='the limit of security groups')
+        parser.add_argument(
+            '--security-group-rule', metavar='security_group_rules',
+            help='the limit of security groups rules')
         quantumv20.add_extra_argument(
             parser, 'value_specs',
             'new values for the %s' % self.resource)
@@ -189,7 +195,8 @@ class UpdateQuota(QuantumCommand, show.ShowOne):
         quantum_client = self.get_client()
         quantum_client.format = parsed_args.request_format
         quota = {}
-        for resource in ('network', 'subnet', 'port', 'router', 'floatingip'):
+        for resource in ('network', 'subnet', 'port', 'router', 'floatingip',
+                         'security_group', 'security_group_rule'):
             if getattr(parsed_args, resource):
                 quota[resource] = self._validate_int(
                     resource,
