@@ -443,7 +443,7 @@ class CLITestV20Base(testtools.TestCase):
         self.assertTrue(myid in _str)
 
     def _test_update_resource_action(self, resource, cmd, myid, action, args,
-                                     body):
+                                     body, retval=None):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
@@ -453,7 +453,7 @@ class CLITestV20Base(testtools.TestCase):
             end_url(path % path_action, format=self.format), 'PUT',
             body=MyComparator(body, self.client),
             headers=mox.ContainsKeyValue(
-                'X-Auth-Token', TOKEN)).AndReturn((MyResp(204), None))
+                'X-Auth-Token', TOKEN)).AndReturn((MyResp(204), retval))
         args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("delete_" + resource)
