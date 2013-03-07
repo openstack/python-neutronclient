@@ -358,7 +358,7 @@ class UpdateCommand(QuantumCommand):
     def get_parser(self, prog_name):
         parser = super(UpdateCommand, self).get_parser(prog_name)
         parser.add_argument(
-            'id', metavar=self.resource,
+            'id', metavar=self.resource.upper(),
             help='ID or name of %s to update' % self.resource)
         self.add_known_arguments(parser)
         return parser
@@ -407,7 +407,7 @@ class DeleteCommand(QuantumCommand):
         else:
             help_str = 'ID of %s to delete'
         parser.add_argument(
-            'id', metavar=self.resource,
+            'id', metavar=self.resource.upper(),
             help=help_str % self.resource)
         return parser
 
@@ -550,7 +550,7 @@ class ShowCommand(QuantumCommand, show.ShowOne):
         else:
             help_str = 'ID of %s to look up'
         parser.add_argument(
-            'id', metavar=self.resource,
+            'id', metavar=self.resource.upper(),
             help=help_str % self.resource)
         return parser
 

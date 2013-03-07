@@ -102,11 +102,11 @@ class AssociateFloatingIP(QuantumCommand):
     def get_parser(self, prog_name):
         parser = super(AssociateFloatingIP, self).get_parser(prog_name)
         parser.add_argument(
-            'floatingip_id', metavar='floatingip-id',
-            help='IP address of the floating IP to associate')
+            'floatingip_id', metavar='FLOATINGIP_ID',
+            help='ID of the floating IP to associate')
         parser.add_argument(
-            'port_id',
-            help='ID of the port to be associated with the floatingip')
+            'port_id', metavar='PORT',
+            help='ID or name of the port to be associated with the floatingip')
         parser.add_argument(
             '--fixed-ip-address',
             help=('IP address on the port (only required if port has multiple'
@@ -142,8 +142,8 @@ class DisassociateFloatingIP(QuantumCommand):
     def get_parser(self, prog_name):
         parser = super(DisassociateFloatingIP, self).get_parser(prog_name)
         parser.add_argument(
-            'floatingip_id', metavar='floatingip-id',
-            help='IP address of the floating IP to associate')
+            'floatingip_id', metavar='FLOATINGIP_ID',
+            help='ID of the floating IP to associate')
         return parser
 
     def run(self, parsed_args):
