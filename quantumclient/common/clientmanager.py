@@ -54,7 +54,8 @@ class ClientManager(object):
                  username=None, password=None,
                  region_name=None,
                  api_version=None,
-                 auth_strategy=None
+                 auth_strategy=None,
+                 insecure=False
                  ):
         self._token = token
         self._url = url
@@ -67,6 +68,7 @@ class ClientManager(object):
         self._api_version = api_version
         self._service_catalog = None
         self._auth_strategy = auth_strategy
+        self._insecure = insecure
         return
 
     def initialize(self):
@@ -75,7 +77,8 @@ class ClientManager(object):
                                     tenant_name=self._tenant_name,
                                     password=self._password,
                                     region_name=self._region_name,
-                                    auth_url=self._auth_url)
+                                    auth_url=self._auth_url,
+                                    insecure=self._insecure)
             httpclient.authenticate()
             # Populate other password flow attributes
             self._token = httpclient.auth_token

@@ -412,6 +412,15 @@ class QuantumShell(App):
             '--os_url',
             help=argparse.SUPPRESS)
 
+        parser.add_argument(
+            '--insecure',
+            action='store_true',
+            default=env('QUANTUMCLIENT_INSECURE', default=False),
+            help="Explicitly allow quantumclient to perform \"insecure\" "
+                 "SSL (https) requests. The server's certificate will "
+                 "not be verified against any certificate authorities. "
+                 "This option should be used with caution.")
+
         return parser
 
     def _bash_completion(self):
@@ -572,7 +581,8 @@ class QuantumShell(App):
             password=self.options.os_password,
             region_name=self.options.os_region_name,
             api_version=self.api_version,
-            auth_strategy=self.options.os_auth_strategy, )
+            auth_strategy=self.options.os_auth_strategy,
+            insecure=self.options.insecure, )
         return
 
     def initialize_app(self, argv):
