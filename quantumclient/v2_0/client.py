@@ -911,6 +911,9 @@ class Client(object):
         else:
             self._handle_fault_response(status_code, replybody)
 
+    def get_auth_info(self):
+        return self.httpclient.get_auth_info()
+
     def get_status_code(self, response):
         """
         Returns the integer status code from the response, which

@@ -218,6 +218,12 @@ class HTTPClient(httplib2.Http):
 
         raise exceptions.EndpointNotFound()
 
+    def get_auth_info(self):
+        return {'auth_token': self.auth_token,
+                'auth_tenant_id': self.auth_tenant_id,
+                'auth_user_id': self.auth_user_id,
+                'endpoint_url': self.endpoint_url}
+
     def get_status_code(self, response):
         """
         Returns the integer status code from the response, which
