@@ -99,8 +99,9 @@ class HTTPClient(httplib2.Http):
                  token=None, region_name=None, timeout=None,
                  endpoint_url=None, insecure=False,
                  endpoint_type='publicURL',
-                 auth_strategy='keystone', **kwargs):
-        super(HTTPClient, self).__init__(timeout=timeout)
+                 auth_strategy='keystone', ca_cert=None, **kwargs):
+        super(HTTPClient, self).__init__(timeout=timeout, ca_certs=ca_cert)
+
         self.username = username
         self.tenant_name = tenant_name
         self.tenant_id = tenant_id
@@ -134,6 +135,8 @@ class HTTPClient(httplib2.Http):
         utils.http_log_req(_logger, args, kargs)
         try:
             resp, body = self.request(*args, **kargs)
+        except httplib2.SSLHandshakeError as e:
+            raise exceptions.SslCertificateValidationError(reason=e)
         except Exception as e:
             # Wrap the low-level connection error (socket timeout, redirect
             # limit, decompression error, etc) into our custom high-level
