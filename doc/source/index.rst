@@ -42,3 +42,14 @@ Release Notes
 2.0
 -----
 * support Quantum API 2.0
+
+2.2.0
+-----
+* add security group commands
+* add Lbaas commands
+* allow options put after positional arguments
+* add NVP queue and net gateway commands
+* add commands for agent management extensions
+* add commands for DHCP and L3 agents scheduling
+* support XML request format
+* support pagination options
