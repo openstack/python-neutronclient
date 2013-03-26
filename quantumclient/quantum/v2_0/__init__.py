@@ -119,14 +119,6 @@ def add_sorting_argument(parser):
         choices=['asc', 'desc'])
 
 
-def add_extra_argument(parser, name, _help):
-    parser.add_argument(
-        name,
-        nargs=argparse.REMAINDER,
-        help=_help + ': --key1 [type=int|bool|...] value '
-                     '[--key2 [type=int|bool|...] value ...]')
-
-
 def is_number(s):
     try:
         float(s)  # for int, long and float
@@ -446,8 +438,6 @@ class ListCommand(QuantumCommand, lister.Lister):
     def get_parser(self, prog_name):
         parser = super(ListCommand, self).get_parser(prog_name)
         add_show_list_common_argument(parser)
-        if self.unknown_parts_flag:
-            add_extra_argument(parser, 'filter_specs', 'filters options')
         if self.pagination_support:
             add_pagination_argument(parser)
         if self.sorting_support:
@@ -456,8 +446,6 @@ class ListCommand(QuantumCommand, lister.Lister):
 
     def args2search_opts(self, parsed_args):
         search_opts = {}
-        if self.unknown_parts_flag:
-            search_opts = parse_args_to_dict(parsed_args.filter_specs)
         fields = parsed_args.fields
         if parsed_args.fields:
             search_opts.update({'fields': fields})
