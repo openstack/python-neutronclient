@@ -54,6 +54,7 @@ class DeleteAgent(quantumV20.DeleteCommand):
 
     log = logging.getLogger(__name__ + '.DeleteAgent')
     resource = 'agent'
+    allow_names = False
 
 
 class UpdateAgent(quantumV20.UpdateCommand):
