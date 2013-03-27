@@ -191,7 +191,7 @@ class CreateSecurityGroupRule(quantumv20.CreateCommand):
             '--remote_ip_prefix',
             help=argparse.SUPPRESS)
         parser.add_argument(
-            '--remote-group-id', metavar='SOURCE_GROUP',
+            '--remote-group-id', metavar='REMOTE_GROUP',
             help='remote security group name or id to apply rule')
         parser.add_argument(
             '--remote_group_id',
