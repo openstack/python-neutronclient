@@ -97,7 +97,7 @@ class CreateSubnet(CreateCommand):
             help='gateway ip of this subnet')
         parser.add_argument(
             '--no-gateway',
-            default=False, action='store_true',
+            action='store_true',
             help='No distribution of gateway')
         parser.add_argument(
             '--allocation-pool', metavar='start=IP_ADDR,end=IP_ADDR',

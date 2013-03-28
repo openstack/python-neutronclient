@@ -94,16 +94,15 @@ class CreateNetwork(CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--admin-state-down',
-            default=True, action='store_false',
+            dest='admin_state', action='store_false',
             help='Set Admin State Up to false')
         parser.add_argument(
             '--admin_state_down',
-            action='store_false',
+            dest='admin_state', action='store_false',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--shared',
             action='store_true',
-            default=argparse.SUPPRESS,
             help='Set the network as shared')
         parser.add_argument(
             'name', metavar='NAME',
@@ -112,10 +111,10 @@ class CreateNetwork(CreateCommand):
     def args2body(self, parsed_args):
         body = {'network': {
             'name': parsed_args.name,
-            'admin_state_up': parsed_args.admin_state_down}, }
+            'admin_state_up': parsed_args.admin_state}, }
         if parsed_args.tenant_id:
             body['network'].update({'tenant_id': parsed_args.tenant_id})
-        if hasattr(parsed_args, 'shared'):
+        if parsed_args.shared:
             body['network'].update({'shared': parsed_args.shared})
         return body
 

@@ -50,7 +50,7 @@ class CreatePool(quantumv20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--admin-state-down',
-            default=True, action='store_false',
+            dest='admin_state', action='store_false',
             help='set admin state up to false')
         parser.add_argument(
             '--description',
@@ -76,7 +76,7 @@ class CreatePool(quantumv20.CreateCommand):
     def args2body(self, parsed_args):
         body = {
             self.resource: {
-                'admin_state_up': parsed_args.admin_state_down,
+                'admin_state_up': parsed_args.admin_state,
             },
         }
         quantumv20.update_dict(parsed_args, body[self.resource],

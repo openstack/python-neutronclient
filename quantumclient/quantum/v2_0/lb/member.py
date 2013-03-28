@@ -54,7 +54,7 @@ class CreateMember(quantumv20.CreateCommand):
             help='Pool id or name this vip belongs to')
         parser.add_argument(
             '--admin-state-down',
-            default=True, action='store_false',
+            dest='admin_state', action='store_false',
             help='set admin state up to false')
         parser.add_argument(
             '--weight',
@@ -75,7 +75,7 @@ class CreateMember(quantumv20.CreateCommand):
         body = {
             self.resource: {
                 'pool_id': _pool_id,
-                'admin_state_up': parsed_args.admin_state_down,
+                'admin_state_up': parsed_args.admin_state,
             },
         }
         quantumv20.update_dict(

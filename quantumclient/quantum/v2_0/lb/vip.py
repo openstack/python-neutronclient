@@ -56,7 +56,7 @@ class CreateVip(quantumv20.CreateCommand):
             help='IP address of the vip')
         parser.add_argument(
             '--admin-state-down',
-            default=True, action='store_false',
+            dest='admin_state', action='store_false',
             help='set admin state up to false')
         parser.add_argument(
             '--connection-limit',
@@ -89,7 +89,7 @@ class CreateVip(quantumv20.CreateCommand):
         body = {
             self.resource: {
                 'pool_id': _pool_id,
-                'admin_state_up': parsed_args.admin_state_down,
+                'admin_state_up': parsed_args.admin_state,
             },
         }
         quantumv20.update_dict(parsed_args, body[self.resource],

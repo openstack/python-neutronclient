@@ -49,7 +49,7 @@ class CreateHealthMonitor(quantumv20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--admin-state-down',
-            default=True, action='store_false',
+            dest='admin_state', action='store_false',
             help='set admin state up to false')
         parser.add_argument(
             '--expected-codes',
@@ -92,7 +92,7 @@ class CreateHealthMonitor(quantumv20.CreateCommand):
     def args2body(self, parsed_args):
         body = {
             self.resource: {
-                'admin_state_up': parsed_args.admin_state_down,
+                'admin_state_up': parsed_args.admin_state,
                 'delay': parsed_args.delay,
                 'max_retries': parsed_args.max_retries,
                 'timeout': parsed_args.timeout,

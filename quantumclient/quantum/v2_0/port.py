@@ -90,11 +90,11 @@ class CreatePort(CreateCommand):
             help='name of this port')
         parser.add_argument(
             '--admin-state-down',
-            default=True, action='store_false',
+            dest='admin_state', action='store_false',
             help='set admin state up to false')
         parser.add_argument(
             '--admin_state_down',
-            action='store_false',
+            dest='admin_state', action='store_false',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--mac-address',
@@ -130,7 +130,7 @@ class CreatePort(CreateCommand):
     def args2body(self, parsed_args):
         _network_id = quantumv20.find_resourceid_by_name_or_id(
             self.get_client(), 'network', parsed_args.network_id)
-        body = {'port': {'admin_state_up': parsed_args.admin_state_down,
+        body = {'port': {'admin_state_up': parsed_args.admin_state,
                          'network_id': _network_id, }, }
         if parsed_args.mac_address:
             body['port'].update({'mac_address': parsed_args.mac_address})
@@ -179,7 +179,7 @@ class UpdatePort(UpdateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--no-security-groups',
-            default=False, action='store_true',
+            action='store_true',
             help='remove security groups from port')
 
     def args2body(self, parsed_args):
