@@ -129,6 +129,18 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_port_secgroup_off(self):
+        resource = 'port'
+        cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        args = ['--no-security-group', netid]
+        position_names = ['network_id', 'security_groups']
+        position_values = [netid, None]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_list_ports(self):
         """List ports: -D."""
         resources = "ports"
@@ -274,6 +286,24 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                     '--tags', 'a', 'b'],
                                    {'name': 'myname', 'tags': ['a', 'b'], }
                                    )
+
+    def test_update_port_secgroup(self):
+        resource = 'port'
+        cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
+        myid = 'myid'
+        args = ['--security-group', 'sg1_id', myid]
+        updatefields = {'security_groups': ['sg1_id']}
+        self._test_update_resource(resource, cmd, myid, args, updatefields)
+
+    def test_update_port_secgroups(self):
+        resource = 'port'
+        cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
+        myid = 'myid'
+        args = ['--security-group', 'sg1_id',
+                '--security-group', 'sg2_id',
+                myid]
+        updatefields = {'security_groups': ['sg1_id', 'sg2_id']}
+        self._test_update_resource(resource, cmd, myid, args, updatefields)
 
     def test_update_port_security_group_off(self):
         """Update port: --no-security-groups myid."""
