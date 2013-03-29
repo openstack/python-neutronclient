@@ -101,7 +101,6 @@ class HTTPClient(httplib2.Http):
         self.auth_url = auth_url.rstrip('/') if auth_url else None
         self.region_name = region_name
         self.auth_token = token
-        self.token_retrieved = False
         self.content_type = 'application/json'
         self.endpoint_url = endpoint_url
         self.auth_strategy = auth_strategy
@@ -134,30 +133,27 @@ class HTTPClient(httplib2.Http):
         return resp, body
 
     def do_request(self, url, method, **kwargs):
-        if not self.endpoint_url:
+        if not self.auth_token:
             self.authenticate()
+        elif not self.endpoint_url:
+            self.endpoint_url = self._get_endpoint_url()
 
         # Perform the request once. If we get a 401 back then it
         # might be because the auth token expired, so try to
         # re-authenticate and try again. If it still fails, bail.
         try:
-            if self.auth_token:
-                kwargs.setdefault('headers', {})
-                kwargs['headers']['X-Auth-Token'] = self.auth_token
+            kwargs.setdefault('headers', {})
+            kwargs['headers']['X-Auth-Token'] = self.auth_token
             resp, body = self._cs_request(self.endpoint_url + url, method,
                                           **kwargs)
             return resp, body
-        except exceptions.Unauthorized as ex:
-            if not self.endpoint_url or self.token_retrieved:
-                self.authenticate()
-                if self.auth_token:
-                    kwargs.setdefault('headers', {})
-                    kwargs['headers']['X-Auth-Token'] = self.auth_token
-                resp, body = self._cs_request(
-                    self.endpoint_url + url, method, **kwargs)
-                return resp, body
-            else:
-                raise ex
+        except exceptions.Unauthorized:
+            self.authenticate()
+            kwargs.setdefault('headers', {})
+            kwargs['headers']['X-Auth-Token'] = self.auth_token
+            resp, body = self._cs_request(
+                self.endpoint_url + url, method, **kwargs)
+            return resp, body
 
     def _extract_service_catalog(self, body):
         """ Set the client's service catalog from the response data. """
@@ -167,7 +163,6 @@ class HTTPClient(httplib2.Http):
             self.auth_token = sc['id']
             self.auth_tenant_id = sc.get('tenant_id')
             self.auth_user_id = sc.get('user_id')
-            self.token_retrieved = True
         except KeyError:
             raise exceptions.Unauthorized()
         self.endpoint_url = self.service_catalog.url_for(
@@ -204,6 +199,24 @@ class HTTPClient(httplib2.Http):
         else:
             body = None
         self._extract_service_catalog(body)
+
+    def _get_endpoint_url(self):
+        url = self.auth_url + '/tokens/%s/endpoints' % self.auth_token
+        try:
+            resp, body = self._cs_request(url, "GET")
+        except exceptions.Unauthorized:
+            # rollback to authenticate() to handle case when quantum client
+            # is initialized just before the token is expired
+            self.authenticate()
+            return self.endpoint_url
+
+        body = json.loads(body)
+        for endpoint in body.get('endpoints', []):
+            if (endpoint['type'] == 'network' and
+                endpoint.get('region') == self.region_name):
+                return endpoint['adminURL']
+
+        raise exceptions.EndpointNotFound()
 
     def get_status_code(self, response):
         """
