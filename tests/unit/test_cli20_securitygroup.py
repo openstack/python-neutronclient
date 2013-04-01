@@ -24,7 +24,7 @@ from quantumclient.quantum.v2_0 import securitygroup
 from tests.unit import test_cli20
 
 
-class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):
+class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
     def test_create_security_group(self):
         """Create security group: webservers."""
         resource = 'security_group'
@@ -304,3 +304,7 @@ class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):
         args = '-F id -F security_group -F remote_group'.split()
         self._test_list_security_group_rules_extend(args=args,
                                                     query_field=True)
+
+
+class CLITestV20SecurityGroupsXML(CLITestV20SecurityGroupsJSON):
+    format = 'xml'

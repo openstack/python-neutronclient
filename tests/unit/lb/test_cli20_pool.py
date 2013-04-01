@@ -25,7 +25,7 @@ from quantumclient.quantum.v2_0.lb import pool
 from tests.unit import test_cli20
 
 
-class CLITestV20LbPool(test_cli20.CLITestV20Base):
+class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
 
     def test_create_pool_with_mandatory_params(self):
         """lb-pool-create with mandatory params only"""
@@ -165,3 +165,7 @@ class CLITestV20LbPool(test_cli20.CLITestV20Base):
         _str = self.fake_stdout.make_string()
         self.assertTrue('bytes_in' in _str)
         self.assertTrue('bytes_out' in _str)
+
+
+class CLITestV20LbPoolXML(CLITestV20LbPoolJSON):
+    format = 'xml'

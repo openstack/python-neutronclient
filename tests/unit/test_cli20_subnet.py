@@ -26,7 +26,9 @@ from tests.unit.test_cli20 import CLITestV20Base
 from tests.unit.test_cli20 import MyApp
 
 
-class CLITestV20Subnet(CLITestV20Base):
+class CLITestV20SubnetJSON(CLITestV20Base):
+    def setUp(self):
+        super(CLITestV20SubnetJSON, self).setUp(plurals={'tags': 'tag'})
 
     def test_create_subnet(self):
         """Create subnet: --gateway gateway netid cidr."""
@@ -399,3 +401,7 @@ class CLITestV20Subnet(CLITestV20Base):
         myid = 'myid'
         args = [myid]
         self._test_delete_resource(resource, cmd, myid, args)
+
+
+class CLITestV20SubnetXML(CLITestV20SubnetJSON):
+    format = 'xml'

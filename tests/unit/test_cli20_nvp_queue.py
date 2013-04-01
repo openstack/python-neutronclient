@@ -22,7 +22,11 @@ from quantumclient.quantum.v2_0 import nvp_qos_queue as qos
 from tests.unit import test_cli20
 
 
-class CLITestV20NvpQosQueue(test_cli20.CLITestV20Base):
+class CLITestV20NvpQosQueueJSON(test_cli20.CLITestV20Base):
+    def setUp(self):
+        super(CLITestV20NvpQosQueueJSON, self).setUp(
+            plurals={'qos_queues': 'qos_queue'})
+
     def test_create_qos_queue(self):
         """Create a qos queue."""
         resource = 'qos_queue'
@@ -78,3 +82,7 @@ class CLITestV20NvpQosQueue(test_cli20.CLITestV20Base):
         myid = 'myid'
         args = [myid]
         self._test_delete_resource(resource, cmd, myid, args)
+
+
+class CLITestV20NvpQosQueueXML(CLITestV20NvpQosQueueJSON):
+    format = 'xml'

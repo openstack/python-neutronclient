@@ -25,7 +25,7 @@ from quantumclient.quantum.v2_0.lb import healthmonitor
 from tests.unit import test_cli20
 
 
-class CLITestV20LbHealthmonitor(test_cli20.CLITestV20Base):
+class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
     def test_create_healthmonitor_with_mandatory_params(self):
         """lb-healthmonitor-create with mandatory params only"""
         resource = 'health_monitor'
@@ -213,3 +213,7 @@ class CLITestV20LbHealthmonitor(test_cli20.CLITestV20Base):
         cmd.run(parsed_args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
+
+
+class CLITestV20LbHealthmonitorXML(CLITestV20LbHealthmonitorJSON):
+    format = 'xml'

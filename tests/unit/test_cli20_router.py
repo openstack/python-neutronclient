@@ -31,7 +31,7 @@ from tests.unit.test_cli20 import CLITestV20Base
 from tests.unit.test_cli20 import MyApp
 
 
-class CLITestV20Router(CLITestV20Base):
+class CLITestV20RouterJSON(CLITestV20Base):
     def test_create_router(self):
         """Create router: router1."""
         resource = 'router'
@@ -170,3 +170,7 @@ class CLITestV20Router(CLITestV20Base):
         self._test_update_resource(resource, cmd, 'externalid',
                                    args, {"external_gateway_info": {}}
                                    )
+
+
+class CLITestV20RouterXML(CLITestV20RouterJSON):
+    format = 'xml'

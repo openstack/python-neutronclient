@@ -33,12 +33,27 @@ from tests.unit.test_cli20 import CLITestV20Base
 from tests.unit.test_cli20 import MyApp
 
 
-class CLITestV20Network(CLITestV20Base):
+class CLITestV20NetworkJSON(CLITestV20Base):
+    def setUp(self):
+        super(CLITestV20NetworkJSON, self).setUp(plurals={'tags': 'tag'})
+
     def test_create_network(self):
         """Create net: myname."""
         resource = 'network'
         cmd = CreateNetwork(MyApp(sys.stdout), None)
         name = 'myname'
+        myid = 'myid'
+        args = [name, ]
+        position_names = ['name', ]
+        position_values = [name, ]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
+    def test_create_network_with_unicode(self):
+        """Create net: u'\u7f51\u7edc'."""
+        resource = 'network'
+        cmd = CreateNetwork(MyApp(sys.stdout), None)
+        name = u'\u7f51\u7edc'
         myid = 'myid'
         args = [name, ]
         position_names = ['name', ]
@@ -178,6 +193,11 @@ class CLITestV20Network(CLITestV20Base):
         """List nets: -- --tags a b."""
         cmd = ListNetwork(MyApp(sys.stdout), None)
         self._test_list_networks(cmd, tags=['a', 'b'])
+
+    def test_list_nets_tags_with_unicode(self):
+        """List nets: -- --tags u'\u7f51\u7edc'."""
+        cmd = ListNetwork(MyApp(sys.stdout), None)
+        self._test_list_networks(cmd, tags=[u'\u7f51\u7edc'])
 
     def test_list_nets_detail_tags(self):
         """List nets: -D -- --tags a b."""
@@ -426,6 +446,17 @@ class CLITestV20Network(CLITestV20Base):
                                    {'name': 'myname', 'tags': ['a', 'b'], }
                                    )
 
+    def test_update_network_with_unicode(self):
+        """Update net: myid --name u'\u7f51\u7edc' --tags a b."""
+        resource = 'network'
+        cmd = UpdateNetwork(MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--name', u'\u7f51\u7edc',
+                                    '--tags', 'a', 'b'],
+                                   {'name': u'\u7f51\u7edc',
+                                    'tags': ['a', 'b'], }
+                                   )
+
     def test_show_network(self):
         """Show net: --fields id --fields name myid."""
         resource = 'network'
@@ -441,3 +472,7 @@ class CLITestV20Network(CLITestV20Base):
         myid = 'myid'
         args = [myid]
         self._test_delete_resource(resource, cmd, myid, args)
+
+
+class CLITestV20NetworkXML(CLITestV20NetworkJSON):
+    format = 'xml'

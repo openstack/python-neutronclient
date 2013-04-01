@@ -22,9 +22,14 @@ from tests.unit.test_cli20 import CLITestV20Base
 from tests.unit.test_cli20 import MyApp
 
 
-class CLITestV20NetworkGateway(CLITestV20Base):
+class CLITestV20NetworkGatewayJSON(CLITestV20Base):
 
     resource = "network_gateway"
+
+    def setUp(self):
+        super(CLITestV20NetworkGatewayJSON, self).setUp(
+            plurals={'devices': 'device',
+                     'network_gateways': 'network_gateway'})
 
     def test_create_gateway(self):
         cmd = nvpnetworkgateway.CreateNetworkGateway(MyApp(sys.stdout), None)
@@ -105,3 +110,7 @@ class CLITestV20NetworkGateway(CLITestV20Base):
                                           {'network_id': 'net_id',
                                            'segmentation_type': 'edi',
                                            'segmentation_id': '7'})
+
+
+class CLITestV20NetworkGatewayXML(CLITestV20NetworkGatewayJSON):
+    format = 'xml'

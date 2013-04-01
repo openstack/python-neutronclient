@@ -23,7 +23,10 @@ from quantumclient.quantum.v2_0.lb import vip
 from tests.unit import test_cli20
 
 
-class CLITestV20LbVip(test_cli20.CLITestV20Base):
+class CLITestV20LbVipJSON(test_cli20.CLITestV20Base):
+    def setUp(self):
+        super(CLITestV20LbVipJSON, self).setUp(plurals={'tags': 'tag'})
+
     def test_create_vip_with_mandatory_params(self):
         """lb-vip-create with all mandatory params"""
         resource = 'vip'
@@ -205,3 +208,7 @@ class CLITestV20LbVip(test_cli20.CLITestV20Base):
         my_id = 'my-id'
         args = [my_id]
         self._test_delete_resource(resource, cmd, my_id, args)
+
+
+class CLITestV20LbVipXML(CLITestV20LbVipJSON):
+    format = 'xml'

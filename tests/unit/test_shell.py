@@ -21,6 +21,7 @@ import re
 import sys
 
 import fixtures
+import mox
 import testtools
 from testtools import matchers
 
@@ -58,6 +59,7 @@ class ShellTest(testtools.TestCase):
     # Patch os.environ to avoid required auth info.
     def setUp(self):
         super(ShellTest, self).setUp()
+        self.mox = mox.Mox()
         for var in self.FAKE_ENV:
             self.useFixture(
                 fixtures.EnvironmentVariable(
@@ -127,3 +129,17 @@ class ShellTest(testtools.TestCase):
         quant_shell = openstack_shell.QuantumShell('2.0')
         result = quant_shell.build_option_parser('descr', '2.0')
         self.assertEqual(True, isinstance(result, argparse.ArgumentParser))
+
+    def test_main_with_unicode(self):
+        self.mox.StubOutClassWithMocks(openstack_shell, 'QuantumShell')
+        qshell_mock = openstack_shell.QuantumShell('2.0')
+        #self.mox.StubOutWithMock(qshell_mock, 'run')
+        unicode_text = u'\u7f51\u7edc'
+        argv = ['net-list', unicode_text, unicode_text.encode('utf-8')]
+        qshell_mock.run([u'net-list', unicode_text,
+                         unicode_text]).AndReturn(0)
+        self.mox.ReplayAll()
+        ret = openstack_shell.main(argv=argv)
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
+        self.assertEqual(ret, 0)

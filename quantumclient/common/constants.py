@@ -23,6 +23,7 @@ TYPE_XMLNS = "xmlns:quantum"
 TYPE_ATTR = "quantum:type"
 VIRTUAL_ROOT_KEY = "_v_root"
 ATOM_NAMESPACE = "http://www.w3.org/2005/Atom"
+ATOM_XMLNS = "xmlns:atom"
 ATOM_LINK_NOTATION = "{%s}link" % ATOM_NAMESPACE
 
 TYPE_BOOL = "bool"
