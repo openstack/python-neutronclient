@@ -22,8 +22,8 @@ from quantumclient.quantum.v2_0.subnet import DeleteSubnet
 from quantumclient.quantum.v2_0.subnet import ListSubnet
 from quantumclient.quantum.v2_0.subnet import ShowSubnet
 from quantumclient.quantum.v2_0.subnet import UpdateSubnet
-from quantumclient.tests.unit.test_cli20 import CLITestV20Base
-from quantumclient.tests.unit.test_cli20 import MyApp
+from tests.unit.test_cli20 import CLITestV20Base
+from tests.unit.test_cli20 import MyApp
 
 
 class CLITestV20Subnet(CLITestV20Base):

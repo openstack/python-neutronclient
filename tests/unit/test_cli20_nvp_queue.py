@@ -19,7 +19,7 @@
 import sys
 
 from quantumclient.quantum.v2_0 import nvp_qos_queue as qos
-from quantumclient.tests.unit import test_cli20
+from tests.unit import test_cli20
 
 
 class CLITestV20NvpQosQueue(test_cli20.CLITestV20Base):

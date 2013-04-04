@@ -21,7 +21,7 @@ import sys
 import mox
 
 from quantumclient.quantum.v2_0 import securitygroup
-from quantumclient.tests.unit import test_cli20
+from tests.unit import test_cli20
 
 
 class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):

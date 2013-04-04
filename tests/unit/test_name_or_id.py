@@ -23,7 +23,7 @@ import testtools
 
 from quantumclient.common import exceptions
 from quantumclient.quantum import v2_0 as quantumv20
-from quantumclient.tests.unit import test_cli20
+from tests.unit import test_cli20
 from quantumclient.v2_0.client import Client
 
 

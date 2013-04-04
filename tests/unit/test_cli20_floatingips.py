@@ -25,8 +25,8 @@ from quantumclient.quantum.v2_0.floatingip import DeleteFloatingIP
 from quantumclient.quantum.v2_0.floatingip import DisassociateFloatingIP
 from quantumclient.quantum.v2_0.floatingip import ListFloatingIP
 from quantumclient.quantum.v2_0.floatingip import ShowFloatingIP
-from quantumclient.tests.unit.test_cli20 import CLITestV20Base
-from quantumclient.tests.unit.test_cli20 import MyApp
+from tests.unit.test_cli20 import CLITestV20Base
+from tests.unit.test_cli20 import MyApp
 
 
 class CLITestV20FloatingIps(CLITestV20Base):
