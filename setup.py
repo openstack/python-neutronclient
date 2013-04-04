@@ -70,7 +70,7 @@ setuptools.setup(
     tests_require=tests_require,
     cmdclass=setup.get_cmdclass(),
     include_package_data=False,
-    packages=setuptools.find_packages('.'),
+    packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     package_data=PackageData,
     eager_resources=EagerResources,
     entry_points={
