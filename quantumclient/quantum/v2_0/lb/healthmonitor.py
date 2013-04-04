@@ -52,11 +52,6 @@ class CreateHealthMonitor(quantumv20.CreateCommand):
             default=True, action='store_false',
             help='set admin state up to false')
         parser.add_argument(
-            '--delay',
-            required=True,
-            help='the minimum time in seconds between regular connections '
-                 'of the member.')
-        parser.add_argument(
             '--expected-codes',
             help='the list of HTTP status codes expected in '
                  'response from the member to declare it healthy. This '
@@ -68,6 +63,16 @@ class CreateHealthMonitor(quantumv20.CreateCommand):
             '--http-method',
             help='the HTTP method used for requests by the monitor of type '
                  'HTTP.')
+        parser.add_argument(
+            '--url-path',
+            help='the HTTP path used in the HTTP request used by the monitor'
+                 ' to test a member health. This must be a string '
+                 'beginning with a / (forward slash)')
+        parser.add_argument(
+            '--delay',
+            required=True,
+            help='the minimum time in seconds between regular connections '
+                 'of the member.')
         parser.add_argument(
             '--max-retries',
             required=True,
@@ -83,11 +88,6 @@ class CreateHealthMonitor(quantumv20.CreateCommand):
             '--type',
             required=True,
             help='one of predefined health monitor types, e.g. RoundRobin')
-        parser.add_argument(
-            '--url-path',
-            help='the HTTP path used in the HTTP request used by the monitor'
-                 ' to test a member health. This must be a string '
-                 'beginning with a / (forward slash)')
 
     def args2body(self, parsed_args):
         body = {

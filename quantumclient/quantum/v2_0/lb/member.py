@@ -53,21 +53,21 @@ class CreateMember(quantumv20.CreateCommand):
             'pool_id', metavar='pool',
             help='Pool id or name this vip belongs to')
         parser.add_argument(
-            '--address',
-            required=True,
-            help='IP address of the pool member on the pool network. ')
-        parser.add_argument(
             '--admin-state-down',
             default=True, action='store_false',
             help='set admin state up to false')
+        parser.add_argument(
+            '--weight',
+            help='weight of pool member in the pool')
+        parser.add_argument(
+            '--address',
+            required=True,
+            help='IP address of the pool member on the pool network. ')
         parser.add_argument(
             '--protocol-port',
             required=True,
             help='port on which the pool member listens for requests or '
                  'connections. ')
-        parser.add_argument(
-            '--weight',
-            help='weight of pool member in the pool')
 
     def args2body(self, parsed_args):
         _pool_id = quantumv20.find_resourceid_by_name_or_id(
