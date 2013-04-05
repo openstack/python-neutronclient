@@ -21,7 +21,6 @@
 import logging
 
 from quantumclient.client import HTTPClient
-from quantumclient.common import exceptions as exc
 from quantumclient.quantum import client as quantum_client
 
 

@@ -26,11 +26,12 @@ from tests.unit import test_cli20
 
 
 class CLITestV20LbHealthmonitor(test_cli20.CLITestV20Base):
-    def test_create_healthmonitor_with_all_params(self):
+    def test_create_healthmonitor_with_mandatory_params(self):
         """lb-healthmonitor-create with mandatory params only"""
         resource = 'health_monitor'
         cmd = healthmonitor.CreateHealthMonitor(test_cli20.MyApp(sys.stdout),
                                                 None)
+        admin_state_up = False
         delay = '60'
         max_retries = '2'
         timeout = '10'
@@ -45,7 +46,7 @@ class CLITestV20LbHealthmonitor(test_cli20.CLITestV20Base):
                 '--tenant-id', tenant_id]
         position_names = ['admin_state_up', 'delay', 'max_retries', 'timeout',
                           'type', 'tenant_id']
-        position_values = [True, delay, max_retries, timeout, type,
+        position_values = [admin_state_up, delay, max_retries, timeout, type,
                            tenant_id]
         self._test_create_resource(resource, cmd, '', my_id, args,
                                    position_names, position_values)

@@ -3,8 +3,8 @@ coverage
 discover
 distribute>=0.6.24
 fixtures>=0.3.12
+flake8
 mox
-pep8
 python-subunit
 sphinx>=1.1.2
 testrepository>=0.0.13

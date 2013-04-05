@@ -41,8 +41,8 @@ class CLITestV20Router(CLITestV20Base):
         args = [name, ]
         position_names = ['name', ]
         position_values = [name, ]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values)
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
 
     def test_create_router_tenant(self):
         """Create router: --tenant_id tenantid myname."""
@@ -53,9 +53,9 @@ class CLITestV20Router(CLITestV20Base):
         args = ['--tenant_id', 'tenantid', name]
         position_names = ['name', ]
         position_values = [name, ]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          tenant_id='tenantid')
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
 
     def test_create_router_admin_state(self):
         """Create router: --admin_state_down myname."""
@@ -66,9 +66,9 @@ class CLITestV20Router(CLITestV20Base):
         args = ['--admin_state_down', name, ]
         position_names = ['name', ]
         position_values = [name, ]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          admin_state_up=False)
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   admin_state_up=False)
 
     def test_list_routers_detail(self):
         """list routers: -D."""

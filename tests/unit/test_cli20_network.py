@@ -17,7 +17,6 @@
 
 import sys
 
-import mox
 from mox import (ContainsKeyValue, IgnoreArg, IsA)
 
 from quantumclient.common import exceptions
@@ -182,7 +181,6 @@ class CLITestV20Network(CLITestV20Base):
 
     def test_list_nets_detail_tags(self):
         """List nets: -D -- --tags a b."""
-        resources = "networks"
         cmd = ListNetwork(MyApp(sys.stdout), None)
         self._test_list_networks(cmd, detail=True, tags=['a', 'b'])
 
@@ -198,7 +196,6 @@ class CLITestV20Network(CLITestV20Base):
                 headers=ContainsKeyValue(
                     'X-Auth-Token', test_cli20.TOKEN)).AndReturn(resp)
 
-        resources = "networks"
         cmd = ListNetwork(test_cli20.MyApp(sys.stdout), None)
         self.mox.StubOutWithMock(cmd, 'get_client')
         self.mox.StubOutWithMock(self.client.httpclient, 'request')
@@ -249,7 +246,6 @@ class CLITestV20Network(CLITestV20Base):
 
     def test_list_nets_fields(self):
         """List nets: --fields a --fields b -- --fields c d."""
-        resources = "networks"
         cmd = ListNetwork(MyApp(sys.stdout), None)
         self._test_list_networks(cmd,
                                  fields_1=['a', 'b'], fields_2=['c', 'd'])

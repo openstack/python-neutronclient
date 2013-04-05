@@ -18,7 +18,6 @@
 import argparse
 import logging
 
-from quantumclient.common import utils
 from quantumclient.quantum.v2_0 import CreateCommand
 from quantumclient.quantum.v2_0 import DeleteCommand
 from quantumclient.quantum.v2_0 import ListCommand

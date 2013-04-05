@@ -236,7 +236,6 @@ class CLITestV20SecurityGroups(test_cli20.CLITestV20Base):
         expected['cols'] = expected.get('cols', _expected['cols'])
         expected['data'] = expected.get('data', _expected['data'])
 
-        resources = "security_group_rules"
         cmd = securitygroup.ListSecurityGroupRule(
             test_cli20.MyApp(sys.stdout), None)
         self.mox.StubOutWithMock(cmd, 'get_client')

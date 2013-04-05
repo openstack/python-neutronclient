@@ -18,7 +18,6 @@
 
 import sys
 
-from quantumclient.common import exceptions
 from quantumclient.quantum.v2_0.floatingip import AssociateFloatingIP
 from quantumclient.quantum.v2_0.floatingip import CreateFloatingIP
 from quantumclient.quantum.v2_0.floatingip import DeleteFloatingIP
@@ -39,8 +38,8 @@ class CLITestV20FloatingIps(CLITestV20Base):
         args = [name]
         position_names = ['floating_network_id']
         position_values = [name]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values)
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
 
     def test_create_floatingip_and_port(self):
         """Create floatingip: fip1."""
@@ -52,14 +51,14 @@ class CLITestV20FloatingIps(CLITestV20Base):
         args = [name, '--port_id', pid]
         position_names = ['floating_network_id', 'port_id']
         position_values = [name, pid]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values)
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
 
         # Test dashed options
         args = [name, '--port-id', pid]
         position_names = ['floating_network_id', 'port_id']
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values)
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
 
     def test_create_floatingip_and_port_and_address(self):
         """Create floatingip: fip1 with a given port and address"""
@@ -72,13 +71,13 @@ class CLITestV20FloatingIps(CLITestV20Base):
         args = [name, '--port_id', pid, '--fixed_ip_address', addr]
         position_names = ['floating_network_id', 'port_id', 'fixed_ip_address']
         position_values = [name, pid, addr]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values)
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
         # Test dashed options
         args = [name, '--port-id', pid, '--fixed-ip-address', addr]
         position_names = ['floating_network_id', 'port_id', 'fixed_ip_address']
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values)
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
 
     def test_list_floatingips(self):
         """list floatingips: -D."""

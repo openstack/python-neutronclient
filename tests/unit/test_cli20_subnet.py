@@ -40,8 +40,8 @@ class CLITestV20Subnet(CLITestV20Base):
         args = ['--gateway', gateway, netid, cidr]
         position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
         position_values = [4, netid, cidr, gateway]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values)
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
 
     def test_create_subnet_with_no_gateway(self):
         """Create subnet: --no-gateway netid cidr"""
@@ -54,8 +54,8 @@ class CLITestV20Subnet(CLITestV20Base):
         args = ['--no-gateway', netid, cidr]
         position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
         position_values = [4, netid, cidr, None]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values)
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
 
     def test_create_subnet_with_bad_gateway_option(self):
         """Create sbunet: --no-gateway netid cidr"""
@@ -70,8 +70,8 @@ class CLITestV20Subnet(CLITestV20Base):
         position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
         position_values = [4, netid, cidr, None]
         try:
-            _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                              position_names, position_values)
+            self._test_create_resource(resource, cmd, name, myid, args,
+                                       position_names, position_values)
         except:
             return
         self.fail('No exception for bad gateway option')
@@ -87,9 +87,9 @@ class CLITestV20Subnet(CLITestV20Base):
         args = ['--tenant_id', 'tenantid', netid, cidr]
         position_names = ['ip_version', 'network_id', 'cidr']
         position_values = [4, netid, cidr]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          tenant_id='tenantid')
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
 
     def test_create_subnet_tags(self):
         """Create subnet: netid cidr --tags a b."""
@@ -102,9 +102,9 @@ class CLITestV20Subnet(CLITestV20Base):
         args = [netid, cidr, '--tags', 'a', 'b']
         position_names = ['ip_version', 'network_id', 'cidr']
         position_values = [4, netid, cidr]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          tags=['a', 'b'])
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tags=['a', 'b'])
 
     def test_create_subnet_allocation_pool(self):
         """Create subnet: --tenant_id tenantid <allocation_pool> netid cidr.
@@ -123,9 +123,9 @@ class CLITestV20Subnet(CLITestV20Base):
                           'cidr']
         pool = [{'start': '1.1.1.10', 'end': '1.1.1.20'}]
         position_values = [4, pool, netid, cidr]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          tenant_id='tenantid')
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
 
     def test_create_subnet_allocation_pools(self):
         """Create subnet: --tenant-id tenantid <pools> netid cidr.
@@ -147,9 +147,9 @@ class CLITestV20Subnet(CLITestV20Base):
         pools = [{'start': '1.1.1.10', 'end': '1.1.1.20'},
                  {'start': '1.1.1.30', 'end': '1.1.1.40'}]
         position_values = [4, pools, netid, cidr]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          tenant_id='tenantid')
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
 
     def test_create_subnet_host_route(self):
         """Create subnet: --tenant_id tenantid <host_route> netid cidr.
@@ -169,9 +169,9 @@ class CLITestV20Subnet(CLITestV20Base):
                           'cidr']
         route = [{'destination': '172.16.1.0/24', 'nexthop': '1.1.1.20'}]
         position_values = [4, route, netid, cidr]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          tenant_id='tenantid')
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
 
     def test_create_subnet_host_routes(self):
         """Create subnet: --tenant-id tenantid <host_routes> netid cidr.
@@ -194,9 +194,9 @@ class CLITestV20Subnet(CLITestV20Base):
         routes = [{'destination': '172.16.1.0/24', 'nexthop': '1.1.1.20'},
                   {'destination': '172.17.7.0/24', 'nexthop': '1.1.1.40'}]
         position_values = [4, routes, netid, cidr]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          tenant_id='tenantid')
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
 
     def test_create_subnet_dns_nameservers(self):
         """Create subnet: --tenant-id tenantid <dns-nameservers> netid cidr.
@@ -217,9 +217,9 @@ class CLITestV20Subnet(CLITestV20Base):
                           'cidr']
         nameservers = ['1.1.1.20', '1.1.1.40']
         position_values = [4, nameservers, netid, cidr]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          tenant_id='tenantid')
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
 
     def test_create_subnet_with_disable_dhcp(self):
         """Create subnet: --tenant-id tenantid --disable-dhcp netid cidr."""
@@ -235,9 +235,9 @@ class CLITestV20Subnet(CLITestV20Base):
         position_names = ['ip_version', 'enable_dhcp', 'network_id',
                           'cidr']
         position_values = [4, False, netid, cidr]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          tenant_id='tenantid')
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
 
     def test_create_subnet_merge_single_plurar(self):
         resource = 'subnet'
@@ -256,9 +256,9 @@ class CLITestV20Subnet(CLITestV20Base):
         pools = [{'start': '1.1.1.10', 'end': '1.1.1.20'},
                  {'start': '1.1.1.30', 'end': '1.1.1.40'}]
         position_values = [4, pools, netid, cidr]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          tenant_id='tenantid')
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
 
     def test_create_subnet_merge_plurar(self):
         resource = 'subnet'
@@ -275,9 +275,9 @@ class CLITestV20Subnet(CLITestV20Base):
                           'cidr']
         pools = [{'start': '1.1.1.30', 'end': '1.1.1.40'}]
         position_values = [4, pools, netid, cidr]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          tenant_id='tenantid')
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
 
     def test_create_subnet_merge_single_single(self):
         resource = 'subnet'
@@ -296,9 +296,9 @@ class CLITestV20Subnet(CLITestV20Base):
         pools = [{'start': '1.1.1.10', 'end': '1.1.1.20'},
                  {'start': '1.1.1.30', 'end': '1.1.1.40'}]
         position_values = [4, pools, netid, cidr]
-        _str = self._test_create_resource(resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          tenant_id='tenantid')
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
 
     def test_list_subnets_detail(self):
         """List subnets: -D."""

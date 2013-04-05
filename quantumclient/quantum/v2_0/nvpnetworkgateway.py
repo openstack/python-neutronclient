@@ -15,7 +15,6 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-import argparse
 import logging
 
 from quantumclient.common import utils

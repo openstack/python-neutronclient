@@ -17,7 +17,6 @@
 
 import sys
 
-from quantumclient.common import exceptions
 from quantumclient.quantum.v2_0 import nvpnetworkgateway
 from tests.unit.test_cli20 import CLITestV20Base
 from tests.unit.test_cli20 import MyApp
@@ -34,8 +33,8 @@ class CLITestV20NetworkGateway(CLITestV20Base):
         args = [name, ]
         position_names = ['name', ]
         position_values = [name, ]
-        _str = self._test_create_resource(self.resource, cmd, name, myid, args,
-                                          position_names, position_values)
+        self._test_create_resource(self.resource, cmd, name, myid, args,
+                                   position_names, position_values)
 
     def test_create_gateway_with_tenant(self):
         cmd = nvpnetworkgateway.CreateNetworkGateway(MyApp(sys.stdout), None)
@@ -44,9 +43,9 @@ class CLITestV20NetworkGateway(CLITestV20Base):
         args = ['--tenant_id', 'tenantid', name]
         position_names = ['name', ]
         position_values = [name, ]
-        _str = self._test_create_resource(self.resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          tenant_id='tenantid')
+        self._test_create_resource(self.resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
 
     def test_create_gateway_with_device(self):
         cmd = nvpnetworkgateway.CreateNetworkGateway(MyApp(sys.stdout), None)
@@ -55,9 +54,9 @@ class CLITestV20NetworkGateway(CLITestV20Base):
         args = ['--device', 'device_id=test', name, ]
         position_names = ['name', ]
         position_values = [name, ]
-        _str = self._test_create_resource(self.resource, cmd, name, myid, args,
-                                          position_names, position_values,
-                                          devices=[{'device_id': 'test'}])
+        self._test_create_resource(self.resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   devices=[{'device_id': 'test'}])
 
     def test_list_gateways(self):
         resources = '%ss' % self.resource
