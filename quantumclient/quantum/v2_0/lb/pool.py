@@ -42,7 +42,7 @@ class ShowPool(quantumv20.ShowCommand):
 
 
 class CreatePool(quantumv20.CreateCommand):
-    """Create a pool"""
+    """Create a pool."""
 
     resource = 'pool'
     log = logging.getLogger(__name__ + '.CreatePool')

@@ -180,7 +180,7 @@ class CLITestV20NetworkJSON(CLITestV20Base):
                                  sort_dir=['desc', 'asc'])
 
     def test_list_nets_limit(self):
-        """list nets: -P"""
+        """list nets: -P."""
         cmd = ListNetwork(MyApp(sys.stdout), None)
         self._test_list_networks(cmd, page_size=1000)
 

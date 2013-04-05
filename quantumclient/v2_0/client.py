@@ -33,7 +33,7 @@ _logger = logging.getLogger(__name__)
 
 
 def exception_handler_v20(status_code, error_content):
-    """ Exception handler for API v2.0 client
+    """Exception handler for API v2.0 client
 
         This routine generates the appropriate
         Quantum exception according to the contents of the
@@ -213,7 +213,8 @@ class Client(object):
     @APIParamsCall
     def get_quotas_tenant(self, **_params):
         """Fetch tenant info in server's context for
-        following quota operation."""
+        following quota operation.
+        """
         return self.get(self.quota_path % 'tenant', params=_params)
 
     @APIParamsCall
@@ -871,7 +872,7 @@ class Client(object):
             l3_agent, router_id))
 
     def __init__(self, **kwargs):
-        """ Initialize a new client for the Quantum v2.0 API. """
+        """Initialize a new client for the Quantum v2.0 API."""
         super(Client, self).__init__()
         self.httpclient = HTTPClient(**kwargs)
         self.version = '2.0'
@@ -886,7 +887,7 @@ class Client(object):
         # Add deserialized error message to exception arguments
         try:
             des_error_body = self.deserialize(response_body, status_code)
-        except:
+        except Exception:
             # If unable to deserialized body it is probably not a
             # Quantum error
             des_error_body = {'message': response_body}

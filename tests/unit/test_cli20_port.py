@@ -19,13 +19,13 @@ import sys
 
 from mox import ContainsKeyValue
 
-from quantumclient import shell
 from quantumclient.quantum.v2_0.port import CreatePort
 from quantumclient.quantum.v2_0.port import DeletePort
 from quantumclient.quantum.v2_0.port import ListPort
 from quantumclient.quantum.v2_0.port import ListRouterPort
 from quantumclient.quantum.v2_0.port import ShowPort
 from quantumclient.quantum.v2_0.port import UpdatePort
+from quantumclient import shell
 from tests.unit import test_cli20
 from tests.unit.test_cli20 import CLITestV20Base
 from tests.unit.test_cli20 import MyApp
@@ -105,7 +105,7 @@ class CLITestV20PortJSON(CLITestV20Base):
                                    tags=['a', 'b'])
 
     def test_create_port_secgroup(self):
-        """Create port: --security-group sg1_id netid"""
+        """Create port: --security-group sg1_id netid."""
         resource = 'port'
         cmd = CreatePort(MyApp(sys.stdout), None)
         name = 'myname'
@@ -158,7 +158,7 @@ class CLITestV20PortJSON(CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_ports_limit(self):
-        """list ports: -P"""
+        """list ports: -P."""
         resources = "ports"
         cmd = ListPort(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)

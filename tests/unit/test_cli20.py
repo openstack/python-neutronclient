@@ -158,7 +158,7 @@ class CLITestV20Base(testtools.TestCase):
                 constants.EXT_NS: {'prefix': 'http://xxxx.yy.com'}}
 
     def setUp(self, plurals={}):
-        """Prepare the test environment"""
+        """Prepare the test environment."""
         super(CLITestV20Base, self).setUp()
         Client.EXTED_PLURALS.update(constants.PLURALS)
         Client.EXTED_PLURALS.update(plurals)

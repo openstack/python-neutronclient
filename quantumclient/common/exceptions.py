@@ -119,7 +119,7 @@ class AmbiguousEndpoints(QuantumClientException):
 
 
 class QuantumCLIError(QuantumClientException):
-    """ Exception raised when command line parsing fails """
+    """Exception raised when command line parsing fails."""
     pass
 
 
@@ -128,7 +128,7 @@ class ConnectionFailed(QuantumClientException):
 
 
 class BadInputError(Exception):
-    """Error resulting from a client sending bad input to a server"""
+    """Error resulting from a client sending bad input to a server."""
     pass
 
 
@@ -151,7 +151,8 @@ class InvalidContentType(Invalid):
 
 class UnsupportedVersion(Exception):
     """Indicates that the user is trying to use an unsupported
-       version of the API"""
+       version of the API
+    """
     pass
 
 

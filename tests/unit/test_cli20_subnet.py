@@ -46,7 +46,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_subnet_with_no_gateway(self):
-        """Create subnet: --no-gateway netid cidr"""
+        """Create subnet: --no-gateway netid cidr."""
         resource = 'subnet'
         cmd = CreateSubnet(MyApp(sys.stdout), None)
         name = 'myname'
@@ -60,7 +60,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_subnet_with_bad_gateway_option(self):
-        """Create sbunet: --no-gateway netid cidr"""
+        """Create sbunet: --no-gateway netid cidr."""
         resource = 'subnet'
         cmd = CreateSubnet(MyApp(sys.stdout), None)
         name = 'myname'
@@ -74,7 +74,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
         try:
             self._test_create_resource(resource, cmd, name, myid, args,
                                        position_names, position_values)
-        except:
+        except Exception:
             return
         self.fail('No exception for bad gateway option')
 

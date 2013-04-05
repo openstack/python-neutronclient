@@ -352,7 +352,7 @@ class CreateCommand(QuantumCommand, show.ShowOne):
         # {u'network': {u'id': u'e9424a76-6db4-4c93-97b6-ec311cd51f19'}}
         info = self.resource in data and data[self.resource] or None
         if info:
-            print >>self.app.stdout, _('Created a new %s:' % self.resource)
+            print >>self.app.stdout, _('Created a new %s:') % self.resource
         else:
             info = {'': ''}
         return zip(*sorted(info.iteritems()))

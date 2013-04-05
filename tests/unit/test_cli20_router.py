@@ -92,7 +92,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_routers_limit(self):
-        """list routers: -P"""
+        """list routers: -P."""
         resources = "routers"
         cmd = ListRouter(MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)
@@ -130,7 +130,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
                                  ['id', 'name'])
 
     def test_add_interface(self):
-        """Add interface to router: myid subnetid"""
+        """Add interface to router: myid subnetid."""
         resource = 'router'
         cmd = AddInterfaceRouter(MyApp(sys.stdout), None)
         args = ['myid', 'subnetid']
@@ -141,7 +141,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
                                           )
 
     def test_del_interface(self):
-        """Delete interface from router: myid subnetid"""
+        """Delete interface from router: myid subnetid."""
         resource = 'router'
         cmd = RemoveInterfaceRouter(MyApp(sys.stdout), None)
         args = ['myid', 'subnetid']
@@ -152,7 +152,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
                                           )
 
     def test_set_gateway(self):
-        """Set external gateway for router: myid externalid"""
+        """Set external gateway for router: myid externalid."""
         resource = 'router'
         cmd = SetGatewayRouter(MyApp(sys.stdout), None)
         args = ['myid', 'externalid']
@@ -163,7 +163,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
                                    )
 
     def test_remove_gateway(self):
-        """Remove external gateway from router: externalid"""
+        """Remove external gateway from router: externalid."""
         resource = 'router'
         cmd = RemoveGatewayRouter(MyApp(sys.stdout), None)
         args = ['externalid']

@@ -67,7 +67,7 @@ ENDPOINTS_RESULT = {
 class CLITestAuthKeystone(testtools.TestCase):
 
     def setUp(self):
-        """Prepare the test environment"""
+        """Prepare the test environment."""
         super(CLITestAuthKeystone, self).setUp()
         self.mox = mox.Mox()
         self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,

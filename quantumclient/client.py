@@ -47,14 +47,14 @@ class ServiceCatalog(object):
         self.catalog = resource_dict
 
     def get_token(self):
-        """Fetch token details fron service catalog"""
+        """Fetch token details fron service catalog."""
         token = {'id': self.catalog['access']['token']['id'],
                  'expires': self.catalog['access']['token']['expires'], }
         try:
             token['user_id'] = self.catalog['access']['user']['id']
             token['tenant_id'] = (
                 self.catalog['access']['token']['tenant']['id'])
-        except:
+        except Exception:
             # just leave the tenant and user out if it doesn't exist
             pass
         return token
@@ -63,7 +63,8 @@ class ServiceCatalog(object):
                 service_type='network', endpoint_type='adminURL'):
         """Fetch the admin URL from the Quantum service for
         a particular endpoint attribute. If none given, return
-        the first. See tests for sample service catalog."""
+        the first. See tests for sample service catalog.
+        """
 
         catalog = self.catalog['access'].get('serviceCatalog', [])
         matching_endpoints = []
@@ -85,7 +86,7 @@ class ServiceCatalog(object):
 
 
 class HTTPClient(httplib2.Http):
-    """Handles the REST calls and responses, include authn"""
+    """Handles the REST calls and responses, include authn."""
 
     USER_AGENT = 'python-quantumclient'
 
@@ -158,7 +159,7 @@ class HTTPClient(httplib2.Http):
             return resp, body
 
     def _extract_service_catalog(self, body):
-        """ Set the client's service catalog from the response data. """
+        """Set the client's service catalog from the response data."""
         self.service_catalog = ServiceCatalog(body)
         try:
             sc = self.service_catalog.get_token()

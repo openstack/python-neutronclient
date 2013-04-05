@@ -28,7 +28,7 @@ class CLITestV20LbVipJSON(test_cli20.CLITestV20Base):
         super(CLITestV20LbVipJSON, self).setUp(plurals={'tags': 'tag'})
 
     def test_create_vip_with_mandatory_params(self):
-        """lb-vip-create with all mandatory params"""
+        """lb-vip-create with all mandatory params."""
         resource = 'vip'
         cmd = vip.CreateVip(test_cli20.MyApp(sys.stdout), None)
         pool_id = 'my-pool-id'
@@ -53,7 +53,7 @@ class CLITestV20LbVipJSON(test_cli20.CLITestV20Base):
                                    admin_state_up=True)
 
     def test_create_vip_with_all_params(self):
-        """lb-vip-create with all params"""
+        """lb-vip-create with all params."""
         resource = 'vip'
         cmd = vip.CreateVip(test_cli20.MyApp(sys.stdout), None)
         pool_id = 'my-pool-id'
@@ -89,7 +89,7 @@ class CLITestV20LbVipJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_vip_with_session_persistence_params(self):
-        """lb-vip-create with mandatory and session-persistence params"""
+        """lb-vip-create with mandatory and session-persistence params."""
         resource = 'vip'
         cmd = vip.CreateVip(test_cli20.MyApp(sys.stdout), None)
         pool_id = 'my-pool-id'
@@ -123,13 +123,13 @@ class CLITestV20LbVipJSON(test_cli20.CLITestV20Base):
                                    admin_state_up=True, extra_body=extra_body)
 
     def test_list_vips(self):
-        """lb-vip-list"""
+        """lb-vip-list."""
         resources = "vips"
         cmd = vip.ListVip(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_vips_pagination(self):
-        """lb-vip-list"""
+        """lb-vip-list."""
         resources = "vips"
         cmd = vip.ListVip(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources_with_pagination(resources, cmd)
@@ -145,20 +145,20 @@ class CLITestV20LbVipJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_vips_limit(self):
-        """lb-vip-list -P"""
+        """lb-vip-list -P."""
         resources = "vips"
         cmd = vip.ListVip(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_show_vip_id(self):
-        """lb-vip-show test_id"""
+        """lb-vip-show test_id."""
         resource = 'vip'
         cmd = vip.ShowVip(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
     def test_show_vip_id_name(self):
-        """lb-vip-show"""
+        """lb-vip-show."""
         resource = 'vip'
         cmd = vip.ShowVip(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
@@ -202,7 +202,7 @@ class CLITestV20LbVipJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, 'myid', args, body)
 
     def test_delete_vip(self):
-        """lb-vip-delete my-id"""
+        """lb-vip-delete my-id."""
         resource = 'vip'
         cmd = vip.DeleteVip(test_cli20.MyApp(sys.stdout), None)
         my_id = 'my-id'

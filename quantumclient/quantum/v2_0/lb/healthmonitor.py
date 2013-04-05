@@ -41,7 +41,7 @@ class ShowHealthMonitor(quantumv20.ShowCommand):
 
 
 class CreateHealthMonitor(quantumv20.CreateCommand):
-    """Create a healthmonitor"""
+    """Create a healthmonitor."""
 
     resource = 'health_monitor'
     log = logging.getLogger(__name__ + '.CreateHealthMonitor')

@@ -119,7 +119,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         self._test_delete_resource(resource, cmd, myid, args)
 
     def test_create_security_group_rule_full(self):
-        """Create security group rule"""
+        """Create security group rule."""
         resource = 'security_group_rule'
         cmd = securitygroup.CreateSecurityGroupRule(
             test_cli20.MyApp(sys.stdout), None)

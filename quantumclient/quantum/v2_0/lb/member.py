@@ -43,7 +43,7 @@ class ShowMember(quantumv20.ShowCommand):
 
 
 class CreateMember(quantumv20.CreateCommand):
-    """Create a member"""
+    """Create a member."""
 
     resource = 'member'
     log = logging.getLogger(__name__ + '.CreateMember')

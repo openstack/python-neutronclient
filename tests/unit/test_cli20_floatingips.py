@@ -61,7 +61,7 @@ class CLITestV20FloatingIpsJSON(CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_floatingip_and_port_and_address(self):
-        """Create floatingip: fip1 with a given port and address"""
+        """Create floatingip: fip1 with a given port and address."""
         resource = 'floatingip'
         cmd = CreateFloatingIP(MyApp(sys.stdout), None)
         name = 'fip1'
@@ -107,7 +107,7 @@ class CLITestV20FloatingIpsJSON(CLITestV20Base):
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_delete_floatingip(self):
-        """Delete floatingip: fip1"""
+        """Delete floatingip: fip1."""
         resource = 'floatingip'
         cmd = DeleteFloatingIP(MyApp(sys.stdout), None)
         myid = 'myid'
@@ -123,7 +123,7 @@ class CLITestV20FloatingIpsJSON(CLITestV20Base):
                                  args, ['id'])
 
     def test_disassociate_ip(self):
-        """Disassociate floating IP: myid"""
+        """Disassociate floating IP: myid."""
         resource = 'floatingip'
         cmd = DisassociateFloatingIP(MyApp(sys.stdout), None)
         args = ['myid']
@@ -132,7 +132,7 @@ class CLITestV20FloatingIpsJSON(CLITestV20Base):
                                    )
 
     def test_associate_ip(self):
-        """Associate floating IP: myid portid"""
+        """Associate floating IP: myid portid."""
         resource = 'floatingip'
         cmd = AssociateFloatingIP(MyApp(sys.stdout), None)
         args = ['myid', 'portid']

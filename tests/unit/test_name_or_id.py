@@ -23,14 +23,14 @@ import testtools
 
 from quantumclient.common import exceptions
 from quantumclient.quantum import v2_0 as quantumv20
-from tests.unit import test_cli20
 from quantumclient.v2_0.client import Client
+from tests.unit import test_cli20
 
 
 class CLITestNameorID(testtools.TestCase):
 
     def setUp(self):
-        """Prepare the test environment"""
+        """Prepare the test environment."""
         super(CLITestNameorID, self).setUp()
         self.mox = mox.Mox()
         self.endurl = test_cli20.ENDURL

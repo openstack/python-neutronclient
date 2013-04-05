@@ -42,7 +42,7 @@ class ShowVip(quantumv20.ShowCommand):
 
 
 class CreateVip(quantumv20.CreateCommand):
-    """Create a vip"""
+    """Create a vip."""
 
     resource = 'vip'
     log = logging.getLogger(__name__ + '.CreateVip')

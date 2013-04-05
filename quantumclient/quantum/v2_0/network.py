@@ -44,7 +44,7 @@ class ListNetwork(ListCommand):
     sorting_support = True
 
     def extend_list(self, data, parsed_args):
-        """Add subnet information to a network list"""
+        """Add subnet information to a network list."""
         quantum_client = self.get_client()
         search_opts = {'fields': ['id', 'cidr']}
         if self.pagination_support:
@@ -65,7 +65,7 @@ class ListNetwork(ListCommand):
 
 
 class ListExternalNetwork(ListNetwork):
-    """List external networks that belong to a given tenant"""
+    """List external networks that belong to a given tenant."""
 
     log = logging.getLogger(__name__ + '.ListExternalNetwork')
     pagination_support = True

@@ -4,6 +4,7 @@ discover
 distribute>=0.6.24
 fixtures>=0.3.12
 flake8
+hacking
 mox
 python-subunit
 sphinx>=1.1.2

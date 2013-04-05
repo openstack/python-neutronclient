@@ -46,7 +46,7 @@ class ListPort(ListCommand):
 
 
 class ListRouterPort(ListCommand):
-    """List ports that belong to a given tenant, with specified router"""
+    """List ports that belong to a given tenant, with specified router."""
 
     resource = 'port'
     log = logging.getLogger(__name__ + '.ListRouterPort')

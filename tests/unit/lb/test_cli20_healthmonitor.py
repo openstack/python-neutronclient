@@ -27,7 +27,7 @@ from tests.unit import test_cli20
 
 class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
     def test_create_healthmonitor_with_mandatory_params(self):
-        """lb-healthmonitor-create with mandatory params only"""
+        """lb-healthmonitor-create with mandatory params only."""
         resource = 'health_monitor'
         cmd = healthmonitor.CreateHealthMonitor(test_cli20.MyApp(sys.stdout),
                                                 None)
@@ -52,7 +52,7 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_healthmonitor_with_all_params(self):
-        """lb-healthmonitor-create with all params set"""
+        """lb-healthmonitor-create with all params set."""
         resource = 'health_monitor'
         cmd = healthmonitor.CreateHealthMonitor(test_cli20.MyApp(sys.stdout),
                                                 None)
@@ -87,14 +87,14 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_list_healthmonitors(self):
-        """lb-healthmonitor-list"""
+        """lb-healthmonitor-list."""
         resources = "health_monitors"
         cmd = healthmonitor.ListHealthMonitor(test_cli20.MyApp(sys.stdout),
                                               None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_healthmonitors_pagination(self):
-        """lb-healthmonitor-list"""
+        """lb-healthmonitor-list."""
         resources = "health_monitors"
         cmd = healthmonitor.ListHealthMonitor(test_cli20.MyApp(sys.stdout),
                                               None)
@@ -112,14 +112,14 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_healthmonitors_limit(self):
-        """lb-healthmonitor-list -P"""
+        """lb-healthmonitor-list -P."""
         resources = "health_monitors"
         cmd = healthmonitor.ListHealthMonitor(test_cli20.MyApp(sys.stdout),
                                               None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_show_healthmonitor_id(self):
-        """lb-healthmonitor-show test_id"""
+        """lb-healthmonitor-show test_id."""
         resource = 'health_monitor'
         cmd = healthmonitor.ShowHealthMonitor(test_cli20.MyApp(sys.stdout),
                                               None)
@@ -127,7 +127,7 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
     def test_show_healthmonitor_id_name(self):
-        """lb-healthmonitor-show"""
+        """lb-healthmonitor-show."""
         resource = 'health_monitor'
         cmd = healthmonitor.ShowHealthMonitor(test_cli20.MyApp(sys.stdout),
                                               None)
@@ -145,7 +145,7 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
                                    {'timeout': '5', })
 
     def test_delete_healthmonitor(self):
-        """lb-healthmonitor-delete my-id"""
+        """lb-healthmonitor-delete my-id."""
         resource = 'health_monitor'
         cmd = healthmonitor.DeleteHealthMonitor(test_cli20.MyApp(sys.stdout),
                                                 None)
