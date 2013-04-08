@@ -31,7 +31,9 @@ from tests.unit.test_cli20 import CLITestV20Base
 from tests.unit.test_cli20 import MyApp
 
 
-class CLITestV20Port(CLITestV20Base):
+class CLITestV20PortJSON(CLITestV20Base):
+    def setUp(self):
+        super(CLITestV20PortJSON, self).setUp(plurals={'tags': 'tag'})
 
     def test_create_port(self):
         """Create port: netid."""
@@ -304,3 +306,7 @@ class CLITestV20Port(CLITestV20Base):
         myid = 'myid'
         args = [myid]
         self._test_delete_resource(resource, cmd, myid, args)
+
+
+class CLITestV20PortXML(CLITestV20PortJSON):
+    format = 'xml'

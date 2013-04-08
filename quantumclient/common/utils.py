@@ -27,6 +27,7 @@ import os
 import sys
 
 from quantumclient.common import exceptions
+from quantumclient.openstack.common import strutils
 
 
 def env(*vars, **kwargs):
@@ -165,6 +166,7 @@ def http_log_req(_logger, args, kwargs):
 
     if 'body' in kwargs and kwargs['body']:
         string_parts.append(" -d '%s'" % (kwargs['body']))
+    string_parts = safe_encode_list(string_parts)
     _logger.debug("\nREQ: %s\n" % "".join(string_parts))
 
 
@@ -172,3 +174,24 @@ def http_log_resp(_logger, resp, body):
     if not _logger.isEnabledFor(logging.DEBUG):
         return
     _logger.debug("RESP:%s %s\n", resp, body)
+
+
+def _safe_encode_without_obj(data):
+    if isinstance(data, basestring):
+        return strutils.safe_encode(data)
+    return data
+
+
+def safe_encode_list(data):
+    return map(_safe_encode_without_obj, data)
+
+
+def safe_encode_dict(data):
+    def _encode_item((k, v)):
+        if isinstance(v, list):
+            return (k, safe_encode_list(v))
+        elif isinstance(v, dict):
+            return (k, safe_encode_dict(v))
+        return (k, _safe_encode_without_obj(v))
+
+    return dict(map(_encode_item, data.items()))

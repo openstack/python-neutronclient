@@ -58,7 +58,9 @@ class JSONDictSerializer(DictSerializer):
     """Default JSON request body serialization"""
 
     def default(self, data):
-        return jsonutils.dumps(data)
+        def sanitizer(obj):
+            return unicode(obj)
+        return jsonutils.dumps(data, default=sanitizer)
 
 
 class XMLDictSerializer(DictSerializer):
@@ -78,21 +80,33 @@ class XMLDictSerializer(DictSerializer):
         self.xmlns = xmlns
 
     def default(self, data):
-        # We expect data to contain a single key which is the XML root or
-        # non root
+        """
+        :param data: expect data to contain a single key as XML root, or
+                     contain another '*_links' key as atom links. Other
+                     case will use 'VIRTUAL_ROOT_KEY' as XML root.
+        """
         try:
-            key_len = data and len(data.keys()) or 0
-            if (key_len == 1):
-                root_key = data.keys()[0]
-                root_value = data[root_key]
-            else:
+            links = None
+            has_atom = False
+            if data is None:
                 root_key = constants.VIRTUAL_ROOT_KEY
-                root_value = data
+                root_value = None
+            else:
+                link_keys = [k for k in data.iterkeys() or []
+                             if k.endswith('_links')]
+                if link_keys:
+                    links = data.pop(link_keys[0], None)
+                    has_atom = True
+                root_key = (len(data) == 1 and
+                            data.keys()[0] or constants.VIRTUAL_ROOT_KEY)
+                root_value = data.get(root_key, data)
             doc = etree.Element("_temp_root")
             used_prefixes = []
             self._to_xml_node(doc, self.metadata, root_key,
                               root_value, used_prefixes)
-            return self.to_xml_string(list(doc)[0], used_prefixes)
+            if links:
+                self._create_link_nodes(list(doc)[0], links)
+            return self.to_xml_string(list(doc)[0], used_prefixes, has_atom)
         except AttributeError as e:
             LOG.exception(str(e))
             return ''
@@ -115,7 +129,7 @@ class XMLDictSerializer(DictSerializer):
         node.set('xmlns', self.xmlns)
         node.set(constants.TYPE_XMLNS, self.xmlns)
         if has_atom:
-            node.set('xmlns:atom', "http://www.w3.org/2005/Atom")
+            node.set(constants.ATOM_XMLNS, constants.ATOM_NAMESPACE)
         node.set(constants.XSI_NIL_ATTR, constants.XSI_NAMESPACE)
         ext_ns = self.metadata.get(constants.EXT_NS, {})
         for prefix in used_prefixes:
@@ -179,19 +193,17 @@ class XMLDictSerializer(DictSerializer):
             LOG.debug(_("Data %(data)s type is %(type)s"),
                       {'data': data,
                        'type': type(data)})
-            result.text = str(data)
+            if isinstance(data, str):
+                result.text = unicode(data, 'utf-8')
+            else:
+                result.text = unicode(data)
         return result
 
     def _create_link_nodes(self, xml_doc, links):
-        link_nodes = []
         for link in links:
-            link_node = xml_doc.createElement('atom:link')
+            link_node = etree.SubElement(xml_doc, 'atom:link')
             link_node.set('rel', link['rel'])
             link_node.set('href', link['href'])
-            if 'type' in link:
-                link_node.set('type', link['type'])
-            link_nodes.append(link_node)
-        return link_nodes
 
 
 class TextDeserializer(ActionDispatcher):
@@ -329,7 +341,7 @@ class XMLDeserializer(TextDeserializer):
                     attr == constants.XSI_ATTR or
                     attr == constants.TYPE_ATTR):
                     continue
-                result[self._get_key(attr)] = node.get[attr]
+                result[self._get_key(attr)] = node.get(attr)
             children = list(node)
             for child in children:
                 result[self._get_key(child.tag)] = self._from_xml_node(

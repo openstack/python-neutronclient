@@ -122,6 +122,8 @@ class HTTPClient(httplib2.Http):
 
         if 'body' in kwargs:
             kargs['body'] = kwargs['body']
+        args = utils.safe_encode_list(args)
+        kargs = utils.safe_encode_dict(kargs)
         utils.http_log_req(_logger, args, kargs)
         resp, body = self.request(*args, **kargs)
         utils.http_log_resp(_logger, resp, body)

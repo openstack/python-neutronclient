@@ -28,7 +28,7 @@ from tests.unit.test_cli20 import CLITestV20Base
 from tests.unit.test_cli20 import MyApp
 
 
-class CLITestV20FloatingIps(CLITestV20Base):
+class CLITestV20FloatingIpsJSON(CLITestV20Base):
     def test_create_floatingip(self):
         """Create floatingip: fip1."""
         resource = 'floatingip'
@@ -139,3 +139,7 @@ class CLITestV20FloatingIps(CLITestV20Base):
         self._test_update_resource(resource, cmd, 'myid',
                                    args, {"port_id": "portid"}
                                    )
+
+
+class CLITestV20FloatingIpsXML(CLITestV20FloatingIpsJSON):
+    format = 'xml'

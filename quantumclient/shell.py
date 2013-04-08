@@ -31,6 +31,7 @@ from cliff.commandmanager import CommandManager
 from quantumclient.common import clientmanager
 from quantumclient.common import exceptions as exc
 from quantumclient.common import utils
+from quantumclient.openstack.common import strutils
 
 
 VERSION = '2.0'
@@ -476,10 +477,10 @@ class QuantumShell(App):
             self.initialize_app(remainder)
         except Exception as err:
             if self.options.debug:
-                self.log.exception(err)
+                self.log.exception(unicode(err))
                 raise
             else:
-                self.log.error(err)
+                self.log.error(unicode(err))
             return 1
         result = 1
         if self.interactive_mode:
@@ -506,16 +507,16 @@ class QuantumShell(App):
             return run_command(cmd, cmd_parser, sub_argv)
         except Exception as err:
             if self.options.debug:
-                self.log.exception(err)
+                self.log.exception(unicode(err))
             else:
-                self.log.error(err)
+                self.log.error(unicode(err))
             try:
                 self.clean_up(cmd, result, err)
             except Exception as err2:
                 if self.options.debug:
-                    self.log.exception(err2)
+                    self.log.exception(unicode(err2))
                 else:
-                    self.log.error('Could not clean up: %s', err2)
+                    self.log.error('Could not clean up: %s', unicode(err2))
             if self.options.debug:
                 raise
         else:
@@ -523,9 +524,9 @@ class QuantumShell(App):
                 self.clean_up(cmd, result, None)
             except Exception as err3:
                 if self.options.debug:
-                    self.log.exception(err3)
+                    self.log.exception(unicode(err3))
                 else:
-                    self.log.error('Could not clean up: %s', err3)
+                    self.log.error('Could not clean up: %s', unicode(err3))
         return result
 
     def authenticate_user(self):
@@ -608,7 +609,7 @@ class QuantumShell(App):
     def clean_up(self, cmd, result, err):
         self.log.debug('clean_up %s', cmd.__class__.__name__)
         if err:
-            self.log.debug('got an error: %s', err)
+            self.log.debug('got an error: %s', unicode(err))
 
     def configure_logging(self):
         """Create logging handlers for any log output.
@@ -637,11 +638,12 @@ class QuantumShell(App):
 def main(argv=sys.argv[1:]):
     gettext.install('quantumclient', unicode=1)
     try:
-        return QuantumShell(QUANTUM_API_VERSION).run(argv)
+        return QuantumShell(QUANTUM_API_VERSION).run(map(strutils.safe_decode,
+                                                         argv))
     except exc.QuantumClientException:
         return 1
     except Exception as e:
-        print e
+        print unicode(e)
         return 1
 
 

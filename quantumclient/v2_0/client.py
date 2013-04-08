@@ -26,6 +26,7 @@ from quantumclient.common import _
 from quantumclient.common import constants
 from quantumclient.common import exceptions
 from quantumclient.common import serializer
+from quantumclient.common import utils
 
 
 _logger = logging.getLogger(__name__)
@@ -897,6 +898,7 @@ class Client(object):
         action += ".%s" % self.format
         action = self.action_prefix + action
         if type(params) is dict and params:
+            params = utils.safe_encode_dict(params)
             action += '?' + urllib.urlencode(params, doseq=1)
         if body:
             body = self.serialize(body)
