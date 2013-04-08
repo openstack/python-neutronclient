@@ -19,6 +19,7 @@ import argparse
 import logging
 import re
 
+from cliff.formatters import table
 from cliff import lister
 from cliff import show
 
@@ -252,11 +253,29 @@ def update_dict(obj, dict, attributes):
             dict[attribute] = getattr(obj, attribute)
 
 
+class TableFormater(table.TableFormatter):
+    """This class is used to keep consistency with prettytable 0.6.
+
+    https://bugs.launchpad.net/python-quantumclient/+bug/1165962
+    """
+    def emit_list(self, column_names, data, stdout, parsed_args):
+        if column_names:
+            super(TableFormater, self).emit_list(column_names, data, stdout,
+                                                 parsed_args)
+        else:
+            stdout.write('\n')
+
+
 class QuantumCommand(command.OpenStackCommand):
     api = 'network'
     log = logging.getLogger(__name__ + '.QuantumCommand')
     values_specs = []
     json_indent = None
+
+    def __init__(self, app, app_args):
+        super(QuantumCommand, self).__init__(app, app_args)
+        if hasattr(self, 'formatters'):
+            self.formatters['table'] = TableFormater()
 
     def get_client(self):
         return self.app.client_manager.quantum
