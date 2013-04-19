@@ -131,13 +131,13 @@ class Client(object):
 
     Example::
 
-        >>> from quantumclient.v2_0 import client
-        >>> quantum = client.Client(username=USER,
-                                     password=PASS,
-                                     tenant_name=TENANT_NAME,
-                                     auth_url=KEYSTONE_URL)
+        from quantumclient.v2_0 import client
+        quantum = client.Client(username=USER,
+                                password=PASS,
+                                tenant_name=TENANT_NAME,
+                                auth_url=KEYSTONE_URL)
 
-        >>> nets = quantum.list_networks()
+        nets = quantum.list_networks()
         ...
 
     """
