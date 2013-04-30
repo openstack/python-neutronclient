@@ -406,6 +406,11 @@ class QuantumShell(App):
             help=argparse.SUPPRESS)
 
         parser.add_argument(
+            '--endpoint-type', metavar='<endpoint-type>',
+            default=env('OS_ENDPOINT_TYPE', default='publicURL'),
+            help='Defaults to env[OS_ENDPOINT_TYPE] or publicURL.')
+
+        parser.add_argument(
             '--os-url', metavar='<url>',
             default=env('OS_URL'),
             help='Defaults to env[OS_URL]')
@@ -583,6 +588,7 @@ class QuantumShell(App):
             region_name=self.options.os_region_name,
             api_version=self.api_version,
             auth_strategy=self.options.os_auth_strategy,
+            endpoint_type=self.options.endpoint_type,
             insecure=self.options.insecure, )
         return
 

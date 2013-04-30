@@ -111,6 +111,14 @@ class EndpointNotFound(QuantumClientException):
     message = _("Could not find Service or Region in Service Catalog.")
 
 
+class EndpointTypeNotFound(QuantumClientException):
+    """Could not find endpoint type in Service Catalog."""
+
+    def __str__(self):
+        msg = "Could not find endpoint type %s in Service Catalog."
+        return msg % repr(self.message)
+
+
 class AmbiguousEndpoints(QuantumClientException):
     """Found more than one matching endpoint in Service Catalog."""
 

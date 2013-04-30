@@ -119,6 +119,9 @@ class Client(object):
     :param string token: Token for authentication. (optional)
     :param string tenant_name: Tenant name. (optional)
     :param string auth_url: Keystone service endpoint for authorization.
+    :param string endpoint_type: Network service endpoint type to pull from the
+                                 keystone catalog (e.g. 'publicURL',
+                                 'internalURL', or 'adminURL') (optional)
     :param string region_name: Name of a region to select when choosing an
                                endpoint from the service catalog.
     :param string endpoint_url: A user-supplied endpoint URL for the quantum
