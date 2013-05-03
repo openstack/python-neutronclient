@@ -18,6 +18,7 @@
 import argparse
 import logging
 
+from quantumclient.common import exceptions
 from quantumclient.quantum.v2_0 import CreateCommand
 from quantumclient.quantum.v2_0 import DeleteCommand
 from quantumclient.quantum.v2_0 import ListCommand
@@ -36,6 +37,9 @@ def _format_subnets(network):
 class ListNetwork(ListCommand):
     """List networks that belong to a given tenant."""
 
+    # Length of a query filter on subnet id
+    # id=<uuid>& (with len(uuid)=36)
+    subnet_id_filter_len = 40
     resource = 'network'
     log = logging.getLogger(__name__ + '.ListNetwork')
     _formatters = {'subnets': _format_subnets, }
@@ -55,8 +59,27 @@ class ListNetwork(ListCommand):
         for n in data:
             if 'subnets' in n:
                 subnet_ids.extend(n['subnets'])
-        search_opts.update({'id': subnet_ids})
-        subnets = quantum_client.list_subnets(**search_opts).get('subnets', [])
+
+        def _get_subnet_list(sub_ids):
+            search_opts['id'] = sub_ids
+            return quantum_client.list_subnets(
+                **search_opts).get('subnets', [])
+
+        try:
+            subnets = _get_subnet_list(subnet_ids)
+        except exceptions.RequestURITooLong as uri_len_exc:
+            # The URI is too long because of too many subnet_id filters
+            # Use the excess attribute of the exception to know how many
+            # subnet_id filters can be inserted into a single request
+            subnet_count = len(subnet_ids)
+            max_size = ((self.subnet_id_filter_len * subnet_count) -
+                        uri_len_exc.excess)
+            chunk_size = max_size / self.subnet_id_filter_len
+            subnets = []
+            for i in xrange(0, subnet_count, chunk_size):
+                subnets.extend(
+                    _get_subnet_list(subnet_ids[i: i + chunk_size]))
+
         subnet_dict = dict([(s['id'], s) for s in subnets])
         for n in data:
             if 'subnets' in n:

@@ -1,4 +1,3 @@
-# Copyright 2012 OpenStack LLC.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -472,6 +471,72 @@ class CLITestV20NetworkJSON(CLITestV20Base):
         myid = 'myid'
         args = [myid]
         self._test_delete_resource(resource, cmd, myid, args)
+
+    def _test_extend_list(self, mox_calls):
+        data = [{'id': 'netid%d' % i, 'name': 'net%d' % i,
+                 'subnets': ['mysubid%d' % i]}
+                for i in range(0, 10)]
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        path = getattr(self.client, 'subnets_path')
+        cmd = ListNetwork(MyApp(sys.stdout), None)
+        self.mox.StubOutWithMock(cmd, "get_client")
+        cmd.get_client().MultipleTimes().AndReturn(self.client)
+        mox_calls(path, data)
+        self.mox.ReplayAll()
+        known_args, _vs = cmd.get_parser('create_subnets').parse_known_args()
+        cmd.extend_list(data, known_args)
+        self.mox.VerifyAll()
+
+    def _build_test_data(self, data):
+        subnet_ids = []
+        response = []
+        filters = ""
+        for n in data:
+            if 'subnets' in n:
+                subnet_ids.extend(n['subnets'])
+                for subnet_id in n['subnets']:
+                    filters = "%s&id=%s" % (filters, subnet_id)
+                    response.append({'id': subnet_id,
+                                     'cidr': '192.168.0.0/16'})
+        resp_str = self.client.serialize({'subnets': response})
+        resp = (test_cli20.MyResp(200), resp_str)
+        return filters, resp
+
+    def test_extend_list(self):
+        def mox_calls(path, data):
+            filters, response = self._build_test_data(data)
+            self.client.httpclient.request(
+                test_cli20.end_url(path, 'fields=id&fields=cidr' + filters),
+                'GET',
+                body=None,
+                headers=ContainsKeyValue(
+                    'X-Auth-Token', test_cli20.TOKEN)).AndReturn(response)
+
+        self._test_extend_list(mox_calls)
+
+    def test_extend_list_exceed_max_uri_len(self):
+        def mox_calls(path, data):
+            sub_data_lists = [data[:len(data) - 1], data[len(data) - 1:]]
+            filters, response = self._build_test_data(data)
+            # 1 char of extra URI len will cause a split in 2 requests
+            self.client.httpclient.request(
+                test_cli20.end_url(path, 'fields=id&fields=cidr%s' % filters),
+                'GET',
+                body=None,
+                headers=ContainsKeyValue(
+                    'X-Auth-Token', test_cli20.TOKEN)).AndRaise(
+                        exceptions.RequestURITooLong(excess=1))
+            for data in sub_data_lists:
+                filters, response = self._build_test_data(data)
+                self.client.httpclient.request(
+                    test_cli20.end_url(path,
+                                       'fields=id&fields=cidr%s' % filters),
+                    'GET',
+                    body=None,
+                    headers=ContainsKeyValue(
+                        'X-Auth-Token', test_cli20.TOKEN)).AndReturn(response)
+
+        self._test_extend_list(mox_calls)
 
 
 class CLITestV20NetworkXML(CLITestV20NetworkJSON):

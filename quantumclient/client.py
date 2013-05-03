@@ -135,12 +135,14 @@ class HTTPClient(httplib2.Http):
             raise exceptions.Forbidden(message=body)
         return resp, body
 
-    def do_request(self, url, method, **kwargs):
+    def authenticate_and_fetch_endpoint_url(self):
         if not self.auth_token:
             self.authenticate()
         elif not self.endpoint_url:
             self.endpoint_url = self._get_endpoint_url()
 
+    def do_request(self, url, method, **kwargs):
+        self.authenticate_and_fetch_endpoint_url()
         # Perform the request once. If we get a 401 back then it
         # might be because the auth token expired, so try to
         # re-authenticate and try again. If it still fails, bail.
