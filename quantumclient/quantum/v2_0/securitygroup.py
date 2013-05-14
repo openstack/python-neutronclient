@@ -73,6 +73,31 @@ class DeleteSecurityGroup(quantumv20.DeleteCommand):
     allow_names = True
 
 
+class UpdateSecurityGroup(quantumv20.UpdateCommand):
+    """Update a given security group."""
+
+    log = logging.getLogger(__name__ + '.UpdateSecurityGroup')
+    resource = 'security_group'
+
+    def add_known_arguments(self, parser):
+        parser.add_argument(
+            '--name',
+            help='Name of security group')
+        parser.add_argument(
+            '--description',
+            help='description of security group')
+
+    def args2body(self, parsed_args):
+        body = {'security_group': {}}
+        if parsed_args.name:
+            body['security_group'].update(
+                {'name': parsed_args.name})
+        if parsed_args.description:
+            body['security_group'].update(
+                {'description': parsed_args.description})
+        return body
+
+
 class ListSecurityGroupRule(quantumv20.ListCommand):
     """List security group rules that belong to a given tenant."""
 

@@ -150,6 +150,8 @@ COMMAND_V2 = {
         'quantumclient.quantum.v2_0.securitygroup.CreateSecurityGroup'),
     'security-group-delete': utils.import_class(
         'quantumclient.quantum.v2_0.securitygroup.DeleteSecurityGroup'),
+    'security-group-update': utils.import_class(
+        'quantumclient.quantum.v2_0.securitygroup.UpdateSecurityGroup'),
     'security-group-rule-list': utils.import_class(
         'quantumclient.quantum.v2_0.securitygroup.ListSecurityGroupRule'),
     'security-group-rule-show': utils.import_class(

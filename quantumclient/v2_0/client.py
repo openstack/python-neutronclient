@@ -471,6 +471,14 @@ class Client(object):
         return self.post(self.security_groups_path, body=body)
 
     @APIParamsCall
+    def update_security_group(self, security_group, body=None):
+        """
+        Updates a security group
+        """
+        return self.put(self.security_group_path %
+                        security_group, body=body)
+
+    @APIParamsCall
     def list_security_groups(self, retrieve_all=True, **_params):
         """
         Fetches a list of all security groups for a tenant

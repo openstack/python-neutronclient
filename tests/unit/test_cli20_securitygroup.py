@@ -118,6 +118,29 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         args = [myid]
         self._test_delete_resource(resource, cmd, myid, args)
 
+    def test_update_security_group(self):
+        """Update security group: myid --name myname --description desc."""
+        resource = 'security_group'
+        cmd = securitygroup.UpdateSecurityGroup(
+            test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--name', 'myname',
+                                    '--description', 'mydescription'],
+                                   {'name': 'myname',
+                                    'description': 'mydescription'}
+                                   )
+
+    def test_update_security_group_with_unicode(self):
+        resource = 'security_group'
+        cmd = securitygroup.UpdateSecurityGroup(
+            test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--name', u'\u7f51\u7edc',
+                                    '--description', u'\u7f51\u7edc'],
+                                   {'name': u'\u7f51\u7edc',
+                                    'description': u'\u7f51\u7edc'}
+                                   )
+
     def test_create_security_group_rule_full(self):
         """Create security group rule."""
         resource = 'security_group_rule'
