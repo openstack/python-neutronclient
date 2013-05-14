@@ -1,10 +1,14 @@
+# Install bounded pep8/pyflakes first, then let flake8 install
+pep8==1.4.5
+pyflakes==0.7.2
+flake8==2.0
+hacking>=0.5.3,<0.6
+
 cliff-tablib>=1.0
 coverage
 discover
 distribute>=0.6.24
 fixtures>=0.3.12
-flake8
-hacking
 mox
 python-subunit
 sphinx>=1.1.2
