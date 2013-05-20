@@ -53,6 +53,10 @@ from neutronclient.neutron.v2_0 import router
 from neutronclient.neutron.v2_0 import securitygroup
 from neutronclient.neutron.v2_0 import servicetype
 from neutronclient.neutron.v2_0 import subnet
+from neutronclient.neutron.v2_0.vpn import ikepolicy
+from neutronclient.neutron.v2_0.vpn import ipsec_site_connection
+from neutronclient.neutron.v2_0.vpn import ipsecpolicy
+from neutronclient.neutron.v2_0.vpn import vpnservice
 from neutronclient.openstack.common import strutils
 from neutronclient.version import __version__
 
@@ -75,7 +79,7 @@ def run_command(cmd, cmd_parser, sub_argv):
 
 
 def env(*_vars, **kwargs):
-    """Search for the first defined of possibly many env vars
+    """Search for the first defined of possibly many env vars.
 
     Returns the first environment variable defined in vars, or
     returns the default defined in kwargs.
@@ -216,6 +220,36 @@ COMMAND_V2 = {
     'cisco-policy-profile-list': policyprofile.ListPolicyProfile,
     'cisco-policy-profile-show': policyprofile.ShowPolicyProfile,
     'cisco-policy-profile-update': policyprofile.UpdatePolicyProfile,
+    'ipsec-site-connection-list': (
+        ipsec_site_connection.ListIPsecSiteConnection
+    ),
+    'ipsec-site-connection-show': (
+        ipsec_site_connection.ShowIPsecSiteConnection
+    ),
+    'ipsec-site-connection-create': (
+        ipsec_site_connection.CreateIPsecSiteConnection
+    ),
+    'ipsec-site-connection-update': (
+        ipsec_site_connection.UpdateIPsecSiteConnection
+    ),
+    'ipsec-site-connection-delete': (
+        ipsec_site_connection.DeleteIPsecSiteConnection
+    ),
+    'vpn-service-list': vpnservice.ListVPNService,
+    'vpn-service-show': vpnservice.ShowVPNService,
+    'vpn-service-create': vpnservice.CreateVPNService,
+    'vpn-service-update': vpnservice.UpdateVPNService,
+    'vpn-service-delete': vpnservice.DeleteVPNService,
+    'vpn-ipsecpolicy-list': ipsecpolicy.ListIPsecPolicy,
+    'vpn-ipsecpolicy-show': ipsecpolicy.ShowIPsecPolicy,
+    'vpn-ipsecpolicy-create': ipsecpolicy.CreateIPsecPolicy,
+    'vpn-ipsecpolicy-update': ipsecpolicy.UpdateIPsecPolicy,
+    'vpn-ipsecpolicy-delete': ipsecpolicy.DeleteIPsecPolicy,
+    'vpn-ikepolicy-list': ikepolicy.ListIKEPolicy,
+    'vpn-ikepolicy-show': ikepolicy.ShowIKEPolicy,
+    'vpn-ikepolicy-create': ikepolicy.CreateIKEPolicy,
+    'vpn-ikepolicy-update': ikepolicy.UpdateIKEPolicy,
+    'vpn-ikepolicy-delete': ikepolicy.DeleteIKEPolicy,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}
@@ -594,8 +628,7 @@ class NeutronShell(app.App):
             self.log.debug('got an error: %s', unicode(err))
 
     def configure_logging(self):
-        """Create logging handlers for any log output.
-        """
+        """Create logging handlers for any log output."""
         root_logger = logging.getLogger('')
 
         # Set up logging to a file

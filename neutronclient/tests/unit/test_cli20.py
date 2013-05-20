@@ -188,7 +188,8 @@ class CLITestV20Base(testtools.TestCase):
         non_admin_status_resources = ['subnet', 'floatingip', 'security_group',
                                       'security_group_rule', 'qos_queue',
                                       'network_gateway', 'credential',
-                                      'network_profile', 'policy_profile']
+                                      'network_profile', 'policy_profile',
+                                      'ikepolicy', 'ipsecpolicy']
         if (resource in non_admin_status_resources):
             body = {resource: {}, }
         else:
@@ -215,9 +216,13 @@ class CLITestV20Base(testtools.TestCase):
         resource_plural = neutronV2_0._get_resource_plural(resource,
                                                            self.client)
         path = getattr(self.client, resource_plural + "_path")
+        if self.format == 'json':
+            mox_body = MyComparator(body, self.client)
+        else:
+            mox_body = self.client.serialize(body)
         self.client.httpclient.request(
             end_url(path, format=self.format), 'POST',
-            body=MyComparator(body, self.client),
+            body=mox_body,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
         args.extend(['--request-format', self.format])

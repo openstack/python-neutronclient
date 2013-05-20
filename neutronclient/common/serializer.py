@@ -168,7 +168,7 @@ class XMLDictSerializer(DictSerializer):
                     constants.TYPE_DICT)
                 return result
             attrs = metadata.get('attributes', {}).get(nodename, {})
-            for k, v in data.items():
+            for k, v in sorted(data.items()):
                 if k in attrs:
                     result.set(k, str(v))
                 else:

@@ -165,6 +165,14 @@ class Client(object):
     security_group_path = "/security-groups/%s"
     security_group_rules_path = "/security-group-rules"
     security_group_rule_path = "/security-group-rules/%s"
+    vpnservices_path = "/vpn/vpnservices"
+    vpnservice_path = "/vpn/vpnservices/%s"
+    ipsecpolicies_path = "/vpn/ipsecpolicies"
+    ipsecpolicy_path = "/vpn/ipsecpolicies/%s"
+    ikepolicies_path = "/vpn/ikepolicies"
+    ikepolicy_path = "/vpn/ikepolicies/%s"
+    ipsec_site_connections_path = "/vpn/ipsec-site-connections"
+    ipsec_site_connection_path = "/vpn/ipsec-site-connections/%s"
     vips_path = "/lb/vips"
     vip_path = "/lb/vips/%s"
     pools_path = "/lb/pools"
@@ -215,6 +223,10 @@ class Client(object):
                      'service_definitions': 'service_definition',
                      'security_groups': 'security_group',
                      'security_group_rules': 'security_group_rule',
+                     'ipsecpolicies': 'ipsecpolicy',
+                     'ikepolicies': 'ikepolicy',
+                     'ipsec_site_connections': 'ipsec_site_connection',
+                     'vpnservices': 'vpnservice',
                      'vips': 'vip',
                      'pools': 'pool',
                      'members': 'member',
@@ -487,6 +499,118 @@ class Client(object):
         """Fetches information of a certain security group rule."""
         return self.get(self.security_group_rule_path % (security_group_rule),
                         params=_params)
+
+    @APIParamsCall
+    def list_vpnservices(self, retrieve_all=True, **_params):
+        """Fetches a list of all configured VPNServices for a tenant."""
+        return self.list('vpnservices', self.vpnservices_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_vpnservice(self, vpnservice, **_params):
+        """Fetches information of a specific VPNService."""
+        return self.get(self.vpnservice_path % (vpnservice), params=_params)
+
+    @APIParamsCall
+    def create_vpnservice(self, body=None):
+        """Creates a new VPNService."""
+        return self.post(self.vpnservices_path, body=body)
+
+    @APIParamsCall
+    def update_vpnservice(self, vpnservice, body=None):
+        """Updates a VPNService."""
+        return self.put(self.vpnservice_path % (vpnservice), body=body)
+
+    @APIParamsCall
+    def delete_vpnservice(self, vpnservice):
+        """Deletes the specified VPNService."""
+        return self.delete(self.vpnservice_path % (vpnservice))
+
+    @APIParamsCall
+    def list_ipsec_site_connections(self, retrieve_all=True, **_params):
+        """Fetches all configured IPsecSiteConnections for a tenant."""
+        return self.list('ipsec_site_connections',
+                         self.ipsec_site_connections_path,
+                         retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_ipsec_site_connection(self, ipsecsite_conn, **_params):
+        """Fetches information of a specific IPsecSiteConnection."""
+        return self.get(
+            self.ipsec_site_connection_path % (ipsecsite_conn), params=_params
+        )
+
+    @APIParamsCall
+    def create_ipsec_site_connection(self, body=None):
+        """Creates a new IPsecSiteConnection."""
+        return self.post(self.ipsec_site_connections_path, body=body)
+
+    @APIParamsCall
+    def update_ipsec_site_connection(self, ipsecsite_conn, body=None):
+        """Updates an IPsecSiteConnection."""
+        return self.put(
+            self.ipsec_site_connection_path % (ipsecsite_conn), body=body
+        )
+
+    @APIParamsCall
+    def delete_ipsec_site_connection(self, ipsecsite_conn):
+        """Deletes the specified IPsecSiteConnection."""
+        return self.delete(self.ipsec_site_connection_path % (ipsecsite_conn))
+
+    @APIParamsCall
+    def list_ikepolicies(self, retrieve_all=True, **_params):
+        """Fetches a list of all configured IKEPolicies for a tenant."""
+        return self.list('ikepolicies', self.ikepolicies_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_ikepolicy(self, ikepolicy, **_params):
+        """Fetches information of a specific IKEPolicy."""
+        return self.get(self.ikepolicy_path % (ikepolicy), params=_params)
+
+    @APIParamsCall
+    def create_ikepolicy(self, body=None):
+        """Creates a new IKEPolicy."""
+        return self.post(self.ikepolicies_path, body=body)
+
+    @APIParamsCall
+    def update_ikepolicy(self, ikepolicy, body=None):
+        """Updates an IKEPolicy."""
+        return self.put(self.ikepolicy_path % (ikepolicy), body=body)
+
+    @APIParamsCall
+    def delete_ikepolicy(self, ikepolicy):
+        """Deletes the specified IKEPolicy."""
+        return self.delete(self.ikepolicy_path % (ikepolicy))
+
+    @APIParamsCall
+    def list_ipsecpolicies(self, retrieve_all=True, **_params):
+        """Fetches a list of all configured IPsecPolicies for a tenant."""
+        return self.list('ipsecpolicies',
+                         self.ipsecpolicies_path,
+                         retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_ipsecpolicy(self, ipsecpolicy, **_params):
+        """Fetches information of a specific IPsecPolicy."""
+        return self.get(self.ipsecpolicy_path % (ipsecpolicy), params=_params)
+
+    @APIParamsCall
+    def create_ipsecpolicy(self, body=None):
+        """Creates a new IPsecPolicy."""
+        return self.post(self.ipsecpolicies_path, body=body)
+
+    @APIParamsCall
+    def update_ipsecpolicy(self, ipsecpolicy, body=None):
+        """Updates an IPsecPolicy."""
+        return self.put(self.ipsecpolicy_path % (ipsecpolicy), body=body)
+
+    @APIParamsCall
+    def delete_ipsecpolicy(self, ipsecpolicy):
+        """Deletes the specified IPsecPolicy."""
+        return self.delete(self.ipsecpolicy_path % (ipsecpolicy))
 
     @APIParamsCall
     def list_vips(self, retrieve_all=True, **_params):
