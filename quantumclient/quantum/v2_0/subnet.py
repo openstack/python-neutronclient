@@ -21,11 +21,6 @@ import logging
 from quantumclient.common import exceptions
 from quantumclient.common import utils
 from quantumclient.quantum import v2_0 as quantumv20
-from quantumclient.quantum.v2_0 import CreateCommand
-from quantumclient.quantum.v2_0 import DeleteCommand
-from quantumclient.quantum.v2_0 import ListCommand
-from quantumclient.quantum.v2_0 import ShowCommand
-from quantumclient.quantum.v2_0 import UpdateCommand
 
 
 def _format_allocation_pools(subnet):
@@ -52,7 +47,7 @@ def _format_host_routes(subnet):
         return ''
 
 
-class ListSubnet(ListCommand):
+class ListSubnet(quantumv20.ListCommand):
     """List networks that belong to a given tenant."""
 
     resource = 'subnet'
@@ -65,14 +60,14 @@ class ListSubnet(ListCommand):
     sorting_support = True
 
 
-class ShowSubnet(ShowCommand):
+class ShowSubnet(quantumv20.ShowCommand):
     """Show information of a given subnet."""
 
     resource = 'subnet'
     log = logging.getLogger(__name__ + '.ShowSubnet')
 
 
-class CreateSubnet(CreateCommand):
+class CreateSubnet(quantumv20.CreateCommand):
     """Create a subnet for a given tenant."""
 
     resource = 'subnet'
@@ -159,14 +154,14 @@ class CreateSubnet(CreateCommand):
         return body
 
 
-class DeleteSubnet(DeleteCommand):
+class DeleteSubnet(quantumv20.DeleteCommand):
     """Delete a given subnet."""
 
     resource = 'subnet'
     log = logging.getLogger(__name__ + '.DeleteSubnet')
 
 
-class UpdateSubnet(UpdateCommand):
+class UpdateSubnet(quantumv20.UpdateCommand):
     """Update subnet's information."""
 
     resource = 'subnet'

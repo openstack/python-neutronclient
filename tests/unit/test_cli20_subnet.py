@@ -17,23 +17,18 @@
 
 import sys
 
-from quantumclient.quantum.v2_0.subnet import CreateSubnet
-from quantumclient.quantum.v2_0.subnet import DeleteSubnet
-from quantumclient.quantum.v2_0.subnet import ListSubnet
-from quantumclient.quantum.v2_0.subnet import ShowSubnet
-from quantumclient.quantum.v2_0.subnet import UpdateSubnet
-from tests.unit.test_cli20 import CLITestV20Base
-from tests.unit.test_cli20 import MyApp
+from quantumclient.quantum.v2_0 import subnet
+from tests.unit import test_cli20
 
 
-class CLITestV20SubnetJSON(CLITestV20Base):
+class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
     def setUp(self):
         super(CLITestV20SubnetJSON, self).setUp(plurals={'tags': 'tag'})
 
     def test_create_subnet(self):
         """Create subnet: --gateway gateway netid cidr."""
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -48,7 +43,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
     def test_create_subnet_with_no_gateway(self):
         """Create subnet: --no-gateway netid cidr."""
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -62,7 +57,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
     def test_create_subnet_with_bad_gateway_option(self):
         """Create sbunet: --no-gateway netid cidr."""
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -81,7 +76,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
     def test_create_subnet_tenant(self):
         """Create subnet: --tenant_id tenantid netid cidr."""
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -96,7 +91,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
     def test_create_subnet_tags(self):
         """Create subnet: netid cidr --tags a b."""
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -113,7 +108,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
         The <allocation_pool> is --allocation_pool start=1.1.1.10,end=1.1.1.20
         """
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -135,7 +130,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
         --allocation_pool start=1.1.1.30,end=1.1.1.40
         """
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -159,7 +154,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
         --host-route destination=172.16.1.0/24,nexthop=1.1.1.20
         """
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -182,7 +177,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
         --host-route destination=172.17.7.0/24,nexthop=1.1.1.40
         """
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -206,7 +201,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
         --dns-nameserver 1.1.1.20 and --dns-nameserver 1.1.1.40
         """
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -226,7 +221,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
     def test_create_subnet_with_disable_dhcp(self):
         """Create subnet: --tenant-id tenantid --disable-dhcp netid cidr."""
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -243,7 +238,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
 
     def test_create_subnet_merge_single_plurar(self):
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -264,7 +259,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
 
     def test_create_subnet_merge_plurar(self):
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -283,7 +278,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
 
     def test_create_subnet_merge_single_single(self):
         resource = 'subnet'
-        cmd = CreateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
@@ -305,37 +300,37 @@ class CLITestV20SubnetJSON(CLITestV20Base):
     def test_list_subnets_detail(self):
         """List subnets: -D."""
         resources = "subnets"
-        cmd = ListSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.ListSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_subnets_tags(self):
         """List subnets: -- --tags a b."""
         resources = "subnets"
-        cmd = ListSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.ListSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, tags=['a', 'b'])
 
     def test_list_subnets_known_option_after_unknown(self):
         """List subnets: -- --tags a b --request-format xml."""
         resources = "subnets"
-        cmd = ListSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.ListSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, tags=['a', 'b'])
 
     def test_list_subnets_detail_tags(self):
         """List subnets: -D -- --tags a b."""
         resources = "subnets"
-        cmd = ListSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.ListSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, detail=True, tags=['a', 'b'])
 
     def test_list_subnets_fields(self):
         """List subnets: --fields a --fields b -- --fields c d."""
         resources = "subnets"
-        cmd = ListSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.ListSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
                                   fields_1=['a', 'b'], fields_2=['c', 'd'])
 
     def test_list_subnets_pagination(self):
         resources = "subnets"
-        cmd = ListSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.ListSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources_with_pagination(resources, cmd)
 
     def test_list_subnets_sort(self):
@@ -343,7 +338,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
         --sort-key desc
         """
         resources = "subnets"
-        cmd = ListSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.ListSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
                                   sort_key=["name", "id"],
                                   sort_dir=["asc", "desc"])
@@ -351,13 +346,13 @@ class CLITestV20SubnetJSON(CLITestV20Base):
     def test_list_subnets_limit(self):
         """List subnets: -P."""
         resources = "subnets"
-        cmd = ListSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.ListSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_update_subnet(self):
         """Update subnet: myid --name myname --tags a b."""
         resource = 'subnet'
-        cmd = UpdateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.UpdateSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'myname',
                                     '--tags', 'a', 'b'],
@@ -368,7 +363,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
         """Update subnet: --request-format json myid --name myname."""
         # --request-format xml is known option
         resource = 'subnet'
-        cmd = UpdateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.UpdateSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['--request-format', 'json',
                                     'myid', '--name', 'myname'],
@@ -379,7 +374,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
         """Update subnet: myid --name myname --request-format json."""
         # --request-format xml is known option
         resource = 'subnet'
-        cmd = UpdateSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.UpdateSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'myname',
                                     '--request-format', 'json'],
@@ -389,7 +384,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
     def test_show_subnet(self):
         """Show subnet: --fields id --fields name myid."""
         resource = 'subnet'
-        cmd = ShowSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.ShowSubnet(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id,
                                  args, ['id', 'name'])
@@ -397,7 +392,7 @@ class CLITestV20SubnetJSON(CLITestV20Base):
     def test_delete_subnet(self):
         """Delete subnet: subnetid."""
         resource = 'subnet'
-        cmd = DeleteSubnet(MyApp(sys.stdout), None)
+        cmd = subnet.DeleteSubnet(test_cli20.MyApp(sys.stdout), None)
         myid = 'myid'
         args = [myid]
         self._test_delete_resource(resource, cmd, myid, args)

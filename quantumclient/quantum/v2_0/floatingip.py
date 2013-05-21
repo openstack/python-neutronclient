@@ -19,14 +19,9 @@ import argparse
 import logging
 
 from quantumclient.quantum import v2_0 as quantumv20
-from quantumclient.quantum.v2_0 import CreateCommand
-from quantumclient.quantum.v2_0 import DeleteCommand
-from quantumclient.quantum.v2_0 import ListCommand
-from quantumclient.quantum.v2_0 import QuantumCommand
-from quantumclient.quantum.v2_0 import ShowCommand
 
 
-class ListFloatingIP(ListCommand):
+class ListFloatingIP(quantumv20.ListCommand):
     """List floating ips that belong to a given tenant."""
 
     resource = 'floatingip'
@@ -37,7 +32,7 @@ class ListFloatingIP(ListCommand):
     sorting_support = True
 
 
-class ShowFloatingIP(ShowCommand):
+class ShowFloatingIP(quantumv20.ShowCommand):
     """Show information of a given floating ip."""
 
     resource = 'floatingip'
@@ -45,7 +40,7 @@ class ShowFloatingIP(ShowCommand):
     allow_names = False
 
 
-class CreateFloatingIP(CreateCommand):
+class CreateFloatingIP(quantumv20.CreateCommand):
     """Create a floating ip for a given tenant."""
 
     resource = 'floatingip'
@@ -83,7 +78,7 @@ class CreateFloatingIP(CreateCommand):
         return body
 
 
-class DeleteFloatingIP(DeleteCommand):
+class DeleteFloatingIP(quantumv20.DeleteCommand):
     """Delete a given floating ip."""
 
     log = logging.getLogger(__name__ + '.DeleteFloatingIP')
@@ -91,7 +86,7 @@ class DeleteFloatingIP(DeleteCommand):
     allow_names = False
 
 
-class AssociateFloatingIP(QuantumCommand):
+class AssociateFloatingIP(quantumv20.QuantumCommand):
     """Create a mapping between a floating ip and a fixed ip."""
 
     api = 'network'
@@ -130,7 +125,7 @@ class AssociateFloatingIP(QuantumCommand):
             _('Associated floatingip %s') % parsed_args.floatingip_id)
 
 
-class DisassociateFloatingIP(QuantumCommand):
+class DisassociateFloatingIP(quantumv20.QuantumCommand):
     """Remove a mapping from a floating ip to a fixed ip.
     """
 

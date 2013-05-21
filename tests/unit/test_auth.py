@@ -21,12 +21,10 @@ import json
 import uuid
 
 import mox
-from mox import ContainsKeyValue, IsA, StrContains
 import testtools
 
-from quantumclient.client import exceptions
-from quantumclient.client import HTTPClient
-from quantumclient.client import ServiceCatalog
+from quantumclient import client
+from quantumclient.common import exceptions
 
 
 USERNAME = 'testuser'
@@ -73,9 +71,11 @@ class CLITestAuthKeystone(testtools.TestCase):
         """Prepare the test environment."""
         super(CLITestAuthKeystone, self).setUp()
         self.mox = mox.Mox()
-        self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,
-                                 password=PASSWORD, auth_url=AUTH_URL,
-                                 region_name=REGION)
+        self.client = client.HTTPClient(username=USERNAME,
+                                        tenant_name=TENANT_NAME,
+                                        password=PASSWORD,
+                                        auth_url=AUTH_URL,
+                                        region_name=REGION)
         self.addCleanup(self.mox.VerifyAll)
         self.addCleanup(self.mox.UnsetStubs)
 
@@ -85,12 +85,14 @@ class CLITestAuthKeystone(testtools.TestCase):
         res200 = self.mox.CreateMock(httplib2.Response)
         res200.status = 200
 
-        self.client.request(AUTH_URL + '/tokens', 'POST',
-                            body=IsA(str), headers=IsA(dict)).\
-            AndReturn((res200, json.dumps(KS_TOKEN_RESULT)))
-        self.client.request(StrContains(ENDPOINT_URL + '/resource'), 'GET',
-                            headers=ContainsKeyValue('X-Auth-Token', TOKEN)).\
-            AndReturn((res200, ''))
+        self.client.request(
+            AUTH_URL + '/tokens', 'POST',
+            body=mox.IsA(str), headers=mox.IsA(dict)
+        ).AndReturn((res200, json.dumps(KS_TOKEN_RESULT)))
+        self.client.request(
+            mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
+            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+        ).AndReturn((res200, ''))
         self.mox.ReplayAll()
 
         self.client.do_request('/resource', 'GET')
@@ -109,15 +111,18 @@ class CLITestAuthKeystone(testtools.TestCase):
         res401.status = 401
 
         # If a token is expired, quantum server retruns 401
-        self.client.request(StrContains(ENDPOINT_URL + '/resource'), 'GET',
-                            headers=ContainsKeyValue('X-Auth-Token', TOKEN)).\
-            AndReturn((res401, ''))
-        self.client.request(AUTH_URL + '/tokens', 'POST',
-                            body=IsA(str), headers=IsA(dict)).\
-            AndReturn((res200, json.dumps(KS_TOKEN_RESULT)))
-        self.client.request(StrContains(ENDPOINT_URL + '/resource'), 'GET',
-                            headers=ContainsKeyValue('X-Auth-Token', TOKEN)).\
-            AndReturn((res200, ''))
+        self.client.request(
+            mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
+            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+        ).AndReturn((res401, ''))
+        self.client.request(
+            AUTH_URL + '/tokens', 'POST',
+            body=mox.IsA(str), headers=mox.IsA(dict)
+        ).AndReturn((res200, json.dumps(KS_TOKEN_RESULT)))
+        self.client.request(
+            mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
+            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+        ).AndReturn((res200, ''))
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
 
@@ -129,20 +134,21 @@ class CLITestAuthKeystone(testtools.TestCase):
         res200 = self.mox.CreateMock(httplib2.Response)
         res200.status = 200
 
-        self.client.request(StrContains(AUTH_URL +
-                                        '/tokens/%s/endpoints' % TOKEN), 'GET',
-                            headers=IsA(dict)). \
-            AndReturn((res200, json.dumps(ENDPOINTS_RESULT)))
-        self.client.request(StrContains(ENDPOINT_URL + '/resource'), 'GET',
-                            headers=ContainsKeyValue('X-Auth-Token', TOKEN)). \
-            AndReturn((res200, ''))
+        self.client.request(
+            mox.StrContains(AUTH_URL + '/tokens/%s/endpoints' % TOKEN), 'GET',
+            headers=mox.IsA(dict)
+        ).AndReturn((res200, json.dumps(ENDPOINTS_RESULT)))
+        self.client.request(
+            mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
+            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+        ).AndReturn((res200, ''))
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
 
     def test_get_endpoint_url_other(self):
-        self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,
-                                 password=PASSWORD, auth_url=AUTH_URL,
-                                 region_name=REGION, endpoint_type='otherURL')
+        self.client = client.HTTPClient(
+            username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
+            auth_url=AUTH_URL, region_name=REGION, endpoint_type='otherURL')
         self.mox.StubOutWithMock(self.client, "request")
 
         self.client.auth_token = TOKEN
@@ -150,10 +156,10 @@ class CLITestAuthKeystone(testtools.TestCase):
         res200 = self.mox.CreateMock(httplib2.Response)
         res200.status = 200
 
-        self.client.request(StrContains(AUTH_URL +
-                                        '/tokens/%s/endpoints' % TOKEN), 'GET',
-                            headers=IsA(dict)). \
-            AndReturn((res200, json.dumps(ENDPOINTS_RESULT)))
+        self.client.request(
+            mox.StrContains(AUTH_URL + '/tokens/%s/endpoints' % TOKEN), 'GET',
+            headers=mox.IsA(dict)
+        ).AndReturn((res200, json.dumps(ENDPOINTS_RESULT)))
         self.mox.ReplayAll()
         self.assertRaises(exceptions.EndpointTypeNotFound,
                           self.client.do_request,
@@ -170,16 +176,18 @@ class CLITestAuthKeystone(testtools.TestCase):
         res401 = self.mox.CreateMock(httplib2.Response)
         res401.status = 401
 
-        self.client.request(StrContains(AUTH_URL +
-                                        '/tokens/%s/endpoints' % TOKEN), 'GET',
-                            headers=IsA(dict)). \
-            AndReturn((res401, ''))
-        self.client.request(AUTH_URL + '/tokens', 'POST',
-                            body=IsA(str), headers=IsA(dict)). \
-            AndReturn((res200, json.dumps(KS_TOKEN_RESULT)))
-        self.client.request(StrContains(ENDPOINT_URL + '/resource'), 'GET',
-                            headers=ContainsKeyValue('X-Auth-Token', TOKEN)). \
-            AndReturn((res200, ''))
+        self.client.request(
+            mox.StrContains(AUTH_URL + '/tokens/%s/endpoints' % TOKEN), 'GET',
+            headers=mox.IsA(dict)
+        ).AndReturn((res401, ''))
+        self.client.request(
+            AUTH_URL + '/tokens', 'POST',
+            body=mox.IsA(str), headers=mox.IsA(dict)
+        ).AndReturn((res200, json.dumps(KS_TOKEN_RESULT)))
+        self.client.request(
+            mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
+            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+        ).AndReturn((res200, ''))
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
 
@@ -190,7 +198,7 @@ class CLITestAuthKeystone(testtools.TestCase):
         endpoints['publicURL'] = 'public'
         endpoints['internalURL'] = 'internal'
         endpoints['adminURL'] = 'admin'
-        catalog = ServiceCatalog(resources)
+        catalog = client.ServiceCatalog(resources)
 
         # endpoint_type not specified
         url = catalog.url_for(attr='region',
@@ -223,7 +231,7 @@ class CLITestAuthKeystone(testtools.TestCase):
     # Test scenario with url_for when the service catalog only has publicURL.
     def test_url_for_only_public_url(self):
         resources = copy.deepcopy(KS_TOKEN_RESULT)
-        catalog = ServiceCatalog(resources)
+        catalog = client.ServiceCatalog(resources)
 
         # Remove endpoints from the catalog.
         endpoints = resources['access']['serviceCatalog'][0]['endpoints'][0]
@@ -245,7 +253,7 @@ class CLITestAuthKeystone(testtools.TestCase):
     # Test scenario with url_for when the service catalog only has adminURL.
     def test_url_for_only_admin_url(self):
         resources = copy.deepcopy(KS_TOKEN_RESULT)
-        catalog = ServiceCatalog(resources)
+        catalog = client.ServiceCatalog(resources)
         endpoints = resources['access']['serviceCatalog'][0]['endpoints'][0]
         del endpoints['internalURL']
         del endpoints['publicURL']
@@ -271,43 +279,41 @@ class CLITestAuthKeystone(testtools.TestCase):
         endpoints['publicURL'] = 'public'
 
         # Test default behavior is to choose public.
-        self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,
-                                 password=PASSWORD, auth_url=AUTH_URL,
-                                 region_name=REGION)
+        self.client = client.HTTPClient(
+            username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
+            auth_url=AUTH_URL, region_name=REGION)
 
         self.client._extract_service_catalog(resources)
         self.assertEqual(self.client.endpoint_url, 'public')
 
         # Test admin url
-        self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,
-                                 password=PASSWORD, auth_url=AUTH_URL,
-                                 region_name=REGION, endpoint_type='adminURL')
+        self.client = client.HTTPClient(
+            username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
+            auth_url=AUTH_URL, region_name=REGION, endpoint_type='adminURL')
 
         self.client._extract_service_catalog(resources)
         self.assertEqual(self.client.endpoint_url, 'admin')
 
         # Test public url
-        self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,
-                                 password=PASSWORD, auth_url=AUTH_URL,
-                                 region_name=REGION, endpoint_type='publicURL')
+        self.client = client.HTTPClient(
+            username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
+            auth_url=AUTH_URL, region_name=REGION, endpoint_type='publicURL')
 
         self.client._extract_service_catalog(resources)
         self.assertEqual(self.client.endpoint_url, 'public')
 
         # Test internal url
-        self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,
-                                 password=PASSWORD, auth_url=AUTH_URL,
-                                 region_name=REGION,
-                                 endpoint_type='internalURL')
+        self.client = client.HTTPClient(
+            username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
+            auth_url=AUTH_URL, region_name=REGION, endpoint_type='internalURL')
 
         self.client._extract_service_catalog(resources)
         self.assertEqual(self.client.endpoint_url, 'internal')
 
         # Test url that isn't found in the service catalog
-        self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,
-                                 password=PASSWORD, auth_url=AUTH_URL,
-                                 region_name=REGION,
-                                 endpoint_type='privateURL')
+        self.client = client.HTTPClient(
+            username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
+            auth_url=AUTH_URL, region_name=REGION, endpoint_type='privateURL')
 
         self.assertRaises(exceptions.EndpointTypeNotFound,
                           self.client._extract_service_catalog,

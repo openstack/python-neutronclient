@@ -19,11 +19,7 @@ import argparse
 import logging
 
 from quantumclient.common import exceptions
-from quantumclient.quantum.v2_0 import CreateCommand
-from quantumclient.quantum.v2_0 import DeleteCommand
-from quantumclient.quantum.v2_0 import ListCommand
-from quantumclient.quantum.v2_0 import ShowCommand
-from quantumclient.quantum.v2_0 import UpdateCommand
+from quantumclient.quantum import v2_0 as quantumv20
 
 
 def _format_subnets(network):
@@ -34,7 +30,7 @@ def _format_subnets(network):
         return ''
 
 
-class ListNetwork(ListCommand):
+class ListNetwork(quantumv20.ListCommand):
     """List networks that belong to a given tenant."""
 
     # Length of a query filter on subnet id
@@ -101,14 +97,14 @@ class ListExternalNetwork(ListNetwork):
         return super(ListExternalNetwork, self).retrieve_list(parsed_args)
 
 
-class ShowNetwork(ShowCommand):
+class ShowNetwork(quantumv20.ShowCommand):
     """Show information of a given network."""
 
     resource = 'network'
     log = logging.getLogger(__name__ + '.ShowNetwork')
 
 
-class CreateNetwork(CreateCommand):
+class CreateNetwork(quantumv20.CreateCommand):
     """Create a network for a given tenant."""
 
     resource = 'network'
@@ -142,14 +138,14 @@ class CreateNetwork(CreateCommand):
         return body
 
 
-class DeleteNetwork(DeleteCommand):
+class DeleteNetwork(quantumv20.DeleteCommand):
     """Delete a given network."""
 
     log = logging.getLogger(__name__ + '.DeleteNetwork')
     resource = 'network'
 
 
-class UpdateNetwork(UpdateCommand):
+class UpdateNetwork(quantumv20.UpdateCommand):
     """Update network's information."""
 
     log = logging.getLogger(__name__ + '.UpdateNetwork')

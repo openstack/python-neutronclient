@@ -17,12 +17,11 @@
 
 import sys
 
-from quantumclient.quantum.v2_0 import nvpnetworkgateway
-from tests.unit.test_cli20 import CLITestV20Base
-from tests.unit.test_cli20 import MyApp
+from quantumclient.quantum.v2_0 import nvpnetworkgateway as nwgw
+from tests.unit import test_cli20
 
 
-class CLITestV20NetworkGatewayJSON(CLITestV20Base):
+class CLITestV20NetworkGatewayJSON(test_cli20.CLITestV20Base):
 
     resource = "network_gateway"
 
@@ -32,7 +31,7 @@ class CLITestV20NetworkGatewayJSON(CLITestV20Base):
                      'network_gateways': 'network_gateway'})
 
     def test_create_gateway(self):
-        cmd = nvpnetworkgateway.CreateNetworkGateway(MyApp(sys.stdout), None)
+        cmd = nwgw.CreateNetworkGateway(test_cli20.MyApp(sys.stdout), None)
         name = 'gw-test'
         myid = 'myid'
         args = [name, ]
@@ -42,7 +41,7 @@ class CLITestV20NetworkGatewayJSON(CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_gateway_with_tenant(self):
-        cmd = nvpnetworkgateway.CreateNetworkGateway(MyApp(sys.stdout), None)
+        cmd = nwgw.CreateNetworkGateway(test_cli20.MyApp(sys.stdout), None)
         name = 'gw-test'
         myid = 'myid'
         args = ['--tenant_id', 'tenantid', name]
@@ -53,7 +52,7 @@ class CLITestV20NetworkGatewayJSON(CLITestV20Base):
                                    tenant_id='tenantid')
 
     def test_create_gateway_with_device(self):
-        cmd = nvpnetworkgateway.CreateNetworkGateway(MyApp(sys.stdout), None)
+        cmd = nwgw.CreateNetworkGateway(test_cli20.MyApp(sys.stdout), None)
         name = 'gw-test'
         myid = 'myid'
         args = ['--device', 'device_id=test', name, ]
@@ -65,29 +64,29 @@ class CLITestV20NetworkGatewayJSON(CLITestV20Base):
 
     def test_list_gateways(self):
         resources = '%ss' % self.resource
-        cmd = nvpnetworkgateway.ListNetworkGateway(MyApp(sys.stdout), None)
+        cmd = nwgw.ListNetworkGateway(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
     def test_update_gateway(self):
-        cmd = nvpnetworkgateway.UpdateNetworkGateway(MyApp(sys.stdout), None)
+        cmd = nwgw.UpdateNetworkGateway(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(self.resource, cmd, 'myid',
                                    ['myid', '--name', 'cavani'],
                                    {'name': 'cavani'})
 
     def test_delete_gateway(self):
-        cmd = nvpnetworkgateway.DeleteNetworkGateway(MyApp(sys.stdout), None)
+        cmd = nwgw.DeleteNetworkGateway(test_cli20.MyApp(sys.stdout), None)
         myid = 'myid'
         args = [myid]
         self._test_delete_resource(self.resource, cmd, myid, args)
 
     def test_show_gateway(self):
-        cmd = nvpnetworkgateway.ShowNetworkGateway(MyApp(sys.stdout), None)
+        cmd = nwgw.ShowNetworkGateway(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
         self._test_show_resource(self.resource, cmd, self.test_id, args,
                                  ['id', 'name'])
 
     def test_connect_network_to_gateway(self):
-        cmd = nvpnetworkgateway.ConnectNetworkGateway(MyApp(sys.stdout), None)
+        cmd = nwgw.ConnectNetworkGateway(test_cli20.MyApp(sys.stdout), None)
         args = ['gw_id', 'net_id',
                 '--segmentation-type', 'edi',
                 '--segmentation-id', '7']
@@ -99,8 +98,7 @@ class CLITestV20NetworkGatewayJSON(CLITestV20Base):
                                            'segmentation_id': '7'})
 
     def test_disconnect_network_from_gateway(self):
-        cmd = nvpnetworkgateway.DisconnectNetworkGateway(MyApp(sys.stdout),
-                                                         None)
+        cmd = nwgw.DisconnectNetworkGateway(test_cli20.MyApp(sys.stdout), None)
         args = ['gw_id', 'net_id',
                 '--segmentation-type', 'edi',
                 '--segmentation-id', '7']

@@ -20,12 +20,6 @@ import logging
 
 from quantumclient.common import utils
 from quantumclient.quantum import v2_0 as quantumv20
-from quantumclient.quantum.v2_0 import CreateCommand
-from quantumclient.quantum.v2_0 import DeleteCommand
-from quantumclient.quantum.v2_0 import ListCommand
-from quantumclient.quantum.v2_0 import QuantumCommand
-from quantumclient.quantum.v2_0 import ShowCommand
-from quantumclient.quantum.v2_0 import UpdateCommand
 
 
 def _format_external_gateway_info(router):
@@ -35,7 +29,7 @@ def _format_external_gateway_info(router):
         return ''
 
 
-class ListRouter(ListCommand):
+class ListRouter(quantumv20.ListCommand):
     """List routers that belong to a given tenant."""
 
     resource = 'router'
@@ -46,14 +40,14 @@ class ListRouter(ListCommand):
     sorting_support = True
 
 
-class ShowRouter(ShowCommand):
+class ShowRouter(quantumv20.ShowCommand):
     """Show information of a given router."""
 
     resource = 'router'
     log = logging.getLogger(__name__ + '.ShowRouter')
 
 
-class CreateRouter(CreateCommand):
+class CreateRouter(quantumv20.CreateCommand):
     """Create a router for a given tenant."""
 
     resource = 'router'
@@ -82,21 +76,21 @@ class CreateRouter(CreateCommand):
         return body
 
 
-class DeleteRouter(DeleteCommand):
+class DeleteRouter(quantumv20.DeleteCommand):
     """Delete a given router."""
 
     log = logging.getLogger(__name__ + '.DeleteRouter')
     resource = 'router'
 
 
-class UpdateRouter(UpdateCommand):
+class UpdateRouter(quantumv20.UpdateCommand):
     """Update router's information."""
 
     log = logging.getLogger(__name__ + '.UpdateRouter')
     resource = 'router'
 
 
-class RouterInterfaceCommand(QuantumCommand):
+class RouterInterfaceCommand(quantumv20.QuantumCommand):
     """Based class to Add/Remove router interface."""
 
     api = 'network'
@@ -151,7 +145,7 @@ class RemoveInterfaceRouter(RouterInterfaceCommand):
             _('Removed interface from router %s') % parsed_args.router_id)
 
 
-class SetGatewayRouter(QuantumCommand):
+class SetGatewayRouter(quantumv20.QuantumCommand):
     """Set the external network gateway for a router."""
 
     log = logging.getLogger(__name__ + '.SetGatewayRouter')
@@ -187,7 +181,7 @@ class SetGatewayRouter(QuantumCommand):
             _('Set gateway for router %s') % parsed_args.router_id)
 
 
-class RemoveGatewayRouter(QuantumCommand):
+class RemoveGatewayRouter(quantumv20.QuantumCommand):
     """Remove an external network gateway from a router."""
 
     log = logging.getLogger(__name__ + '.RemoveGatewayRouter')
