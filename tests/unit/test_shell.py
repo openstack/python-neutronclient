@@ -143,3 +143,31 @@ class ShellTest(testtools.TestCase):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         self.assertEqual(ret, 0)
+
+    def test_endpoint_option(self):
+        shell = openstack_shell.QuantumShell('2.0')
+        parser = shell.build_option_parser('descr', '2.0')
+
+        # Neither $OS_ENDPOINT_TYPE nor --endpoint-type
+        namespace = parser.parse_args([])
+        self.assertEqual('publicURL', namespace.endpoint_type)
+
+        # --endpoint-type but not $OS_ENDPOINT_TYPE
+        namespace = parser.parse_args(['--endpoint-type=admin'])
+        self.assertEqual('admin', namespace.endpoint_type)
+
+    def test_endpoint_environment_variable(self):
+        fixture = fixtures.EnvironmentVariable("OS_ENDPOINT_TYPE",
+                                               "public")
+        self.useFixture(fixture)
+
+        shell = openstack_shell.QuantumShell('2.0')
+        parser = shell.build_option_parser('descr', '2.0')
+
+        # $OS_ENDPOINT_TYPE but not --endpoint-type
+        namespace = parser.parse_args([])
+        self.assertEqual("public", namespace.endpoint_type)
+
+        # --endpoint-type and $OS_ENDPOINT_TYPE
+        namespace = parser.parse_args(['--endpoint-type=admin'])
+        self.assertEqual('admin', namespace.endpoint_type)

@@ -15,6 +15,7 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+import copy
 import httplib2
 import json
 import uuid
@@ -23,7 +24,9 @@ import mox
 from mox import ContainsKeyValue, IsA, StrContains
 import testtools
 
+from quantumclient.client import exceptions
 from quantumclient.client import HTTPClient
+from quantumclient.client import ServiceCatalog
 
 
 USERNAME = 'testuser'
@@ -136,6 +139,27 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
 
+    def test_get_endpoint_url_other(self):
+        self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,
+                                 password=PASSWORD, auth_url=AUTH_URL,
+                                 region_name=REGION, endpoint_type='otherURL')
+        self.mox.StubOutWithMock(self.client, "request")
+
+        self.client.auth_token = TOKEN
+
+        res200 = self.mox.CreateMock(httplib2.Response)
+        res200.status = 200
+
+        self.client.request(StrContains(AUTH_URL +
+                                        '/tokens/%s/endpoints' % TOKEN), 'GET',
+                            headers=IsA(dict)). \
+            AndReturn((res200, json.dumps(ENDPOINTS_RESULT)))
+        self.mox.ReplayAll()
+        self.assertRaises(exceptions.EndpointTypeNotFound,
+                          self.client.do_request,
+                          '/resource',
+                          'GET')
+
     def test_get_endpoint_url_failed(self):
         self.mox.StubOutWithMock(self.client, "request")
 
@@ -158,3 +182,133 @@ class CLITestAuthKeystone(testtools.TestCase):
             AndReturn((res200, ''))
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
+
+    def test_url_for(self):
+        resources = copy.deepcopy(KS_TOKEN_RESULT)
+
+        endpoints = resources['access']['serviceCatalog'][0]['endpoints'][0]
+        endpoints['publicURL'] = 'public'
+        endpoints['internalURL'] = 'internal'
+        endpoints['adminURL'] = 'admin'
+        catalog = ServiceCatalog(resources)
+
+        # endpoint_type not specified
+        url = catalog.url_for(attr='region',
+                              filter_value=REGION)
+        self.assertEqual('public', url)
+
+        # endpoint type specified (3 cases)
+        url = catalog.url_for(attr='region',
+                              filter_value=REGION,
+                              endpoint_type='adminURL')
+        self.assertEqual('admin', url)
+
+        url = catalog.url_for(attr='region',
+                              filter_value=REGION,
+                              endpoint_type='publicURL')
+        self.assertEqual('public', url)
+
+        url = catalog.url_for(attr='region',
+                              filter_value=REGION,
+                              endpoint_type='internalURL')
+        self.assertEqual('internal', url)
+
+        # endpoint_type requested does not exist.
+        self.assertRaises(exceptions.EndpointTypeNotFound,
+                          catalog.url_for,
+                          attr='region',
+                          filter_value=REGION,
+                          endpoint_type='privateURL')
+
+    # Test scenario with url_for when the service catalog only has publicURL.
+    def test_url_for_only_public_url(self):
+        resources = copy.deepcopy(KS_TOKEN_RESULT)
+        catalog = ServiceCatalog(resources)
+
+        # Remove endpoints from the catalog.
+        endpoints = resources['access']['serviceCatalog'][0]['endpoints'][0]
+        del endpoints['internalURL']
+        del endpoints['adminURL']
+        endpoints['publicURL'] = 'public'
+
+        # Use publicURL when specified explicitly.
+        url = catalog.url_for(attr='region',
+                              filter_value=REGION,
+                              endpoint_type='publicURL')
+        self.assertEqual('public', url)
+
+        # Use publicURL when specified explicitly.
+        url = catalog.url_for(attr='region',
+                              filter_value=REGION)
+        self.assertEqual('public', url)
+
+    # Test scenario with url_for when the service catalog only has adminURL.
+    def test_url_for_only_admin_url(self):
+        resources = copy.deepcopy(KS_TOKEN_RESULT)
+        catalog = ServiceCatalog(resources)
+        endpoints = resources['access']['serviceCatalog'][0]['endpoints'][0]
+        del endpoints['internalURL']
+        del endpoints['publicURL']
+        endpoints['adminURL'] = 'admin'
+
+        # Use publicURL when specified explicitly.
+        url = catalog.url_for(attr='region',
+                              filter_value=REGION,
+                              endpoint_type='adminURL')
+        self.assertEqual('admin', url)
+
+        # But not when nothing is specified.
+        self.assertRaises(exceptions.EndpointTypeNotFound,
+                          catalog.url_for,
+                          attr='region',
+                          filter_value=REGION)
+
+    def test_endpoint_type(self):
+        resources = copy.deepcopy(KS_TOKEN_RESULT)
+        endpoints = resources['access']['serviceCatalog'][0]['endpoints'][0]
+        endpoints['internalURL'] = 'internal'
+        endpoints['adminURL'] = 'admin'
+        endpoints['publicURL'] = 'public'
+
+        # Test default behavior is to choose public.
+        self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,
+                                 password=PASSWORD, auth_url=AUTH_URL,
+                                 region_name=REGION)
+
+        self.client._extract_service_catalog(resources)
+        self.assertEqual(self.client.endpoint_url, 'public')
+
+        # Test admin url
+        self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,
+                                 password=PASSWORD, auth_url=AUTH_URL,
+                                 region_name=REGION, endpoint_type='adminURL')
+
+        self.client._extract_service_catalog(resources)
+        self.assertEqual(self.client.endpoint_url, 'admin')
+
+        # Test public url
+        self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,
+                                 password=PASSWORD, auth_url=AUTH_URL,
+                                 region_name=REGION, endpoint_type='publicURL')
+
+        self.client._extract_service_catalog(resources)
+        self.assertEqual(self.client.endpoint_url, 'public')
+
+        # Test internal url
+        self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,
+                                 password=PASSWORD, auth_url=AUTH_URL,
+                                 region_name=REGION,
+                                 endpoint_type='internalURL')
+
+        self.client._extract_service_catalog(resources)
+        self.assertEqual(self.client.endpoint_url, 'internal')
+
+        # Test url that isn't found in the service catalog
+        self.client = HTTPClient(username=USERNAME, tenant_name=TENANT_NAME,
+                                 password=PASSWORD, auth_url=AUTH_URL,
+                                 region_name=REGION,
+                                 endpoint_type='privateURL')
+
+        self.assertRaises(exceptions.EndpointTypeNotFound,
+                          self.client._extract_service_catalog,
+                          resources)

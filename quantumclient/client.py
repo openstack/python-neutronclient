@@ -60,10 +60,10 @@ class ServiceCatalog(object):
         return token
 
     def url_for(self, attr=None, filter_value=None,
-                service_type='network', endpoint_type='adminURL'):
-        """Fetch the admin URL from the Quantum service for
-        a particular endpoint attribute. If none given, return
-        the first. See tests for sample service catalog.
+                service_type='network', endpoint_type='publicURL'):
+        """Fetch the URL from the Quantum service for
+        a particular endpoint type. If none given, return
+        publicURL.
         """
 
         catalog = self.catalog['access'].get('serviceCatalog', [])
@@ -82,6 +82,9 @@ class ServiceCatalog(object):
         elif len(matching_endpoints) > 1:
             raise exceptions.AmbiguousEndpoints(message=matching_endpoints)
         else:
+            if endpoint_type not in matching_endpoints[0]:
+                raise exceptions.EndpointTypeNotFound(message=endpoint_type)
+
             return matching_endpoints[0][endpoint_type]
 
 
@@ -94,12 +97,14 @@ class HTTPClient(httplib2.Http):
                  password=None, auth_url=None,
                  token=None, region_name=None, timeout=None,
                  endpoint_url=None, insecure=False,
+                 endpoint_type='publicURL',
                  auth_strategy='keystone', **kwargs):
         super(HTTPClient, self).__init__(timeout=timeout)
         self.username = username
         self.tenant_name = tenant_name
         self.password = password
         self.auth_url = auth_url.rstrip('/') if auth_url else None
+        self.endpoint_type = endpoint_type
         self.region_name = region_name
         self.auth_token = token
         self.content_type = 'application/json'
@@ -170,7 +175,7 @@ class HTTPClient(httplib2.Http):
             raise exceptions.Unauthorized()
         self.endpoint_url = self.service_catalog.url_for(
             attr='region', filter_value=self.region_name,
-            endpoint_type='adminURL')
+            endpoint_type=self.endpoint_type)
 
     def authenticate(self):
         if self.auth_strategy != 'keystone':
@@ -217,7 +222,10 @@ class HTTPClient(httplib2.Http):
         for endpoint in body.get('endpoints', []):
             if (endpoint['type'] == 'network' and
                 endpoint.get('region') == self.region_name):
-                return endpoint['adminURL']
+                if self.endpoint_type not in endpoint:
+                    raise exceptions.EndpointTypeNotFound(
+                        message=self.endpoint_type)
+                return endpoint[self.endpoint_type]
 
         raise exceptions.EndpointNotFound()
 

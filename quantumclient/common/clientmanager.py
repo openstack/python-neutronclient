@@ -49,6 +49,7 @@ class ClientManager(object):
 
     def __init__(self, token=None, url=None,
                  auth_url=None,
+                 endpoint_type=None,
                  tenant_name=None, tenant_id=None,
                  username=None, password=None,
                  region_name=None,
@@ -59,6 +60,7 @@ class ClientManager(object):
         self._token = token
         self._url = url
         self._auth_url = auth_url
+        self._endpoint_type = endpoint_type
         self._tenant_name = tenant_name
         self._tenant_id = tenant_id
         self._username = username
@@ -77,6 +79,7 @@ class ClientManager(object):
                                     password=self._password,
                                     region_name=self._region_name,
                                     auth_url=self._auth_url,
+                                    endpoint_type=self._endpoint_type,
                                     insecure=self._insecure)
             httpclient.authenticate()
             # Populate other password flow attributes
