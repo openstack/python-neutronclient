@@ -131,6 +131,14 @@ class QuantumCLIError(QuantumClientException):
     pass
 
 
+class RequestURITooLong(QuantumClientException):
+    """Raised when a request fails with HTTP error 414."""
+
+    def __init__(self, **kwargs):
+        self.excess = kwargs.get('excess', 0)
+        super(RequestURITooLong, self).__init__(**kwargs)
+
+
 class ConnectionFailed(QuantumClientException):
     message = _("Connection to quantum failed: %(reason)s")
 
