@@ -1,6 +1,6 @@
 include tox.ini
 include LICENSE README HACKING.rst
+include AUTHORS
 include ChangeLog
 include tools/*
-include quantumclient/versioninfo
 recursive-include tests *
