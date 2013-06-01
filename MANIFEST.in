@@ -1,5 +1,5 @@
 include tox.ini
-include LICENSE README HACKING.rst
+include LICENSE README.rst HACKING.rst
 include AUTHORS
 include ChangeLog
 include tools/*
