@@ -159,7 +159,8 @@ class CLITestV20RouterJSON(CLITestV20Base):
         self._test_update_resource(resource, cmd, 'myid',
                                    args,
                                    {"external_gateway_info":
-                                    {"network_id": "externalid"}}
+                                    {"network_id": "externalid",
+                                     "enable_snat": True}}
                                    )
 
     def test_remove_gateway(self):
