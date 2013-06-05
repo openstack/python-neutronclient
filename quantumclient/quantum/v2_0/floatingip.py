@@ -31,7 +31,6 @@ class ListFloatingIP(ListCommand):
 
     resource = 'floatingip'
     log = logging.getLogger(__name__ + '.ListFloatingIP')
-    _formatters = {}
     list_columns = ['id', 'fixed_ip_address', 'floating_ip_address',
                     'port_id']
     pagination_support = True

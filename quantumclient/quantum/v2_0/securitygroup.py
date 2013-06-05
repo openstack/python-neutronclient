@@ -26,7 +26,6 @@ class ListSecurityGroup(quantumv20.ListCommand):
 
     resource = 'security_group'
     log = logging.getLogger(__name__ + '.ListSecurityGroup')
-    _formatters = {}
     list_columns = ['id', 'name', 'description']
     pagination_support = True
     sorting_support = True
@@ -103,7 +102,6 @@ class ListSecurityGroupRule(quantumv20.ListCommand):
 
     resource = 'security_group_rule'
     log = logging.getLogger(__name__ + '.ListSecurityGroupRule')
-    _formatters = {}
     list_columns = ['id', 'security_group_id', 'direction', 'protocol',
                     'remote_ip_prefix', 'remote_group_id']
     replace_rules = {'security_group_id': 'security_group',

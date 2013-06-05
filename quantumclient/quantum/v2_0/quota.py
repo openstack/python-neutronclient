@@ -70,7 +70,6 @@ class ListQuota(QuantumCommand, lister.Lister):
     api = 'network'
     resource = 'quota'
     log = logging.getLogger(__name__ + '.ListQuota')
-    _formatters = None
 
     def get_parser(self, prog_name):
         parser = super(ListQuota, self).get_parser(prog_name)

@@ -30,7 +30,6 @@ class ListMember(quantumv20.ListCommand):
     list_columns = [
         'id', 'address', 'protocol_port', 'admin_state_up', 'status'
     ]
-    _formatters = {}
     pagination_support = True
     sorting_support = True
 

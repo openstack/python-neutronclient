@@ -25,7 +25,6 @@ class ListQoSQueue(quantumv20.ListCommand):
 
     resource = 'qos_queue'
     log = logging.getLogger(__name__ + '.ListQoSQueue')
-    _formatters = {}
     list_columns = ['id', 'name', 'min', 'max',
                     'qos_marking', 'dscp', 'default']
 
