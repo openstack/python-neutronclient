@@ -66,7 +66,8 @@ class JSONDictSerializer(DictSerializer):
 class XMLDictSerializer(DictSerializer):
 
     def __init__(self, metadata=None, xmlns=None):
-        """
+        """XMLDictSerializer constructor.
+
         :param metadata: information needed to deserialize xml into
                          a dictionary.
         :param xmlns: XML namespace to include with serialized xml
@@ -80,7 +81,8 @@ class XMLDictSerializer(DictSerializer):
         self.xmlns = xmlns
 
     def default(self, data):
-        """
+        """Default serializer of XMLDictSerializer.
+
         :param data: expect data to contain a single key as XML root, or
                      contain another '*_links' key as atom links. Other
                      case will use 'VIRTUAL_ROOT_KEY' as XML root.
@@ -232,7 +234,8 @@ class JSONDeserializer(TextDeserializer):
 class XMLDeserializer(TextDeserializer):
 
     def __init__(self, metadata=None):
-        """
+        """XMLDeserializer constructor.
+
         :param metadata: information needed to deserialize xml into
                          a dictionary.
         """

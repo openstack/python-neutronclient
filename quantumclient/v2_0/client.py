@@ -254,633 +254,465 @@ class Client(object):
 
     @APIParamsCall
     def list_ports(self, retrieve_all=True, **_params):
-        """
-        Fetches a list of all networks for a tenant
-        """
+        """Fetches a list of all networks for a tenant."""
         # Pass filters in "params" argument to do_request
         return self.list('ports', self.ports_path, retrieve_all,
                          **_params)
 
     @APIParamsCall
     def show_port(self, port, **_params):
-        """
-        Fetches information of a certain network
-        """
+        """Fetches information of a certain network."""
         return self.get(self.port_path % (port), params=_params)
 
     @APIParamsCall
     def create_port(self, body=None):
-        """
-        Creates a new port
-        """
+        """Creates a new port."""
         return self.post(self.ports_path, body=body)
 
     @APIParamsCall
     def update_port(self, port, body=None):
-        """
-        Updates a port
-        """
+        """Updates a port."""
         return self.put(self.port_path % (port), body=body)
 
     @APIParamsCall
     def delete_port(self, port):
-        """
-        Deletes the specified port
-        """
+        """Deletes the specified port."""
         return self.delete(self.port_path % (port))
 
     @APIParamsCall
     def list_networks(self, retrieve_all=True, **_params):
-        """
-        Fetches a list of all networks for a tenant
-        """
+        """Fetches a list of all networks for a tenant."""
         # Pass filters in "params" argument to do_request
         return self.list('networks', self.networks_path, retrieve_all,
                          **_params)
 
     @APIParamsCall
     def show_network(self, network, **_params):
-        """
-        Fetches information of a certain network
-        """
+        """Fetches information of a certain network."""
         return self.get(self.network_path % (network), params=_params)
 
     @APIParamsCall
     def create_network(self, body=None):
-        """
-        Creates a new network
-        """
+        """Creates a new network."""
         return self.post(self.networks_path, body=body)
 
     @APIParamsCall
     def update_network(self, network, body=None):
-        """
-        Updates a network
-        """
+        """Updates a network."""
         return self.put(self.network_path % (network), body=body)
 
     @APIParamsCall
     def delete_network(self, network):
-        """
-        Deletes the specified network
-        """
+        """Deletes the specified network."""
         return self.delete(self.network_path % (network))
 
     @APIParamsCall
     def list_subnets(self, retrieve_all=True, **_params):
-        """
-        Fetches a list of all networks for a tenant
-        """
+        """Fetches a list of all networks for a tenant."""
         return self.list('subnets', self.subnets_path, retrieve_all,
                          **_params)
 
     @APIParamsCall
     def show_subnet(self, subnet, **_params):
-        """
-        Fetches information of a certain subnet
-        """
+        """Fetches information of a certain subnet."""
         return self.get(self.subnet_path % (subnet), params=_params)
 
     @APIParamsCall
     def create_subnet(self, body=None):
-        """
-        Creates a new subnet
-        """
+        """Creates a new subnet."""
         return self.post(self.subnets_path, body=body)
 
     @APIParamsCall
     def update_subnet(self, subnet, body=None):
-        """
-        Updates a subnet
-        """
+        """Updates a subnet."""
         return self.put(self.subnet_path % (subnet), body=body)
 
     @APIParamsCall
     def delete_subnet(self, subnet):
-        """
-        Deletes the specified subnet
-        """
+        """Deletes the specified subnet."""
         return self.delete(self.subnet_path % (subnet))
 
     @APIParamsCall
     def list_routers(self, retrieve_all=True, **_params):
-        """
-        Fetches a list of all routers for a tenant
-        """
+        """Fetches a list of all routers for a tenant."""
         # Pass filters in "params" argument to do_request
         return self.list('routers', self.routers_path, retrieve_all,
                          **_params)
 
     @APIParamsCall
     def show_router(self, router, **_params):
-        """
-        Fetches information of a certain router
-        """
+        """Fetches information of a certain router."""
         return self.get(self.router_path % (router), params=_params)
 
     @APIParamsCall
     def create_router(self, body=None):
-        """
-        Creates a new router
-        """
+        """Creates a new router."""
         return self.post(self.routers_path, body=body)
 
     @APIParamsCall
     def update_router(self, router, body=None):
-        """
-        Updates a router
-        """
+        """Updates a router."""
         return self.put(self.router_path % (router), body=body)
 
     @APIParamsCall
     def delete_router(self, router):
-        """
-        Deletes the specified router
-        """
+        """Deletes the specified router."""
         return self.delete(self.router_path % (router))
 
     @APIParamsCall
     def add_interface_router(self, router, body=None):
-        """
-        Adds an internal network interface to the specified router
-        """
+        """Adds an internal network interface to the specified router."""
         return self.put((self.router_path % router) + "/add_router_interface",
                         body=body)
 
     @APIParamsCall
     def remove_interface_router(self, router, body=None):
-        """
-        Removes an internal network interface from the specified router
-        """
+        """Removes an internal network interface from the specified router."""
         return self.put((self.router_path % router) +
                         "/remove_router_interface", body=body)
 
     @APIParamsCall
     def add_gateway_router(self, router, body=None):
-        """
-        Adds an external network gateway to the specified router
-        """
+        """Adds an external network gateway to the specified router."""
         return self.put((self.router_path % router),
                         body={'router': {'external_gateway_info': body}})
 
     @APIParamsCall
     def remove_gateway_router(self, router):
-        """
-        Removes an external network gateway from the specified router
-        """
+        """Removes an external network gateway from the specified router."""
         return self.put((self.router_path % router),
                         body={'router': {'external_gateway_info': {}}})
 
     @APIParamsCall
     def list_floatingips(self, retrieve_all=True, **_params):
-        """
-        Fetches a list of all floatingips for a tenant
-        """
+        """Fetches a list of all floatingips for a tenant."""
         # Pass filters in "params" argument to do_request
         return self.list('floatingips', self.floatingips_path, retrieve_all,
                          **_params)
 
     @APIParamsCall
     def show_floatingip(self, floatingip, **_params):
-        """
-        Fetches information of a certain floatingip
-        """
+        """Fetches information of a certain floatingip."""
         return self.get(self.floatingip_path % (floatingip), params=_params)
 
     @APIParamsCall
     def create_floatingip(self, body=None):
-        """
-        Creates a new floatingip
-        """
+        """Creates a new floatingip."""
         return self.post(self.floatingips_path, body=body)
 
     @APIParamsCall
     def update_floatingip(self, floatingip, body=None):
-        """
-        Updates a floatingip
-        """
+        """Updates a floatingip."""
         return self.put(self.floatingip_path % (floatingip), body=body)
 
     @APIParamsCall
     def delete_floatingip(self, floatingip):
-        """
-        Deletes the specified floatingip
-        """
+        """Deletes the specified floatingip."""
         return self.delete(self.floatingip_path % (floatingip))
 
     @APIParamsCall
     def create_security_group(self, body=None):
-        """
-        Creates a new security group
-        """
+        """Creates a new security group."""
         return self.post(self.security_groups_path, body=body)
 
     @APIParamsCall
     def update_security_group(self, security_group, body=None):
-        """
-        Updates a security group
-        """
+        """Updates a security group."""
         return self.put(self.security_group_path %
                         security_group, body=body)
 
     @APIParamsCall
     def list_security_groups(self, retrieve_all=True, **_params):
-        """
-        Fetches a list of all security groups for a tenant
-        """
+        """Fetches a list of all security groups for a tenant."""
         return self.list('security_groups', self.security_groups_path,
                          retrieve_all, **_params)
 
     @APIParamsCall
     def show_security_group(self, security_group, **_params):
-        """
-        Fetches information of a certain security group
-        """
+        """Fetches information of a certain security group."""
         return self.get(self.security_group_path % (security_group),
                         params=_params)
 
     @APIParamsCall
     def delete_security_group(self, security_group):
-        """
-        Deletes the specified security group
-        """
+        """Deletes the specified security group."""
         return self.delete(self.security_group_path % (security_group))
 
     @APIParamsCall
     def create_security_group_rule(self, body=None):
-        """
-        Creates a new security group rule
-        """
+        """Creates a new security group rule."""
         return self.post(self.security_group_rules_path, body=body)
 
     @APIParamsCall
     def delete_security_group_rule(self, security_group_rule):
-        """
-        Deletes the specified security group rule
-        """
+        """Deletes the specified security group rule."""
         return self.delete(self.security_group_rule_path %
                            (security_group_rule))
 
     @APIParamsCall
     def list_security_group_rules(self, retrieve_all=True, **_params):
-        """
-        Fetches a list of all security group rules for a tenant
-        """
+        """Fetches a list of all security group rules for a tenant."""
         return self.list('security_group_rules',
                          self.security_group_rules_path,
                          retrieve_all, **_params)
 
     @APIParamsCall
     def show_security_group_rule(self, security_group_rule, **_params):
-        """
-        Fetches information of a certain security group rule
-        """
+        """Fetches information of a certain security group rule."""
         return self.get(self.security_group_rule_path % (security_group_rule),
                         params=_params)
 
     @APIParamsCall
     def list_vips(self, retrieve_all=True, **_params):
-        """
-        Fetches a list of all load balancer vips for a tenant
-        """
+        """Fetches a list of all load balancer vips for a tenant."""
         # Pass filters in "params" argument to do_request
         return self.list('vips', self.vips_path, retrieve_all,
                          **_params)
 
     @APIParamsCall
     def show_vip(self, vip, **_params):
-        """
-        Fetches information of a certain load balancer vip
-        """
+        """Fetches information of a certain load balancer vip."""
         return self.get(self.vip_path % (vip), params=_params)
 
     @APIParamsCall
     def create_vip(self, body=None):
-        """
-        Creates a new load balancer vip
-        """
+        """Creates a new load balancer vip."""
         return self.post(self.vips_path, body=body)
 
     @APIParamsCall
     def update_vip(self, vip, body=None):
-        """
-        Updates a load balancer vip
-        """
+        """Updates a load balancer vip."""
         return self.put(self.vip_path % (vip), body=body)
 
     @APIParamsCall
     def delete_vip(self, vip):
-        """
-        Deletes the specified load balancer vip
-        """
+        """Deletes the specified load balancer vip."""
         return self.delete(self.vip_path % (vip))
 
     @APIParamsCall
     def list_pools(self, retrieve_all=True, **_params):
-        """
-        Fetches a list of all load balancer pools for a tenant
-        """
+        """Fetches a list of all load balancer pools for a tenant."""
         # Pass filters in "params" argument to do_request
         return self.list('pools', self.pools_path, retrieve_all,
                          **_params)
 
     @APIParamsCall
     def show_pool(self, pool, **_params):
-        """
-        Fetches information of a certain load balancer pool
-        """
+        """Fetches information of a certain load balancer pool."""
         return self.get(self.pool_path % (pool), params=_params)
 
     @APIParamsCall
     def create_pool(self, body=None):
-        """
-        Creates a new load balancer pool
-        """
+        """Creates a new load balancer pool."""
         return self.post(self.pools_path, body=body)
 
     @APIParamsCall
     def update_pool(self, pool, body=None):
-        """
-        Updates a load balancer pool
-        """
+        """Updates a load balancer pool."""
         return self.put(self.pool_path % (pool), body=body)
 
     @APIParamsCall
     def delete_pool(self, pool):
-        """
-        Deletes the specified load balancer pool
-        """
+        """Deletes the specified load balancer pool."""
         return self.delete(self.pool_path % (pool))
 
     @APIParamsCall
     def retrieve_pool_stats(self, pool, **_params):
-        """
-        Retrieves stats for a certain load balancer pool
-        """
+        """Retrieves stats for a certain load balancer pool."""
         return self.get(self.pool_path_stats % (pool), params=_params)
 
     @APIParamsCall
     def list_members(self, retrieve_all=True, **_params):
-        """
-        Fetches a list of all load balancer members for a tenant
-        """
+        """Fetches a list of all load balancer members for a tenant."""
         # Pass filters in "params" argument to do_request
         return self.list('members', self.members_path, retrieve_all,
                          **_params)
 
     @APIParamsCall
     def show_member(self, member, **_params):
-        """
-        Fetches information of a certain load balancer member
-        """
+        """Fetches information of a certain load balancer member."""
         return self.get(self.member_path % (member), params=_params)
 
     @APIParamsCall
     def create_member(self, body=None):
-        """
-        Creates a new load balancer member
-        """
+        """Creates a new load balancer member."""
         return self.post(self.members_path, body=body)
 
     @APIParamsCall
     def update_member(self, member, body=None):
-        """
-        Updates a load balancer member
-        """
+        """Updates a load balancer member."""
         return self.put(self.member_path % (member), body=body)
 
     @APIParamsCall
     def delete_member(self, member):
-        """
-        Deletes the specified load balancer member
-        """
+        """Deletes the specified load balancer member."""
         return self.delete(self.member_path % (member))
 
     @APIParamsCall
     def list_health_monitors(self, retrieve_all=True, **_params):
-        """
-        Fetches a list of all load balancer health monitors for a tenant
-        """
+        """Fetches a list of all load balancer health monitors for a tenant."""
         # Pass filters in "params" argument to do_request
         return self.list('health_monitors', self.health_monitors_path,
                          retrieve_all, **_params)
 
     @APIParamsCall
     def show_health_monitor(self, health_monitor, **_params):
-        """
-        Fetches information of a certain load balancer health monitor
-        """
+        """Fetches information of a certain load balancer health monitor."""
         return self.get(self.health_monitor_path % (health_monitor),
                         params=_params)
 
     @APIParamsCall
     def create_health_monitor(self, body=None):
-        """
-        Creates a new load balancer health monitor
-        """
+        """Creates a new load balancer health monitor."""
         return self.post(self.health_monitors_path, body=body)
 
     @APIParamsCall
     def update_health_monitor(self, health_monitor, body=None):
-        """
-        Updates a load balancer health monitor
-        """
+        """Updates a load balancer health monitor."""
         return self.put(self.health_monitor_path % (health_monitor), body=body)
 
     @APIParamsCall
     def delete_health_monitor(self, health_monitor):
-        """
-        Deletes the specified load balancer health monitor
-        """
+        """Deletes the specified load balancer health monitor."""
         return self.delete(self.health_monitor_path % (health_monitor))
 
     @APIParamsCall
     def associate_health_monitor(self, pool, body):
-        """
-        Associate  specified load balancer health monitor and pool
-        """
+        """Associate  specified load balancer health monitor and pool."""
         return self.post(self.associate_pool_health_monitors_path % (pool),
                          body=body)
 
     @APIParamsCall
     def disassociate_health_monitor(self, pool, health_monitor):
-        """
-        Disassociate specified load balancer health monitor and pool
-        """
+        """Disassociate specified load balancer health monitor and pool."""
         path = (self.disassociate_pool_health_monitors_path %
                 {'pool': pool, 'health_monitor': health_monitor})
         return self.delete(path)
 
     @APIParamsCall
     def create_qos_queue(self, body=None):
-        """
-        Creates a new queue
-        """
+        """Creates a new queue."""
         return self.post(self.qos_queues_path, body=body)
 
     @APIParamsCall
     def list_qos_queues(self, **_params):
-        """
-        Fetches a list of all queues for a tenant
-        """
+        """Fetches a list of all queues for a tenant."""
         return self.get(self.qos_queues_path, params=_params)
 
     @APIParamsCall
     def show_qos_queue(self, queue, **_params):
-        """
-        Fetches information of a certain queue
-        """
+        """Fetches information of a certain queue."""
         return self.get(self.qos_queue_path % (queue),
                         params=_params)
 
     @APIParamsCall
     def delete_qos_queue(self, queue):
-        """
-        Deletes the specified queue
-        """
+        """Deletes the specified queue."""
         return self.delete(self.qos_queue_path % (queue))
 
     @APIParamsCall
     def list_agents(self, **_params):
-        """
-        Fetches agents
-        """
+        """Fetches agents."""
         # Pass filters in "params" argument to do_request
         return self.get(self.agents_path, params=_params)
 
     @APIParamsCall
     def show_agent(self, agent, **_params):
-        """
-        Fetches information of a certain agent
-        """
+        """Fetches information of a certain agent."""
         return self.get(self.agent_path % (agent), params=_params)
 
     @APIParamsCall
     def update_agent(self, agent, body=None):
-        """
-        Updates an agent
-        """
+        """Updates an agent."""
         return self.put(self.agent_path % (agent), body=body)
 
     @APIParamsCall
     def delete_agent(self, agent):
-        """
-        Deletes the specified agent
-        """
+        """Deletes the specified agent."""
         return self.delete(self.agent_path % (agent))
 
     @APIParamsCall
     def list_network_gateways(self, **_params):
-        """
-        Retrieve network gateways
-        """
+        """Retrieve network gateways."""
         return self.get(self.network_gateways_path, params=_params)
 
     @APIParamsCall
     def show_network_gateway(self, gateway_id, **_params):
-        """
-        Fetch a network gateway
-        """
+        """Fetch a network gateway."""
         return self.get(self.network_gateway_path % gateway_id, params=_params)
 
     @APIParamsCall
     def create_network_gateway(self, body=None):
-        """
-        Create a new network gateway
-        """
+        """Create a new network gateway."""
         return self.post(self.network_gateways_path, body=body)
 
     @APIParamsCall
     def update_network_gateway(self, gateway_id, body=None):
-        """
-        Update a network gateway
-        """
+        """Update a network gateway."""
         return self.put(self.network_gateway_path % gateway_id, body=body)
 
     @APIParamsCall
     def delete_network_gateway(self, gateway_id):
-        """
-        Delete the specified network gateway
-        """
+        """Delete the specified network gateway."""
         return self.delete(self.network_gateway_path % gateway_id)
 
     @APIParamsCall
     def connect_network_gateway(self, gateway_id, body=None):
-        """
-        Connect a network gateway to the specified network
-        """
+        """Connect a network gateway to the specified network."""
         base_uri = self.network_gateway_path % gateway_id
         return self.put("%s/connect_network" % base_uri, body=body)
 
     @APIParamsCall
     def disconnect_network_gateway(self, gateway_id, body=None):
-        """
-        Disconnect a network from the specified gateway
-        """
+        """Disconnect a network from the specified gateway."""
         base_uri = self.network_gateway_path % gateway_id
         return self.put("%s/disconnect_network" % base_uri, body=body)
 
     @APIParamsCall
     def list_dhcp_agent_hosting_networks(self, network, **_params):
-        """
-        Fetches a list of dhcp agents hosting a network.
-        """
+        """Fetches a list of dhcp agents hosting a network."""
         return self.get((self.network_path + self.DHCP_AGENTS) % network,
                         params=_params)
 
     @APIParamsCall
     def list_networks_on_dhcp_agent(self, dhcp_agent, **_params):
-        """
-        Fetches a list of dhcp agents hosting a network.
-        """
+        """Fetches a list of dhcp agents hosting a network."""
         return self.get((self.agent_path + self.DHCP_NETS) % dhcp_agent,
                         params=_params)
 
     @APIParamsCall
     def add_network_to_dhcp_agent(self, dhcp_agent, body=None):
-        """
-        Adds a network to dhcp agent.
-        """
+        """Adds a network to dhcp agent."""
         return self.post((self.agent_path + self.DHCP_NETS) % dhcp_agent,
                          body=body)
 
     @APIParamsCall
     def remove_network_from_dhcp_agent(self, dhcp_agent, network_id):
-        """
-        Remove a network from dhcp agent.
-        """
+        """Remove a network from dhcp agent."""
         return self.delete((self.agent_path + self.DHCP_NETS + "/%s") % (
             dhcp_agent, network_id))
 
     @APIParamsCall
     def list_l3_agent_hosting_routers(self, router, **_params):
-        """
-        Fetches a list of L3 agents hosting a router.
-        """
+        """Fetches a list of L3 agents hosting a router."""
         return self.get((self.router_path + self.L3_AGENTS) % router,
                         params=_params)
 
     @APIParamsCall
     def list_routers_on_l3_agent(self, l3_agent, **_params):
-        """
-        Fetches a list of L3 agents hosting a router.
-        """
+        """Fetches a list of L3 agents hosting a router."""
         return self.get((self.agent_path + self.L3_ROUTERS) % l3_agent,
                         params=_params)
 
     @APIParamsCall
     def add_router_to_l3_agent(self, l3_agent, body):
-        """
-        Adds a router to L3 agent.
-        """
+        """Adds a router to L3 agent."""
         return self.post((self.agent_path + self.L3_ROUTERS) % l3_agent,
                          body=body)
 
     @APIParamsCall
     def remove_router_from_l3_agent(self, l3_agent, router_id):
-        """
-        Remove a router from l3 agent.
-        """
+        """Remove a router from l3 agent."""
         return self.delete((self.agent_path + self.L3_ROUTERS + "/%s") % (
             l3_agent, router_id))
 
@@ -937,9 +769,10 @@ class Client(object):
         return self.httpclient.get_auth_info()
 
     def get_status_code(self, response):
-        """
-        Returns the integer status code from the response, which
-        can be either a Webob.Response (used in testing) or httplib.Response
+        """Returns the integer status code from the response.
+
+        Either a Webob.Response (used in testing) or httplib.Response
+        is returned.
         """
         if hasattr(response, 'status_int'):
             return response.status_int
@@ -947,9 +780,10 @@ class Client(object):
             return response.status
 
     def serialize(self, data):
-        """
-        Serializes a dictionary with a single key (which can contain any
-        structure) into either xml or json
+        """Serializes a dictionary into either xml or json.
+
+        A dictionary with a single key can be passed and
+        it can contain any structure.
         """
         if data is None:
             return None
@@ -961,28 +795,25 @@ class Client(object):
                             type(data))
 
     def deserialize(self, data, status_code):
-        """
-        Deserializes an xml or json string into a dictionary
-        """
+        """Deserializes an xml or json string into a dictionary."""
         if status_code == 204:
             return data
         return serializer.Serializer(self.get_attr_metadata()).deserialize(
             data, self.content_type())['body']
 
     def content_type(self, _format=None):
-        """
-        Returns the mime-type for either 'xml' or 'json'.  Defaults to the
-        currently set format
+        """Returns the mime-type for either 'xml' or 'json'.
+
+        Defaults to the currently set format.
         """
         _format = _format or self.format
         return "application/%s" % (_format)
 
     def retry_request(self, method, action, body=None,
                       headers=None, params=None):
-        """
-        Call do_request with the default retry configuration. Only
-        idempotent requests should retry failed connection attempts.
+        """Call do_request with the default retry configuration.
 
+        Only idempotent requests should retry failed connection attempts.
         :raises: ConnectionFailed if the maximum # of retries is exceeded
         """
         max_attempts = self.retries + 1

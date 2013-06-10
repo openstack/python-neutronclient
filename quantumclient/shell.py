@@ -432,10 +432,7 @@ class QuantumShell(app.App):
         return parser
 
     def _bash_completion(self):
-        """
-        Prints all of the commands and options to stdout so that the
-        quantum's bash-completion script doesn't have to hard code them.
-        """
+        """Prints all of the commands and options for bash-completion."""
         commands = set()
         options = set()
         for option, _action in self.parser._option_string_actions.items():

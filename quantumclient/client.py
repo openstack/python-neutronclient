@@ -238,9 +238,10 @@ class HTTPClient(httplib2.Http):
                 'endpoint_url': self.endpoint_url}
 
     def get_status_code(self, response):
-        """
-        Returns the integer status code from the response, which
-        can be either a Webob.Response (used in testing) or httplib.Response
+        """Returns the integer status code from the response.
+
+        Either a Webob.Response (used in testing) or httplib.Response
+        is returned.
         """
         if hasattr(response, 'status_int'):
             return response.status_int
