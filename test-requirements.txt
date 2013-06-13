@@ -7,7 +7,6 @@ hacking>=0.5.3,<0.6
 cliff-tablib>=1.0
 coverage
 discover
-distribute>=0.6.24
 fixtures>=0.3.12
 mox
 python-subunit
