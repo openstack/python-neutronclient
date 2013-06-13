@@ -1,7 +1,7 @@
 d2to1>=0.2.10,<0.3
-pbr>=0.5.10,<0.6
+pbr>=0.5.16,<0.6
 argparse
-cliff>=1.3.2
+cliff>=1.4
 httplib2
 iso8601
 prettytable>=0.6,<0.8
