@@ -17,6 +17,7 @@
 
 import logging
 
+from quantumclient.openstack.common.gettextutils import _
 from quantumclient.quantum import v2_0 as quantumV20
 from quantumclient.quantum.v2_0 import network
 from quantumclient.quantum.v2_0 import router

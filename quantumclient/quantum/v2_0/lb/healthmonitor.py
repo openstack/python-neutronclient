@@ -19,6 +19,7 @@
 
 import logging
 
+from quantumclient.openstack.common.gettextutils import _
 from quantumclient.quantum import v2_0 as quantumv20
 
 

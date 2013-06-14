@@ -19,6 +19,7 @@ import argparse
 import logging
 
 from quantumclient.common import utils
+from quantumclient.openstack.common.gettextutils import _
 from quantumclient.quantum import v2_0 as quantumv20
 from quantumclient.quantum.v2_0 import CreateCommand
 from quantumclient.quantum.v2_0 import DeleteCommand

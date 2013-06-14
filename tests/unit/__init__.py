@@ -14,9 +14,3 @@
 #    under the License.
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
-
-import gettext
-
-# Because we installed '_' for quantum cli in shell.py, this help unittest
-# have definition of '_'
-gettext.install('quantumclient', unicode=1)
