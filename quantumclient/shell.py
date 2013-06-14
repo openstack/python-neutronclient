@@ -32,6 +32,7 @@ from quantumclient.common import clientmanager
 from quantumclient.common import exceptions as exc
 from quantumclient.common import utils
 from quantumclient.openstack.common import strutils
+from quantumclient.version import __version__
 
 
 VERSION = '2.0'
@@ -324,7 +325,7 @@ class QuantumShell(App):
         parser.add_argument(
             '--version',
             action='version',
-            version='%(prog)s {0}'.format(version), )
+            version=__version__, )
         parser.add_argument(
             '-v', '--verbose',
             action='count',
