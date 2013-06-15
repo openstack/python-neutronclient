@@ -24,7 +24,6 @@ from cliff import show
 from quantumclient.common import exceptions
 from quantumclient.common import utils
 from quantumclient.quantum import v2_0 as quantumv20
-from quantumclient.quantum.v2_0 import QuantumCommand
 
 
 def get_tenant_id(tenant_id, client):
@@ -32,7 +31,7 @@ def get_tenant_id(tenant_id, client):
             client.get_quotas_tenant()['tenant']['tenant_id'])
 
 
-class DeleteQuota(QuantumCommand):
+class DeleteQuota(quantumv20.QuantumCommand):
     """Delete defined quotas of a given tenant."""
 
     api = 'network'
@@ -64,7 +63,7 @@ class DeleteQuota(QuantumCommand):
         return
 
 
-class ListQuota(QuantumCommand, lister.Lister):
+class ListQuota(quantumv20.QuantumCommand, lister.Lister):
     """List defined quotas of all tenants."""
 
     api = 'network'
@@ -93,7 +92,7 @@ class ListQuota(QuantumCommand, lister.Lister):
                 for s in info))
 
 
-class ShowQuota(QuantumCommand, show.ShowOne):
+class ShowQuota(quantumv20.QuantumCommand, show.ShowOne):
     """Show quotas of a given tenant
 
     """
@@ -140,7 +139,7 @@ class ShowQuota(QuantumCommand, show.ShowOne):
             return None
 
 
-class UpdateQuota(QuantumCommand, show.ShowOne):
+class UpdateQuota(quantumv20.QuantumCommand, show.ShowOne):
     """Define tenant's quotas not to use defaults."""
 
     resource = 'quota'

@@ -19,7 +19,7 @@
 
 import sys
 
-from mox import ContainsKeyValue
+import mox
 
 from quantumclient.quantum.v2_0.lb import healthmonitor
 from tests.unit import test_cli20
@@ -176,8 +176,8 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
         self.client.httpclient.request(
             test_cli20.end_url(path), 'POST',
             body=test_cli20.MyComparator(body, self.client),
-            headers=ContainsKeyValue('X-Auth-Token',
-                                     test_cli20.TOKEN)).AndReturn(return_tup)
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(return_tup)
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser('test_' + resource)
         parsed_args = cmd_parser.parse_args(args)
@@ -198,15 +198,15 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
 
-        path = getattr(self.client,
-                       "disassociate_pool_health_monitors_path") % \
-            {'pool': pool_id, 'health_monitor': health_monitor_id}
+        path = (getattr(self.client,
+                        "disassociate_pool_health_monitors_path") %
+                {'pool': pool_id, 'health_monitor': health_monitor_id})
         return_tup = (test_cli20.MyResp(204), None)
         self.client.httpclient.request(
             test_cli20.end_url(path), 'DELETE',
             body=None,
-            headers=ContainsKeyValue('X-Auth-Token',
-                                     test_cli20.TOKEN)).AndReturn(return_tup)
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(return_tup)
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser('test_' + resource)
         parsed_args = cmd_parser.parse_args(args)

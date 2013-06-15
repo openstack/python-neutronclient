@@ -19,13 +19,11 @@ import urllib
 
 import fixtures
 import mox
-from mox import Comparator
-from mox import ContainsKeyValue
 import testtools
 
 from quantumclient.common import constants
 from quantumclient import shell
-from quantumclient.v2_0.client import Client
+from quantumclient.v2_0 import client
 
 
 API_VERSION = "2.0"
@@ -64,7 +62,7 @@ def end_url(path, query=None, format=FORMAT):
     return query and _url_str + "?" + query or _url_str
 
 
-class MyUrlComparator(Comparator):
+class MyUrlComparator(mox.Comparator):
     def __init__(self, lhs, client):
         self.lhs = lhs
         self.client = client
@@ -89,7 +87,7 @@ class MyUrlComparator(Comparator):
         return str(self)
 
 
-class MyComparator(Comparator):
+class MyComparator(mox.Comparator):
     def __init__(self, lhs, client):
         self.lhs = lhs
         self.client = client
@@ -152,18 +150,18 @@ class CLITestV20Base(testtools.TestCase):
 
     def _get_attr_metadata(self):
         return self.metadata
-        Client.EXTED_PLURALS.update(constants.PLURALS)
-        Client.EXTED_PLURALS.update({'tags': 'tag'})
-        return {'plurals': Client.EXTED_PLURALS,
+        client.Client.EXTED_PLURALS.update(constants.PLURALS)
+        client.Client.EXTED_PLURALS.update({'tags': 'tag'})
+        return {'plurals': client.Client.EXTED_PLURALS,
                 'xmlns': constants.XML_NS_V20,
                 constants.EXT_NS: {'prefix': 'http://xxxx.yy.com'}}
 
     def setUp(self, plurals={}):
         """Prepare the test environment."""
         super(CLITestV20Base, self).setUp()
-        Client.EXTED_PLURALS.update(constants.PLURALS)
-        Client.EXTED_PLURALS.update(plurals)
-        self.metadata = {'plurals': Client.EXTED_PLURALS,
+        client.Client.EXTED_PLURALS.update(constants.PLURALS)
+        client.Client.EXTED_PLURALS.update(plurals)
+        self.metadata = {'plurals': client.Client.EXTED_PLURALS,
                          'xmlns': constants.XML_NS_V20,
                          constants.EXT_NS: {'prefix':
                                             'http://xxxx.yy.com'}}
@@ -177,7 +175,7 @@ class CLITestV20Base(testtools.TestCase):
         self.useFixture(fixtures.MonkeyPatch(
             'quantumclient.v2_0.client.Client.get_attr_metadata',
             self._get_attr_metadata))
-        self.client = Client(token=TOKEN, endpoint_url=self.endurl)
+        self.client = client.Client(token=TOKEN, endpoint_url=self.endurl)
 
     def _test_create_resource(self, resource, cmd,
                               name, myid, args,
@@ -217,9 +215,8 @@ class CLITestV20Base(testtools.TestCase):
         self.client.httpclient.request(
             end_url(path, format=self.format), 'POST',
             body=MyComparator(body, self.client),
-            headers=ContainsKeyValue('X-Auth-Token',
-                                     TOKEN)).AndReturn((MyResp(200),
-                                                        resstr))
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
         args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser('create_' + resource)
@@ -243,8 +240,8 @@ class CLITestV20Base(testtools.TestCase):
         self.client.httpclient.request(
             end_url(path, format=self.format), 'GET',
             body=None,
-            headers=ContainsKeyValue('X-Auth-Token',
-                                     TOKEN)).AndReturn((MyResp(200), resstr))
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
         args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("list_" + resources_collection)
@@ -332,8 +329,8 @@ class CLITestV20Base(testtools.TestCase):
                             self.client),
             'GET',
             body=None,
-            headers=ContainsKeyValue('X-Auth-Token',
-                                     TOKEN)).AndReturn((MyResp(200), resstr))
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("list_" + resources)
         shell.run_command(cmd, cmd_parser, args)
@@ -362,13 +359,13 @@ class CLITestV20Base(testtools.TestCase):
         self.client.httpclient.request(
             end_url(path, "", format=self.format), 'GET',
             body=None,
-            headers=ContainsKeyValue('X-Auth-Token',
-                                     TOKEN)).AndReturn((MyResp(200), resstr1))
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr1))
         self.client.httpclient.request(
             end_url(path, fake_query, format=self.format), 'GET',
             body=None,
-            headers=ContainsKeyValue('X-Auth-Token',
-                                     TOKEN)).AndReturn((MyResp(200), resstr2))
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr2))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("list_" + resources)
         args = ['--request-format', self.format]
@@ -389,8 +386,8 @@ class CLITestV20Base(testtools.TestCase):
                             self.client),
             'PUT',
             body=MyComparator(body, self.client),
-            headers=ContainsKeyValue('X-Auth-Token',
-                                     TOKEN)).AndReturn((MyResp(204), None))
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', TOKEN)).AndReturn((MyResp(204), None))
         args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("update_" + resource)
@@ -414,8 +411,8 @@ class CLITestV20Base(testtools.TestCase):
         self.client.httpclient.request(
             end_url(path % myid, query, format=self.format), 'GET',
             body=None,
-            headers=ContainsKeyValue('X-Auth-Token',
-                                     TOKEN)).AndReturn((MyResp(200), resstr))
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
         args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("show_" + resource)
@@ -434,8 +431,8 @@ class CLITestV20Base(testtools.TestCase):
         self.client.httpclient.request(
             end_url(path % myid, format=self.format), 'DELETE',
             body=None,
-            headers=ContainsKeyValue('X-Auth-Token',
-                                     TOKEN)).AndReturn((MyResp(204), None))
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', TOKEN)).AndReturn((MyResp(204), None))
         args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("delete_" + resource)
@@ -455,8 +452,8 @@ class CLITestV20Base(testtools.TestCase):
         self.client.httpclient.request(
             end_url(path % path_action, format=self.format), 'PUT',
             body=MyComparator(body, self.client),
-            headers=ContainsKeyValue('X-Auth-Token',
-                                     TOKEN)).AndReturn((MyResp(204), None))
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', TOKEN)).AndReturn((MyResp(204), None))
         args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("delete_" + resource)
@@ -489,7 +486,7 @@ class ClientV2UnicodeTestJson(CLITestV20Base):
         self.client.httpclient.request(
             end_url(expected_action, query=expect_query, format=self.format),
             'PUT', body=expect_body,
-            headers=ContainsKeyValue(
+            headers=mox.ContainsKeyValue(
                 'X-Auth-Token',
                 expected_auth_token)).AndReturn((MyResp(200), expect_body))
 

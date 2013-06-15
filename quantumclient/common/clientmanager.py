@@ -20,7 +20,7 @@
 
 import logging
 
-from quantumclient.client import HTTPClient
+from quantumclient import client
 from quantumclient.quantum import client as quantum_client
 
 
@@ -74,13 +74,13 @@ class ClientManager(object):
 
     def initialize(self):
         if not self._url:
-            httpclient = HTTPClient(username=self._username,
-                                    tenant_name=self._tenant_name,
-                                    password=self._password,
-                                    region_name=self._region_name,
-                                    auth_url=self._auth_url,
-                                    endpoint_type=self._endpoint_type,
-                                    insecure=self._insecure)
+            httpclient = client.HTTPClient(username=self._username,
+                                           tenant_name=self._tenant_name,
+                                           password=self._password,
+                                           region_name=self._region_name,
+                                           auth_url=self._auth_url,
+                                           endpoint_type=self._endpoint_type,
+                                           insecure=self._insecure)
             httpclient.authenticate()
             # Populate other password flow attributes
             self._token = httpclient.auth_token

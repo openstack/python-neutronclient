@@ -20,11 +20,6 @@ import logging
 
 from quantumclient.common import utils
 from quantumclient.quantum import v2_0 as quantumv20
-from quantumclient.quantum.v2_0 import CreateCommand
-from quantumclient.quantum.v2_0 import DeleteCommand
-from quantumclient.quantum.v2_0 import ListCommand
-from quantumclient.quantum.v2_0 import ShowCommand
-from quantumclient.quantum.v2_0 import UpdateCommand
 
 
 def _format_fixed_ips(port):
@@ -34,7 +29,7 @@ def _format_fixed_ips(port):
         return ''
 
 
-class ListPort(ListCommand):
+class ListPort(quantumv20.ListCommand):
     """List ports that belong to a given tenant."""
 
     resource = 'port'
@@ -45,7 +40,7 @@ class ListPort(ListCommand):
     sorting_support = True
 
 
-class ListRouterPort(ListCommand):
+class ListRouterPort(quantumv20.ListCommand):
     """List ports that belong to a given tenant, with specified router."""
 
     resource = 'port'
@@ -71,14 +66,14 @@ class ListRouterPort(ListCommand):
         return super(ListRouterPort, self).get_data(parsed_args)
 
 
-class ShowPort(ShowCommand):
+class ShowPort(quantumv20.ShowCommand):
     """Show information of a given port."""
 
     resource = 'port'
     log = logging.getLogger(__name__ + '.ShowPort')
 
 
-class CreatePort(CreateCommand):
+class CreatePort(quantumv20.CreateCommand):
     """Create a port for a given tenant."""
 
     resource = 'port'
@@ -163,14 +158,14 @@ class CreatePort(CreateCommand):
         return body
 
 
-class DeletePort(DeleteCommand):
+class DeletePort(quantumv20.DeleteCommand):
     """Delete a given port."""
 
     resource = 'port'
     log = logging.getLogger(__name__ + '.DeletePort')
 
 
-class UpdatePort(UpdateCommand):
+class UpdatePort(quantumv20.UpdateCommand):
     """Update port's information."""
 
     resource = 'port'

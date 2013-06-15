@@ -21,7 +21,7 @@ import time
 import urllib
 import urlparse
 
-from quantumclient.client import HTTPClient
+from quantumclient import client
 from quantumclient.common import _
 from quantumclient.common import constants
 from quantumclient.common import exceptions
@@ -887,7 +887,7 @@ class Client(object):
     def __init__(self, **kwargs):
         """Initialize a new client for the Quantum v2.0 API."""
         super(Client, self).__init__()
-        self.httpclient = HTTPClient(**kwargs)
+        self.httpclient = client.HTTPClient(**kwargs)
         self.version = '2.0'
         self.format = 'json'
         self.action_prefix = "/v%s" % (self.version)

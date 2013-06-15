@@ -18,24 +18,15 @@
 import sys
 
 from quantumclient.common import exceptions
-from quantumclient.quantum.v2_0.router import AddInterfaceRouter
-from quantumclient.quantum.v2_0.router import CreateRouter
-from quantumclient.quantum.v2_0.router import DeleteRouter
-from quantumclient.quantum.v2_0.router import ListRouter
-from quantumclient.quantum.v2_0.router import RemoveGatewayRouter
-from quantumclient.quantum.v2_0.router import RemoveInterfaceRouter
-from quantumclient.quantum.v2_0.router import SetGatewayRouter
-from quantumclient.quantum.v2_0.router import ShowRouter
-from quantumclient.quantum.v2_0.router import UpdateRouter
-from tests.unit.test_cli20 import CLITestV20Base
-from tests.unit.test_cli20 import MyApp
+from quantumclient.quantum.v2_0 import router
+from tests.unit import test_cli20
 
 
-class CLITestV20RouterJSON(CLITestV20Base):
+class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
     def test_create_router(self):
         """Create router: router1."""
         resource = 'router'
-        cmd = CreateRouter(MyApp(sys.stdout), None)
+        cmd = router.CreateRouter(test_cli20.MyApp(sys.stdout), None)
         name = 'router1'
         myid = 'myid'
         args = [name, ]
@@ -47,7 +38,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
     def test_create_router_tenant(self):
         """Create router: --tenant_id tenantid myname."""
         resource = 'router'
-        cmd = CreateRouter(MyApp(sys.stdout), None)
+        cmd = router.CreateRouter(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         args = ['--tenant_id', 'tenantid', name]
@@ -60,7 +51,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
     def test_create_router_admin_state(self):
         """Create router: --admin_state_down myname."""
         resource = 'router'
-        cmd = CreateRouter(MyApp(sys.stdout), None)
+        cmd = router.CreateRouter(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         args = ['--admin_state_down', name, ]
@@ -73,12 +64,12 @@ class CLITestV20RouterJSON(CLITestV20Base):
     def test_list_routers_detail(self):
         """list routers: -D."""
         resources = "routers"
-        cmd = ListRouter(MyApp(sys.stdout), None)
+        cmd = router.ListRouter(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_routers_pagination(self):
         resources = "routers"
-        cmd = ListRouter(MyApp(sys.stdout), None)
+        cmd = router.ListRouter(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources_with_pagination(resources, cmd)
 
     def test_list_routers_sort(self):
@@ -86,7 +77,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
         --sort-key desc
         """
         resources = "routers"
-        cmd = ListRouter(MyApp(sys.stdout), None)
+        cmd = router.ListRouter(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
                                   sort_key=["name", "id"],
                                   sort_dir=["asc", "desc"])
@@ -94,20 +85,20 @@ class CLITestV20RouterJSON(CLITestV20Base):
     def test_list_routers_limit(self):
         """list routers: -P."""
         resources = "routers"
-        cmd = ListRouter(MyApp(sys.stdout), None)
+        cmd = router.ListRouter(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_update_router_exception(self):
         """Update router: myid."""
         resource = 'router'
-        cmd = UpdateRouter(MyApp(sys.stdout), None)
+        cmd = router.UpdateRouter(test_cli20.MyApp(sys.stdout), None)
         self.assertRaises(exceptions.CommandError, self._test_update_resource,
                           resource, cmd, 'myid', ['myid'], {})
 
     def test_update_router(self):
         """Update router: myid --name myname --tags a b."""
         resource = 'router'
-        cmd = UpdateRouter(MyApp(sys.stdout), None)
+        cmd = router.UpdateRouter(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'myname'],
                                    {'name': 'myname'}
@@ -116,7 +107,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
     def test_delete_router(self):
         """Delete router: myid."""
         resource = 'router'
-        cmd = DeleteRouter(MyApp(sys.stdout), None)
+        cmd = router.DeleteRouter(test_cli20.MyApp(sys.stdout), None)
         myid = 'myid'
         args = [myid]
         self._test_delete_resource(resource, cmd, myid, args)
@@ -124,7 +115,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
     def test_show_router(self):
         """Show router: myid."""
         resource = 'router'
-        cmd = ShowRouter(MyApp(sys.stdout), None)
+        cmd = router.ShowRouter(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id, args,
                                  ['id', 'name'])
@@ -132,7 +123,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
     def test_add_interface(self):
         """Add interface to router: myid subnetid."""
         resource = 'router'
-        cmd = AddInterfaceRouter(MyApp(sys.stdout), None)
+        cmd = router.AddInterfaceRouter(test_cli20.MyApp(sys.stdout), None)
         args = ['myid', 'subnetid']
         self._test_update_resource_action(resource, cmd, 'myid',
                                           'add_router_interface',
@@ -143,7 +134,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
     def test_del_interface(self):
         """Delete interface from router: myid subnetid."""
         resource = 'router'
-        cmd = RemoveInterfaceRouter(MyApp(sys.stdout), None)
+        cmd = router.RemoveInterfaceRouter(test_cli20.MyApp(sys.stdout), None)
         args = ['myid', 'subnetid']
         self._test_update_resource_action(resource, cmd, 'myid',
                                           'remove_router_interface',
@@ -154,7 +145,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
     def test_set_gateway(self):
         """Set external gateway for router: myid externalid."""
         resource = 'router'
-        cmd = SetGatewayRouter(MyApp(sys.stdout), None)
+        cmd = router.SetGatewayRouter(test_cli20.MyApp(sys.stdout), None)
         args = ['myid', 'externalid']
         self._test_update_resource(resource, cmd, 'myid',
                                    args,
@@ -166,7 +157,7 @@ class CLITestV20RouterJSON(CLITestV20Base):
     def test_remove_gateway(self):
         """Remove external gateway from router: externalid."""
         resource = 'router'
-        cmd = RemoveGatewayRouter(MyApp(sys.stdout), None)
+        cmd = router.RemoveGatewayRouter(test_cli20.MyApp(sys.stdout), None)
         args = ['externalid']
         self._test_update_resource(resource, cmd, 'externalid',
                                    args, {"external_gateway_info": {}}

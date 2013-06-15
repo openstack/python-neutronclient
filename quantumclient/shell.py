@@ -25,8 +25,8 @@ import logging
 import os
 import sys
 
-from cliff.app import App
-from cliff.commandmanager import CommandManager
+from cliff import app
+from cliff import commandmanager
 
 from quantumclient.common import clientmanager
 from quantumclient.common import exceptions as exc
@@ -287,7 +287,7 @@ class HelpAction(argparse.Action):
         sys.exit(0)
 
 
-class QuantumShell(App):
+class QuantumShell(app.App):
 
     CONSOLE_MESSAGE_FORMAT = '%(message)s'
     DEBUG_MESSAGE_FORMAT = '%(levelname)s: %(name)s %(message)s'
@@ -297,7 +297,7 @@ class QuantumShell(App):
         super(QuantumShell, self).__init__(
             description=__doc__.strip(),
             version=VERSION,
-            command_manager=CommandManager('quantum.cli'), )
+            command_manager=commandmanager.CommandManager('quantum.cli'), )
         self.commands = COMMANDS
         for k, v in self.commands[apiversion].items():
             self.command_manager.add_command(k, v)

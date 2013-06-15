@@ -19,7 +19,7 @@
 
 import sys
 
-from mox import ContainsKeyValue
+import mox
 
 from quantumclient.quantum.v2_0.lb import pool
 from tests.unit import test_cli20
@@ -152,8 +152,8 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
         self.client.httpclient.request(
             test_cli20.end_url(path % my_id, query), 'GET',
             body=None,
-            headers=ContainsKeyValue('X-Auth-Token',
-                                     test_cli20.TOKEN)).AndReturn(return_tup)
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(return_tup)
         self.mox.ReplayAll()
 
         cmd_parser = cmd.get_parser("test_" + resource)
