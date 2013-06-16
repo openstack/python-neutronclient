@@ -73,14 +73,17 @@ class CreatePool(quantumv20.CreateCommand):
             help='the subnet on which the members of the pool will be located')
 
     def args2body(self, parsed_args):
+        _subnet_id = quantumv20.find_resourceid_by_name_or_id(
+            self.get_client(), 'subnet', parsed_args.subnet_id)
         body = {
             self.resource: {
                 'admin_state_up': parsed_args.admin_state,
+                'subnet_id': _subnet_id,
             },
         }
         quantumv20.update_dict(parsed_args, body[self.resource],
                                ['description', 'lb_method', 'name',
-                                'subnet_id', 'protocol', 'tenant_id'])
+                                'protocol', 'tenant_id'])
         return body
 
 
