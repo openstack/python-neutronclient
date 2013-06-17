@@ -104,7 +104,7 @@ class CreatePort(quantumv20.CreateCommand):
             '--device_id',
             help=argparse.SUPPRESS)
         parser.add_argument(
-            '--fixed-ip',
+            '--fixed-ip', metavar='ip_address=IP_ADDR',
             action='append',
             help='desired IP for this port: '
             'subnet_id=<name_or_id>,ip_address=<ip>, '
