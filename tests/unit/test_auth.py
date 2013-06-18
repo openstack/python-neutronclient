@@ -25,6 +25,7 @@ import testtools
 
 from neutronclient import client
 from neutronclient.common import exceptions
+from neutronclient.common import utils
 
 
 USERNAME = 'testuser'
@@ -322,6 +323,34 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.assertRaises(exceptions.EndpointTypeNotFound,
                           self.client._extract_service_catalog,
                           resources)
+
+    def test_strip_credentials_from_log(self):
+        def verify_no_credentials(kwargs):
+            return ('REDACTED' in kwargs['body']) and (
+                self.client.password not in kwargs['body'])
+
+        def verify_credentials(body):
+            return 'REDACTED' not in body and self.client.password in body
+
+        self.mox.StubOutWithMock(self.client, "request")
+        self.mox.StubOutWithMock(utils, "http_log_req")
+
+        res200 = self.mox.CreateMock(httplib2.Response)
+        res200.status = 200
+
+        utils.http_log_req(mox.IgnoreArg(), mox.IgnoreArg(), mox.Func(
+            verify_no_credentials))
+        self.client.request(
+            mox.IsA(str), mox.IsA(str), body=mox.Func(verify_credentials),
+            headers=mox.IgnoreArg()
+        ).AndReturn((res200, json.dumps(KS_TOKEN_RESULT)))
+        utils.http_log_req(mox.IgnoreArg(), mox.IgnoreArg(), mox.IgnoreArg())
+        self.client.request(
+            mox.IsA(str), mox.IsA(str), headers=mox.IsA(dict)
+        ).AndReturn((res200, ''))
+        self.mox.ReplayAll()
+
+        self.client.do_request('/resource', 'GET')
 
 
 class CLITestAuthKeystoneWithId(CLITestAuthKeystone):

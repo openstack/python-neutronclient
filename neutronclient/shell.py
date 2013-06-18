@@ -529,7 +529,8 @@ class NeutronShell(app.App):
             auth_strategy=self.options.os_auth_strategy,
             endpoint_type=self.options.endpoint_type,
             insecure=self.options.insecure,
-            ca_cert=self.options.os_cacert, )
+            ca_cert=self.options.os_cacert,
+            log_credentials=True)
         return
 
     def initialize_app(self, argv):

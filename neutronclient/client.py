@@ -99,7 +99,8 @@ class HTTPClient(httplib2.Http):
                  token=None, region_name=None, timeout=None,
                  endpoint_url=None, insecure=False,
                  endpoint_type='publicURL',
-                 auth_strategy='keystone', ca_cert=None, **kwargs):
+                 auth_strategy='keystone', ca_cert=None, log_credentials=False,
+                 **kwargs):
         super(HTTPClient, self).__init__(timeout=timeout, ca_certs=ca_cert)
 
         self.username = username
@@ -113,6 +114,7 @@ class HTTPClient(httplib2.Http):
         self.content_type = 'application/json'
         self.endpoint_url = endpoint_url
         self.auth_strategy = auth_strategy
+        self.log_credentials = log_credentials
         # httplib2 overrides
         self.disable_ssl_certificate_validation = insecure
 
@@ -132,7 +134,13 @@ class HTTPClient(httplib2.Http):
             kargs['body'] = kwargs['body']
         args = utils.safe_encode_list(args)
         kargs = utils.safe_encode_dict(kargs)
-        utils.http_log_req(_logger, args, kargs)
+
+        if self.log_credentials:
+            log_kargs = kargs
+        else:
+            log_kargs = self._strip_credentials(kargs)
+
+        utils.http_log_req(_logger, args, log_kargs)
         try:
             resp, body = self.request(*args, **kargs)
         except httplib2.SSLHandshakeError as e:
@@ -149,6 +157,15 @@ class HTTPClient(httplib2.Http):
         elif status_code == 403:
             raise exceptions.Forbidden(message=body)
         return resp, body
+
+    def _strip_credentials(self, kwargs):
+        if kwargs.get('body') and self.password:
+            log_kwargs = kwargs.copy()
+            log_kwargs['body'] = kwargs['body'].replace(self.password,
+                                                        'REDACTED')
+            return log_kwargs
+        else:
+            return kwargs
 
     def authenticate_and_fetch_endpoint_url(self):
         if not self.auth_token:
