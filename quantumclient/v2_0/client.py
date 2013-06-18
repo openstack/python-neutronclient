@@ -907,6 +907,12 @@ class Client(object):
         # Raise the appropriate exception
         exception_handler_v20(status_code, des_error_body)
 
+    def _check_uri_length(self, action):
+        uri_len = len(self.httpclient.endpoint_url) + len(action)
+        if uri_len > self.MAX_URI_LEN:
+            raise exceptions.RequestURITooLong(
+                excess=uri_len - self.MAX_URI_LEN)
+
     def do_request(self, method, action, body=None, headers=None, params=None):
         # Add format and tenant_id
         action += ".%s" % self.format
@@ -916,10 +922,8 @@ class Client(object):
             action += '?' + urllib.urlencode(params, doseq=1)
         # Ensure client always has correct uri - do not guesstimate anything
         self.httpclient.authenticate_and_fetch_endpoint_url()
-        uri_len = len(self.httpclient.endpoint_url) + len(action)
-        if uri_len > self.MAX_URI_LEN:
-            raise exceptions.RequestURITooLong(
-                excess=uri_len - self.MAX_URI_LEN)
+        self._check_uri_length(action)
+
         if body:
             body = self.serialize(body)
         self.httpclient.content_type = self.content_type()
