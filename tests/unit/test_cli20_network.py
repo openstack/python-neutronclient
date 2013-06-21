@@ -509,16 +509,15 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         def mox_calls(path, data):
             sub_data_lists = [data[:len(data) - 1], data[len(data) - 1:]]
             filters, response = self._build_test_data(data)
+
             # 1 char of extra URI len will cause a split in 2 requests
-            self.client.httpclient.request(
-                test_cli20.end_url(path, 'fields=id&fields=cidr%s' % filters),
-                'GET',
-                body=None,
-                headers=mox.ContainsKeyValue(
-                    'X-Auth-Token', test_cli20.TOKEN)).AndRaise(
-                        exceptions.RequestURITooLong(excess=1))
+            self.mox.StubOutWithMock(self.client, "_check_uri_length")
+            self.client._check_uri_length(mox.IgnoreArg()).AndRaise(
+                exceptions.RequestURITooLong(excess=1))
+
             for data in sub_data_lists:
                 filters, response = self._build_test_data(data)
+                self.client._check_uri_length(mox.IgnoreArg()).AndReturn(None)
                 self.client.httpclient.request(
                     test_cli20.end_url(path,
                                        'fields=id&fields=cidr%s' % filters),
