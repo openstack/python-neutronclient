@@ -18,6 +18,7 @@
 import argparse
 import logging
 
+from quantumclient.common import exceptions
 from quantumclient.common import utils
 from quantumclient.quantum import v2_0 as quantumv20
 
@@ -94,8 +95,13 @@ class RouterInterfaceCommand(quantumv20.QuantumCommand):
     """Based class to Add/Remove router interface."""
 
     api = 'network'
-    log = logging.getLogger(__name__ + '.AddInterfaceRouter')
     resource = 'router'
+
+    def call_api(self, quantum_client, router_id, body):
+        raise NotImplementedError()
+
+    def success_message(self, router_id, portinfo):
+        raise NotImplementedError()
 
     def get_parser(self, prog_name):
         parser = super(RouterInterfaceCommand, self).get_parser(prog_name)
@@ -103,46 +109,63 @@ class RouterInterfaceCommand(quantumv20.QuantumCommand):
             'router_id', metavar='router-id',
             help='ID of the router')
         parser.add_argument(
-            'subnet_id', metavar='subnet-id',
-            help='ID of the internal subnet for the interface')
+            'interface', metavar='INTERFACE',
+            help='The format is "SUBNET|subnet=SUBNET|port=PORT". '
+            'Either a subnet or port must be specified. '
+            'Both ID and name are accepted as SUBNET or PORT. '
+            'Note that "subnet=" can be omitted when specifying subnet.')
         return parser
+
+    def run(self, parsed_args):
+        self.log.debug('run(%s)' % parsed_args)
+        quantum_client = self.get_client()
+        quantum_client.format = parsed_args.request_format
+
+        if '=' in parsed_args.interface:
+            resource, value = parsed_args.interface.split('=', 1)
+            if resource not in ['subnet', 'port']:
+                exceptions.CommandError('You must specify either subnet or '
+                                        'port for INTERFACE parameter.')
+        else:
+            resource = 'subnet'
+            value = parsed_args.interface
+
+        _router_id = quantumv20.find_resourceid_by_name_or_id(
+            quantum_client, self.resource, parsed_args.router_id)
+
+        _interface_id = quantumv20.find_resourceid_by_name_or_id(
+            quantum_client, resource, value)
+        body = {'%s_id' % resource: _interface_id}
+
+        portinfo = self.call_api(quantum_client, _router_id, body)
+        print >>self.app.stdout, self.success_message(parsed_args.router_id,
+                                                      portinfo)
 
 
 class AddInterfaceRouter(RouterInterfaceCommand):
     """Add an internal network interface to a router."""
 
-    def run(self, parsed_args):
-        self.log.debug('run(%s)' % parsed_args)
-        quantum_client = self.get_client()
-        quantum_client.format = parsed_args.request_format
-        #TODO(danwent): handle passing in port-id
-        _router_id = quantumv20.find_resourceid_by_name_or_id(
-            quantum_client, self.resource, parsed_args.router_id)
-        _subnet_id = quantumv20.find_resourceid_by_name_or_id(
-            quantum_client, 'subnet', parsed_args.subnet_id)
-        quantum_client.add_interface_router(_router_id,
-                                            {'subnet_id': _subnet_id})
-        #TODO(danwent): print port ID that is added
-        print >>self.app.stdout, (
-            _('Added interface to router %s') % parsed_args.router_id)
+    log = logging.getLogger(__name__ + '.AddInterfaceRouter')
+
+    def call_api(self, quantum_client, router_id, body):
+        return quantum_client.add_interface_router(router_id, body)
+
+    def success_message(self, router_id, portinfo):
+        return (_('Added interface %(port)s to router %(router)s.') %
+                {'router': router_id, 'port': portinfo['port_id']})
 
 
 class RemoveInterfaceRouter(RouterInterfaceCommand):
     """Remove an internal network interface from a router."""
 
-    def run(self, parsed_args):
-        self.log.debug('run(%s)' % parsed_args)
-        quantum_client = self.get_client()
-        quantum_client.format = parsed_args.request_format
-        #TODO(danwent): handle passing in port-id
-        _router_id = quantumv20.find_resourceid_by_name_or_id(
-            quantum_client, self.resource, parsed_args.router_id)
-        _subnet_id = quantumv20.find_resourceid_by_name_or_id(
-            quantum_client, 'subnet', parsed_args.subnet_id)
-        quantum_client.remove_interface_router(_router_id,
-                                               {'subnet_id': _subnet_id})
-        print >>self.app.stdout, (
-            _('Removed interface from router %s') % parsed_args.router_id)
+    log = logging.getLogger(__name__ + '.RemoveInterfaceRouter')
+
+    def call_api(self, quantum_client, router_id, body):
+        return quantum_client.remove_interface_router(router_id, body)
+
+    def success_message(self, router_id, portinfo):
+        # portinfo is not used since it is None for router-interface-delete.
+        return _('Removed interface from router %s.') % router_id
 
 
 class SetGatewayRouter(quantumv20.QuantumCommand):

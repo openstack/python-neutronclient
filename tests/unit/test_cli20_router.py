@@ -120,27 +120,56 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
         self._test_show_resource(resource, cmd, self.test_id, args,
                                  ['id', 'name'])
 
-    def test_add_interface(self):
-        """Add interface to router: myid subnetid."""
+    def _test_add_remove_interface(self, action, mode, cmd, args):
         resource = 'router'
+        subcmd = '%s_router_interface' % action
+        if mode == 'port':
+            body = {'port_id': 'portid'}
+        else:
+            body = {'subnet_id': 'subnetid'}
+        if action == 'add':
+            retval = {'subnet_id': 'subnetid', 'port_id': 'portid'}
+        else:
+            retval = None
+        self._test_update_resource_action(resource, cmd, 'myid',
+                                          subcmd, args,
+                                          body, retval)
+
+    def test_add_interface_compat(self):
+        """Add interface to router: myid subnetid."""
         cmd = router.AddInterfaceRouter(test_cli20.MyApp(sys.stdout), None)
         args = ['myid', 'subnetid']
-        self._test_update_resource_action(resource, cmd, 'myid',
-                                          'add_router_interface',
-                                          args,
-                                          {'subnet_id': 'subnetid'}
-                                          )
+        self._test_add_remove_interface('add', 'subnet', cmd, args)
 
-    def test_del_interface(self):
+    def test_add_interface_by_subnet(self):
+        """Add interface to router: myid subnet=subnetid."""
+        cmd = router.AddInterfaceRouter(test_cli20.MyApp(sys.stdout), None)
+        args = ['myid', 'subnet=subnetid']
+        self._test_add_remove_interface('add', 'subnet', cmd, args)
+
+    def test_add_interface_by_port(self):
+        """Add interface to router: myid port=portid."""
+        cmd = router.AddInterfaceRouter(test_cli20.MyApp(sys.stdout), None)
+        args = ['myid', 'port=portid']
+        self._test_add_remove_interface('add', 'port', cmd, args)
+
+    def test_del_interface_compat(self):
         """Delete interface from router: myid subnetid."""
-        resource = 'router'
         cmd = router.RemoveInterfaceRouter(test_cli20.MyApp(sys.stdout), None)
         args = ['myid', 'subnetid']
-        self._test_update_resource_action(resource, cmd, 'myid',
-                                          'remove_router_interface',
-                                          args,
-                                          {'subnet_id': 'subnetid'}
-                                          )
+        self._test_add_remove_interface('remove', 'subnet', cmd, args)
+
+    def test_del_interface_by_subnet(self):
+        """Delete interface from router: myid subnet=subnetid."""
+        cmd = router.RemoveInterfaceRouter(test_cli20.MyApp(sys.stdout), None)
+        args = ['myid', 'subnet=subnetid']
+        self._test_add_remove_interface('remove', 'subnet', cmd, args)
+
+    def test_del_interface_by_port(self):
+        """Delete interface from router: myid port=portid."""
+        cmd = router.RemoveInterfaceRouter(test_cli20.MyApp(sys.stdout), None)
+        args = ['myid', 'port=portid']
+        self._test_add_remove_interface('remove', 'port', cmd, args)
 
     def test_set_gateway(self):
         """Set external gateway for router: myid externalid."""
