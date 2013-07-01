@@ -20,7 +20,6 @@ Command-line interface to the Quantum APIs
 """
 
 import argparse
-import gettext
 import logging
 import os
 import sys
@@ -642,7 +641,6 @@ class QuantumShell(app.App):
 
 
 def main(argv=sys.argv[1:]):
-    gettext.install('quantumclient', unicode=1)
     try:
         return QuantumShell(QUANTUM_API_VERSION).run(map(strutils.safe_decode,
                                                          argv))

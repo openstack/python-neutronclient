@@ -26,6 +26,7 @@ from xml.parsers import expat
 
 from quantumclient.common import constants
 from quantumclient.common import exceptions as exception
+from quantumclient.openstack.common.gettextutils import _
 from quantumclient.openstack.common import jsonutils
 
 LOG = logging.getLogger(__name__)

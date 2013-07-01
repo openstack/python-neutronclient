@@ -18,6 +18,7 @@
 import logging
 
 from quantumclient.common import utils
+from quantumclient.openstack.common.gettextutils import _
 from quantumclient.quantum import v2_0 as quantumv20
 
 RESOURCE = 'network_gateway'
