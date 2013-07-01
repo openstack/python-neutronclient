@@ -94,7 +94,7 @@ class HTTPClient(httplib2.Http):
 
     USER_AGENT = 'python-neutronclient'
 
-    def __init__(self, username=None, tenant_name=None,
+    def __init__(self, username=None, tenant_name=None, tenant_id=None,
                  password=None, auth_url=None,
                  token=None, region_name=None, timeout=None,
                  endpoint_url=None, insecure=False,
@@ -103,6 +103,7 @@ class HTTPClient(httplib2.Http):
         super(HTTPClient, self).__init__(timeout=timeout)
         self.username = username
         self.tenant_name = tenant_name
+        self.tenant_id = tenant_id
         self.password = password
         self.auth_url = auth_url.rstrip('/') if auth_url else None
         self.endpoint_type = endpoint_type
@@ -183,10 +184,16 @@ class HTTPClient(httplib2.Http):
     def authenticate(self):
         if self.auth_strategy != 'keystone':
             raise exceptions.Unauthorized(message='unknown auth strategy')
-        body = {'auth': {'passwordCredentials':
-                         {'username': self.username,
-                          'password': self.password, },
-                         'tenantName': self.tenant_name, }, }
+        if self.tenant_id:
+            body = {'auth': {'passwordCredentials':
+                             {'username': self.username,
+                              'password': self.password, },
+                             'tenantId': self.tenant_id, }, }
+        else:
+            body = {'auth': {'passwordCredentials':
+                             {'username': self.username,
+                              'password': self.password, },
+                             'tenantName': self.tenant_name, }, }
 
         token_url = self.auth_url + "/tokens"
 

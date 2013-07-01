@@ -29,6 +29,7 @@ from neutronclient.common import exceptions
 
 USERNAME = 'testuser'
 TENANT_NAME = 'testtenant'
+TENANT_ID = 'testtenantid'
 PASSWORD = 'password'
 AUTH_URL = 'authurl'
 ENDPOINT_URL = 'localurl'
@@ -67,6 +68,9 @@ ENDPOINTS_RESULT = {
 
 class CLITestAuthKeystone(testtools.TestCase):
 
+    # Auth Body expected when using tenant name
+    auth_type = 'tenantName'
+
     def setUp(self):
         """Prepare the test environment."""
         super(CLITestAuthKeystone, self).setUp()
@@ -87,7 +91,7 @@ class CLITestAuthKeystone(testtools.TestCase):
 
         self.client.request(
             AUTH_URL + '/tokens', 'POST',
-            body=mox.IsA(str), headers=mox.IsA(dict)
+            body=mox.StrContains(self.auth_type), headers=mox.IsA(dict)
         ).AndReturn((res200, json.dumps(KS_TOKEN_RESULT)))
         self.client.request(
             mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
@@ -318,3 +322,38 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.assertRaises(exceptions.EndpointTypeNotFound,
                           self.client._extract_service_catalog,
                           resources)
+
+
+class CLITestAuthKeystoneWithId(CLITestAuthKeystone):
+
+    # Auth Body expected when using tenant Id
+    auth_type = 'tenantId'
+
+    def setUp(self):
+        """Prepare the test environment."""
+        super(CLITestAuthKeystone, self).setUp()
+        self.mox = mox.Mox()
+        self.client = client.HTTPClient(username=USERNAME,
+                                        tenant_id=TENANT_ID,
+                                        password=PASSWORD,
+                                        auth_url=AUTH_URL,
+                                        region_name=REGION)
+        self.addCleanup(self.mox.VerifyAll)
+        self.addCleanup(self.mox.UnsetStubs)
+
+
+class CLITestAuthKeystoneWithIdandName(CLITestAuthKeystone):
+
+    # Auth Body expected when using tenant Id
+    auth_type = 'tenantId'
+
+    def setUp(self):
+        """Prepare the test environment."""
+        super(CLITestAuthKeystone, self).setUp()
+        self.mox = mox.Mox()
+        self.client = client.HTTPClient(username=USERNAME,
+                                        tenant_id=TENANT_ID,
+                                        tenant_name=TENANT_NAME,
+                                        password=PASSWORD,
+                                        auth_url=AUTH_URL,
+                                        region_name=REGION)

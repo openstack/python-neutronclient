@@ -76,6 +76,7 @@ class ClientManager(object):
         if not self._url:
             httpclient = client.HTTPClient(username=self._username,
                                            tenant_name=self._tenant_name,
+                                           tenant_id=self._tenant_id,
                                            password=self._password,
                                            region_name=self._region_name,
                                            auth_url=self._auth_url,

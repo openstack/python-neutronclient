@@ -296,6 +296,11 @@ class NeutronShell(app.App):
             help=argparse.SUPPRESS)
 
         parser.add_argument(
+            '--os-tenant-id', metavar='<auth-tenant-id>',
+            default=env('OS_TENANT_ID'),
+            help='Authentication tenant name (Env: OS_TENANT_ID)')
+
+        parser.add_argument(
             '--os-username', metavar='<auth-username>',
             default=utils.env('OS_USERNAME'),
             help='Authentication username (Env: OS_USERNAME)')
@@ -482,10 +487,12 @@ class NeutronShell(app.App):
                         "You must provide a password via"
                         " either --os-password or env[OS_PASSWORD]")
 
-                if not (self.options.os_tenant_name):
+                if (not self.options.os_tenant_name
+                    and not self.options.os_tenant_id):
                     raise exc.CommandError(
-                        "You must provide a tenant_name via"
-                        " either --os-tenant-name or via env[OS_TENANT_NAME]")
+                        "You must provide a tenant_name or tenant_id via"
+                        "  --os-tenant-name, env[OS_TENANT_NAME]"
+                        "  --os-tenant-id, or via env[OS_TENANT_ID]")
 
                 if not self.options.os_auth_url:
                     raise exc.CommandError(
@@ -502,6 +509,7 @@ class NeutronShell(app.App):
             url=self.options.os_url,
             auth_url=self.options.os_auth_url,
             tenant_name=self.options.os_tenant_name,
+            tenant_id=self.options.os_tenant_id,
             username=self.options.os_username,
             password=self.options.os_password,
             region_name=self.options.os_region_name,

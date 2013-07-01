@@ -118,6 +118,7 @@ class Client(object):
     :param string password: Password for authentication. (optional)
     :param string token: Token for authentication. (optional)
     :param string tenant_name: Tenant name. (optional)
+    :param string tenant_id: Tenant id. (optional)
     :param string auth_url: Keystone service endpoint for authorization.
     :param string endpoint_type: Network service endpoint type to pull from the
                                  keystone catalog (e.g. 'publicURL',
