@@ -31,9 +31,9 @@ from quantumclient.openstack.common import strutils
 
 
 def env(*vars, **kwargs):
-    """
-    returns the first environment variable set
-    if none are non-empty, defaults to '' or keyword arg default
+    """Returns the first environment variable set.
+
+    if none are non-empty, defaults to '' or keyword arg default.
     """
     for v in vars:
         value = os.environ.get(v)
@@ -76,7 +76,7 @@ def loads(s):
 
 
 def import_class(import_str):
-    """Returns a class from a string including module and class
+    """Returns a class from a string including module and class.
 
     :param import_str: a string representation of the class name
     :rtype: the requested class
@@ -141,7 +141,7 @@ def str2bool(strbool):
 
 
 def str2dict(strdict):
-        '''
+        '''Convert key1=value1,key2=value2,... string into dictionary.
 
         :param strdict: key1=value1,key2=value2
         '''

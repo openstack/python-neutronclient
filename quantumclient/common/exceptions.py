@@ -91,17 +91,10 @@ class AlreadyAttachedClient(QuantumClientException):
 
 
 class Unauthorized(QuantumClientException):
-    """
-    HTTP 401 - Unauthorized: bad credentials.
-    """
     message = _("Unauthorized: bad credentials.")
 
 
 class Forbidden(QuantumClientException):
-    """
-    HTTP 403 - Forbidden: your credentials don't give you access to this
-    resource.
-    """
     message = _("Forbidden: your credentials don't give you access to this "
                 "resource.")
 
