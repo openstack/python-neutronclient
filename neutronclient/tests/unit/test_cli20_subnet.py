@@ -18,7 +18,7 @@
 import sys
 
 from neutronclient.neutron.v2_0 import subnet
-from tests.unit import test_cli20
+from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):

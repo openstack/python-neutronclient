@@ -19,7 +19,7 @@
 import sys
 
 from neutronclient.neutron.v2_0 import nvp_qos_queue as qos
-from tests.unit import test_cli20
+from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20NvpQosQueueJSON(test_cli20.CLITestV20Base):

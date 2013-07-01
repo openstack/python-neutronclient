@@ -19,7 +19,7 @@
 import sys
 
 from neutronclient.neutron.v2_0 import floatingip as fip
-from tests.unit import test_cli20
+from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):

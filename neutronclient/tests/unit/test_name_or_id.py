@@ -22,8 +22,8 @@ import testtools
 
 from neutronclient.common import exceptions
 from neutronclient.neutron import v2_0 as neutronV20
+from neutronclient.tests.unit import test_cli20
 from neutronclient.v2_0 import client
-from tests.unit import test_cli20
 
 
 class CLITestNameorID(testtools.TestCase):

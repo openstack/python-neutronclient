@@ -21,7 +21,7 @@ import sys
 import mox
 
 from neutronclient.neutron.v2_0 import securitygroup
-from tests.unit import test_cli20
+from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):

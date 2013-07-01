@@ -23,7 +23,7 @@ import mox
 
 from neutronclient.neutron.v2_0.fw import firewallpolicy
 from neutronclient import shell
-from tests.unit import test_cli20
+from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):

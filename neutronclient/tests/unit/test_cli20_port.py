@@ -21,7 +21,7 @@ import mox
 
 from neutronclient.neutron.v2_0 import port
 from neutronclient import shell
-from tests.unit import test_cli20
+from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20PortJSON(test_cli20.CLITestV20Base):

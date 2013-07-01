@@ -20,7 +20,7 @@
 import sys
 
 from neutronclient.neutron.v2_0 import agentscheduler
-from tests.unit import test_cli20
+from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20LBaaSAgentScheduler(test_cli20.CLITestV20Base):

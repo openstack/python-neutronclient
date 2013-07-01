@@ -19,8 +19,8 @@ import sys
 
 from neutronclient.neutron.v2_0.extension import ListExt
 from neutronclient.neutron.v2_0.extension import ShowExt
-from tests.unit.test_cli20 import CLITestV20Base
-from tests.unit.test_cli20 import MyApp
+from neutronclient.tests.unit.test_cli20 import CLITestV20Base
+from neutronclient.tests.unit.test_cli20 import MyApp
 
 
 class CLITestV20Extension(CLITestV20Base):

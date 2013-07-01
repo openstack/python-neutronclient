@@ -20,7 +20,7 @@ import testtools
 
 from neutronclient.client import HTTPClient
 from neutronclient.common import exceptions
-from tests.unit.test_cli20 import MyResp
+from neutronclient.tests.unit.test_cli20 import MyResp
 
 
 AUTH_TOKEN = 'test_token'

@@ -19,7 +19,7 @@ import sys
 
 from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0 import quota as test_quota
-from tests.unit import test_cli20
+from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20Quota(test_cli20.CLITestV20Base):

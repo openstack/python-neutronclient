@@ -20,7 +20,7 @@
 import sys
 
 from neutronclient.neutron.v2_0 import credential
-from tests.unit import test_cli20
+from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20Credential(test_cli20.CLITestV20Base):

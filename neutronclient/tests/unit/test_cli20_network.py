@@ -22,7 +22,7 @@ from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.neutron.v2_0 import network
 from neutronclient import shell
-from tests.unit import test_cli20
+from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):

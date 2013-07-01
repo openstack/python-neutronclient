@@ -22,7 +22,7 @@ import sys
 import mox
 
 from neutronclient.neutron.v2_0.lb import pool
-from tests.unit import test_cli20
+from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
