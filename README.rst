@@ -1,1 +1,1 @@
-This is the client API library for Quantum.
+This is the client API library for Neutron.

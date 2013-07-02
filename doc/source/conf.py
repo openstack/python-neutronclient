@@ -4,7 +4,7 @@
 import sys
 import os
 
-project = 'python-quantumclient'
+project = 'python-neutronclient'
 
 # -- General configuration ---------------------------------------------
 

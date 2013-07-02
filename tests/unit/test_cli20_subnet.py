@@ -17,7 +17,7 @@
 
 import sys
 
-from quantumclient.quantum.v2_0 import subnet
+from neutronclient.neutron.v2_0 import subnet
 from tests.unit import test_cli20
 
 

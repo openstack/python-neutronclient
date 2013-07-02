@@ -19,8 +19,8 @@ import sys
 
 import mox
 
-from quantumclient.quantum.v2_0 import port
-from quantumclient import shell
+from neutronclient.neutron.v2_0 import port
+from neutronclient import shell
 from tests.unit import test_cli20
 
 

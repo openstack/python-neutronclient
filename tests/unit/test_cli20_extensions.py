@@ -17,8 +17,8 @@
 
 import sys
 
-from quantumclient.quantum.v2_0.extension import ListExt
-from quantumclient.quantum.v2_0.extension import ShowExt
+from neutronclient.neutron.v2_0.extension import ListExt
+from neutronclient.neutron.v2_0.extension import ShowExt
 from tests.unit.test_cli20 import CLITestV20Base
 from tests.unit.test_cli20 import MyApp
 

@@ -20,9 +20,9 @@ import uuid
 import mox
 import testtools
 
-from quantumclient.common import exceptions
-from quantumclient.quantum import v2_0 as quantumv20
-from quantumclient.v2_0 import client
+from neutronclient.common import exceptions
+from neutronclient.neutron import v2_0 as neutronV20
+from neutronclient.v2_0 import client
 from tests.unit import test_cli20
 
 
@@ -50,7 +50,7 @@ class CLITestNameorID(testtools.TestCase):
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
         ).AndReturn((test_cli20.MyResp(200), resstr))
         self.mox.ReplayAll()
-        returned_id = quantumv20.find_resourceid_by_name_or_id(
+        returned_id = neutronV20.find_resourceid_by_name_or_id(
             self.client, 'network', _id)
         self.assertEqual(_id, returned_id)
 
@@ -72,7 +72,7 @@ class CLITestNameorID(testtools.TestCase):
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
         ).AndReturn((test_cli20.MyResp(200), resstr))
         self.mox.ReplayAll()
-        returned_id = quantumv20.find_resourceid_by_name_or_id(
+        returned_id = neutronV20.find_resourceid_by_name_or_id(
             self.client, 'network', _id)
         self.assertEqual(_id, returned_id)
 
@@ -89,7 +89,7 @@ class CLITestNameorID(testtools.TestCase):
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
         ).AndReturn((test_cli20.MyResp(200), resstr))
         self.mox.ReplayAll()
-        returned_id = quantumv20.find_resourceid_by_name_or_id(
+        returned_id = neutronV20.find_resourceid_by_name_or_id(
             self.client, 'network', name)
         self.assertEqual(_id, returned_id)
 
@@ -107,9 +107,9 @@ class CLITestNameorID(testtools.TestCase):
         ).AndReturn((test_cli20.MyResp(200), resstr))
         self.mox.ReplayAll()
         try:
-            quantumv20.find_resourceid_by_name_or_id(
+            neutronV20.find_resourceid_by_name_or_id(
                 self.client, 'network', name)
-        except exceptions.QuantumClientException as ex:
+        except exceptions.NeutronClientException as ex:
             self.assertTrue('Multiple' in ex.message)
 
     def test_get_id_from_name_notfound(self):
@@ -125,8 +125,8 @@ class CLITestNameorID(testtools.TestCase):
         ).AndReturn((test_cli20.MyResp(200), resstr))
         self.mox.ReplayAll()
         try:
-            quantumv20.find_resourceid_by_name_or_id(
+            neutronV20.find_resourceid_by_name_or_id(
                 self.client, 'network', name)
-        except exceptions.QuantumClientException as ex:
+        except exceptions.NeutronClientException as ex:
             self.assertTrue('Unable to find' in ex.message)
             self.assertEqual(404, ex.status_code)

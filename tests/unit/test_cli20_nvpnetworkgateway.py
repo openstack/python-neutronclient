@@ -17,7 +17,7 @@
 
 import sys
 
-from quantumclient.quantum.v2_0 import nvpnetworkgateway as nwgw
+from neutronclient.neutron.v2_0 import nvpnetworkgateway as nwgw
 from tests.unit import test_cli20
 
 

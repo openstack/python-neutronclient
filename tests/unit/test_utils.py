@@ -19,8 +19,8 @@ import sys
 
 import testtools
 
-from quantumclient.common import exceptions
-from quantumclient.common import utils
+from neutronclient.common import exceptions
+from neutronclient.common import utils
 
 
 class TestUtils(testtools.TestCase):

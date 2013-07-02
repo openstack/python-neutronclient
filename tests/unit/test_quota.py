@@ -17,8 +17,8 @@
 
 import sys
 
-from quantumclient.common import exceptions
-from quantumclient.quantum.v2_0 import quota as test_quota
+from neutronclient.common import exceptions
+from neutronclient.neutron.v2_0 import quota as test_quota
 from tests.unit import test_cli20
 
 
@@ -36,7 +36,7 @@ class CLITestV20Quota(test_cli20.CLITestV20Base):
             test_cli20.MyApp(sys.stdout), None)
         args = ['--tenant-id', self.test_id, '--network', 'test']
         self.assertRaises(
-            exceptions.QuantumClientException, self._test_update_resource,
+            exceptions.NeutronClientException, self._test_update_resource,
             resource, cmd, self.test_id, args=args,
             extrafields={'network': 'new'})
 

@@ -18,7 +18,7 @@
 
 import sys
 
-from quantumclient.quantum.v2_0 import floatingip as fip
+from neutronclient.neutron.v2_0 import floatingip as fip
 from tests.unit import test_cli20
 
 

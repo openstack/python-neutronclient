@@ -19,7 +19,7 @@
 
 import sys
 
-from quantumclient.quantum.v2_0.lb import member
+from neutronclient.neutron.v2_0.lb import member
 from tests.unit import test_cli20
 
 

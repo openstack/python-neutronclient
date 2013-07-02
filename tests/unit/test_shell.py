@@ -25,8 +25,8 @@ import mox
 import testtools
 from testtools import matchers
 
-from quantumclient.common import exceptions
-from quantumclient import shell as openstack_shell
+from neutronclient.common import exceptions
+from neutronclient import shell as openstack_shell
 
 
 DEFAULT_USERNAME = 'username'
@@ -53,7 +53,7 @@ class ShellTest(testtools.TestCase):
         'OS_AUTH_URL': DEFAULT_AUTH_URL}
 
     def _tolerant_shell(self, cmd):
-        t_shell = openstack_shell.QuantumShell('2.0')
+        t_shell = openstack_shell.NeutronShell('2.0')
         t_shell.run(cmd.split())
 
     # Patch os.environ to avoid required auth info.
@@ -68,7 +68,7 @@ class ShellTest(testtools.TestCase):
         # Make a fake shell object, a helping wrapper to call it, and a quick
         # way of asserting that certain API calls were made.
         global shell, _shell, assert_called, assert_called_anytime
-        _shell = openstack_shell.QuantumShell('2.0')
+        _shell = openstack_shell.NeutronShell('2.0')
         shell = lambda cmd: _shell.run(cmd.split())
 
     def shell(self, argstr):
@@ -77,7 +77,7 @@ class ShellTest(testtools.TestCase):
         _old_env, os.environ = os.environ, clean_env.copy()
         try:
             sys.stdout = cStringIO.StringIO()
-            _shell = openstack_shell.QuantumShell('2.0')
+            _shell = openstack_shell.NeutronShell('2.0')
             _shell.run(argstr.split())
         except SystemExit:
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -90,7 +90,7 @@ class ShellTest(testtools.TestCase):
         return out
 
     def test_run_unknown_command(self):
-        openstack_shell.QuantumShell('2.0').run('fake')
+        openstack_shell.NeutronShell('2.0').run('fake')
 
     def test_help(self):
         required = 'usage:'
@@ -126,13 +126,13 @@ class ShellTest(testtools.TestCase):
                    ' --os-auth-strategy keystone quota-list')
 
     def test_build_option_parser(self):
-        quant_shell = openstack_shell.QuantumShell('2.0')
-        result = quant_shell.build_option_parser('descr', '2.0')
+        neutron_shell = openstack_shell.NeutronShell('2.0')
+        result = neutron_shell.build_option_parser('descr', '2.0')
         self.assertEqual(True, isinstance(result, argparse.ArgumentParser))
 
     def test_main_with_unicode(self):
-        self.mox.StubOutClassWithMocks(openstack_shell, 'QuantumShell')
-        qshell_mock = openstack_shell.QuantumShell('2.0')
+        self.mox.StubOutClassWithMocks(openstack_shell, 'NeutronShell')
+        qshell_mock = openstack_shell.NeutronShell('2.0')
         #self.mox.StubOutWithMock(qshell_mock, 'run')
         unicode_text = u'\u7f51\u7edc'
         argv = ['net-list', unicode_text, unicode_text.encode('utf-8')]
@@ -145,7 +145,7 @@ class ShellTest(testtools.TestCase):
         self.assertEqual(ret, 0)
 
     def test_endpoint_option(self):
-        shell = openstack_shell.QuantumShell('2.0')
+        shell = openstack_shell.NeutronShell('2.0')
         parser = shell.build_option_parser('descr', '2.0')
 
         # Neither $OS_ENDPOINT_TYPE nor --endpoint-type
@@ -161,7 +161,7 @@ class ShellTest(testtools.TestCase):
                                                "public")
         self.useFixture(fixture)
 
-        shell = openstack_shell.QuantumShell('2.0')
+        shell = openstack_shell.NeutronShell('2.0')
         parser = shell.build_option_parser('descr', '2.0')
 
         # $OS_ENDPOINT_TYPE but not --endpoint-type

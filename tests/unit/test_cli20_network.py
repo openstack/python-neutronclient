@@ -18,10 +18,10 @@ import sys
 
 import mox
 
-from quantumclient.common import exceptions
-from quantumclient.common import utils
-from quantumclient.quantum.v2_0 import network
-from quantumclient import shell
+from neutronclient.common import exceptions
+from neutronclient.common import utils
+from neutronclient.neutron.v2_0 import network
+from neutronclient import shell
 from tests.unit import test_cli20
 
 

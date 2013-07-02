@@ -23,8 +23,8 @@ import uuid
 import mox
 import testtools
 
-from quantumclient import client
-from quantumclient.common import exceptions
+from neutronclient import client
+from neutronclient.common import exceptions
 
 
 USERNAME = 'testuser'
@@ -48,7 +48,7 @@ KS_TOKEN_RESULT = {
                             'publicURL': ENDPOINT_URL,
                             'region': REGION}],
              'type': 'network',
-             'name': 'Quantum Service'}
+             'name': 'Neutron Service'}
         ]
     }
 }
@@ -56,7 +56,7 @@ KS_TOKEN_RESULT = {
 ENDPOINTS_RESULT = {
     'endpoints': [{
         'type': 'network',
-        'name': 'Quantum Service',
+        'name': 'Neutron Service',
         'region': REGION,
         'adminURL': ENDPOINT_URL,
         'internalURL': ENDPOINT_URL,
@@ -110,7 +110,7 @@ class CLITestAuthKeystone(testtools.TestCase):
         res401 = self.mox.CreateMock(httplib2.Response)
         res401.status = 401
 
-        # If a token is expired, quantum server retruns 401
+        # If a token is expired, neutron server retruns 401
         self.client.request(
             mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
             headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)

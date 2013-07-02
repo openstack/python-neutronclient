@@ -17,8 +17,8 @@
 
 import sys
 
-from quantumclient.common import exceptions
-from quantumclient.quantum.v2_0 import router
+from neutronclient.common import exceptions
+from neutronclient.neutron.v2_0 import router
 from tests.unit import test_cli20
 
 

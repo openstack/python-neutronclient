@@ -21,9 +21,9 @@ import fixtures
 import mox
 import testtools
 
-from quantumclient.common import constants
-from quantumclient import shell
-from quantumclient.v2_0 import client
+from neutronclient.common import constants
+from neutronclient import shell
+from neutronclient.v2_0 import client
 
 
 API_VERSION = "2.0"
@@ -170,10 +170,10 @@ class CLITestV20Base(testtools.TestCase):
         self.fake_stdout = FakeStdout()
         self.useFixture(fixtures.MonkeyPatch('sys.stdout', self.fake_stdout))
         self.useFixture(fixtures.MonkeyPatch(
-            'quantumclient.quantum.v2_0.find_resourceid_by_name_or_id',
+            'neutronclient.neutron.v2_0.find_resourceid_by_name_or_id',
             self._find_resourceid))
         self.useFixture(fixtures.MonkeyPatch(
-            'quantumclient.v2_0.client.Client.get_attr_metadata',
+            'neutronclient.v2_0.client.Client.get_attr_metadata',
             self._get_attr_metadata))
         self.client = client.Client(token=TOKEN, endpoint_url=self.endurl)
 

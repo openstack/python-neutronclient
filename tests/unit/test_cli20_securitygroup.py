@@ -20,7 +20,7 @@ import sys
 
 import mox
 
-from quantumclient.quantum.v2_0 import securitygroup
+from neutronclient.neutron.v2_0 import securitygroup
 from tests.unit import test_cli20
 
 

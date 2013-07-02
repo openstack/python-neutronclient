@@ -21,7 +21,7 @@ import sys
 
 import mox
 
-from quantumclient.quantum.v2_0.lb import pool
+from neutronclient.neutron.v2_0.lb import pool
 from tests.unit import test_cli20
 
 
