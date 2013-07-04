@@ -189,7 +189,8 @@ class CLITestV20Base(testtools.TestCase):
                                       'security_group_rule', 'qos_queue',
                                       'network_gateway', 'credential',
                                       'network_profile', 'policy_profile',
-                                      'ikepolicy', 'ipsecpolicy']
+                                      'ikepolicy', 'ipsecpolicy',
+                                      'metering_label', 'metering_label_rule']
         if (resource in non_admin_status_resources):
             body = {resource: {}, }
         else:

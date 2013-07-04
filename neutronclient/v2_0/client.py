@@ -200,7 +200,10 @@ class Client(object):
     policy_profiles_path = "/policy_profiles"
     policy_profile_path = "/policy_profiles/%s"
     policy_profile_bindings_path = "/policy_profile_bindings"
-
+    metering_labels_path = "/metering/metering-labels"
+    metering_label_path = "/metering/metering-labels/%s"
+    metering_label_rules_path = "/metering/metering-label-rules"
+    metering_label_rule_path = "/metering/metering-label-rules/%s"
     DHCP_NETS = '/dhcp-networks'
     DHCP_AGENTS = '/dhcp-agents'
     L3_ROUTERS = '/l3-routers'
@@ -236,6 +239,8 @@ class Client(object):
                      'firewall_rules': 'firewall_rule',
                      'firewall_policies': 'firewall_policy',
                      'firewalls': 'firewall',
+                     'metering_labels': 'metering_label',
+                     'metering_label_rules': 'metering_label_rule'
                      }
     # 8192 Is the default max URI len for eventlet.wsgi.server
     MAX_URI_LEN = 8192
@@ -1056,6 +1061,51 @@ class Client(object):
     def update_policy_profile(self, profile, body=None):
         """Update a policy profile."""
         return self.put(self.policy_profile_path % (profile), body=body)
+
+    @APIParamsCall
+    def create_metering_label(self, body=None):
+        """Creates a metering label."""
+        return self.post(self.metering_labels_path, body=body)
+
+    @APIParamsCall
+    def delete_metering_label(self, label):
+        """Deletes the specified metering label."""
+        return self.delete(self.metering_label_path % (label))
+
+    @APIParamsCall
+    def list_metering_labels(self, retrieve_all=True, **_params):
+        """Fetches a list of all metering labels for a tenant."""
+        return self.list('metering_labels', self.metering_labels_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_metering_label(self, metering_label, **_params):
+        """Fetches information of a certain metering label."""
+        return self.get(self.metering_label_path %
+                        (metering_label), params=_params)
+
+    @APIParamsCall
+    def create_metering_label_rule(self, body=None):
+        """Creates a metering label rule."""
+        return self.post(self.metering_label_rules_path, body=body)
+
+    @APIParamsCall
+    def delete_metering_label_rule(self, rule):
+        """Deletes the specified metering label rule."""
+        return self.delete(self.metering_label_rule_path % (rule))
+
+    @APIParamsCall
+    def list_metering_label_rules(self, retrieve_all=True, **_params):
+        """Fetches a list of all metering label rules for a label."""
+        return self.list('metering_label_rules',
+                         self.metering_label_rules_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_metering_label_rule(self, metering_label_rule, **_params):
+        """Fetches information of a certain metering label rule."""
+        return self.get(self.metering_label_rule_path %
+                        (metering_label_rule), params=_params)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
