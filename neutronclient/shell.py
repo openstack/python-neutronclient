@@ -45,6 +45,7 @@ from neutronclient.neutron.v2_0 import port
 from neutronclient.neutron.v2_0 import quota
 from neutronclient.neutron.v2_0 import router
 from neutronclient.neutron.v2_0 import securitygroup
+from neutronclient.neutron.v2_0 import servicetype
 from neutronclient.neutron.v2_0 import subnet
 from neutronclient.openstack.common import strutils
 from neutronclient.version import __version__
@@ -179,6 +180,7 @@ COMMAND_V2 = {
     'l3-agent-list-hosting-router': agentscheduler.ListL3AgentsHostingRouter,
     'lb-pool-list-on-agent': agentscheduler.ListPoolsOnLbaasAgent,
     'lb-agent-hosting-pool': agentscheduler.GetLbaasAgentHostingPool,
+    'service-provider-list': servicetype.ListServiceProvider,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}

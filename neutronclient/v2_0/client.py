@@ -183,6 +183,7 @@ class Client(object):
     agent_path = "/agents/%s"
     network_gateways_path = "/network-gateways"
     network_gateway_path = "/network-gateways/%s"
+    service_providers_path = "/service-providers"
 
     DHCP_NETS = '/dhcp-networks'
     DHCP_AGENTS = '/dhcp-agents'
@@ -202,6 +203,7 @@ class Client(object):
                      'members': 'member',
                      'health_monitors': 'health_monitor',
                      'quotas': 'quota',
+                     'service_providers': 'service_provider'
                      }
     # 8192 Is the default max URI len for eventlet.wsgi.server
     MAX_URI_LEN = 8192
@@ -731,6 +733,13 @@ class Client(object):
         """Fetches a list of pools hosted by the loadbalancer agent."""
         return self.get((self.agent_path + self.LOADBALANCER_POOLS) %
                         lbaas_agent, params=_params)
+
+    @APIParamsCall
+    def list_service_providers(self, retrieve_all=True, **_params):
+        """Fetches service providers."""
+        # Pass filters in "params" argument to do_request
+        return self.list('service_providers', self.service_providers_path,
+                         retrieve_all, **_params)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
