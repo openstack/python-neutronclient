@@ -97,3 +97,24 @@ class CLITestArgs(testtools.TestCase):
         arg1 = neutronV20.parse_args_to_dict(_specs)['arg1']
         self.assertEqual('value1', arg1[0]['key1'])
         self.assertEqual('value2', arg1[0]['key2'])
+
+    def test_clear_action(self):
+        _specs = ['--anyarg', 'action=clear']
+        args = neutronV20.parse_args_to_dict(_specs)
+        self.assertEqual(None, args['anyarg'])
+
+    def test_bad_values_str(self):
+        _specs = ['--strarg', 'type=str']
+        self.assertRaises(exceptions.CommandError,
+                          neutronV20.parse_args_to_dict, _specs)
+
+    def test_bad_values_list(self):
+        _specs = ['--listarg', 'list=true', 'type=str']
+        self.assertRaises(exceptions.CommandError,
+                          neutronV20.parse_args_to_dict, _specs)
+        _specs = ['--listarg', 'type=list']
+        self.assertRaises(exceptions.CommandError,
+                          neutronV20.parse_args_to_dict, _specs)
+        _specs = ['--listarg', 'type=list', 'action=clear']
+        self.assertRaises(exceptions.CommandError,
+                          neutronV20.parse_args_to_dict, _specs)
