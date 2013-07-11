@@ -52,11 +52,8 @@ def _find_resourceid_by_name(client, resource, name):
     collection = resource + "s"
     info = data[collection]
     if len(info) > 1:
-        msg = (_("Multiple %(resource)s matches found for name '%(name)s',"
-               " use an ID to be more specific.") %
-               {'resource': resource, 'name': name})
-        raise exceptions.NeutronClientException(
-            message=msg)
+        raise exceptions.NeutronClientNoUniqueMatch(resource=resource,
+                                                    name=name)
     elif len(info) == 0:
         not_found_message = (_("Unable to find %(resource)s with name "
                                "'%(name)s'") %

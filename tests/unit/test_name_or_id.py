@@ -109,7 +109,7 @@ class CLITestNameorID(testtools.TestCase):
         try:
             neutronV20.find_resourceid_by_name_or_id(
                 self.client, 'network', name)
-        except exceptions.NeutronClientException as ex:
+        except exceptions.NeutronClientNoUniqueMatch as ex:
             self.assertTrue('Multiple' in ex.message)
 
     def test_get_id_from_name_notfound(self):

@@ -167,3 +167,8 @@ class UnsupportedVersion(Exception):
 
 class CommandError(Exception):
     pass
+
+
+class NeutronClientNoUniqueMatch(NeutronClientException):
+    message = _("Multiple %(resource)s matches found for name '%(name)s',"
+                " use an ID to be more specific.")
