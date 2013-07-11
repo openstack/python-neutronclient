@@ -113,7 +113,6 @@ class HTTPClient(httplib2.Http):
         self.endpoint_url = endpoint_url
         self.auth_strategy = auth_strategy
         # httplib2 overrides
-        self.force_exception_to_status_code = True
         self.disable_ssl_certificate_validation = insecure
 
     def _cs_request(self, *args, **kwargs):
@@ -133,7 +132,13 @@ class HTTPClient(httplib2.Http):
         args = utils.safe_encode_list(args)
         kargs = utils.safe_encode_dict(kargs)
         utils.http_log_req(_logger, args, kargs)
-        resp, body = self.request(*args, **kargs)
+        try:
+            resp, body = self.request(*args, **kargs)
+        except Exception as e:
+            # Wrap the low-level connection error (socket timeout, redirect
+            # limit, decompression error, etc) into our custom high-level
+            # connection exception (it is excepted in the upper layers of code)
+            raise exceptions.ConnectionFailed(reason=e)
         utils.http_log_resp(_logger, resp, body)
         status_code = self.get_status_code(resp)
         if status_code == 401:
