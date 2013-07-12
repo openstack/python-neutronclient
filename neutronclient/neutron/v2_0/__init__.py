@@ -133,6 +133,26 @@ def is_number(s):
     return True
 
 
+def _process_previous_argument(current_arg, _value_number, current_type_str,
+                               _list_flag, _values_specs, _clear_flag,
+                               values_specs):
+    if current_arg is not None:
+        if _value_number == 0 and (current_type_str or _list_flag):
+                # This kind of argument should have value
+                raise exceptions.CommandError(
+                    "invalid values_specs %s" % ' '.join(values_specs))
+        if _value_number > 1 or _list_flag or current_type_str == 'list':
+            current_arg.update({'nargs': '+'})
+        elif _value_number == 0:
+            if _clear_flag:
+                # if we have action=clear, we use argument's default
+                # value None for argument
+                _values_specs.pop()
+            else:
+                # We assume non value argument as bool one
+                current_arg.update({'action': 'store_true'})
+
+
 def parse_args_to_dict(values_specs):
     '''It is used to analyze the extra command options to command.
 
@@ -148,81 +168,101 @@ def parse_args_to_dict(values_specs):
     a bool option. Key with two values will be a list option.
 
     '''
+
+    # values_specs for example: '-- --tag x y --key1 type=int value1'
     # -- is a pseudo argument
     values_specs_copy = values_specs[:]
     if values_specs_copy and values_specs_copy[0] == '--':
         del values_specs_copy[0]
+    # converted ArgumentParser arguments for each of the options
     _options = {}
+    # the argument part for current option in _options
     current_arg = None
+    # the string after remove meta info in values_specs
+    # for example, '--tag x y --key1 value1'
     _values_specs = []
+    # record the count of values for an option
+    # for example: for '--tag x y', it is 2, while for '--key1 value1', it is 1
     _value_number = 0
+    # list=true
     _list_flag = False
+    # action=clear
+    _clear_flag = False
+    # the current item in values_specs
     current_item = None
+    # the str after 'type='
+    current_type_str = None
     for _item in values_specs_copy:
         if _item.startswith('--'):
-            if current_arg is not None:
-                if _value_number > 1 or _list_flag:
-                    current_arg.update({'nargs': '+'})
-                elif _value_number == 0:
-                    current_arg.update({'action': 'store_true'})
-            _temp = _item
+            # Deal with previous argument if any
+            _process_previous_argument(
+                current_arg, _value_number, current_type_str,
+                _list_flag, _values_specs, _clear_flag, values_specs)
+
+            # Init variables for current argument
+            current_item = _item
+            _list_flag = False
+            _clear_flag = False
+            current_type_str = None
             if "=" in _item:
+                _value_number = 1
                 _item = _item.split('=')[0]
+            else:
+                _value_number = 0
             if _item in _options:
                 raise exceptions.CommandError(
                     "duplicated options %s" % ' '.join(values_specs))
             else:
                 _options.update({_item: {}})
             current_arg = _options[_item]
-            _item = _temp
+            _item = current_item
         elif _item.startswith('type='):
             if current_arg is None:
                 raise exceptions.CommandError(
                     "invalid values_specs %s" % ' '.join(values_specs))
             if 'type' not in current_arg:
-                _type_str = _item.split('=', 2)[1]
-                current_arg.update({'type': eval(_type_str)})
-                if _type_str == 'bool':
+                current_type_str = _item.split('=', 2)[1]
+                current_arg.update({'type': eval(current_type_str)})
+                if current_type_str == 'bool':
                     current_arg.update({'type': utils.str2bool})
-                elif _type_str == 'dict':
+                elif current_type_str == 'dict':
                     current_arg.update({'type': utils.str2dict})
                 continue
         elif _item == 'list=true':
             _list_flag = True
             continue
+        elif _item == 'action=clear':
+            _clear_flag = True
+            continue
+
         if not _item.startswith('--'):
+            # All others are value items
+            # Make sure '--' occurs first and allow minus value
             if (not current_item or '=' in current_item or
                 _item.startswith('-') and not is_number(_item)):
                 raise exceptions.CommandError(
                     "Invalid values_specs %s" % ' '.join(values_specs))
             _value_number += 1
-        elif _item.startswith('--'):
-            current_item = _item
-            if '=' in current_item:
-                _value_number = 1
-            else:
-                _value_number = 0
-            _list_flag = False
+
         _values_specs.append(_item)
-    if current_arg is not None:
-        if _value_number > 1 or _list_flag:
-            current_arg.update({'nargs': '+'})
-        elif _value_number == 0:
-            current_arg.update({'action': 'store_true'})
-    _args = None
-    if _values_specs:
-        _parser = argparse.ArgumentParser(add_help=False)
-        for opt, optspec in _options.iteritems():
-            _parser.add_argument(opt, **optspec)
-        _args = _parser.parse_args(_values_specs)
+
+    # Deal with last one argument
+    _process_previous_argument(
+        current_arg, _value_number, current_type_str,
+        _list_flag, _values_specs, _clear_flag, values_specs)
+
+    # populate the parser with arguments
+    _parser = argparse.ArgumentParser(add_help=False)
+    for opt, optspec in _options.iteritems():
+        _parser.add_argument(opt, **optspec)
+    _args = _parser.parse_args(_values_specs)
+
     result_dict = {}
-    if _args:
-        for opt in _options.iterkeys():
-            _opt = opt.split('--', 2)[1]
-            _opt = _opt.replace('-', '_')
-            _value = getattr(_args, _opt)
-            if _value is not None:
-                result_dict.update({_opt: _value})
+    for opt in _options.iterkeys():
+        _opt = opt.split('--', 2)[1]
+        _opt = _opt.replace('-', '_')
+        _value = getattr(_args, _opt)
+        result_dict.update({_opt: _value})
     return result_dict
 
 
