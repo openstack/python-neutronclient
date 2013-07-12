@@ -370,8 +370,6 @@ class CLITestV20Base(testtools.TestCase):
         cmd_parser = cmd.get_parser("list_" + resources)
         args = ['--request-format', self.format]
         shell.run_command(cmd, cmd_parser, args)
-        #parsed_args = cmd_parser.parse_args("")
-        #cmd.run(parsed_args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
 
