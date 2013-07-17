@@ -177,6 +177,8 @@ COMMAND_V2 = {
     'l3-agent-router-remove': agentscheduler.RemoveRouterFromL3Agent,
     'router-list-on-l3-agent': agentscheduler.ListRoutersOnL3Agent,
     'l3-agent-list-hosting-router': agentscheduler.ListL3AgentsHostingRouter,
+    'lb-pool-list-on-agent': agentscheduler.ListPoolsOnLbaasAgent,
+    'lb-agent-hosting-pool': agentscheduler.GetLbaasAgentHostingPool,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}

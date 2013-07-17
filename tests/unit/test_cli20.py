@@ -251,7 +251,8 @@ class CLITestV20Base(testtools.TestCase):
 
     def _test_list_resources(self, resources, cmd, detail=False, tags=[],
                              fields_1=[], fields_2=[], page_size=None,
-                             sort_key=[], sort_dir=[], response_contents=None):
+                             sort_key=[], sort_dir=[], response_contents=None,
+                             base_args=None, path=None):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
@@ -265,7 +266,9 @@ class CLITestV20Base(testtools.TestCase):
         resstr = self.client.serialize(reses)
         # url method body
         query = ""
-        args = detail and ['-D', ] or []
+        args = base_args if base_args is not None else []
+        if detail:
+            args.append('-D')
         args.extend(['--request-format', self.format])
         if fields_1:
             for field in fields_1:
@@ -323,7 +326,8 @@ class CLITestV20Base(testtools.TestCase):
                 if query:
                     query += '&'
                 query += 'sort_dir=%s' % dir
-        path = getattr(self.client, resources + "_path")
+        if path is None:
+            path = getattr(self.client, resources + "_path")
         self.client.httpclient.request(
             MyUrlComparator(end_url(path, query, format=self.format),
                             self.client),

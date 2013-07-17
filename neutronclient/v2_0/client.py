@@ -187,6 +187,8 @@ class Client(object):
     DHCP_AGENTS = '/dhcp-agents'
     L3_ROUTERS = '/l3-routers'
     L3_AGENTS = '/l3-agents'
+    LOADBALANCER_POOLS = '/loadbalancer-pools'
+    LOADBALANCER_AGENT = '/loadbalancer-agent'
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
                      'floatingips': 'floatingip',
@@ -716,6 +718,18 @@ class Client(object):
         """Remove a router from l3 agent."""
         return self.delete((self.agent_path + self.L3_ROUTERS + "/%s") % (
             l3_agent, router_id))
+
+    @APIParamsCall
+    def get_lbaas_agent_hosting_pool(self, pool, **_params):
+        """Fetches a loadbalancer agent hosting a pool."""
+        return self.get((self.pool_path + self.LOADBALANCER_AGENT) % pool,
+                        params=_params)
+
+    @APIParamsCall
+    def list_pools_on_lbaas_agent(self, lbaas_agent, **_params):
+        """Fetches a list of pools hosted by the loadbalancer agent."""
+        return self.get((self.agent_path + self.LOADBALANCER_POOLS) %
+                        lbaas_agent, params=_params)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
