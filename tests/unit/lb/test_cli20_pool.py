@@ -32,8 +32,8 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
         resource = 'pool'
         cmd = pool.CreatePool(test_cli20.MyApp(sys.stdout), None)
         name = 'my-name'
-        lb_method = 'round-robin'
-        protocol = 'http'
+        lb_method = 'ROUND_ROBIN'
+        protocol = 'HTTP'
         subnet_id = 'subnet-id'
         tenant_id = 'my-tenant'
         my_id = 'my-id'
@@ -55,8 +55,8 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
         cmd = pool.CreatePool(test_cli20.MyApp(sys.stdout), None)
         name = 'my-name'
         description = 'my-desc'
-        lb_method = 'round-robin'
-        protocol = 'http'
+        lb_method = 'ROUND_ROBIN'
+        protocol = 'HTTP'
         subnet_id = 'subnet-id'
         tenant_id = 'my-tenant'
         my_id = 'my-id'

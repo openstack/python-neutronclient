@@ -71,13 +71,12 @@ class CreateHealthMonitor(neutronV20.CreateCommand):
         parser.add_argument(
             '--delay',
             required=True,
-            help='the minimum time in seconds between regular connections '
-                 'of the member.')
+            help='the time in seconds between sending probes to members.')
         parser.add_argument(
             '--max-retries',
             required=True,
             help='number of permissible connection failures before changing '
-                 'the member status to INACTIVE.')
+                 'the member status to INACTIVE. [1..10]')
         parser.add_argument(
             '--timeout',
             required=True,
@@ -86,8 +85,8 @@ class CreateHealthMonitor(neutronV20.CreateCommand):
                  'value must be less than the delay value.')
         parser.add_argument(
             '--type',
-            required=True,
-            help='one of predefined health monitor types, e.g. RoundRobin')
+            required=True, choices=['PING', 'TCP', 'HTTP', 'HTTPS'],
+            help='one of predefined health monitor types')
 
     def args2body(self, parsed_args):
         body = {
@@ -128,10 +127,10 @@ class AssociateHealthMonitor(neutronV20.NeutronCommand):
     def get_parser(self, prog_name):
         parser = super(AssociateHealthMonitor, self).get_parser(prog_name)
         parser.add_argument(
-            'health_monitor_id',
+            'health_monitor_id', metavar='HEALTH_MONITOR_ID',
             help='Health monitor to associate')
         parser.add_argument(
-            'pool_id',
+            'pool_id', metavar='POOL',
             help='ID of the pool to be associated with the health monitor')
         return parser
 
@@ -155,10 +154,10 @@ class DisassociateHealthMonitor(neutronV20.NeutronCommand):
     def get_parser(self, prog_name):
         parser = super(DisassociateHealthMonitor, self).get_parser(prog_name)
         parser.add_argument(
-            'health_monitor_id',
+            'health_monitor_id', metavar='HEALTH_MONITOR_ID',
             help='Health monitor to associate')
         parser.add_argument(
-            'pool_id',
+            'pool_id', metavar='POOL',
             help='ID of the pool to be associated with the health monitor')
         return parser
 

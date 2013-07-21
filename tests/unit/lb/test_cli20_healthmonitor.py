@@ -35,7 +35,7 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
         delay = '60'
         max_retries = '2'
         timeout = '10'
-        type = 'tcp'
+        type = 'TCP'
         tenant_id = 'my-tenant'
         my_id = 'my-id'
         args = ['--admin-state-down',
@@ -62,7 +62,7 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
         http_method = 'HEAD'
         max_retries = '2'
         timeout = '10'
-        type = 'tcp'
+        type = 'TCP'
         tenant_id = 'my-tenant'
         url_path = '/health'
         my_id = 'my-id'
