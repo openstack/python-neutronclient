@@ -60,17 +60,19 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
         subnet_id = 'subnet-id'
         tenant_id = 'my-tenant'
         my_id = 'my-id'
+        provider = 'lbaas'
         args = ['--admin-state-down',
                 '--description', description,
                 '--lb-method', lb_method,
                 '--name', name,
                 '--protocol', protocol,
                 '--subnet-id', subnet_id,
-                '--tenant-id', tenant_id]
+                '--tenant-id', tenant_id,
+                '--provider', provider]
         position_names = ['admin_state_up', 'description', 'lb_method', 'name',
-                          'protocol', 'subnet_id', 'tenant_id']
+                          'protocol', 'subnet_id', 'tenant_id', 'provider']
         position_values = [False, description, lb_method, name,
-                           protocol, subnet_id, tenant_id]
+                           protocol, subnet_id, tenant_id, provider]
         self._test_create_resource(resource, cmd, name, my_id, args,
                                    position_names, position_values)
 
