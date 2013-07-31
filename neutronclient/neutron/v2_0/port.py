@@ -73,7 +73,32 @@ class ShowPort(neutronV20.ShowCommand):
     log = logging.getLogger(__name__ + '.ShowPort')
 
 
-class CreatePort(neutronV20.CreateCommand):
+class UpdatePortSecGroupMixin(object):
+    def add_arguments_secgroup(self, parser):
+        group_sg = parser.add_mutually_exclusive_group()
+        group_sg.add_argument(
+            '--security-group', metavar='SECURITY_GROUP',
+            default=[], action='append', dest='security_groups',
+            help='security group associated with the port '
+            '(This option can be repeated)')
+        group_sg.add_argument(
+            '--no-security-groups',
+            action='store_true',
+            help='associate no security groups with the port')
+
+    def _resolv_sgid(self, secgroup):
+        return neutronV20.find_resourceid_by_name_or_id(
+            self.get_client(), 'security_group', secgroup)
+
+    def args2body_secgroup(self, parsed_args, port):
+        if parsed_args.security_groups:
+            port['security_groups'] = [self._resolv_sgid(sg) for sg
+                                       in parsed_args.security_groups]
+        elif parsed_args.no_security_groups:
+            port['security_groups'] = None
+
+
+class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin):
     """Create a port for a given tenant."""
 
     resource = 'port'
@@ -113,11 +138,9 @@ class CreatePort(neutronV20.CreateCommand):
             '--fixed_ip',
             action='append',
             help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--security-group', metavar='SECURITY_GROUP',
-            default=[], action='append', dest='security_groups',
-            help='security group associated with the port '
-            '(This option can be repeated)')
+
+        self.add_arguments_secgroup(parser)
+
         parser.add_argument(
             'network_id', metavar='NETWORK',
             help='Network id or name this port belongs to')
@@ -148,12 +171,7 @@ class CreatePort(neutronV20.CreateCommand):
         if ips:
             body['port'].update({'fixed_ips': ips})
 
-        _sgids = []
-        for sg in parsed_args.security_groups:
-            _sgids.append(neutronV20.find_resourceid_by_name_or_id(
-                self.get_client(), 'security_group', sg))
-        if _sgids:
-            body['port']['security_groups'] = _sgids
+        self.args2body_secgroup(parsed_args, body['port'])
 
         return body
 
@@ -165,20 +183,16 @@ class DeletePort(neutronV20.DeleteCommand):
     log = logging.getLogger(__name__ + '.DeletePort')
 
 
-class UpdatePort(neutronV20.UpdateCommand):
+class UpdatePort(neutronV20.UpdateCommand, UpdatePortSecGroupMixin):
     """Update port's information."""
 
     resource = 'port'
     log = logging.getLogger(__name__ + '.UpdatePort')
 
     def add_known_arguments(self, parser):
-        parser.add_argument(
-            '--no-security-groups',
-            action='store_true',
-            help='remove security groups from port')
+        self.add_arguments_secgroup(parser)
 
     def args2body(self, parsed_args):
         body = {'port': {}}
-        if parsed_args.no_security_groups:
-            body['port'].update({'security_groups': None})
+        self.args2body_secgroup(parsed_args, body['port'])
         return body
