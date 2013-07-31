@@ -331,15 +331,12 @@ class CLITestAuthKeystoneWithId(CLITestAuthKeystone):
 
     def setUp(self):
         """Prepare the test environment."""
-        super(CLITestAuthKeystone, self).setUp()
-        self.mox = mox.Mox()
+        super(CLITestAuthKeystoneWithId, self).setUp()
         self.client = client.HTTPClient(username=USERNAME,
                                         tenant_id=TENANT_ID,
                                         password=PASSWORD,
                                         auth_url=AUTH_URL,
                                         region_name=REGION)
-        self.addCleanup(self.mox.VerifyAll)
-        self.addCleanup(self.mox.UnsetStubs)
 
 
 class CLITestAuthKeystoneWithIdandName(CLITestAuthKeystone):
@@ -349,8 +346,7 @@ class CLITestAuthKeystoneWithIdandName(CLITestAuthKeystone):
 
     def setUp(self):
         """Prepare the test environment."""
-        super(CLITestAuthKeystone, self).setUp()
-        self.mox = mox.Mox()
+        super(CLITestAuthKeystoneWithIdandName, self).setUp()
         self.client = client.HTTPClient(username=USERNAME,
                                         tenant_id=TENANT_ID,
                                         tenant_name=TENANT_NAME,
