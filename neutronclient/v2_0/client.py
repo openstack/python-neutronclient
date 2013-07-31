@@ -131,7 +131,8 @@ class Client(object):
                             instantiation.(optional)
     :param integer timeout: Allows customization of the timeout for client
                             http requests. (optional)
-    :param insecure: ssl certificate validation. (optional)
+    :param bool insecure: SSL certificate validation. (optional)
+    :param string ca_cert: SSL CA bundle file to use. (optional)
 
     Example::
 

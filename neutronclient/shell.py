@@ -348,6 +348,14 @@ class NeutronShell(app.App):
             help=argparse.SUPPRESS)
 
         parser.add_argument(
+            '--os-cacert',
+            metavar='<ca-certificate>',
+            default=env('OS_CACERT', default=None),
+            help="Specify a CA bundle file to use in "
+                 "verifying a TLS (https) server certificate. "
+                 "Defaults to env[OS_CACERT]")
+
+        parser.add_argument(
             '--insecure',
             action='store_true',
             default=env('NEUTRONCLIENT_INSECURE', default=False),
@@ -518,7 +526,8 @@ class NeutronShell(app.App):
             api_version=self.api_version,
             auth_strategy=self.options.os_auth_strategy,
             endpoint_type=self.options.endpoint_type,
-            insecure=self.options.insecure, )
+            insecure=self.options.insecure,
+            ca_cert=self.options.os_cacert, )
         return
 
     def initialize_app(self, argv):
