@@ -61,6 +61,19 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values,
                                    admin_state_up=False)
 
+    def test_create_router_distributed(self):
+        """Create router: --distributed myname."""
+        resource = 'router'
+        cmd = router.CreateRouter(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        args = ['--distributed', name, ]
+        position_names = ['name', ]
+        position_values = [name, ]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   distributed=True)
+
     def test_list_routers_detail(self):
         """list routers: -D."""
         resources = "routers"
