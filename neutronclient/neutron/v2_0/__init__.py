@@ -34,11 +34,20 @@ UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
                          HEX_ELEM + '{12}'])
 
 
+def _get_resource_plural(resource, client):
+    plurals = client.EXTED_PLURALS
+    for k in plurals:
+        if plurals[k] == resource:
+            return k
+    return resource + 's'
+
+
 def find_resourceid_by_name_or_id(client, resource, name_or_id):
-    obj_lister = getattr(client, "list_%ss" % resource)
+    resource_plural = _get_resource_plural(resource, client)
+    obj_lister = getattr(client, "list_%s" % resource_plural)
     # perform search by id only if we are passing a valid UUID
     match = re.match(UUID_PATTERN, name_or_id)
-    collection = resource + "s"
+    collection = resource_plural
     if match:
         data = obj_lister(id=name_or_id, fields='id')
         if data and data[collection]:
@@ -47,9 +56,10 @@ def find_resourceid_by_name_or_id(client, resource, name_or_id):
 
 
 def _find_resourceid_by_name(client, resource, name):
-    obj_lister = getattr(client, "list_%ss" % resource)
+    resource_plural = _get_resource_plural(resource, client)
+    obj_lister = getattr(client, "list_%s" % resource_plural)
     data = obj_lister(name=name, fields='id')
-    collection = resource + "s"
+    collection = resource_plural
     info = data[collection]
     if len(info) > 1:
         raise exceptions.NeutronClientNoUniqueMatch(resource=resource,
@@ -511,8 +521,8 @@ class ListCommand(NeutronCommand, lister.Lister):
         return search_opts
 
     def call_server(self, neutron_client, search_opts, parsed_args):
-        obj_lister = getattr(neutron_client,
-                             "list_%ss" % self.resource)
+        resource_plural = _get_resource_plural(self.resource, neutron_client)
+        obj_lister = getattr(neutron_client, "list_%s" % resource_plural)
         data = obj_lister(**search_opts)
         return data
 
@@ -542,7 +552,7 @@ class ListCommand(NeutronCommand, lister.Lister):
             if dirs:
                 search_opts.update({'sort_dir': dirs})
         data = self.call_server(neutron_client, search_opts, parsed_args)
-        collection = self.resource + "s"
+        collection = _get_resource_plural(self.resource, neutron_client)
         return data.get(collection, [])
 
     def extend_list(self, data, parsed_args):

@@ -22,9 +22,9 @@ import mox
 import testtools
 
 from neutronclient.common import constants
+from neutronclient.neutron import v2_0 as neutronV2_0
 from neutronclient import shell
 from neutronclient.v2_0 import client
-
 
 API_VERSION = "2.0"
 FORMAT = 'json'
@@ -211,7 +211,9 @@ class CLITestV20Base(testtools.TestCase):
         self.client.format = self.format
         resstr = self.client.serialize(ress)
         # url method body
-        path = getattr(self.client, resource + "s_path")
+        resource_plural = neutronV2_0._get_resource_plural(resource,
+                                                           self.client)
+        path = getattr(self.client, resource_plural + "_path")
         self.client.httpclient.request(
             end_url(path, format=self.format), 'POST',
             body=MyComparator(body, self.client),

@@ -191,6 +191,15 @@ class Client(object):
     L3_AGENTS = '/l3-agents'
     LOADBALANCER_POOLS = '/loadbalancer-pools'
     LOADBALANCER_AGENT = '/loadbalancer-agent'
+    firewall_rules_path = "/fw/firewall_rules"
+    firewall_rule_path = "/fw/firewall_rules/%s"
+    firewall_policies_path = "/fw/firewall_policies"
+    firewall_policy_path = "/fw/firewall_policies/%s"
+    firewall_policy_insert_path = "/fw/firewall_policies/%s/insert_rule"
+    firewall_policy_remove_path = "/fw/firewall_policies/%s/remove_rule"
+    firewalls_path = "/fw/firewalls"
+    firewall_path = "/fw/firewalls/%s"
+
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
                      'floatingips': 'floatingip',
@@ -203,7 +212,10 @@ class Client(object):
                      'members': 'member',
                      'health_monitors': 'health_monitor',
                      'quotas': 'quota',
-                     'service_providers': 'service_provider'
+                     'service_providers': 'service_provider',
+                     'firewall_rules': 'firewall_rule',
+                     'firewall_policies': 'firewall_policy',
+                     'firewalls': 'firewall',
                      }
     # 8192 Is the default max URI len for eventlet.wsgi.server
     MAX_URI_LEN = 8192
@@ -715,6 +727,105 @@ class Client(object):
         """Adds a router to L3 agent."""
         return self.post((self.agent_path + self.L3_ROUTERS) % l3_agent,
                          body=body)
+
+    @APIParamsCall
+    def list_firewall_rules(self, retrieve_all=True, **_params):
+        """Fetches a list of all firewall rules for a tenant."""
+        # Pass filters in "params" argument to do_request
+
+        return self.list('firewall_rules', self.firewall_rules_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_firewall_rule(self, firewall_rule, **_params):
+        """Fetches information of a certain firewall rule."""
+        return self.get(self.firewall_rule_path % (firewall_rule),
+                        params=_params)
+
+    @APIParamsCall
+    def create_firewall_rule(self, body=None):
+        """Creates a new firewall rule."""
+        return self.post(self.firewall_rules_path, body=body)
+
+    @APIParamsCall
+    def update_firewall_rule(self, firewall_rule, body=None):
+        """Updates a firewall rule."""
+        return self.put(self.firewall_rule_path % (firewall_rule), body=body)
+
+    @APIParamsCall
+    def delete_firewall_rule(self, firewall_rule):
+        """Deletes the specified firewall rule."""
+        return self.delete(self.firewall_rule_path % (firewall_rule))
+
+    @APIParamsCall
+    def list_firewall_policies(self, retrieve_all=True, **_params):
+        """Fetches a list of all firewall policies for a tenant."""
+        # Pass filters in "params" argument to do_request
+
+        return self.list('firewall_policies', self.firewall_policies_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_firewall_policy(self, firewall_policy, **_params):
+        """Fetches information of a certain firewall policy."""
+        return self.get(self.firewall_policy_path % (firewall_policy),
+                        params=_params)
+
+    @APIParamsCall
+    def create_firewall_policy(self, body=None):
+        """Creates a new firewall policy."""
+        return self.post(self.firewall_policies_path, body=body)
+
+    @APIParamsCall
+    def update_firewall_policy(self, firewall_policy, body=None):
+        """Updates a firewall policy."""
+        return self.put(self.firewall_policy_path % (firewall_policy),
+                        body=body)
+
+    @APIParamsCall
+    def delete_firewall_policy(self, firewall_policy):
+        """Deletes the specified firewall policy."""
+        return self.delete(self.firewall_policy_path % (firewall_policy))
+
+    @APIParamsCall
+    def firewall_policy_insert_rule(self, firewall_policy, body=None):
+        """Inserts specified rule into firewall policy."""
+        return self.put(self.firewall_policy_insert_path % (firewall_policy),
+                        body=body)
+
+    @APIParamsCall
+    def firewall_policy_remove_rule(self, firewall_policy, body=None):
+        """Removes specified rule from firewall policy."""
+        return self.put(self.firewall_policy_remove_path % (firewall_policy),
+                        body=body)
+
+    @APIParamsCall
+    def list_firewalls(self, retrieve_all=True, **_params):
+        """Fetches a list of all firewals for a tenant."""
+        # Pass filters in "params" argument to do_request
+
+        return self.list('firewalls', self.firewalls_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_firewall(self, firewall, **_params):
+        """Fetches information of a certain firewall."""
+        return self.get(self.firewall_path % (firewall), params=_params)
+
+    @APIParamsCall
+    def create_firewall(self, body=None):
+        """Creates a new firewall."""
+        return self.post(self.firewalls_path, body=body)
+
+    @APIParamsCall
+    def update_firewall(self, firewall, body=None):
+        """Updates a firewall."""
+        return self.put(self.firewall_path % (firewall), body=body)
+
+    @APIParamsCall
+    def delete_firewall(self, firewall):
+        """Deletes the specified firewall."""
+        return self.delete(self.firewall_path % (firewall))
 
     @APIParamsCall
     def remove_router_from_l3_agent(self, l3_agent, router_id):
