@@ -35,7 +35,7 @@ UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
 
 
 def _get_resource_plural(resource, client):
-    plurals = client.EXTED_PLURALS
+    plurals = getattr(client, 'EXTED_PLURALS', [])
     for k in plurals:
         if plurals[k] == resource:
             return k
