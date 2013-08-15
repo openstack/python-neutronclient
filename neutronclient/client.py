@@ -202,9 +202,10 @@ class HTTPClient(httplib2.Http):
             self.auth_user_id = sc.get('user_id')
         except KeyError:
             raise exceptions.Unauthorized()
-        self.endpoint_url = self.service_catalog.url_for(
-            attr='region', filter_value=self.region_name,
-            endpoint_type=self.endpoint_type)
+        if not self.endpoint_url:
+            self.endpoint_url = self.service_catalog.url_for(
+                attr='region', filter_value=self.region_name,
+                endpoint_type=self.endpoint_type)
 
     def authenticate(self):
         if self.auth_strategy != 'keystone':
