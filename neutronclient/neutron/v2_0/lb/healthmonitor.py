@@ -28,7 +28,7 @@ class ListHealthMonitor(neutronV20.ListCommand):
 
     resource = 'health_monitor'
     log = logging.getLogger(__name__ + '.ListHealthMonitor')
-    list_columns = ['id', 'type', 'admin_state_up', 'status']
+    list_columns = ['id', 'type', 'admin_state_up']
     pagination_support = True
     sorting_support = True
 
