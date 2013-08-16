@@ -14,6 +14,7 @@
 #
 #@author Abhishek Raut, Cisco Systems
 #@author Sergey Sudakovich, Cisco Systems
+#@author Rudrajit Tapadar, Cisco Systems
 
 import logging
 
@@ -22,7 +23,8 @@ from neutronclient.neutron.v2_0 import parse_args_to_dict
 from neutronclient.openstack.common.gettextutils import _
 
 RESOURCE = 'network_profile'
-SEGMENT_TYPE_CHOICES = ['vlan', 'vxlan']
+SEGMENT_TYPE_CHOICES = ['vlan', 'vxlan', 'multi-segment', 'trunk']
+SEGMENT_SUBTYPE_CHOICES = ['vlan', 'vxlan']
 
 
 class ListNetworkProfile(neutronV20.ListCommand):
@@ -31,7 +33,7 @@ class ListNetworkProfile(neutronV20.ListCommand):
     resource = RESOURCE
     log = logging.getLogger(__name__ + '.ListNetworkProfile')
     _formatters = {}
-    list_columns = ['id', 'name', 'segment_type', 'segment_range',
+    list_columns = ['id', 'name', 'segment_type', 'sub_type', 'segment_range',
                     'physical_network', 'multicast_ip_index',
                     'multicast_ip_range']
 
@@ -56,6 +58,9 @@ class CreateNetworkProfile(neutronV20.CreateCommand):
         parser.add_argument('segment_type',
                             choices=SEGMENT_TYPE_CHOICES,
                             help='Segment type')
+        parser.add_argument('--sub_type',
+                            choices=SEGMENT_SUBTYPE_CHOICES,
+                            help='Sub-type for the Segment')
         parser.add_argument('--segment_range',
                             help='Range for the Segment')
         parser.add_argument('--physical_network',
@@ -70,6 +75,9 @@ class CreateNetworkProfile(neutronV20.CreateCommand):
         if parsed_args.segment_type:
             body['network_profile'].update({'segment_type':
                                            parsed_args.segment_type})
+        if parsed_args.sub_type:
+            body['network_profile'].update({'sub_type':
+                                           parsed_args.sub_type})
         if parsed_args.segment_range:
             body['network_profile'].update({'segment_range':
                                            parsed_args.segment_range})
