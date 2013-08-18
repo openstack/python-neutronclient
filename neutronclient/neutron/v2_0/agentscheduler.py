@@ -211,7 +211,7 @@ class ListL3AgentsHostingRouter(neutronV20.ListCommand):
     resource = 'agent'
     _formatters = {}
     log = logging.getLogger(__name__ + '.ListL3AgentsHostingRouter')
-    list_columns = ['id', 'host', 'admin_state_up', 'alive', 'default']
+    list_columns = ['id', 'host', 'admin_state_up', 'alive']
     unknown_parts_flag = False
 
     def get_parser(self, prog_name):
