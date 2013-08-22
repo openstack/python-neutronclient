@@ -57,6 +57,7 @@ class CreatePool(neutronV20.CreateCommand):
         parser.add_argument(
             '--lb-method',
             required=True,
+            choices=['ROUND_ROBIN', 'LEAST_CONNECTIONS', 'SOURCE_IP'],
             help='the algorithm used to distribute load between the members '
                  'of the pool')
         parser.add_argument(
@@ -66,9 +67,10 @@ class CreatePool(neutronV20.CreateCommand):
         parser.add_argument(
             '--protocol',
             required=True,
+            choices=['HTTP', 'HTTPS', 'TCP'],
             help='protocol for balancing')
         parser.add_argument(
-            '--subnet-id',
+            '--subnet-id', metavar='SUBNET',
             required=True,
             help='the subnet on which the members of the pool will be located')
 

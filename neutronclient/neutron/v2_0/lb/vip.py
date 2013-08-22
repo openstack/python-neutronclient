@@ -48,7 +48,7 @@ class CreateVip(neutronV20.CreateCommand):
 
     def add_known_arguments(self, parser):
         parser.add_argument(
-            'pool_id', metavar='pool',
+            'pool_id', metavar='POOL',
             help='Pool id or name this vip belongs to')
         parser.add_argument(
             '--address',
@@ -60,7 +60,7 @@ class CreateVip(neutronV20.CreateCommand):
         parser.add_argument(
             '--connection-limit',
             help='the maximum number of connections per second allowed for '
-                 'the vip')
+                 'the vip. Positive integer or -1 for unlimited (default)')
         parser.add_argument(
             '--description',
             help='description of the vip')
@@ -75,10 +75,10 @@ class CreateVip(neutronV20.CreateCommand):
                  'associated with the vip address')
         parser.add_argument(
             '--protocol',
-            required=True,
+            required=True, choices=['TCP', 'HTTP', 'HTTPS'],
             help='protocol for balancing')
         parser.add_argument(
-            '--subnet-id',
+            '--subnet-id', metavar='SUBNET',
             required=True,
             help='the subnet on which to allocate the vip address')
 
@@ -87,6 +87,7 @@ class CreateVip(neutronV20.CreateCommand):
             self.get_client(), 'pool', parsed_args.pool_id)
         _subnet_id = neutronV20.find_resourceid_by_name_or_id(
             self.get_client(), 'subnet', parsed_args.subnet_id)
+
         body = {
             self.resource: {
                 'pool_id': _pool_id,

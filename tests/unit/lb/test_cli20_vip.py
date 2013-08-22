@@ -35,7 +35,7 @@ class CLITestV20LbVipJSON(test_cli20.CLITestV20Base):
         name = 'my-name'
         subnet_id = 'subnet-id'
         protocol_port = '1000'
-        protocol = 'tcp'
+        protocol = 'TCP'
         tenant_id = 'my-tenant'
         my_id = 'my-id'
         args = ['--name', name,
@@ -64,7 +64,7 @@ class CLITestV20LbVipJSON(test_cli20.CLITestV20Base):
         connection_limit = '1000'
         subnet_id = 'subnet-id'
         protocol_port = '80'
-        protocol = 'tcp'
+        protocol = 'TCP'
         tenant_id = 'my-tenant'
         my_id = 'my-id'
         args = ['--name', name,
@@ -96,7 +96,7 @@ class CLITestV20LbVipJSON(test_cli20.CLITestV20Base):
         name = 'my-name'
         subnet_id = 'subnet-id'
         protocol_port = '1000'
-        protocol = 'tcp'
+        protocol = 'TCP'
         tenant_id = 'my-tenant'
         my_id = 'my-id'
         args = ['--name', name,

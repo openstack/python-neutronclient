@@ -49,7 +49,7 @@ class CreateMember(neutronV20.CreateCommand):
 
     def add_known_arguments(self, parser):
         parser.add_argument(
-            'pool_id', metavar='pool',
+            'pool_id', metavar='POOL',
             help='Pool id or name this vip belongs to')
         parser.add_argument(
             '--admin-state-down',
@@ -57,7 +57,7 @@ class CreateMember(neutronV20.CreateCommand):
             help='set admin state up to false')
         parser.add_argument(
             '--weight',
-            help='weight of pool member in the pool')
+            help='weight of pool member in the pool (default:1, [0..256])')
         parser.add_argument(
             '--address',
             required=True,
