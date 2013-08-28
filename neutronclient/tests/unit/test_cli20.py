@@ -216,6 +216,8 @@ class CLITestV20Base(testtools.TestCase):
         resource_plural = neutronV2_0._get_resource_plural(resource,
                                                            self.client)
         path = getattr(self.client, resource_plural + "_path")
+        # Work around for LP #1217791. XML deserializer called from
+        # MyComparator does not decodes XML string correctly.
         if self.format == 'json':
             mox_body = MyComparator(body, self.client)
         else:
@@ -391,11 +393,18 @@ class CLITestV20Base(testtools.TestCase):
         cmd.get_client().MultipleTimes().AndReturn(self.client)
         body = {resource: extrafields}
         path = getattr(self.client, resource + "_path")
+        self.client.format = self.format
+        # Work around for LP #1217791. XML deserializer called from
+        # MyComparator does not decodes XML string correctly.
+        if self.format == 'json':
+            mox_body = MyComparator(body, self.client)
+        else:
+            mox_body = self.client.serialize(body)
         self.client.httpclient.request(
             MyUrlComparator(end_url(path % myid, format=self.format),
                             self.client),
             'PUT',
-            body=MyComparator(body, self.client),
+            body=mox_body,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(204), None))
         args.extend(['--request-format', self.format])
