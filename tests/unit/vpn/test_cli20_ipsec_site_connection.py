@@ -19,6 +19,7 @@
 
 import sys
 
+from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0.vpn import ipsec_site_connection
 from tests.unit import test_cli20
 
@@ -166,7 +167,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
                            initiator, description,
                            vpnservice_id, ikepolicy_id, ipsecpolicy_id]
         self.assertRaises(
-            Exception,
+            exceptions.CommandError,
             self._test_create_resource,
             resource, cmd, name, my_id, args,
             position_names, position_values)
@@ -213,7 +214,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
                            initiator, description,
                            vpnservice_id, ikepolicy_id, ipsecpolicy_id]
         self.assertRaises(
-            Exception,
+            exceptions.CommandError,
             self._test_create_resource,
             resource, cmd, name, my_id, args,
             position_names, position_values)

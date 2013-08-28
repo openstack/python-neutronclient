@@ -22,6 +22,7 @@
 """VPN Utilities and helper functions."""
 
 
+from neutronclient.common import exceptions
 from neutronclient.openstack.common.gettextutils import _
 
 dpd_supported_actions = ['hold', 'clear', 'restart',
@@ -40,7 +41,7 @@ def validate_dpd_dict(dpd_dict):
                 "Reason-Invalid DPD key : "
                 "'%(key)s' not in %(supported_key)s ") % {
                     'key': key, 'supported_key': dpd_supported_keys}
-            raise KeyError(message)
+            raise exceptions.CommandError(message)
         if key == 'action' and value not in dpd_supported_actions:
             message = _(
                 "DPD Dictionary ValueError: "
@@ -48,7 +49,7 @@ def validate_dpd_dict(dpd_dict):
                 "'%(key_value)s' not in %(supported_action)s ") % {
                     'key_value': value,
                     'supported_action': dpd_supported_actions}
-            raise ValueError(message)
+            raise exceptions.CommandError(message)
         if key in ('interval', 'timeout'):
             if int(value) <= 0:
                 message = _(
@@ -56,7 +57,7 @@ def validate_dpd_dict(dpd_dict):
                     "Reason-Invalid positive integer value: "
                     "'%(key)s' = %(value)i ") % {
                         'key': key, 'value': int(value)}
-                raise ValueError(message)
+                raise exceptions.CommandError(message)
             else:
                 dpd_dict[key] = int(value)
     return
@@ -78,7 +79,7 @@ def validate_lifetime_dict(lifetime_dict):
                 "Reason-Invalid units : "
                 "'%(key_value)s' not in %(supported_units)s ") % {
                     'key_value': key, 'supported_units': lifetime_units}
-            raise ValueError(message)
+            raise exceptions.CommandError(message)
         if key == 'value':
             if int(value) < 60:
                 message = _(
@@ -86,7 +87,7 @@ def validate_lifetime_dict(lifetime_dict):
                     "Reason-Invalid value should be at least 60:"
                     "'%(key_value)s' = %(value)i ") % {
                         'key_value': key, 'value': int(value)}
-                raise ValueError(str(message))
+                raise exceptions.CommandError(str(message))
             else:
                 lifetime_dict['value'] = int(value)
     return

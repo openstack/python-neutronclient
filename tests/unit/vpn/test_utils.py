@@ -19,6 +19,7 @@
 
 import testtools
 
+from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.neutron.v2_0.vpn import utils as vpn_utils
 
@@ -121,12 +122,12 @@ class TestVPNUtils(testtools.TestCase):
 
     def _test_validate_lifetime_negative_test_case(self, input_str):
         """Generic handler for negative lifetime tests."""
-        self.assertRaises(Exception,
+        self.assertRaises(exceptions.CommandError,
                           vpn_utils.validate_lifetime_dict,
                           (input_str))
 
     def _test_validate_dpd_negative_test_case(self, input_str):
         """Generic handler for negative lifetime tests."""
-        self.assertRaises(Exception,
+        self.assertRaises(exceptions.CommandError,
                           vpn_utils.validate_lifetime_dict,
                           (input_str))
