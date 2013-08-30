@@ -47,14 +47,13 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
                                    protocol=protocol, action=action,
                                    enabled=True, tenant_id=tenant_id)
 
-    def test_create_firewall_rule_with_all_params(self):
+    def _setup_create_firewall_rule_with_all_params(self, protocol='tcp'):
         """firewall-rule-create with all params set."""
         resource = 'firewall_rule'
         cmd = firewallrule.CreateFirewallRule(test_cli20.MyApp(sys.stdout),
                                               None)
         name = 'my-name'
         description = 'my-desc'
-        protocol = 'tcp'
         source_ip = '192.168.1.0/24'
         destination_ip = '192.168.2.0/24'
         source_port = '0:65535'
@@ -75,6 +74,8 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
                 '--tenant-id', tenant_id]
         position_names = []
         position_values = []
+        if protocol == 'any':
+            protocol = None
         self._test_create_resource(resource, cmd, name, my_id, args,
                                    position_names, position_values,
                                    description=description, shared=True,
@@ -85,6 +86,12 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
                                    destination_port=destination_port,
                                    action=action, enabled=True,
                                    tenant_id=tenant_id)
+
+    def test_create_firewall_rule_with_all_params(self):
+        self._setup_create_firewall_rule_with_all_params()
+
+    def test_create_firewall_rule_with_proto_any(self):
+        self._setup_create_firewall_rule_with_all_params(protocol='any')
 
     def test_list_firewall_rules(self):
         """firewall-rule-list."""
@@ -143,6 +150,15 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'newname'],
                                    {'name': 'newname', })
+
+    def test_update_firewall_rule_protocol(self):
+        """firewall-rule-update myid --protocol any."""
+        resource = 'firewall_rule'
+        cmd = firewallrule.UpdateFirewallRule(test_cli20.MyApp(sys.stdout),
+                                              None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--protocol', 'any'],
+                                   {'protocol': None, })
 
     def test_delete_firewall_rule(self):
         """firewall-rule-delete my-id."""
