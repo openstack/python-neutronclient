@@ -21,7 +21,7 @@ import sys
 
 from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0.vpn import ipsec_site_connection
-from tests.unit import test_cli20
+from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
@@ -225,10 +225,6 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
 
     def test_create_ipsec_site_connection_with_invalid_dpd_values(self):
         dpd = 'action=hold,interval=30,timeout=-1'
-        self._test_dpd_values(dpd)
-
-    def test_create_ipsec_site_connection_dpd_timeout_less_than_interval(self):
-        dpd = 'action=restart,interval=30,timeout=10'
         self._test_dpd_values(dpd)
 
     def test_list_ipsec_site_connection(self):

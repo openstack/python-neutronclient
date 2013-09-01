@@ -19,23 +19,23 @@
 
 import sys
 
-from neutronclient.neutron.v2_0.vpn import ikepolicy
-from tests.unit import test_cli20
+from neutronclient.neutron.v2_0.vpn import ipsecpolicy
+from neutronclient.tests.unit import test_cli20
 
 
-class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
+class CLITestV20VpnIpsecPolicyJSON(test_cli20.CLITestV20Base):
 
-    def test_create_ikepolicy_all_params(self):
-        """vpn-ikepolicy-create all params."""
-        resource = 'ikepolicy'
-        cmd = ikepolicy.CreateIKEPolicy(test_cli20.MyApp(sys.stdout), None)
-        name = 'ikepolicy1'
-        description = 'my-ike-policy'
+    def test_create_ipsecpolicy_all_params(self):
+        """vpn-ipsecpolicy-create all params with dashes."""
+        resource = 'ipsecpolicy'
+        cmd = ipsecpolicy.CreateIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
+        name = 'ipsecpolicy1'
+        description = 'first-ipsecpolicy1'
         auth_algorithm = 'sha1'
         encryption_algorithm = 'aes-256'
-        ike_version = 'v1'
-        phase1_negotiation_mode = 'main'
+        encapsulation_mode = 'tunnel'
         pfs = 'group5'
+        transform_protocol = 'ah'
         tenant_id = 'my-tenant'
         my_id = 'my-id'
         lifetime = 'units=seconds,value=20000'
@@ -45,20 +45,19 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
                 '--tenant-id', tenant_id,
                 '--auth-algorithm', auth_algorithm,
                 '--encryption-algorithm', encryption_algorithm,
-                '--ike-version', ike_version,
-                '--phase1-negotiation-mode', phase1_negotiation_mode,
+                '--transform-protocol', transform_protocol,
+                '--encapsulation-mode', encapsulation_mode,
                 '--lifetime', lifetime,
                 '--pfs', pfs]
 
-        position_names = ['name', 'description',
-                          'auth_algorithm', 'encryption_algorithm',
-                          'phase1_negotiation_mode',
-                          'ike_version', 'pfs',
+        position_names = ['name', 'auth_algorithm', 'encryption_algorithm',
+                          'encapsulation_mode', 'description',
+                          'transform_protocol', 'pfs',
                           'tenant_id']
 
-        position_values = [name, description,
-                           auth_algorithm, encryption_algorithm,
-                           phase1_negotiation_mode, ike_version, pfs,
+        position_values = [name, auth_algorithm, encryption_algorithm,
+                           encapsulation_mode, description,
+                           transform_protocol, pfs,
                            tenant_id]
         extra_body = {
             'lifetime': {
@@ -71,42 +70,40 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values,
                                    extra_body=extra_body)
 
-    def test_create_ikepolicy_with_limited_params(self):
-        """vpn-ikepolicy-create with limited params."""
-        resource = 'ikepolicy'
-        cmd = ikepolicy.CreateIKEPolicy(test_cli20.MyApp(sys.stdout), None)
-        name = 'ikepolicy1'
+    def test_create_ipsecpolicy_with_limited_params(self):
+        """vpn-ipsecpolicy-create with limited params."""
+        resource = 'ipsecpolicy'
+        cmd = ipsecpolicy.CreateIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
+        name = 'ipsecpolicy1'
         auth_algorithm = 'sha1'
         encryption_algorithm = 'aes-128'
-        ike_version = 'v1'
-        phase1_negotiation_mode = 'main'
+        encapsulation_mode = 'tunnel'
         pfs = 'group5'
+        transform_protocol = 'esp'
         tenant_id = 'my-tenant'
         my_id = 'my-id'
 
         args = [name,
                 '--tenant-id', tenant_id]
 
-        position_names = ['name',
-                          'auth_algorithm', 'encryption_algorithm',
-                          'phase1_negotiation_mode',
-                          'ike_version', 'pfs',
+        position_names = ['name', 'auth_algorithm', 'encryption_algorithm',
+                          'encapsulation_mode',
+                          'transform_protocol', 'pfs',
                           'tenant_id']
 
-        position_values = [name,
-                           auth_algorithm, encryption_algorithm,
-                           phase1_negotiation_mode,
-                           ike_version, pfs,
+        position_values = [name, auth_algorithm, encryption_algorithm,
+                           encapsulation_mode,
+                           transform_protocol, pfs,
                            tenant_id]
 
         self._test_create_resource(resource, cmd, name, my_id, args,
                                    position_names, position_values)
 
     def _test_lifetime_values(self, lifetime):
-        resource = 'ikepolicy'
-        cmd = ikepolicy.CreateIKEPolicy(test_cli20.MyApp(sys.stdout), None)
-        name = 'ikepolicy1'
-        description = 'my-ike-policy'
+        resource = 'ipsecpolicy'
+        cmd = ipsecpolicy.CreateIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
+        name = 'ipsecpolicy1'
+        description = 'my-ipsec-policy'
         auth_algorithm = 'sha1'
         encryption_algorithm = 'aes-256'
         ike_version = 'v1'
@@ -140,75 +137,75 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
                                        position_names, position_values)
         except Exception:
             return
-        self.fail("IKEPolicy Lifetime Error")
+        self.fail("IPsecPolicy Lifetime Error")
 
-    def test_create_ikepolicy_with_invalid_lifetime_keys(self):
+    def test_create_ipsecpolicy_with_invalid_lifetime_keys(self):
         lifetime = 'uts=seconds,val=20000'
         self._test_lifetime_values(lifetime)
 
-    def test_create_ikepolicy_with_invalid_lifetime_value(self):
-        lifetime = 'units=seconds,value=-1'
+    def test_create_ipsecpolicy_with_invalide_lifetime_values(self):
+        lifetime = 'units=minutes,value=0'
         self._test_lifetime_values(lifetime)
 
-    def test_list_ikepolicy(self):
-        """vpn-ikepolicy-list."""
-        resources = "ikepolicies"
-        cmd = ikepolicy.ListIKEPolicy(test_cli20.MyApp(sys.stdout), None)
+    def test_list_ipsecpolicy(self):
+        """vpn-ipsecpolicy-list."""
+        resources = "ipsecpolicies"
+        cmd = ipsecpolicy.ListIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
-    def test_list_ikepolicy_pagination(self):
-        """vpn-ikepolicy-list."""
-        resources = "ikepolicies"
-        cmd = ikepolicy.ListIKEPolicy(test_cli20.MyApp(sys.stdout), None)
+    def test_list_ipsecpolicy_pagination(self):
+        """vpn-ipsecpolicy-list."""
+        resources = "ipsecpolicies"
+        cmd = ipsecpolicy.ListIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources_with_pagination(resources, cmd)
 
-    def test_list_ikepolicy_sort(self):
-        """vpn-ikepolicy-list --sort-key name --sort-key id --sort-key asc
+    def test_list_ipsecpolicy_sort(self):
+        """vpn-ipsecpolicy-list --sort-key name --sort-key id --sort-key asc
         --sort-key desc
         """
-        resources = "ikepolicies"
-        cmd = ikepolicy.ListIKEPolicy(test_cli20.MyApp(sys.stdout), None)
+        resources = "ipsecpolicies"
+        cmd = ipsecpolicy.ListIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
                                   sort_key=["name", "id"],
                                   sort_dir=["asc", "desc"])
 
-    def test_list_ikepolicy_limit(self):
-        """vpn-ikepolicy-list -P."""
-        resources = "ikepolicies"
-        cmd = ikepolicy.ListIKEPolicy(test_cli20.MyApp(sys.stdout), None)
+    def test_list_ipsecpolicy_limit(self):
+        """vpn-ipsecpolicy-list -P."""
+        resources = "ipsecpolicies"
+        cmd = ipsecpolicy.ListIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
-    def test_show_ikepolicy_id(self):
-        """vpn-ikepolicy-show ikepolicy_id."""
-        resource = 'ikepolicy'
-        cmd = ikepolicy.ShowIKEPolicy(test_cli20.MyApp(sys.stdout), None)
+    def test_show_ipsecpolicy_id(self):
+        """vpn-ipsecpolicy-show ipsecpolicy_id."""
+        resource = 'ipsecpolicy'
+        cmd = ipsecpolicy.ShowIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
-    def test_show_ikepolicy_id_name(self):
-        """vpn-ikepolicy-show."""
-        resource = 'ikepolicy'
-        cmd = ikepolicy.ShowIKEPolicy(test_cli20.MyApp(sys.stdout), None)
+    def test_show_ipsecpolicy_id_name(self):
+        """vpn-ipsecpolicy-show."""
+        resource = 'ipsecpolicy'
+        cmd = ipsecpolicy.ShowIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id,
                                  args, ['id', 'name'])
 
-    def test_update_ikepolicy(self):
-        """vpn-ikepolicy-update myid --name newname --tags a b."""
-        resource = 'ikepolicy'
-        cmd = ikepolicy.UpdateIKEPolicy(test_cli20.MyApp(sys.stdout), None)
+    def test_update_ipsecpolicy(self):
+        """vpn-ipsecpolicy-update myid --name newname --tags a b."""
+        resource = 'ipsecpolicy'
+        cmd = ipsecpolicy.UpdateIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'newname'],
                                    {'name': 'newname', })
 
-    def test_delete_ikepolicy(self):
-        """vpn-ikepolicy-delete my-id."""
-        resource = 'ikepolicy'
-        cmd = ikepolicy.DeleteIKEPolicy(test_cli20.MyApp(sys.stdout), None)
+    def test_delete_ipsecpolicy(self):
+        """vpn-ipsecpolicy-delete my-id."""
+        resource = 'ipsecpolicy'
+        cmd = ipsecpolicy.DeleteIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
         my_id = 'my-id'
         args = [my_id]
         self._test_delete_resource(resource, cmd, my_id, args)
 
 
-class CLITestV20VpnIkePolicyXML(CLITestV20VpnIkePolicyJSON):
+class CLITestV20VpnIpsecPolicyXML(CLITestV20VpnIpsecPolicyJSON):
     format = 'xml'

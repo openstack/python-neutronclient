@@ -20,6 +20,7 @@
 
 import logging
 
+from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronv20
 from neutronclient.neutron.v2_0.vpn import utils as vpn_utils
@@ -128,7 +129,7 @@ class CreateIPsecSiteConnection(neutronv20.CreateCommand):
         if int(parsed_args.mtu) < 68:
             message = _("Invalid MTU value: MTU must be "
                         "greater than or equal to 68")
-            raise ValueError(message)
+            raise exceptions.CommandError(message)
         body = {'ipsec_site_connection': {
             'vpnservice_id': _vpnservice_id,
             'ikepolicy_id': _ikepolicy_id,
