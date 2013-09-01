@@ -44,6 +44,7 @@ from neutronclient.neutron.v2_0.lb import member as lb_member
 from neutronclient.neutron.v2_0.lb import pool as lb_pool
 from neutronclient.neutron.v2_0.lb import vip as lb_vip
 from neutronclient.neutron.v2_0 import metering
+from neutronclient.neutron.v2_0.nec import packetfilter
 from neutronclient.neutron.v2_0 import netpartition
 from neutronclient.neutron.v2_0 import network
 from neutronclient.neutron.v2_0 import networkprofile
@@ -271,6 +272,11 @@ COMMAND_V2 = {
     'nuage-netpartition-show': netpartition.ShowNetPartition,
     'nuage-netpartition-create': netpartition.CreateNetPartition,
     'nuage-netpartition-delete': netpartition.DeleteNetPartition,
+    'nec-packet-filter-list': packetfilter.ListPacketFilter,
+    'nec-packet-filter-show': packetfilter.ShowPacketFilter,
+    'nec-packet-filter-create': packetfilter.CreatePacketFilter,
+    'nec-packet-filter-update': packetfilter.UpdatePacketFilter,
+    'nec-packet-filter-delete': packetfilter.DeletePacketFilter,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}
