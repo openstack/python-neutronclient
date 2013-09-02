@@ -68,6 +68,9 @@ class CreateRouter(neutronV20.CreateCommand):
         parser.add_argument(
             'name', metavar='NAME',
             help='Name of router to create')
+        parser.add_argument(
+            'distributed', action='store_true',
+            help='Create a distributed router (Nicira plugin only)')
 
     def args2body(self, parsed_args):
         body = {'router': {
