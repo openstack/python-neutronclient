@@ -51,12 +51,15 @@ def validate_dpd_dict(dpd_dict):
                     'supported_action': dpd_supported_actions}
             raise exceptions.CommandError(message)
         if key in ('interval', 'timeout'):
-            if int(value) <= 0:
+            try:
+                if int(value) <= 0:
+                    raise ValueError()
+            except ValueError:
                 message = _(
                     "DPD Dictionary ValueError: "
                     "Reason-Invalid positive integer value: "
-                    "'%(key)s' = %(value)i ") % {
-                        'key': key, 'value': int(value)}
+                    "'%(key)s' = %(value)s ") % {
+                        'key': key, 'value': value}
                 raise exceptions.CommandError(message)
             else:
                 dpd_dict[key] = int(value)
@@ -72,7 +75,7 @@ def validate_lifetime_dict(lifetime_dict):
                 "Reason-Invalid unit key : "
                 "'%(key)s' not in %(supported_key)s ") % {
                     'key': key, 'supported_key': lifetime_keys}
-            raise KeyError(message)
+            raise exceptions.CommandError(message)
         if key == 'units' and value not in lifetime_units:
             message = _(
                 "Lifetime Dictionary ValueError: "
@@ -81,13 +84,16 @@ def validate_lifetime_dict(lifetime_dict):
                     'key_value': key, 'supported_units': lifetime_units}
             raise exceptions.CommandError(message)
         if key == 'value':
-            if int(value) < 60:
+            try:
+                if int(value) < 60:
+                    raise ValueError()
+            except ValueError:
                 message = _(
                     "Lifetime Dictionary ValueError: "
                     "Reason-Invalid value should be at least 60:"
-                    "'%(key_value)s' = %(value)i ") % {
-                        'key_value': key, 'value': int(value)}
-                raise exceptions.CommandError(str(message))
+                    "'%(key_value)s' = %(value)s ") % {
+                        'key_value': key, 'value': value}
+                raise exceptions.CommandError(message)
             else:
                 lifetime_dict['value'] = int(value)
     return
