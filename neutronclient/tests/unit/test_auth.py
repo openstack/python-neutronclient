@@ -34,6 +34,7 @@ TENANT_ID = 'testtenantid'
 PASSWORD = 'password'
 AUTH_URL = 'authurl'
 ENDPOINT_URL = 'localurl'
+ENDPOINT_OVERRIDE = 'otherurl'
 TOKEN = 'tokentoken'
 REGION = 'RegionTest'
 
@@ -149,6 +150,28 @@ class CLITestAuthKeystone(testtools.TestCase):
         ).AndReturn((res200, ''))
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
+
+    def test_use_given_endpoint_url(self):
+        self.client = client.HTTPClient(
+            username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
+            auth_url=AUTH_URL, region_name=REGION,
+            endpoint_url=ENDPOINT_OVERRIDE)
+        self.assertEquals(self.client.endpoint_url, ENDPOINT_OVERRIDE)
+
+        self.mox.StubOutWithMock(self.client, "request")
+
+        self.client.auth_token = TOKEN
+
+        res200 = self.mox.CreateMock(httplib2.Response)
+        res200.status = 200
+
+        self.client.request(
+            mox.StrContains(ENDPOINT_OVERRIDE + '/resource'), 'GET',
+            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+        ).AndReturn((res200, ''))
+        self.mox.ReplayAll()
+        self.client.do_request('/resource', 'GET')
+        self.assertEquals(self.client.endpoint_url, ENDPOINT_OVERRIDE)
 
     def test_get_endpoint_url_other(self):
         self.client = client.HTTPClient(
