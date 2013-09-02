@@ -84,3 +84,28 @@ class CLITestV20NetworkProfile(test_cli20.CLITestV20Base):
         myid = 'myid'
         args = [myid]
         self._test_delete_resource(resource, cmd, myid, args)
+
+    def test_create_networkprofile_trunk(self):
+        """Create networkprofile: myid."""
+        resource = 'network_profile'
+        cmd = networkprofile.CreateNetworkProfile(test_cli20.
+                                                  MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        segment_type = 'trunk'
+        args = [name, segment_type, '--sub_type', 'vlan']
+        position_names = ['name', 'segment_type', ]
+        position_values = [name, segment_type, ]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   sub_type='vlan')
+
+    def test_list_networkprofile_trunk_detail(self):
+        """List networkprofile: -D."""
+        resources = 'network_profiles'
+        cmd = networkprofile.ListNetworkProfile(test_cli20.MyApp(sys.stdout),
+                                                None)
+        contents = [{'name': 'myname', 'segment_type': 'trunk',
+                    '--sub_type': 'vlan'}]
+        self._test_list_resources(resources, cmd, True,
+                                  response_contents=contents)
