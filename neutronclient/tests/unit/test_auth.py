@@ -156,7 +156,7 @@ class CLITestAuthKeystone(testtools.TestCase):
             username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
             auth_url=AUTH_URL, region_name=REGION,
             endpoint_url=ENDPOINT_OVERRIDE)
-        self.assertEquals(self.client.endpoint_url, ENDPOINT_OVERRIDE)
+        self.assertEqual(self.client.endpoint_url, ENDPOINT_OVERRIDE)
 
         self.mox.StubOutWithMock(self.client, "request")
 
@@ -171,7 +171,7 @@ class CLITestAuthKeystone(testtools.TestCase):
         ).AndReturn((res200, ''))
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
-        self.assertEquals(self.client.endpoint_url, ENDPOINT_OVERRIDE)
+        self.assertEqual(self.client.endpoint_url, ENDPOINT_OVERRIDE)
 
     def test_get_endpoint_url_other(self):
         self.client = client.HTTPClient(

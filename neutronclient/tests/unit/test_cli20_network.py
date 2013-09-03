@@ -131,7 +131,7 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
-        self.assertEquals('\n', _str)
+        self.assertEqual('\n', _str)
 
     def _test_list_networks(self, cmd, detail=False, tags=[],
                             fields_1=[], fields_2=[], page_size=None,
@@ -279,10 +279,10 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                                      args=['-f', 'json', '-c', 'id'])
         _str = self.fake_stdout.make_string()
         returned_networks = utils.loads(_str)
-        self.assertEquals(1, len(returned_networks))
+        self.assertEqual(1, len(returned_networks))
         net = returned_networks[0]
-        self.assertEquals(1, len(net))
-        self.assertEquals("id", net.keys()[0])
+        self.assertEqual(1, len(net))
+        self.assertEqual("id", net.keys()[0])
 
     def test_list_nets_with_default_column(self):
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
@@ -293,10 +293,10 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         self._test_list_nets_columns(cmd, returned_body)
         _str = self.fake_stdout.make_string()
         returned_networks = utils.loads(_str)
-        self.assertEquals(1, len(returned_networks))
+        self.assertEqual(1, len(returned_networks))
         net = returned_networks[0]
-        self.assertEquals(3, len(net))
-        self.assertEquals(0, len(set(net) ^ set(cmd.list_columns)))
+        self.assertEqual(3, len(net))
+        self.assertEqual(0, len(set(net) ^ set(cmd.list_columns)))
 
     def test_list_external_nets_empty_with_column(self):
         resources = "networks"
@@ -325,7 +325,7 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
-        self.assertEquals('\n', _str)
+        self.assertEqual('\n', _str)
 
     def _test_list_external_nets(self, resources, cmd,
                                  detail=False, tags=[],
