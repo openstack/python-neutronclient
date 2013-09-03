@@ -290,7 +290,8 @@ def _merge_args(qCmd, parsed_args, _extra_values, value_specs):
             if arg_value is not None and value is not None:
                 if isinstance(arg_value, list):
                     if value and isinstance(value, list):
-                        if type(arg_value[0]) == type(value[0]):
+                        if (not arg_value or
+                            type(arg_value[0]) == type(value[0])):
                             arg_value.extend(value)
                             _extra_values.pop(key)
 

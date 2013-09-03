@@ -141,6 +141,22 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_port_secgroups_list(self):
+        """Create port: netid <security_groups>
+        The <security_groups> are
+        --security-groups list=true sg_id1 sg_id2
+        """
+        resource = 'port'
+        cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        args = [netid, '--security-groups', 'list=true', 'sg_id1', 'sg_id2']
+        position_names = ['network_id', 'security_groups']
+        position_values = [netid, ['sg_id1', 'sg_id2']]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_list_ports(self):
         """List ports: -D."""
         resources = "ports"
