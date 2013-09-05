@@ -34,7 +34,7 @@ class ListFirewallRule(neutronv20.ListCommand):
     def extend_list(self, data, parsed_args):
         for d in data:
             val = []
-            if 'protocol' in d:
+            if d.get('protocol'):
                 protocol = d['protocol'].upper()
             else:
                 protocol = 'no-protocol'
@@ -102,7 +102,7 @@ class CreateFirewallRule(neutronv20.CreateCommand):
             action='store_false',
             help='to disable this rule')
         parser.add_argument(
-            '--protocol', choices=['tcp', 'udp', 'icmp'],
+            '--protocol', choices=['tcp', 'udp', 'icmp', 'any'],
             required=True,
             help='protocol for the firewall rule')
         parser.add_argument(
@@ -120,6 +120,10 @@ class CreateFirewallRule(neutronv20.CreateCommand):
                                 'source_ip_address', 'destination_ip_address',
                                 'source_port', 'destination_port',
                                 'action', 'enabled', 'tenant_id'])
+        protocol = parsed_args.protocol
+        if protocol == 'any':
+            protocol = None
+        body[self.resource]['protocol'] = protocol
         return body
 
 
@@ -128,6 +132,23 @@ class UpdateFirewallRule(neutronv20.UpdateCommand):
 
     resource = 'firewall_rule'
     log = logging.getLogger(__name__ + '.UpdateFirewallRule')
+
+    def add_known_arguments(self, parser):
+        parser.add_argument(
+            '--protocol', choices=['tcp', 'udp', 'icmp', 'any'],
+            required=False,
+            help='protocol for the firewall rule')
+
+    def args2body(self, parsed_args):
+        body = {
+            self.resource: {},
+        }
+        protocol = parsed_args.protocol
+        if protocol:
+            if protocol == 'any':
+                protocol = None
+            body[self.resource]['protocol'] = protocol
+        return body
 
 
 class DeleteFirewallRule(neutronv20.DeleteCommand):
