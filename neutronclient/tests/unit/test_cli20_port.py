@@ -42,6 +42,31 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_port_extra_dhcp_opts_args(self):
+        """Create port: netid --extra_dhcp_opt."""
+        resource = 'port'
+        cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        extra_dhcp_opts = [{'opt_name': 'bootfile-name',
+                            'opt_value': 'pxelinux.0'},
+                           {'opt_name': 'tftp-server',
+                            'opt_value': '123.123.123.123'},
+                           {'opt_name': 'server-ip-address',
+                            'opt_value': '123.123.123.45'}]
+        args = [netid]
+        for dhcp_opt in extra_dhcp_opts:
+            args += ['--extra-dhcp-opt',
+                     ('opt_name=%(opt_name)s,opt_value=%(opt_value)s' %
+                      dhcp_opt)]
+        print args
+        position_names = ['network_id', 'extra_dhcp_opts']
+        position_values = [netid, extra_dhcp_opts]
+        position_values.extend([netid])
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_create_port_full(self):
         """Create port: --mac_address mac --device_id deviceid netid."""
         resource = 'port'
@@ -320,6 +345,27 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                 myid]
         updatefields = {'security_groups': ['sg1_id', 'sg2_id']}
         self._test_update_resource(resource, cmd, myid, args, updatefields)
+
+    def test_update_port_extra_dhcp_opts(self):
+        """Update port: myid --extra_dhcp_opt."""
+        resource = 'port'
+        myid = 'myid'
+        args = [myid,
+                '--extra-dhcp-opt',
+                "opt_name=bootfile-name,opt_value=pxelinux.0",
+                '--extra-dhcp-opt',
+                "opt_name=tftp-server,opt_value=123.123.123.123",
+                '--extra-dhcp-opt',
+                "opt_name=server-ip-address,opt_value=123.123.123.45"
+                ]
+        updatedfields = {'extra_dhcp_opts': [{'opt_name': 'bootfile-name',
+                                              'opt_value': 'pxelinux.0'},
+                                             {'opt_name': 'tftp-server',
+                                              'opt_value': '123.123.123.123'},
+                                             {'opt_name': 'server-ip-address',
+                                              'opt_value': '123.123.123.45'}]}
+        cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, myid, args, updatedfields)
 
     def test_update_port_security_group_off(self):
         """Update port: --no-security-groups myid."""

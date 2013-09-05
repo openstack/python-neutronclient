@@ -18,6 +18,7 @@
 import argparse
 import logging
 
+from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
 
@@ -98,7 +99,46 @@ class UpdatePortSecGroupMixin(object):
             port['security_groups'] = None
 
 
-class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin):
+class UpdateExtraDhcpOptMixin(object):
+    def add_arguments_extradhcpopt(self, parser):
+        group_sg = parser.add_mutually_exclusive_group()
+        group_sg.add_argument(
+            '--extra-dhcp-opt',
+            default=[],
+            action='append',
+            dest='extra_dhcp_opts',
+            help='extra dhcp options to be assigned to this port: '
+            'opt_name=<dhcp_option_name>,opt_value=<value>, '
+            '(This option can be repeated.)')
+
+    def args2body_extradhcpopt(self, parsed_args, port):
+        ops = []
+        if parsed_args.extra_dhcp_opts:
+            # the extra_dhcp_opt params (opt_name & opt_value)
+            # must come in pairs, if there is a parm error
+            # both must be thrown out.
+            opt_ele = {}
+            edo_err_msg = ("invalid --extra-dhcp-opt option, can only be: "
+                           "opt_name=<dhcp_option_name>,opt_value=<value>, "
+                           "(This option can be repeated.")
+            for opt in parsed_args.extra_dhcp_opts:
+                if opt.split('=')[0] in ['opt_value', 'opt_name']:
+                    opt_ele.update(utils.str2dict(opt))
+                    if (('opt_name' in opt_ele) and
+                        ('opt_value' in opt_ele)):
+                        ops.append(opt_ele)
+                        opt_ele = {}
+                    else:
+                        raise exceptions.CommandError(edo_err_msg)
+                else:
+                    raise exceptions.CommandError(edo_err_msg)
+
+        if ops:
+            port.update({'extra_dhcp_opts': ops})
+
+
+class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
+                 UpdateExtraDhcpOptMixin):
     """Create a port for a given tenant."""
 
     resource = 'port'
@@ -140,6 +180,7 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin):
             help=argparse.SUPPRESS)
 
         self.add_arguments_secgroup(parser)
+        self.add_arguments_extradhcpopt(parser)
 
         parser.add_argument(
             'network_id', metavar='NETWORK',
@@ -172,6 +213,7 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin):
             body['port'].update({'fixed_ips': ips})
 
         self.args2body_secgroup(parsed_args, body['port'])
+        self.args2body_extradhcpopt(parsed_args, body['port'])
 
         return body
 
@@ -183,7 +225,8 @@ class DeletePort(neutronV20.DeleteCommand):
     log = logging.getLogger(__name__ + '.DeletePort')
 
 
-class UpdatePort(neutronV20.UpdateCommand, UpdatePortSecGroupMixin):
+class UpdatePort(neutronV20.UpdateCommand, UpdatePortSecGroupMixin,
+                 UpdateExtraDhcpOptMixin):
     """Update port's information."""
 
     resource = 'port'
@@ -191,8 +234,10 @@ class UpdatePort(neutronV20.UpdateCommand, UpdatePortSecGroupMixin):
 
     def add_known_arguments(self, parser):
         self.add_arguments_secgroup(parser)
+        self.add_arguments_extradhcpopt(parser)
 
     def args2body(self, parsed_args):
         body = {'port': {}}
         self.args2body_secgroup(parsed_args, body['port'])
+        self.args2body_extradhcpopt(parsed_args, body['port'])
         return body
