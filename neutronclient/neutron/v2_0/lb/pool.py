@@ -22,13 +22,18 @@ import logging
 from neutronclient.neutron import v2_0 as neutronV20
 
 
+def _format_provider(pool):
+    return pool.get('provider') or 'N/A'
+
+
 class ListPool(neutronV20.ListCommand):
     """List pools that belong to a given tenant."""
 
     resource = 'pool'
     log = logging.getLogger(__name__ + '.ListPool')
-    list_columns = ['id', 'name', 'lb_method', 'protocol',
+    list_columns = ['id', 'name', 'provider', 'lb_method', 'protocol',
                     'admin_state_up', 'status']
+    _formatters = {'provider': _format_provider}
     pagination_support = True
     sorting_support = True
 
@@ -73,6 +78,9 @@ class CreatePool(neutronV20.CreateCommand):
             '--subnet-id', metavar='SUBNET',
             required=True,
             help='the subnet on which the members of the pool will be located')
+        parser.add_argument(
+            '--provider',
+            help='provider name of loadbalancer service')
 
     def args2body(self, parsed_args):
         _subnet_id = neutronV20.find_resourceid_by_name_or_id(
@@ -85,7 +93,7 @@ class CreatePool(neutronV20.CreateCommand):
         }
         neutronV20.update_dict(parsed_args, body[self.resource],
                                ['description', 'lb_method', 'name',
-                                'protocol', 'tenant_id'])
+                                'protocol', 'tenant_id', 'provider'])
         return body
 
 
