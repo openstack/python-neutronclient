@@ -23,8 +23,7 @@ from neutronclient.neutron.v2_0 import parse_args_to_dict
 from neutronclient.openstack.common.gettextutils import _
 
 RESOURCE = 'network_profile'
-SEGMENT_TYPE_CHOICES = ['vlan', 'vxlan', 'multi-segment', 'trunk']
-SEGMENT_SUBTYPE_CHOICES = ['vlan', 'vxlan']
+SEGMENT_TYPE_CHOICES = ['vlan', 'overlay', 'multi-segment', 'trunk']
 
 
 class ListNetworkProfile(neutronV20.ListCommand):
@@ -58,9 +57,11 @@ class CreateNetworkProfile(neutronV20.CreateCommand):
         parser.add_argument('segment_type',
                             choices=SEGMENT_TYPE_CHOICES,
                             help='Segment type')
+        # TODO(Abhishek): Check on sub-type choices depending on segment_type
         parser.add_argument('--sub_type',
-                            choices=SEGMENT_SUBTYPE_CHOICES,
-                            help='Sub-type for the Segment')
+                            help='Sub-type for the segment. Available sub-'
+                            'types for overlay segments: native, enhanced; '
+                            'For trunk segments: vlan, overlay.')
         parser.add_argument('--segment_range',
                             help='Range for the Segment')
         parser.add_argument('--physical_network',
