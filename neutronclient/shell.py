@@ -42,6 +42,7 @@ from neutronclient.neutron.v2_0.lb import healthmonitor as lb_healthmonitor
 from neutronclient.neutron.v2_0.lb import member as lb_member
 from neutronclient.neutron.v2_0.lb import pool as lb_pool
 from neutronclient.neutron.v2_0.lb import vip as lb_vip
+from neutronclient.neutron.v2_0 import metering
 from neutronclient.neutron.v2_0 import network
 from neutronclient.neutron.v2_0 import networkprofile
 from neutronclient.neutron.v2_0 import nvp_qos_queue
@@ -250,6 +251,14 @@ COMMAND_V2 = {
     'vpn-ikepolicy-create': ikepolicy.CreateIKEPolicy,
     'vpn-ikepolicy-update': ikepolicy.UpdateIKEPolicy,
     'vpn-ikepolicy-delete': ikepolicy.DeleteIKEPolicy,
+    'meter-label-create': metering.CreateMeteringLabel,
+    'meter-label-list': metering.ListMeteringLabel,
+    'meter-label-show': metering.ShowMeteringLabel,
+    'meter-label-delete': metering.DeleteMeteringLabel,
+    'meter-label-rule-create': metering.CreateMeteringLabelRule,
+    'meter-label-rule-list': metering.ListMeteringLabelRule,
+    'meter-label-rule-show': metering.ShowMeteringLabelRule,
+    'meter-label-rule-delete': metering.DeleteMeteringLabelRule,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}
