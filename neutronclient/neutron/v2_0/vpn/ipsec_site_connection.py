@@ -100,12 +100,12 @@ class CreateIPsecSiteConnection(neutronv20.CreateCommand):
         parser.add_argument(
             '--peer-address',
             required=True,
-            help='Remote branch router public '
-                 'IPv4 address or IPv6 address or FQDN.')
+            help='Peer gateway public IPv4/IPv6 address or FQDN.')
         parser.add_argument(
             '--peer-id',
             required=True,
-            help='Remote branch router identity')
+            help='Peer router identity for authentication. Can be '
+                 'IPv4/IPv6 address, e-mail address, key id, or FQDN.')
         parser.add_argument(
             '--peer-cidr',
             action='append', dest='peer_cidrs',
