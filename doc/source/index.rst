@@ -61,3 +61,8 @@ Release Notes
 * made the publicURL the default endpoint instead of adminURL
 * add ability to update security group name (requires 2013.2-Havana or later)
 * add flake8 and pbr support for testing and building
+
+2.2.4
+-----
+* add compatibility layer to proxy neutronclient
+* removes all quantumclient code
