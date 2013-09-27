@@ -17,4 +17,8 @@
 
 from neutronclient.common.exceptions import *  # noqa
 
+
 QuantumException = NeutronException
+QuantumClientException = NeutronClientException
+QuantumCLIError = NeutronCLIError
+QuantumClientNoUniqueMatch = NeutronClientNoUniqueMatch

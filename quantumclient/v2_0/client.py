@@ -17,4 +17,6 @@
 
 from neutronclient.v2_0 import client
 
+exception_handler_v20 = client.exception_handler_v20
+APIParamsCall = client.APIParamsCall
 Client = client.Client
