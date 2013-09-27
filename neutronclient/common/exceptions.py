@@ -90,6 +90,10 @@ class AlreadyAttachedClient(NeutronClientException):
     pass
 
 
+class IpAddressGenerationFailureClient(NeutronClientException):
+    pass
+
+
 class Unauthorized(NeutronClientException):
     message = _("Unauthorized: bad credentials.")
 

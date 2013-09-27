@@ -49,7 +49,9 @@ def exception_handler_v20(status_code, error_content):
         'PortNotFound': exceptions.PortNotFoundClient,
         'RequestedStateInvalid': exceptions.StateInvalidClient,
         'PortInUse': exceptions.PortInUseClient,
-        'AlreadyAttached': exceptions.AlreadyAttachedClient, }
+        'AlreadyAttached': exceptions.AlreadyAttachedClient,
+        'IpAddressGenerationFailure':
+        exceptions.IpAddressGenerationFailureClient, }
 
     error_dict = None
     if isinstance(error_content, dict):
