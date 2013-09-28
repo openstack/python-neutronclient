@@ -17,11 +17,11 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-import json
 import logging
 import string
 
 from neutronclient.neutron import v2_0 as neutronv20
+from neutronclient.openstack.common.gettextutils import _
 
 
 def _format_firewall_rules(firewall_policy):
@@ -171,9 +171,10 @@ class FirewallPolicyInsertRule(neutronv20.UpdateCommand):
         _id = neutronv20.find_resourceid_by_name_or_id(neutron_client,
                                                        self.resource,
                                                        parsed_args.id)
-        policy_data = self.call_api(neutron_client, _id, body)
-        print json.dumps(policy_data)
-        return
+        self.call_api(neutron_client, _id, body)
+        print >>self.app.stdout, (
+            _('Inserted firewall rule in firewall policy %(id)s') %
+            {'id': parsed_args.id})
 
 
 class FirewallPolicyRemoveRule(neutronv20.UpdateCommand):
@@ -212,6 +213,7 @@ class FirewallPolicyRemoveRule(neutronv20.UpdateCommand):
         _id = neutronv20.find_resourceid_by_name_or_id(neutron_client,
                                                        self.resource,
                                                        parsed_args.id)
-        policy_data = self.call_api(neutron_client, _id, body)
-        print json.dumps(policy_data)
-        return
+        self.call_api(neutron_client, _id, body)
+        print >>self.app.stdout, (
+            _('Removed firewall rule from firewall policy %(id)s') %
+            {'id': parsed_args.id})
