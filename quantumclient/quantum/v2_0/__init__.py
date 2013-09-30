@@ -15,6 +15,7 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-from neutronclient.neutron.v2_0 import NeutronCommand
+from neutronclient.neutron import v2_0
 
-QuantumCommand = NeutronCommand
+QuantumCommand = v2_0.NeutronCommand
+find_resourceid_by_name_or_id = v2_0.find_resourceid_by_name_or_id
