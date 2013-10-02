@@ -150,6 +150,11 @@ class HTTPClient(httplib2.Http):
             # limit, decompression error, etc) into our custom high-level
             # connection exception (it is excepted in the upper layers of code)
             raise exceptions.ConnectionFailed(reason=e)
+        finally:
+            # Temporary Fix for gate failures. RPC calls and HTTP requests
+            # seem to be stepping on each other resulting in bogus fd's being
+            # picked up for making http requests
+            self.connections.clear()
         utils.http_log_resp(_logger, resp, body)
         status_code = self.get_status_code(resp)
         if status_code == 401:
