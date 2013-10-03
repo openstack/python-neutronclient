@@ -94,6 +94,10 @@ class IpAddressGenerationFailureClient(NeutronClientException):
     pass
 
 
+class ExternalIpAddressExhaustedClient(NeutronClientException):
+    pass
+
+
 class Unauthorized(NeutronClientException):
     message = _("Unauthorized: bad credentials.")
 

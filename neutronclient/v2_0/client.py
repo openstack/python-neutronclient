@@ -51,7 +51,9 @@ def exception_handler_v20(status_code, error_content):
         'PortInUse': exceptions.PortInUseClient,
         'AlreadyAttached': exceptions.AlreadyAttachedClient,
         'IpAddressGenerationFailure':
-        exceptions.IpAddressGenerationFailureClient, }
+        exceptions.IpAddressGenerationFailureClient,
+        'ExternalIpAddressExhausted':
+        exceptions.ExternalIpAddressExhaustedClient, }
 
     error_dict = None
     if isinstance(error_content, dict):
