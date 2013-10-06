@@ -46,6 +46,9 @@ class ClientManager(object):
     """Manages access to API clients, including authentication.
     """
     neutron = ClientCache(neutron_client.make_client)
+    # Provide support for old quantum commands (for example
+    # in stable versions)
+    quantum = neutron
 
     def __init__(self, token=None, url=None,
                  auth_url=None,
