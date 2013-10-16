@@ -4,5 +4,5 @@ cliff>=1.4.3
 httplib2
 iso8601>=0.1.4
 simplejson>=2.0.9
-six
-Babel>=0.9.6
+six>=1.4.1
+Babel>=1.3
