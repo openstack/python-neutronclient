@@ -121,11 +121,13 @@ class RetrievePoolStats(neutronV20.ShowCommand):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
         neutron_client.format = parsed_args.request_format
+        pool_id = neutronV20.find_resourceid_by_name_or_id(
+            self.get_client(), 'pool', parsed_args.id)
         params = {}
         if parsed_args.fields:
             params = {'fields': parsed_args.fields}
 
-        data = neutron_client.retrieve_pool_stats(parsed_args.id, **params)
+        data = neutron_client.retrieve_pool_stats(pool_id, **params)
         self.format_output_data(data)
         stats = data['stats']
         if 'stats' in data:
