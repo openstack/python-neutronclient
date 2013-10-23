@@ -148,6 +148,33 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
 
+    def test_refresh_token_no_auth_url(self):
+        self.mox.StubOutWithMock(self.client, "request")
+        self.client.auth_url = None
+
+        self.client.auth_token = TOKEN
+        self.client.endpoint_url = ENDPOINT_URL
+
+        res401 = self.mox.CreateMock(httplib2.Response)
+        res401.status = 401
+
+        # If a token is expired, neutron server returns 401
+        self.client.request(
+            mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
+            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+        ).AndReturn((res401, ''))
+        self.mox.ReplayAll()
+        self.assertRaises(exceptions.NoAuthURLProvided,
+                          self.client.do_request,
+                          '/resource',
+                          'GET')
+
+    def test_get_endpoint_url_with_invalid_auth_url(self):
+        # Handle the case when auth_url is not provided
+        self.client.auth_url = None
+        self.assertRaises(exceptions.NoAuthURLProvided,
+                          self.client._get_endpoint_url)
+
     def test_get_endpoint_url(self):
         self.mox.StubOutWithMock(self.client, "request")
 

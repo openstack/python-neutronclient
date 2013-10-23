@@ -151,6 +151,10 @@ class BadInputError(Exception):
     pass
 
 
+class NoAuthURLProvided(BadInputError):
+    message = _("auth_url was not provided to the Neutron client")
+
+
 class Error(Exception):
     def __init__(self, message=None):
         super(Error, self).__init__(message)
