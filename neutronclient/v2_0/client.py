@@ -73,9 +73,8 @@ def exception_handler_v20(status_code, error_content):
             ex = None
             try:
                 # raise the appropriate error!
-                ex = neutron_errors[error_type](message=error_message)
-                ex.args = ([dict(status_code=status_code,
-                                 message=error_message)], )
+                ex = neutron_errors[error_type](message=error_message,
+                                                status_code=status_code)
             except Exception:
                 pass
             if ex:
