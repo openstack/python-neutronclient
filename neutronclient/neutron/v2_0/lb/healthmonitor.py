@@ -109,6 +109,7 @@ class UpdateHealthMonitor(neutronV20.UpdateCommand):
 
     resource = 'health_monitor'
     log = logging.getLogger(__name__ + '.UpdateHealthMonitor')
+    allow_names = False
 
 
 class DeleteHealthMonitor(neutronV20.DeleteCommand):

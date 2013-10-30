@@ -173,6 +173,9 @@ class CLITestV20Base(testtools.TestCase):
             'neutronclient.neutron.v2_0.find_resourceid_by_name_or_id',
             self._find_resourceid))
         self.useFixture(fixtures.MonkeyPatch(
+            'neutronclient.neutron.v2_0.find_resourceid_by_id',
+            self._find_resourceid))
+        self.useFixture(fixtures.MonkeyPatch(
             'neutronclient.v2_0.client.Client.get_attr_metadata',
             self._get_attr_metadata))
         self.client = client.Client(token=TOKEN, endpoint_url=self.endurl)
