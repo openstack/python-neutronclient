@@ -415,6 +415,11 @@ class NeutronShell(app.App):
             help=argparse.SUPPRESS)
 
         parser.add_argument(
+            '--service-type', metavar='<service-type>',
+            default=env('OS_NETWORK_SERVICE_TYPE', default='network'),
+            help=_('Defaults to env[OS_NETWORK_SERVICE_TYPE] or network.'))
+
+        parser.add_argument(
             '--endpoint-type', metavar='<endpoint-type>',
             default=env('OS_ENDPOINT_TYPE', default='publicURL'),
             help=_('Defaults to env[OS_ENDPOINT_TYPE] or publicURL.'))
@@ -605,6 +610,7 @@ class NeutronShell(app.App):
             region_name=self.options.os_region_name,
             api_version=self.api_version,
             auth_strategy=self.options.os_auth_strategy,
+            service_type=self.options.service_type,
             endpoint_type=self.options.endpoint_type,
             insecure=self.options.insecure,
             ca_cert=self.options.os_cacert,

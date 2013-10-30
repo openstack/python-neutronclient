@@ -99,6 +99,7 @@ class HTTPClient(httplib2.Http):
                  endpoint_url=None, insecure=False,
                  endpoint_type='publicURL',
                  auth_strategy='keystone', ca_cert=None, log_credentials=False,
+                 service_type='network',
                  **kwargs):
         super(HTTPClient, self).__init__(timeout=timeout, ca_certs=ca_cert)
 
@@ -107,6 +108,7 @@ class HTTPClient(httplib2.Http):
         self.tenant_id = tenant_id
         self.password = password
         self.auth_url = auth_url.rstrip('/') if auth_url else None
+        self.service_type = service_type
         self.endpoint_type = endpoint_type
         self.region_name = region_name
         self.auth_token = token
@@ -212,6 +214,7 @@ class HTTPClient(httplib2.Http):
         if not self.endpoint_url:
             self.endpoint_url = self.service_catalog.url_for(
                 attr='region', filter_value=self.region_name,
+                service_type=self.service_type,
                 endpoint_type=self.endpoint_type)
 
     def authenticate(self):
