@@ -49,6 +49,7 @@ def exception_handler_v20(status_code, error_content):
         'PortNotFound': exceptions.PortNotFoundClient,
         'RequestedStateInvalid': exceptions.StateInvalidClient,
         'PortInUse': exceptions.PortInUseClient,
+        'IpAddressInUse': exceptions.IpAddressInUseClient,
         'AlreadyAttached': exceptions.AlreadyAttachedClient,
         'IpAddressGenerationFailure':
         exceptions.IpAddressGenerationFailureClient,

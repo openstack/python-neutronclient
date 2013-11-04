@@ -86,6 +86,10 @@ class PortInUseClient(NeutronClientException):
     pass
 
 
+class IpAddressInUseClient(NeutronClientException):
+    pass
+
+
 class AlreadyAttachedClient(NeutronClientException):
     pass
 
