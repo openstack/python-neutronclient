@@ -17,6 +17,7 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+import argparse
 import logging
 
 from neutronclient.neutron import v2_0 as neutronv20
@@ -59,7 +60,8 @@ class CreateFirewall(neutronv20.CreateCommand):
         parser.add_argument(
             '--shared',
             action='store_true',
-            help='set shared to True (default False)')
+            help='set shared to True (default False)',
+            default=argparse.SUPPRESS)
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state',
