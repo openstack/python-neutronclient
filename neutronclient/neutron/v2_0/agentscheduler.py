@@ -33,10 +33,10 @@ class AddNetworkToDhcpAgent(neutronV20.NeutronCommand):
         parser = super(AddNetworkToDhcpAgent, self).get_parser(prog_name)
         parser.add_argument(
             'dhcp_agent',
-            help='ID of the DHCP agent')
+            help=_('ID of the DHCP agent'))
         parser.add_argument(
             'network',
-            help='network to add')
+            help=_('Network to add'))
         return parser
 
     def run(self, parsed_args):
@@ -59,10 +59,10 @@ class RemoveNetworkFromDhcpAgent(neutronV20.NeutronCommand):
         parser = super(RemoveNetworkFromDhcpAgent, self).get_parser(prog_name)
         parser.add_argument(
             'dhcp_agent',
-            help='ID of the DHCP agent')
+            help=_('ID of the DHCP agent'))
         parser.add_argument(
             'network',
-            help='network to remove')
+            help=_('Network to remove'))
         return parser
 
     def run(self, parsed_args):
@@ -88,7 +88,7 @@ class ListNetworksOnDhcpAgent(network.ListNetwork):
                        self).get_parser(prog_name)
         parser.add_argument(
             'dhcp_agent',
-            help='ID of the DHCP agent')
+            help=_('ID of the DHCP agent'))
         return parser
 
     def call_server(self, neutron_client, search_opts, parsed_args):
@@ -111,7 +111,7 @@ class ListDhcpAgentsHostingNetwork(neutronV20.ListCommand):
                        self).get_parser(prog_name)
         parser.add_argument(
             'network',
-            help='network to query')
+            help=_('Network to query'))
         return parser
 
     def extend_list(self, data, parsed_args):
@@ -136,10 +136,10 @@ class AddRouterToL3Agent(neutronV20.NeutronCommand):
         parser = super(AddRouterToL3Agent, self).get_parser(prog_name)
         parser.add_argument(
             'l3_agent',
-            help='ID of the L3 agent')
+            help=_('ID of the L3 agent'))
         parser.add_argument(
             'router',
-            help='router to add')
+            help=_('Router to add'))
         return parser
 
     def run(self, parsed_args):
@@ -163,10 +163,10 @@ class RemoveRouterFromL3Agent(neutronV20.NeutronCommand):
         parser = super(RemoveRouterFromL3Agent, self).get_parser(prog_name)
         parser.add_argument(
             'l3_agent',
-            help='ID of the L3 agent')
+            help=_('ID of the L3 agent'))
         parser.add_argument(
             'router',
-            help='router to remove')
+            help=_('Router to remove'))
         return parser
 
     def run(self, parsed_args):
@@ -196,7 +196,7 @@ class ListRoutersOnL3Agent(neutronV20.ListCommand):
                        self).get_parser(prog_name)
         parser.add_argument(
             'l3_agent',
-            help='ID of the L3 agent to query')
+            help=_('ID of the L3 agent to query'))
         return parser
 
     def call_server(self, neutron_client, search_opts, parsed_args):
@@ -218,7 +218,7 @@ class ListL3AgentsHostingRouter(neutronV20.ListCommand):
         parser = super(ListL3AgentsHostingRouter,
                        self).get_parser(prog_name)
         parser.add_argument('router',
-                            help='router to query')
+                            help=_('Router to query'))
         return parser
 
     def extend_list(self, data, parsed_args):
@@ -247,7 +247,7 @@ class ListPoolsOnLbaasAgent(neutronV20.ListCommand):
         parser = super(ListPoolsOnLbaasAgent, self).get_parser(prog_name)
         parser.add_argument(
             'lbaas_agent',
-            help='ID of the loadbalancer agent to query')
+            help=_('ID of the loadbalancer agent to query'))
         return parser
 
     def call_server(self, neutron_client, search_opts, parsed_args):
@@ -272,7 +272,7 @@ class GetLbaasAgentHostingPool(neutronV20.ListCommand):
         parser = super(GetLbaasAgentHostingPool,
                        self).get_parser(prog_name)
         parser.add_argument('pool',
-                            help='pool to query')
+                            help=_('Pool to query'))
         return parser
 
     def extend_list(self, data, parsed_args):

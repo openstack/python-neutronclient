@@ -20,6 +20,7 @@ import logging
 
 from neutronclient.common import exceptions
 from neutronclient.neutron import v2_0 as neutronV20
+from neutronclient.openstack.common.gettextutils import _
 
 
 def _format_subnets(network):
@@ -114,7 +115,7 @@ class CreateNetwork(neutronV20.CreateCommand):
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help='Set Admin State Up to false')
+            help=_('Set Admin State Up to false'))
         parser.add_argument(
             '--admin_state_down',
             dest='admin_state', action='store_false',
@@ -122,11 +123,11 @@ class CreateNetwork(neutronV20.CreateCommand):
         parser.add_argument(
             '--shared',
             action='store_true',
-            help='Set the network as shared',
+            help=_('Set the network as shared'),
             default=argparse.SUPPRESS)
         parser.add_argument(
             'name', metavar='NAME',
-            help='Name of network to create')
+            help=_('Name of network to create'))
 
     def args2body(self, parsed_args):
         body = {'network': {

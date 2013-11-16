@@ -58,6 +58,7 @@ from neutronclient.neutron.v2_0.vpn import ikepolicy
 from neutronclient.neutron.v2_0.vpn import ipsec_site_connection
 from neutronclient.neutron.v2_0.vpn import ipsecpolicy
 from neutronclient.neutron.v2_0.vpn import vpnservice
+from neutronclient.openstack.common.gettextutils import _
 from neutronclient.openstack.common import strutils
 from neutronclient.version import __version__
 
@@ -276,7 +277,7 @@ class HelpAction(argparse.Action):
         max_len = 0
         app = self.default
         parser.print_help(app.stdout)
-        app.stdout.write('\nCommands for API v%s:\n' % app.api_version)
+        app.stdout.write(_('\nCommands for API v%s:\n') % app.api_version)
         command_manager = app.command_manager
         for name, ep in sorted(command_manager):
             factory = ep.load()
@@ -332,31 +333,31 @@ class NeutronShell(app.App):
             action='count',
             dest='verbose_level',
             default=self.DEFAULT_VERBOSE_LEVEL,
-            help='Increase verbosity of output. Can be repeated.', )
+            help=_('Increase verbosity of output. Can be repeated.'))
         parser.add_argument(
             '-q', '--quiet',
             action='store_const',
             dest='verbose_level',
             const=0,
-            help='suppress output except warnings and errors', )
+            help=_('Suppress output except warnings and errors'))
         parser.add_argument(
             '-h', '--help',
             action=HelpAction,
             nargs=0,
             default=self,  # tricky
-            help="show this help message and exit", )
+            help=_("Show this help message and exit"))
         parser.add_argument(
             '--debug',
             default=False,
             action='store_true',
-            help='show tracebacks on errors', )
+            help=_('Show tracebacks on errors'))
         # Global arguments
         parser.add_argument(
             '--os-auth-strategy', metavar='<auth-strategy>',
             default=env('OS_AUTH_STRATEGY', default='keystone'),
-            help='Authentication strategy (Env: OS_AUTH_STRATEGY'
+            help=_('Authentication strategy (Env: OS_AUTH_STRATEGY'
             ', default keystone). For now, any other value will'
-            ' disable the authentication')
+            ' disable the authentication'))
         parser.add_argument(
             '--os_auth_strategy',
             help=argparse.SUPPRESS)
@@ -364,7 +365,7 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-auth-url', metavar='<auth-url>',
             default=env('OS_AUTH_URL'),
-            help='Authentication URL (Env: OS_AUTH_URL)')
+            help=_('Authentication URL (Env: OS_AUTH_URL)'))
         parser.add_argument(
             '--os_auth_url',
             help=argparse.SUPPRESS)
@@ -372,7 +373,7 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-tenant-name', metavar='<auth-tenant-name>',
             default=env('OS_TENANT_NAME'),
-            help='Authentication tenant name (Env: OS_TENANT_NAME)')
+            help=_('Authentication tenant name (Env: OS_TENANT_NAME)'))
         parser.add_argument(
             '--os_tenant_name',
             help=argparse.SUPPRESS)
@@ -380,12 +381,12 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-tenant-id', metavar='<auth-tenant-id>',
             default=env('OS_TENANT_ID'),
-            help='Authentication tenant name (Env: OS_TENANT_ID)')
+            help=_('Authentication tenant name (Env: OS_TENANT_ID)'))
 
         parser.add_argument(
             '--os-username', metavar='<auth-username>',
             default=utils.env('OS_USERNAME'),
-            help='Authentication username (Env: OS_USERNAME)')
+            help=_('Authentication username (Env: OS_USERNAME)'))
         parser.add_argument(
             '--os_username',
             help=argparse.SUPPRESS)
@@ -393,7 +394,7 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-password', metavar='<auth-password>',
             default=utils.env('OS_PASSWORD'),
-            help='Authentication password (Env: OS_PASSWORD)')
+            help=_('Authentication password (Env: OS_PASSWORD)'))
         parser.add_argument(
             '--os_password',
             help=argparse.SUPPRESS)
@@ -401,7 +402,7 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-region-name', metavar='<auth-region-name>',
             default=env('OS_REGION_NAME'),
-            help='Authentication region name (Env: OS_REGION_NAME)')
+            help=_('Authentication region name (Env: OS_REGION_NAME)'))
         parser.add_argument(
             '--os_region_name',
             help=argparse.SUPPRESS)
@@ -409,7 +410,7 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-token', metavar='<token>',
             default=env('OS_TOKEN'),
-            help='Defaults to env[OS_TOKEN]')
+            help=_('Defaults to env[OS_TOKEN]'))
         parser.add_argument(
             '--os_token',
             help=argparse.SUPPRESS)
@@ -417,12 +418,12 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--endpoint-type', metavar='<endpoint-type>',
             default=env('OS_ENDPOINT_TYPE', default='publicURL'),
-            help='Defaults to env[OS_ENDPOINT_TYPE] or publicURL.')
+            help=_('Defaults to env[OS_ENDPOINT_TYPE] or publicURL.'))
 
         parser.add_argument(
             '--os-url', metavar='<url>',
             default=env('OS_URL'),
-            help='Defaults to env[OS_URL]')
+            help=_('Defaults to env[OS_URL]'))
         parser.add_argument(
             '--os_url',
             help=argparse.SUPPRESS)
@@ -431,18 +432,18 @@ class NeutronShell(app.App):
             '--os-cacert',
             metavar='<ca-certificate>',
             default=env('OS_CACERT', default=None),
-            help="Specify a CA bundle file to use in "
-                 "verifying a TLS (https) server certificate. "
-                 "Defaults to env[OS_CACERT]")
+            help=_("Specify a CA bundle file to use in "
+                   "verifying a TLS (https) server certificate. "
+                   "Defaults to env[OS_CACERT]"))
 
         parser.add_argument(
             '--insecure',
             action='store_true',
             default=env('NEUTRONCLIENT_INSECURE', default=False),
-            help="Explicitly allow neutronclient to perform \"insecure\" "
-                 "SSL (https) requests. The server's certificate will "
-                 "not be verified against any certificate authorities. "
-                 "This option should be used with caution.")
+            help=_("Explicitly allow neutronclient to perform \"insecure\" "
+                   "SSL (https) requests. The server's certificate will "
+                   "not be verified against any certificate authorities. "
+                   "This option should be used with caution."))
 
         return parser
 
@@ -535,7 +536,7 @@ class NeutronShell(app.App):
                 if self.options.debug:
                     self.log.exception(unicode(err2))
                 else:
-                    self.log.error('Could not clean up: %s', unicode(err2))
+                    self.log.error(_('Could not clean up: %s'), unicode(err2))
             if self.options.debug:
                 raise
         else:
@@ -545,7 +546,7 @@ class NeutronShell(app.App):
                 if self.options.debug:
                     self.log.exception(unicode(err3))
                 else:
-                    self.log.error('Could not clean up: %s', unicode(err3))
+                    self.log.error(_('Could not clean up: %s'), unicode(err3))
         return result
 
     def authenticate_user(self):
@@ -557,42 +558,42 @@ class NeutronShell(app.App):
                 # Token flow auth takes priority
                 if not self.options.os_token:
                     raise exc.CommandError(
-                        "You must provide a token via"
-                        " either --os-token or env[OS_TOKEN]")
+                        _("You must provide a token via"
+                          " either --os-token or env[OS_TOKEN]"))
 
                 if not self.options.os_url:
                     raise exc.CommandError(
-                        "You must provide a service URL via"
-                        " either --os-url or env[OS_URL]")
+                        _("You must provide a service URL via"
+                          " either --os-url or env[OS_URL]"))
 
             else:
                 # Validate password flow auth
                 if not self.options.os_username:
                     raise exc.CommandError(
-                        "You must provide a username via"
-                        " either --os-username or env[OS_USERNAME]")
+                        _("You must provide a username via"
+                          " either --os-username or env[OS_USERNAME]"))
 
                 if not self.options.os_password:
                     raise exc.CommandError(
-                        "You must provide a password via"
-                        " either --os-password or env[OS_PASSWORD]")
+                        _("You must provide a password via"
+                          " either --os-password or env[OS_PASSWORD]"))
 
                 if (not self.options.os_tenant_name
                     and not self.options.os_tenant_id):
                     raise exc.CommandError(
-                        "You must provide a tenant_name or tenant_id via"
-                        "  --os-tenant-name, env[OS_TENANT_NAME]"
-                        "  --os-tenant-id, or via env[OS_TENANT_ID]")
+                        _("You must provide a tenant_name or tenant_id via"
+                          "  --os-tenant-name, env[OS_TENANT_NAME]"
+                          "  --os-tenant-id, or via env[OS_TENANT_ID]"))
 
                 if not self.options.os_auth_url:
                     raise exc.CommandError(
-                        "You must provide an auth url via"
-                        " either --os-auth-url or via env[OS_AUTH_URL]")
+                        _("You must provide an auth url via"
+                          " either --os-auth-url or via env[OS_AUTH_URL]"))
         else:   # not keystone
             if not self.options.os_url:
                 raise exc.CommandError(
-                    "You must provide a service URL via"
-                    " either --os-url or env[OS_URL]")
+                    _("You must provide a service URL via"
+                      " either --os-url or env[OS_URL]"))
 
         self.client_manager = clientmanager.ClientManager(
             token=self.options.os_token,
@@ -634,7 +635,7 @@ class NeutronShell(app.App):
     def clean_up(self, cmd, result, err):
         self.log.debug('clean_up %s', cmd.__class__.__name__)
         if err:
-            self.log.debug('got an error: %s', unicode(err))
+            self.log.debug(_('Got an error: %s'), unicode(err))
 
     def configure_logging(self):
         """Create logging handlers for any log output."""

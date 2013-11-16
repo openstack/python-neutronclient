@@ -1123,7 +1123,7 @@ class Client(object):
 
     def _handle_fault_response(self, status_code, response_body):
         # Create exception with HTTP status code and message
-        _logger.debug("Error message: %s", response_body)
+        _logger.debug(_("Error message: %s"), response_body)
         # Add deserialized error message to exception arguments
         try:
             des_error_body = self.deserialize(response_body, status_code)
@@ -1190,7 +1190,7 @@ class Client(object):
             return serializer.Serializer(
                 self.get_attr_metadata()).serialize(data, self.content_type())
         else:
-            raise Exception("unable to serialize object of type = '%s'" %
+            raise Exception(_("Unable to serialize object of type = '%s'") %
                             type(data))
 
     def deserialize(self, data, status_code):

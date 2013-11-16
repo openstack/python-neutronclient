@@ -22,6 +22,7 @@ import logging
 from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronv20
 from neutronclient.neutron.v2_0.vpn import utils as vpn_utils
+from neutronclient.openstack.common.gettextutils import _
 
 
 class ListIPsecPolicy(neutronv20.ListCommand):
@@ -52,30 +53,30 @@ class CreateIPsecPolicy(neutronv20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--description',
-            help='Description of the IPsecPolicy')
+            help=_('Description of the IPsecPolicy'))
         parser.add_argument(
             '--transform-protocol',
             default='esp', choices=['esp', 'ah', 'ah-esp'],
-            help='Transform Protocol in lowercase, default:esp')
+            help=_('Transform Protocol in lowercase, default:esp'))
         parser.add_argument(
             '--auth-algorithm',
             default='sha1', choices=['sha1'],
-            help='Authentication algorithm in lowercase, default:sha1')
+            help=_('Authentication algorithm in lowercase, default:sha1'))
         parser.add_argument(
             '--encryption-algorithm',
             default='aes-128', choices=['3des',
                                         'aes-128',
                                         'aes-192',
                                         'aes-256'],
-            help='Encryption Algorithm in lowercase, default:aes-128')
+            help=_('Encryption Algorithm in lowercase, default:aes-128'))
         parser.add_argument(
             '--encapsulation-mode',
             default='tunnel', choices=['tunnel', 'transport'],
-            help='Encapsulation Mode in lowercase, default:tunnel')
+            help=_('Encapsulation Mode in lowercase, default:tunnel'))
         parser.add_argument(
             '--pfs',
             default='group5', choices=['group2', 'group5', 'group14'],
-            help='Perfect Forward Secrecy in lowercase, default:group5')
+            help=_('Perfect Forward Secrecy in lowercase, default:group5'))
         parser.add_argument(
             '--lifetime',
             metavar="units=UNITS,value=VALUE",
@@ -83,7 +84,7 @@ class CreateIPsecPolicy(neutronv20.CreateCommand):
             help=vpn_utils.lifetime_help("IPsec"))
         parser.add_argument(
             'name', metavar='NAME',
-            help='Name of the IPsecPolicy')
+            help=_('Name of the IPsecPolicy'))
 
     def args2body(self, parsed_args):
 

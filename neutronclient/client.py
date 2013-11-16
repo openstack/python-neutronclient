@@ -31,6 +31,7 @@ import httplib2
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
+from neutronclient.openstack.common.gettextutils import _
 
 _logger = logging.getLogger(__name__)
 
@@ -215,7 +216,7 @@ class HTTPClient(httplib2.Http):
 
     def authenticate(self):
         if self.auth_strategy != 'keystone':
-            raise exceptions.Unauthorized(message='unknown auth strategy')
+            raise exceptions.Unauthorized(message=_('Unknown auth strategy'))
         if self.tenant_id:
             body = {'auth': {'passwordCredentials':
                              {'username': self.username,

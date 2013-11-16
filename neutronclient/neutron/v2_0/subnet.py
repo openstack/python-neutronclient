@@ -21,6 +21,7 @@ import logging
 from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
+from neutronclient.openstack.common.gettextutils import _
 
 
 def _format_allocation_pools(subnet):
@@ -76,12 +77,12 @@ class CreateSubnet(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--name',
-            help='name of this subnet')
+            help=_('Name of this subnet'))
         parser.add_argument(
             '--ip-version',
             type=int,
             default=4, choices=[4, 6],
-            help='IP version with default 4')
+            help=_('IP version with default 4'))
         parser.add_argument(
             '--ip_version',
             type=int,
@@ -89,16 +90,16 @@ class CreateSubnet(neutronV20.CreateCommand):
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--gateway', metavar='GATEWAY_IP',
-            help='gateway ip of this subnet')
+            help=_('Gateway ip of this subnet'))
         parser.add_argument(
             '--no-gateway',
             action='store_true',
-            help='No distribution of gateway')
+            help=_('No distribution of gateway'))
         parser.add_argument(
             '--allocation-pool', metavar='start=IP_ADDR,end=IP_ADDR',
             action='append', dest='allocation_pools', type=utils.str2dict,
-            help='Allocation pool IP addresses for this subnet '
-            '(This option can be repeated)')
+            help=_('Allocation pool IP addresses for this subnet '
+            '(This option can be repeated)'))
         parser.add_argument(
             '--allocation_pool',
             action='append', dest='allocation_pools', type=utils.str2dict,
@@ -106,22 +107,22 @@ class CreateSubnet(neutronV20.CreateCommand):
         parser.add_argument(
             '--host-route', metavar='destination=CIDR,nexthop=IP_ADDR',
             action='append', dest='host_routes', type=utils.str2dict,
-            help='Additional route (This option can be repeated)')
+            help=_('Additional route (This option can be repeated)'))
         parser.add_argument(
             '--dns-nameserver', metavar='DNS_NAMESERVER',
             action='append', dest='dns_nameservers',
-            help='DNS name server for this subnet '
-            '(This option can be repeated)')
+            help=_('DNS name server for this subnet '
+            '(This option can be repeated)'))
         parser.add_argument(
             '--disable-dhcp',
             action='store_true',
-            help='Disable DHCP for this subnet')
+            help=_('Disable DHCP for this subnet'))
         parser.add_argument(
             'network_id', metavar='NETWORK',
-            help='network id or name this subnet belongs to')
+            help=_('Network id or name this subnet belongs to'))
         parser.add_argument(
             'cidr', metavar='CIDR',
-            help='cidr of subnet to create')
+            help=_('CIDR of subnet to create'))
 
     def args2body(self, parsed_args):
         _network_id = neutronV20.find_resourceid_by_name_or_id(
@@ -131,9 +132,9 @@ class CreateSubnet(neutronV20.CreateCommand):
                            'ip_version': parsed_args.ip_version, }, }
 
         if parsed_args.gateway and parsed_args.no_gateway:
-            raise exceptions.CommandError("--gateway option and "
+            raise exceptions.CommandError(_("--gateway option and "
                                           "--no-gateway option can "
-                                          "not be used same time")
+                                          "not be used same time"))
         if parsed_args.no_gateway:
             body['subnet'].update({'gateway_ip': None})
         if parsed_args.gateway:

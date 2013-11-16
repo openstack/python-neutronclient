@@ -50,17 +50,17 @@ class CreateFloatingIP(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'floating_network_id', metavar='FLOATING_NETWORK',
-            help='Network name or id to allocate floating IP from')
+            help=_('Network name or id to allocate floating IP from'))
         parser.add_argument(
             '--port-id',
-            help='ID of the port to be associated with the floatingip')
+            help=_('ID of the port to be associated with the floatingip'))
         parser.add_argument(
             '--port_id',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--fixed-ip-address',
-            help=('IP address on the port (only required if port has multiple'
-                  'IPs)'))
+            help=_('IP address on the port (only required if port has multiple'
+                   'IPs)'))
         parser.add_argument(
             '--fixed_ip_address',
             help=argparse.SUPPRESS)
@@ -98,14 +98,15 @@ class AssociateFloatingIP(neutronV20.NeutronCommand):
         parser = super(AssociateFloatingIP, self).get_parser(prog_name)
         parser.add_argument(
             'floatingip_id', metavar='FLOATINGIP_ID',
-            help='ID of the floating IP to associate')
+            help=_('ID of the floating IP to associate'))
         parser.add_argument(
             'port_id', metavar='PORT',
-            help='ID or name of the port to be associated with the floatingip')
+            help=_('ID or name of the port to be associated with the '
+                   'floatingip'))
         parser.add_argument(
             '--fixed-ip-address',
-            help=('IP address on the port (only required if port has multiple'
-                  'IPs)'))
+            help=_('IP address on the port (only required if port has multiple'
+                   'IPs)'))
         parser.add_argument(
             '--fixed_ip_address',
             help=argparse.SUPPRESS)
@@ -138,7 +139,7 @@ class DisassociateFloatingIP(neutronV20.NeutronCommand):
         parser = super(DisassociateFloatingIP, self).get_parser(prog_name)
         parser.add_argument(
             'floatingip_id', metavar='FLOATINGIP_ID',
-            help='ID of the floating IP to associate')
+            help=_('ID of the floating IP to associate'))
         return parser
 
     def run(self, parsed_args):

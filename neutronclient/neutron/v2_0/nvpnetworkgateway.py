@@ -48,14 +48,14 @@ class CreateNetworkGateway(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'name', metavar='NAME',
-            help='Name of network gateway to create')
+            help=_('Name of network gateway to create'))
         parser.add_argument(
             '--device',
             action='append',
-            help='device info for this gateway '
+            help=_('Device info for this gateway '
             'device_id=<device identifier>,'
             'interface_name=<name_or_identifier> '
-            'It can be repeated for multiple devices for HA gateways')
+            'It can be repeated for multiple devices for HA gateways'))
 
     def args2body(self, parsed_args):
         body = {self.resource: {
@@ -95,18 +95,18 @@ class NetworkGatewayInterfaceCommand(neutronV20.NeutronCommand):
                        self).get_parser(prog_name)
         parser.add_argument(
             'net_gateway_id', metavar='NET-GATEWAY-ID',
-            help='ID of the network gateway')
+            help=_('ID of the network gateway'))
         parser.add_argument(
             'network_id', metavar='NETWORK-ID',
-            help='ID of the internal network to connect on the gateway')
+            help=_('ID of the internal network to connect on the gateway'))
         parser.add_argument(
             '--segmentation-type',
-            help=('L2 segmentation strategy on the external side of '
-                  'the gateway (e.g.: VLAN, FLAT)'))
+            help=_('L2 segmentation strategy on the external side of '
+                   'the gateway (e.g.: VLAN, FLAT)'))
         parser.add_argument(
             '--segmentation-id',
-            help=('Identifier for the L2 segment on the external side '
-                  'of the gateway'))
+            help=_('Identifier for the L2 segment on the external side '
+                   'of the gateway'))
         return parser
 
     def retrieve_ids(self, client, args):

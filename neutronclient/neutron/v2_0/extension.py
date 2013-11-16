@@ -18,6 +18,7 @@
 import logging
 
 from neutronclient.neutron import v2_0 as cmd_base
+from neutronclient.openstack.common.gettextutils import _
 
 
 class ListExt(cmd_base.ListCommand):
@@ -40,5 +41,5 @@ class ShowExt(cmd_base.ShowCommand):
         cmd_base.add_show_list_common_argument(parser)
         parser.add_argument(
             'id', metavar='EXT-ALIAS',
-            help='the extension alias')
+            help=_('The extension alias'))
         return parser

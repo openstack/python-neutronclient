@@ -53,23 +53,23 @@ class CreateNetworkProfile(neutronV20.CreateCommand):
 
     def add_known_arguments(self, parser):
         parser.add_argument('name',
-                            help='Name for Network Profile')
+                            help=_('Name for Network Profile'))
         parser.add_argument('segment_type',
                             choices=SEGMENT_TYPE_CHOICES,
                             help='Segment type')
         # TODO(Abhishek): Check on sub-type choices depending on segment_type
         parser.add_argument('--sub_type',
-                            help='Sub-type for the segment. Available sub-'
+                            help=_('Sub-type for the segment. Available sub-'
                             'types for overlay segments: native, enhanced; '
-                            'For trunk segments: vlan, overlay.')
+                            'For trunk segments: vlan, overlay.'))
         parser.add_argument('--segment_range',
-                            help='Range for the Segment')
+                            help=_('Range for the Segment'))
         parser.add_argument('--physical_network',
-                            help='Name for the Physical Network')
+                            help=_('Name for the Physical Network'))
         parser.add_argument('--multicast_ip_range',
-                            help='Multicast IPv4 Range')
+                            help=_('Multicast IPv4 Range'))
         parser.add_argument("--add-tenant",
-                            help="Add tenant to the network profile")
+                            help=_("Add tenant to the network profile"))
 
     def args2body(self, parsed_args):
         body = {'network_profile': {'name': parsed_args.name}}

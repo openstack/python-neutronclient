@@ -17,6 +17,7 @@
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
+from neutronclient.openstack.common.gettextutils import _
 
 
 API_NAME = 'network'
@@ -49,7 +50,8 @@ def make_client(instance):
                                 ca_cert=instance._ca_cert)
         return client
     else:
-        raise exceptions.UnsupportedVersion("API version %s is not supported" %
+        raise exceptions.UnsupportedVersion(_("API version %s is not "
+                                              "supported") %
                                             instance._api_version[API_NAME])
 
 

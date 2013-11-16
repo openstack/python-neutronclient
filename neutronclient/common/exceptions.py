@@ -120,7 +120,7 @@ class EndpointTypeNotFound(NeutronClientException):
     """Could not find endpoint type in Service Catalog."""
 
     def __str__(self):
-        msg = "Could not find endpoint type %s in Service Catalog."
+        msg = _("Could not find endpoint type %s in Service Catalog.")
         return msg % repr(self.message)
 
 
@@ -128,7 +128,7 @@ class AmbiguousEndpoints(NeutronClientException):
     """Found more than one matching endpoint in Service Catalog."""
 
     def __str__(self):
-        return "AmbiguousEndpoints: %s" % repr(self.message)
+        return _("AmbiguousEndpoints: %s") % repr(self.message)
 
 
 class NeutronCLIError(NeutronClientException):

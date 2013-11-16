@@ -26,6 +26,7 @@ import logging
 import os
 import sys
 
+from neutronclient.common import _
 from neutronclient.common import exceptions
 from neutronclient.openstack.common import strutils
 
@@ -97,8 +98,10 @@ def get_client_class(api_name, version, version_map):
     try:
         client_path = version_map[str(version)]
     except (KeyError, ValueError):
-        msg = "Invalid %s client version '%s'. must be one of: %s" % (
-              (api_name, version, ', '.join(version_map.keys())))
+        msg = _("Invalid %(api_name)s client version '%(version)s'. must be "
+                "one of: %(map_keys)s")
+        msg = msg % {'api_name': api_name, 'version': version,
+                     'map_keys': ', '.join(version_map.keys())}
         raise exceptions.UnsupportedVersion(msg)
 
     return import_class(client_path)
@@ -170,13 +173,13 @@ def http_log_req(_logger, args, kwargs):
     if 'body' in kwargs and kwargs['body']:
         string_parts.append(" -d '%s'" % (kwargs['body']))
     string_parts = safe_encode_list(string_parts)
-    _logger.debug("\nREQ: %s\n" % "".join(string_parts))
+    _logger.debug(_("\nREQ: %s\n"), "".join(string_parts))
 
 
 def http_log_resp(_logger, resp, body):
     if not _logger.isEnabledFor(logging.DEBUG):
         return
-    _logger.debug("RESP:%s %s\n", resp, body)
+    _logger.debug(_("RESP:%(resp)s %(body)s\n"), {'resp': resp, 'body': body})
 
 
 def _safe_encode_without_obj(data):
