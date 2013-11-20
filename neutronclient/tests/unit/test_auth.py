@@ -36,6 +36,7 @@ ENDPOINT_URL = 'localurl'
 ENDPOINT_OVERRIDE = 'otherurl'
 TOKEN = 'tokentoken'
 REGION = 'RegionTest'
+NOAUTH = 'noauth'
 
 KS_TOKEN_RESULT = {
     'access': {
@@ -65,6 +66,37 @@ ENDPOINTS_RESULT = {
         'publicURL': ENDPOINT_URL
     }]
 }
+
+
+class CLITestAuthNoAuth(testtools.TestCase):
+
+    def setUp(self):
+        """Prepare the test environment."""
+        super(CLITestAuthNoAuth, self).setUp()
+        self.mox = mox.Mox()
+        self.client = client.HTTPClient(username=USERNAME,
+                                        tenant_name=TENANT_NAME,
+                                        password=PASSWORD,
+                                        endpoint_url=ENDPOINT_URL,
+                                        auth_strategy=NOAUTH,
+                                        region_name=REGION)
+        self.addCleanup(self.mox.VerifyAll)
+        self.addCleanup(self.mox.UnsetStubs)
+
+    def test_get_noauth(self):
+        self.mox.StubOutWithMock(self.client, "request")
+
+        res200 = self.mox.CreateMock(httplib2.Response)
+        res200.status = 200
+
+        self.client.request(
+            mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
+            headers=mox.IsA(dict),
+        ).AndReturn((res200, ''))
+        self.mox.ReplayAll()
+
+        self.client.do_request('/resource', 'GET')
+        self.assertEqual(self.client.endpoint_url, ENDPOINT_URL)
 
 
 class CLITestAuthKeystone(testtools.TestCase):
