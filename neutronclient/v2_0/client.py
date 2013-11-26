@@ -15,6 +15,8 @@
 #    under the License.
 #
 
+import inspect
+import itertools
 import logging
 import time
 
@@ -24,6 +26,7 @@ import six.moves.urllib.parse as urlparse
 from neutronclient import client
 from neutronclient.common import constants
 from neutronclient.common import exceptions
+from neutronclient.common import extension as client_extension
 from neutronclient.common import serializer
 from neutronclient.common import utils
 from neutronclient.i18n import _
@@ -452,6 +455,36 @@ class Client(ClientBase):
                      'lbaas_members': 'lbaas_member',
                      'healthmonitors': 'healthmonitor',
                      }
+
+    @APIParamsCall
+    def list_ext(self, path, **_params):
+        """Client extension hook for lists.
+        """
+        return self.get(path, params=_params)
+
+    @APIParamsCall
+    def show_ext(self, path, id, **_params):
+        """Client extension hook for shows.
+        """
+        return self.get(path % id, params=_params)
+
+    @APIParamsCall
+    def create_ext(self, path, body=None):
+        """Client extension hook for creates.
+        """
+        return self.post(path, body=body)
+
+    @APIParamsCall
+    def update_ext(self, path, id, body=None):
+        """Client extension hook for updates.
+        """
+        return self.put(path % id, body=body)
+
+    @APIParamsCall
+    def delete_ext(self, path, id):
+        """Client extension hook for deletes.
+        """
+        return self.delete(path % id)
 
     @APIParamsCall
     def get_quotas_tenant(self, **_params):
@@ -1523,3 +1556,59 @@ class Client(ClientBase):
     def delete_packet_filter(self, packet_filter_id):
         """Delete the specified packet filter."""
         return self.delete(self.packet_filter_path % packet_filter_id)
+
+    def __init__(self, **kwargs):
+        """Initialize a new client for the Neutron v2.0 API."""
+        super(Client, self).__init__(**kwargs)
+        self._register_extensions(self.version)
+
+    def extend_show(self, resource_plural, path):
+        def _fx(obj, **_params):
+            return self.show_ext(path, obj, **_params)
+        setattr(self, "show_%s" % resource_plural, _fx)
+
+    def extend_list(self, resource_plural, path):
+        def _fx(**_params):
+            return self.list_ext(path, **_params)
+        setattr(self, "list_%s" % resource_plural, _fx)
+
+    def extend_create(self, resource_singular, path):
+        def _fx(body=None):
+            return self.create_ext(path, body)
+        setattr(self, "create_%s" % resource_singular, _fx)
+
+    def extend_delete(self, resource_singular, path):
+        def _fx(obj):
+            return self.delete_ext(path, obj)
+        setattr(self, "delete_%s" % resource_singular, _fx)
+
+    def extend_update(self, resource_singular, path):
+        def _fx(obj, body=None):
+            return self.update_ext(path, obj, body)
+        setattr(self, "update_%s" % resource_singular, _fx)
+
+    def _extend_client_with_module(self, module, version):
+        classes = inspect.getmembers(module, inspect.isclass)
+        for cls_name, cls in classes:
+            if hasattr(cls, 'versions'):
+                if version not in cls.versions:
+                    continue
+            if issubclass(cls, client_extension.ClientExtensionList):
+                self.extend_list(cls.resource_plural, cls.object_path)
+            elif issubclass(cls, client_extension.ClientExtensionCreate):
+                self.extend_create(cls.resource, cls.object_path)
+            elif issubclass(cls, client_extension.ClientExtensionUpdate):
+                self.extend_update(cls.resource, cls.resource_path)
+            elif issubclass(cls, client_extension.ClientExtensionDelete):
+                self.extend_delete(cls.resource, cls.resource_path)
+            elif issubclass(cls, client_extension.ClientExtensionShow):
+                self.extend_show(cls.resource, cls.resource_path)
+            elif issubclass(cls, client_extension.NeutronClientExtension):
+                setattr(self, "%s_path" % cls.resource_plural,
+                        cls.object_path)
+                setattr(self, "%s_path" % cls.resource, cls.resource_path)
+
+    def _register_extensions(self, version):
+        for name, module in itertools.chain(
+                client_extension._discover_via_entry_points()):
+            self._extend_client_with_module(module, version)

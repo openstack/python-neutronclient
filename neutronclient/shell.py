@@ -22,6 +22,8 @@ from __future__ import print_function
 
 import argparse
 import getpass
+import inspect
+import itertools
 import logging
 import os
 import sys
@@ -40,6 +42,7 @@ from cliff import commandmanager
 from neutronclient.common import clientmanager
 from neutronclient.common import command as openstack_command
 from neutronclient.common import exceptions as exc
+from neutronclient.common import extension as client_extension
 from neutronclient.common import utils
 from neutronclient.i18n import _
 from neutronclient.neutron.v2_0 import agent
@@ -381,6 +384,8 @@ class NeutronShell(app.App):
         for k, v in self.commands[apiversion].items():
             self.command_manager.add_command(k, v)
 
+        self._register_extensions(VERSION)
+
         # Pop the 'complete' to correct the outputs of 'neutron help'.
         self.command_manager.commands.pop('complete')
 
@@ -670,6 +675,25 @@ class NeutronShell(app.App):
             for option, _action in cmd_parser._option_string_actions.items():
                 options.add(option)
         print(' '.join(commands | options))
+
+    def _register_extensions(self, version):
+        for name, module in itertools.chain(
+                client_extension._discover_via_entry_points()):
+            self._extend_shell_commands(module, version)
+
+    def _extend_shell_commands(self, module, version):
+        classes = inspect.getmembers(module, inspect.isclass)
+        for cls_name, cls in classes:
+            if (issubclass(cls, client_extension.NeutronClientExtension) and
+                    hasattr(cls, 'shell_command')):
+                cmd = cls.shell_command
+                if hasattr(cls, 'versions'):
+                    if version not in cls.versions:
+                        continue
+                try:
+                    self.command_manager.add_command(cmd, cls)
+                except TypeError:
+                    pass
 
     def run(self, argv):
         """Equivalent to the main program for the application.
