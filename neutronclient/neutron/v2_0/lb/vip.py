@@ -16,8 +16,6 @@
 # @author: Ilya Shakhat, Mirantis Inc.
 #
 
-import logging
-
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
 
@@ -26,7 +24,6 @@ class ListVip(neutronV20.ListCommand):
     """List vips that belong to a given tenant."""
 
     resource = 'vip'
-    log = logging.getLogger(__name__ + '.ListVip')
     list_columns = ['id', 'name', 'algorithm', 'address', 'protocol',
                     'admin_state_up', 'status']
     pagination_support = True
@@ -37,14 +34,12 @@ class ShowVip(neutronV20.ShowCommand):
     """Show information of a given vip."""
 
     resource = 'vip'
-    log = logging.getLogger(__name__ + '.ShowVip')
 
 
 class CreateVip(neutronV20.CreateCommand):
     """Create a vip."""
 
     resource = 'vip'
-    log = logging.getLogger(__name__ + '.CreateVip')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -106,11 +101,9 @@ class UpdateVip(neutronV20.UpdateCommand):
     """Update a given vip."""
 
     resource = 'vip'
-    log = logging.getLogger(__name__ + '.UpdateVip')
 
 
 class DeleteVip(neutronV20.DeleteCommand):
     """Delete a given vip."""
 
     resource = 'vip'
-    log = logging.getLogger(__name__ + '.DeleteVip')

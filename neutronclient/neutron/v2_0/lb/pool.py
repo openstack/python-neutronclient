@@ -16,7 +16,6 @@
 # @author: Ilya Shakhat, Mirantis Inc.
 #
 
-import logging
 
 import six
 
@@ -32,7 +31,6 @@ class ListPool(neutronV20.ListCommand):
     """List pools that belong to a given tenant."""
 
     resource = 'pool'
-    log = logging.getLogger(__name__ + '.ListPool')
     list_columns = ['id', 'name', 'provider', 'lb_method', 'protocol',
                     'admin_state_up', 'status']
     _formatters = {'provider': _format_provider}
@@ -44,14 +42,12 @@ class ShowPool(neutronV20.ShowCommand):
     """Show information of a given pool."""
 
     resource = 'pool'
-    log = logging.getLogger(__name__ + '.ShowPool')
 
 
 class CreatePool(neutronV20.CreateCommand):
     """Create a pool."""
 
     resource = 'pool'
-    log = logging.getLogger(__name__ + '.CreatePool')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -104,21 +100,18 @@ class UpdatePool(neutronV20.UpdateCommand):
     """Update a given pool."""
 
     resource = 'pool'
-    log = logging.getLogger(__name__ + '.UpdatePool')
 
 
 class DeletePool(neutronV20.DeleteCommand):
     """Delete a given pool."""
 
     resource = 'pool'
-    log = logging.getLogger(__name__ + '.DeletePool')
 
 
 class RetrievePoolStats(neutronV20.ShowCommand):
     """Retrieve stats for a given pool."""
 
     resource = 'pool'
-    log = logging.getLogger(__name__ + '.RetrievePoolStats')
 
     def get_data(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)

@@ -16,8 +16,6 @@
 
 from __future__ import print_function
 
-import logging
-
 from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
@@ -41,7 +39,6 @@ class ListGatewayDevice(neutronV20.ListCommand):
     """List network gateway devices for a given tenant."""
 
     resource = DEV_RESOURCE
-    log = logging.getLogger(__name__ + '.ListGatewayDevice')
     list_columns = ['id', 'name']
 
 
@@ -49,7 +46,6 @@ class ShowGatewayDevice(neutronV20.ShowCommand):
     """Show information for a given network gateway device."""
 
     resource = DEV_RESOURCE
-    log = logging.getLogger(__name__ + '.ShowGatewayDevice')
 
 
 def read_cert_file(cert_file):
@@ -80,7 +76,6 @@ class CreateGatewayDevice(neutronV20.CreateCommand):
     """Create a network gateway device."""
 
     resource = DEV_RESOURCE
-    log = logging.getLogger(__name__ + '.CreateGatewayDevice')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -114,7 +109,6 @@ class UpdateGatewayDevice(neutronV20.UpdateCommand):
     """Update a network gateway device."""
 
     resource = DEV_RESOURCE
-    log = logging.getLogger(__name__ + '.UpdateGatewayDevice')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -147,14 +141,12 @@ class DeleteGatewayDevice(neutronV20.DeleteCommand):
     """Delete a given network gateway device."""
 
     resource = DEV_RESOURCE
-    log = logging.getLogger(__name__ + '.DeleteGatewayDevice')
 
 
 class ListNetworkGateway(neutronV20.ListCommand):
     """List network gateways for a given tenant."""
 
     resource = GW_RESOURCE
-    log = logging.getLogger(__name__ + '.ListNetworkGateway')
     list_columns = ['id', 'name']
 
 
@@ -162,14 +154,12 @@ class ShowNetworkGateway(neutronV20.ShowCommand):
     """Show information of a given network gateway."""
 
     resource = GW_RESOURCE
-    log = logging.getLogger(__name__ + '.ShowNetworkGateway')
 
 
 class CreateNetworkGateway(neutronV20.CreateCommand):
     """Create a network gateway."""
 
     resource = GW_RESOURCE
-    log = logging.getLogger(__name__ + '.CreateNetworkGateway')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -199,14 +189,12 @@ class DeleteNetworkGateway(neutronV20.DeleteCommand):
     """Delete a given network gateway."""
 
     resource = GW_RESOURCE
-    log = logging.getLogger(__name__ + '.DeleteNetworkGateway')
 
 
 class UpdateNetworkGateway(neutronV20.UpdateCommand):
     """Update the name for a network gateway."""
 
     resource = GW_RESOURCE
-    log = logging.getLogger(__name__ + '.UpdateNetworkGateway')
 
 
 class NetworkGatewayInterfaceCommand(neutronV20.NeutronCommand):
@@ -244,8 +232,6 @@ class NetworkGatewayInterfaceCommand(neutronV20.NeutronCommand):
 class ConnectNetworkGateway(NetworkGatewayInterfaceCommand):
     """Add an internal network interface to a router."""
 
-    log = logging.getLogger(__name__ + '.ConnectNetworkGateway')
-
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
@@ -264,8 +250,6 @@ class ConnectNetworkGateway(NetworkGatewayInterfaceCommand):
 
 class DisconnectNetworkGateway(NetworkGatewayInterfaceCommand):
     """Remove a network from a network gateway."""
-
-    log = logging.getLogger(__name__ + '.DisconnectNetworkGateway')
 
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)

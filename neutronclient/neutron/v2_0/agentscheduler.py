@@ -16,8 +16,6 @@
 
 from __future__ import print_function
 
-import logging
-
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.neutron.v2_0 import network
 from neutronclient.neutron.v2_0 import router
@@ -29,8 +27,6 @@ PERFECT_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 
 class AddNetworkToDhcpAgent(neutronV20.NeutronCommand):
     """Add a network to a DHCP agent."""
-
-    log = logging.getLogger(__name__ + '.AddNetworkToDhcpAgent')
 
     def get_parser(self, prog_name):
         parser = super(AddNetworkToDhcpAgent, self).get_parser(prog_name)
@@ -56,7 +52,6 @@ class AddNetworkToDhcpAgent(neutronV20.NeutronCommand):
 
 class RemoveNetworkFromDhcpAgent(neutronV20.NeutronCommand):
     """Remove a network from a DHCP agent."""
-    log = logging.getLogger(__name__ + '.RemoveNetworkFromDhcpAgent')
 
     def get_parser(self, prog_name):
         parser = super(RemoveNetworkFromDhcpAgent, self).get_parser(prog_name)
@@ -83,7 +78,6 @@ class RemoveNetworkFromDhcpAgent(neutronV20.NeutronCommand):
 class ListNetworksOnDhcpAgent(network.ListNetwork):
     """List the networks on a DHCP agent."""
 
-    log = logging.getLogger(__name__ + '.ListNetworksOnDhcpAgent')
     unknown_parts_flag = False
 
     def get_parser(self, prog_name):
@@ -105,7 +99,6 @@ class ListDhcpAgentsHostingNetwork(neutronV20.ListCommand):
 
     resource = 'agent'
     _formatters = {}
-    log = logging.getLogger(__name__ + '.ListDhcpAgentsHostingNetwork')
     list_columns = ['id', 'host', 'admin_state_up', 'alive']
     unknown_parts_flag = False
 
@@ -133,8 +126,6 @@ class ListDhcpAgentsHostingNetwork(neutronV20.ListCommand):
 class AddRouterToL3Agent(neutronV20.NeutronCommand):
     """Add a router to a L3 agent."""
 
-    log = logging.getLogger(__name__ + '.AddRouterToL3Agent')
-
     def get_parser(self, prog_name):
         parser = super(AddRouterToL3Agent, self).get_parser(prog_name)
         parser.add_argument(
@@ -159,8 +150,6 @@ class AddRouterToL3Agent(neutronV20.NeutronCommand):
 
 class RemoveRouterFromL3Agent(neutronV20.NeutronCommand):
     """Remove a router from a L3 agent."""
-
-    log = logging.getLogger(__name__ + '.RemoveRouterFromL3Agent')
 
     def get_parser(self, prog_name):
         parser = super(RemoveRouterFromL3Agent, self).get_parser(prog_name)
@@ -187,7 +176,6 @@ class RemoveRouterFromL3Agent(neutronV20.NeutronCommand):
 class ListRoutersOnL3Agent(neutronV20.ListCommand):
     """List the routers on a L3 agent."""
 
-    log = logging.getLogger(__name__ + '.ListRoutersOnL3Agent')
     _formatters = {'external_gateway_info':
                    router._format_external_gateway_info}
     list_columns = ['id', 'name', 'external_gateway_info']
@@ -213,7 +201,6 @@ class ListL3AgentsHostingRouter(neutronV20.ListCommand):
 
     resource = 'agent'
     _formatters = {}
-    log = logging.getLogger(__name__ + '.ListL3AgentsHostingRouter')
     list_columns = ['id', 'host', 'admin_state_up', 'alive']
     unknown_parts_flag = False
 
@@ -240,7 +227,6 @@ class ListL3AgentsHostingRouter(neutronV20.ListCommand):
 class ListPoolsOnLbaasAgent(neutronV20.ListCommand):
     """List the pools on a loadbalancer agent."""
 
-    log = logging.getLogger(__name__ + '.ListPoolsOnLbaasAgent')
     list_columns = ['id', 'name', 'lb_method', 'protocol',
                     'admin_state_up', 'status']
     resource = 'pool'
@@ -267,7 +253,6 @@ class GetLbaasAgentHostingPool(neutronV20.ListCommand):
     """
 
     resource = 'agent'
-    log = logging.getLogger(__name__ + '.GetLbaasAgentHostingPool')
     list_columns = ['id', 'host', 'admin_state_up', 'alive']
     unknown_parts_flag = False
 

@@ -14,8 +14,6 @@
 #    under the License.
 #
 
-import logging
-
 from neutronclient.neutron import v2_0 as cmd_base
 from neutronclient.openstack.common.gettextutils import _
 
@@ -24,7 +22,6 @@ class ListExt(cmd_base.ListCommand):
     """List all extensions."""
 
     resource = 'extension'
-    log = logging.getLogger(__name__ + '.ListExt')
     list_columns = ['alias', 'name']
 
 
@@ -32,7 +29,6 @@ class ShowExt(cmd_base.ShowCommand):
     """Show information of a given resource."""
 
     resource = "extension"
-    log = logging.getLogger(__name__ + '.ShowExt')
     allow_names = False
 
     def get_parser(self, prog_name):

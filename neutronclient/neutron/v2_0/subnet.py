@@ -15,7 +15,6 @@
 #
 
 import argparse
-import logging
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
@@ -136,7 +135,6 @@ class ListSubnet(neutronV20.ListCommand):
     """List subnets that belong to a given tenant."""
 
     resource = 'subnet'
-    log = logging.getLogger(__name__ + '.ListSubnet')
     _formatters = {'allocation_pools': _format_allocation_pools,
                    'dns_nameservers': _format_dns_nameservers,
                    'host_routes': _format_host_routes, }
@@ -149,14 +147,12 @@ class ShowSubnet(neutronV20.ShowCommand):
     """Show information of a given subnet."""
 
     resource = 'subnet'
-    log = logging.getLogger(__name__ + '.ShowSubnet')
 
 
 class CreateSubnet(neutronV20.CreateCommand):
     """Create a subnet for a given tenant."""
 
     resource = 'subnet'
-    log = logging.getLogger(__name__ + '.CreateSubnet')
 
     def add_known_arguments(self, parser):
         add_updatable_arguments(parser)
@@ -200,14 +196,12 @@ class DeleteSubnet(neutronV20.DeleteCommand):
     """Delete a given subnet."""
 
     resource = 'subnet'
-    log = logging.getLogger(__name__ + '.DeleteSubnet')
 
 
 class UpdateSubnet(neutronV20.UpdateCommand):
     """Update subnet's information."""
 
     resource = 'subnet'
-    log = logging.getLogger(__name__ + '.UpdateSubnet')
 
     def add_known_arguments(self, parser):
         add_updatable_arguments(parser)

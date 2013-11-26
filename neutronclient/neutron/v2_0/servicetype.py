@@ -14,8 +14,6 @@
 #    under the License.
 #
 
-import logging
-
 from neutronclient.neutron import v2_0 as neutronV20
 
 
@@ -23,7 +21,6 @@ class ListServiceProvider(neutronV20.ListCommand):
     """List service providers."""
 
     resource = 'service_provider'
-    log = logging.getLogger(__name__ + '.ListServiceProviders')
     list_columns = ['service_type', 'name', 'default']
     _formatters = {}
     pagination_support = True

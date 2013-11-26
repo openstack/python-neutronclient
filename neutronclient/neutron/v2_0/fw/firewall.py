@@ -17,7 +17,6 @@
 #
 
 import argparse
-import logging
 
 from neutronclient.neutron import v2_0 as neutronv20
 from neutronclient.openstack.common.gettextutils import _
@@ -27,7 +26,6 @@ class ListFirewall(neutronv20.ListCommand):
     """List firewalls that belong to a given tenant."""
 
     resource = 'firewall'
-    log = logging.getLogger(__name__ + '.ListFirewall')
     list_columns = ['id', 'name', 'firewall_policy_id']
     _formatters = {}
     pagination_support = True
@@ -38,14 +36,12 @@ class ShowFirewall(neutronv20.ShowCommand):
     """Show information of a given firewall."""
 
     resource = 'firewall'
-    log = logging.getLogger(__name__ + '.ShowFirewall')
 
 
 class CreateFirewall(neutronv20.CreateCommand):
     """Create a firewall."""
 
     resource = 'firewall'
-    log = logging.getLogger(__name__ + '.CreateFirewall')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -86,11 +82,9 @@ class UpdateFirewall(neutronv20.UpdateCommand):
     """Update a given firewall."""
 
     resource = 'firewall'
-    log = logging.getLogger(__name__ + '.UpdateFirewall')
 
 
 class DeleteFirewall(neutronv20.DeleteCommand):
     """Delete a given firewall."""
 
     resource = 'firewall'
-    log = logging.getLogger(__name__ + '.DeleteFirewall')

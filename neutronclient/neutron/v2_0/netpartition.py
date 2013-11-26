@@ -14,8 +14,6 @@
 #
 # @author: Ronak Shah, Nuage Networks, Alcatel-Lucent USA Inc.
 
-import logging
-
 from neutronclient.neutron.v2_0 import CreateCommand
 from neutronclient.neutron.v2_0 import DeleteCommand
 from neutronclient.neutron.v2_0 import ListCommand
@@ -25,7 +23,6 @@ from neutronclient.neutron.v2_0 import ShowCommand
 class ListNetPartition(ListCommand):
     """List netpartitions that belong to a given tenant."""
     resource = 'net_partition'
-    log = logging.getLogger(__name__ + '.ListNetPartition')
     list_columns = ['id', 'name']
 
 
@@ -33,14 +30,12 @@ class ShowNetPartition(ShowCommand):
     """Show information of a given netpartition."""
 
     resource = 'net_partition'
-    log = logging.getLogger(__name__ + '.ShowNetPartition')
 
 
 class CreateNetPartition(CreateCommand):
     """Create a netpartition for a given tenant."""
 
     resource = 'net_partition'
-    log = logging.getLogger(__name__ + '.CreateNetPartition')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -56,4 +51,3 @@ class DeleteNetPartition(DeleteCommand):
     """Delete a given netpartition."""
 
     resource = 'net_partition'
-    log = logging.getLogger(__name__ + '.DeleteNetPartition')

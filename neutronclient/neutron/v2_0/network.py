@@ -15,7 +15,6 @@
 #
 
 import argparse
-import logging
 
 from neutronclient.common import exceptions
 from neutronclient.neutron import v2_0 as neutronV20
@@ -37,7 +36,6 @@ class ListNetwork(neutronV20.ListCommand):
     # id=<uuid>& (with len(uuid)=36)
     subnet_id_filter_len = 40
     resource = 'network'
-    log = logging.getLogger(__name__ + '.ListNetwork')
     _formatters = {'subnets': _format_subnets, }
     list_columns = ['id', 'name', 'subnets']
     pagination_support = True
@@ -86,7 +84,6 @@ class ListNetwork(neutronV20.ListCommand):
 class ListExternalNetwork(ListNetwork):
     """List external networks that belong to a given tenant."""
 
-    log = logging.getLogger(__name__ + '.ListExternalNetwork')
     pagination_support = True
     sorting_support = True
 
@@ -101,14 +98,12 @@ class ShowNetwork(neutronV20.ShowCommand):
     """Show information of a given network."""
 
     resource = 'network'
-    log = logging.getLogger(__name__ + '.ShowNetwork')
 
 
 class CreateNetwork(neutronV20.CreateCommand):
     """Create a network for a given tenant."""
 
     resource = 'network'
-    log = logging.getLogger(__name__ + '.CreateNetwork')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -140,12 +135,10 @@ class CreateNetwork(neutronV20.CreateCommand):
 class DeleteNetwork(neutronV20.DeleteCommand):
     """Delete a given network."""
 
-    log = logging.getLogger(__name__ + '.DeleteNetwork')
     resource = 'network'
 
 
 class UpdateNetwork(neutronV20.UpdateCommand):
     """Update network's information."""
 
-    log = logging.getLogger(__name__ + '.UpdateNetwork')
     resource = 'network'

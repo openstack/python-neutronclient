@@ -18,8 +18,6 @@
 
 from __future__ import print_function
 
-import logging
-
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
 
@@ -28,7 +26,6 @@ class ListHealthMonitor(neutronV20.ListCommand):
     """List healthmonitors that belong to a given tenant."""
 
     resource = 'health_monitor'
-    log = logging.getLogger(__name__ + '.ListHealthMonitor')
     list_columns = ['id', 'type', 'admin_state_up']
     pagination_support = True
     sorting_support = True
@@ -38,14 +35,12 @@ class ShowHealthMonitor(neutronV20.ShowCommand):
     """Show information of a given healthmonitor."""
 
     resource = 'health_monitor'
-    log = logging.getLogger(__name__ + '.ShowHealthMonitor')
 
 
 class CreateHealthMonitor(neutronV20.CreateCommand):
     """Create a healthmonitor."""
 
     resource = 'health_monitor'
-    log = logging.getLogger(__name__ + '.CreateHealthMonitor')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -109,7 +104,6 @@ class UpdateHealthMonitor(neutronV20.UpdateCommand):
     """Update a given healthmonitor."""
 
     resource = 'health_monitor'
-    log = logging.getLogger(__name__ + '.UpdateHealthMonitor')
     allow_names = False
 
 
@@ -117,13 +111,11 @@ class DeleteHealthMonitor(neutronV20.DeleteCommand):
     """Delete a given healthmonitor."""
 
     resource = 'health_monitor'
-    log = logging.getLogger(__name__ + '.DeleteHealthMonitor')
 
 
 class AssociateHealthMonitor(neutronV20.NeutronCommand):
     """Create a mapping between a health monitor and a pool."""
 
-    log = logging.getLogger(__name__ + '.AssociateHealthMonitor')
     resource = 'health_monitor'
 
     def get_parser(self, prog_name):
@@ -151,7 +143,6 @@ class AssociateHealthMonitor(neutronV20.NeutronCommand):
 class DisassociateHealthMonitor(neutronV20.NeutronCommand):
     """Remove a mapping from a health monitor to a pool."""
 
-    log = logging.getLogger(__name__ + '.DisassociateHealthMonitor')
     resource = 'health_monitor'
 
     def get_parser(self, prog_name):

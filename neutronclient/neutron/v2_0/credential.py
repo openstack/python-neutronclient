@@ -11,8 +11,6 @@
 #    under the License.
 #
 
-import logging
-
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
 
@@ -21,7 +19,6 @@ class ListCredential(neutronV20.ListCommand):
     """List credentials that belong to a given tenant."""
 
     resource = 'credential'
-    log = logging.getLogger(__name__ + '.ListCredential')
     _formatters = {}
     list_columns = ['credential_id', 'credential_name', 'user_name',
                     'password', 'type']
@@ -31,7 +28,6 @@ class ShowCredential(neutronV20.ShowCommand):
     """Show information of a given credential."""
 
     resource = 'credential'
-    log = logging.getLogger(__name__ + '.ShowCredential')
     allow_names = False
 
 
@@ -39,7 +35,6 @@ class CreateCredential(neutronV20.CreateCommand):
     """Creates a credential."""
 
     resource = 'credential'
-    log = logging.getLogger(__name__ + '.CreateCredential')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -74,6 +69,5 @@ class CreateCredential(neutronV20.CreateCommand):
 class DeleteCredential(neutronV20.DeleteCommand):
     """Delete a  given credential."""
 
-    log = logging.getLogger(__name__ + '.DeleteCredential')
     resource = 'credential'
     allow_names = False
