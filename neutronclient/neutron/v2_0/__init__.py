@@ -297,8 +297,14 @@ def _merge_args(qCmd, parsed_args, _extra_values, value_specs):
 
 
 def update_dict(obj, dict, attributes):
+    """Update dict with fields from obj.attributes
+
+    :param obj: the object updated into dict
+    :param dict: the result dictionary
+    :param attributes: a list of attributes belonging to obj
+    """
     for attribute in attributes:
-        if hasattr(obj, attribute) and getattr(obj, attribute):
+        if hasattr(obj, attribute) and getattr(obj, attribute) is not None:
             dict[attribute] = getattr(obj, attribute)
 
 

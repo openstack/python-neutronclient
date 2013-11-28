@@ -17,6 +17,7 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+import argparse
 import logging
 
 from neutronclient.neutron import v2_0 as neutronv20
@@ -83,7 +84,8 @@ class CreateFirewallRule(neutronv20.CreateCommand):
             '--shared',
             dest='shared',
             action='store_true',
-            help='set shared to True (default False)')
+            help='set shared to True (default False)',
+            default=argparse.SUPPRESS)
         parser.add_argument(
             '--source-ip-address',
             help='source ip address or subnet')
@@ -100,7 +102,8 @@ class CreateFirewallRule(neutronv20.CreateCommand):
             '--disabled',
             dest='enabled',
             action='store_false',
-            help='to disable this rule')
+            help='to disable this rule',
+            default=argparse.SUPPRESS)
         parser.add_argument(
             '--protocol', choices=['tcp', 'udp', 'icmp', 'any'],
             required=True,

@@ -17,6 +17,7 @@
 #
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+import argparse
 import logging
 import string
 
@@ -70,7 +71,8 @@ class CreateFirewallPolicy(neutronv20.CreateCommand):
             '--shared',
             dest='shared',
             action='store_true',
-            help='to create a shared policy')
+            help='to create a shared policy',
+            default=argparse.SUPPRESS)
         parser.add_argument(
             '--firewall-rules', type=string.split,
             help='ordered list of whitespace-delimited firewall rule '
@@ -78,7 +80,8 @@ class CreateFirewallPolicy(neutronv20.CreateCommand):
         parser.add_argument(
             '--audited',
             action='store_true',
-            help='to set audited to True')
+            help='to set audited to True',
+            default=argparse.SUPPRESS)
 
     def args2body(self, parsed_args):
         if parsed_args.firewall_rules:

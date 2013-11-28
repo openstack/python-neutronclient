@@ -122,7 +122,8 @@ class CreateNetwork(neutronV20.CreateCommand):
         parser.add_argument(
             '--shared',
             action='store_true',
-            help='Set the network as shared')
+            help='Set the network as shared',
+            default=argparse.SUPPRESS)
         parser.add_argument(
             'name', metavar='NAME',
             help='Name of network to create')
@@ -131,10 +132,8 @@ class CreateNetwork(neutronV20.CreateCommand):
         body = {'network': {
             'name': parsed_args.name,
             'admin_state_up': parsed_args.admin_state}, }
-        if parsed_args.tenant_id:
-            body['network'].update({'tenant_id': parsed_args.tenant_id})
-        if parsed_args.shared:
-            body['network'].update({'shared': parsed_args.shared})
+        neutronV20.update_dict(parsed_args, body['network'],
+                               ['shared', 'tenant_id'])
         return body
 
 
