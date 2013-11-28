@@ -22,6 +22,7 @@ import mox
 import testtools
 
 from neutronclient.common import constants
+from neutronclient.common import exceptions
 from neutronclient.neutron import v2_0 as neutronV2_0
 from neutronclient import shell
 from neutronclient.v2_0 import client
@@ -520,3 +521,17 @@ class ClientV2UnicodeTestJson(CLITestV20Base):
 
 class ClientV2UnicodeTestXML(ClientV2UnicodeTestJson):
     format = 'xml'
+
+
+class CLITestV20ExceptionHandler(CLITestV20Base):
+
+    def test_exception_handler_v20_ip_address_in_use(self):
+        # Tests that an IpAddressInUse exception from the server is
+        # translated to an IpAddressInUseClient exception in the client.
+        err_msg = ('Unable to complete operation for network '
+                   'fake-network-uuid. The IP address fake-ip is in use.')
+        err_data = {'type': 'IpAddressInUse', 'message': err_msg, 'detail': ''}
+        error_content = {'NeutronError': err_data}
+        self.assertRaises(exceptions.IpAddressInUseClient,
+                          client.exception_handler_v20,
+                          409, error_content)
