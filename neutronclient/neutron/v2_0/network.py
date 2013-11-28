@@ -72,7 +72,7 @@ class ListNetwork(neutronV20.ListCommand):
                         uri_len_exc.excess)
             chunk_size = max_size / self.subnet_id_filter_len
             subnets = []
-            for i in xrange(0, subnet_count, chunk_size):
+            for i in range(0, subnet_count, chunk_size):
                 subnets.extend(
                     _get_subnet_list(subnet_ids[i: i + chunk_size]))
 

@@ -1215,7 +1215,7 @@ class Client(object):
         :raises: ConnectionFailed if the maximum # of retries is exceeded
         """
         max_attempts = self.retries + 1
-        for i in xrange(max_attempts):
+        for i in range(max_attempts):
             try:
                 return self.do_request(method, action, body=body,
                                        headers=headers, params=params)
