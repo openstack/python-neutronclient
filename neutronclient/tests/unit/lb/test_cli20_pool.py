@@ -165,8 +165,8 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
-        self.assertTrue('bytes_in' in _str)
-        self.assertTrue('bytes_out' in _str)
+        self.assertIn('bytes_in', _str)
+        self.assertIn('bytes_out', _str)
 
 
 class CLITestV20LbPoolXML(CLITestV20LbPoolJSON):

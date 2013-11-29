@@ -237,9 +237,9 @@ class CLITestV20Base(testtools.TestCase):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
-        self.assertTrue(myid in _str)
+        self.assertIn(myid, _str)
         if name:
-            self.assertTrue(name in _str)
+            self.assertIn(name, _str)
 
     def _test_list_columns(self, cmd, resources_collection,
                            resources_out, args=['-f', 'json']):
@@ -355,7 +355,7 @@ class CLITestV20Base(testtools.TestCase):
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
         if response_contents is None:
-            self.assertTrue('myid1' in _str)
+            self.assertIn('myid1', _str)
         return _str
 
     def _test_list_resources_with_pagination(self, resources, cmd):
@@ -417,7 +417,7 @@ class CLITestV20Base(testtools.TestCase):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
-        self.assertTrue(myid in _str)
+        self.assertIn(myid, _str)
 
     def _test_show_resource(self, resource, cmd, myid, args, fields=[]):
         self.mox.StubOutWithMock(cmd, "get_client")
@@ -442,8 +442,8 @@ class CLITestV20Base(testtools.TestCase):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
-        self.assertTrue(myid in _str)
-        self.assertTrue('myname' in _str)
+        self.assertIn(myid, _str)
+        self.assertIn('myname', _str)
 
     def _test_delete_resource(self, resource, cmd, myid, args):
         self.mox.StubOutWithMock(cmd, "get_client")
@@ -462,7 +462,7 @@ class CLITestV20Base(testtools.TestCase):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
-        self.assertTrue(myid in _str)
+        self.assertIn(myid, _str)
 
     def _test_update_resource_action(self, resource, cmd, myid, action, args,
                                      body, retval=None):
@@ -483,7 +483,7 @@ class CLITestV20Base(testtools.TestCase):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
-        self.assertTrue(myid in _str)
+        self.assertIn(myid, _str)
 
 
 class ClientV2UnicodeTestJson(CLITestV20Base):

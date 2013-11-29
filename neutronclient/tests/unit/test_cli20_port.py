@@ -287,7 +287,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
 
-        self.assertTrue('myid1' in _str)
+        self.assertIn('myid1', _str)
 
     def test_list_router_ports(self):
         """List router ports: -D."""
