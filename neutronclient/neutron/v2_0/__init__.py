@@ -42,17 +42,22 @@ def _get_resource_plural(resource, client):
     return resource + 's'
 
 
-def find_resourceid_by_name_or_id(client, resource, name_or_id):
+def find_resourceid_by_id(client, resource, resource_id):
     resource_plural = _get_resource_plural(resource, client)
     obj_lister = getattr(client, "list_%s" % resource_plural)
     # perform search by id only if we are passing a valid UUID
-    match = re.match(UUID_PATTERN, name_or_id)
+    match = re.match(UUID_PATTERN, resource_id)
     collection = resource_plural
     if match:
-        data = obj_lister(id=name_or_id, fields='id')
+        data = obj_lister(id=resource_id, fields='id')
         if data and data[collection]:
             return data[collection][0]['id']
-    return _find_resourceid_by_name(client, resource, name_or_id)
+    not_found_message = (_("Unable to find %(resource)s with id "
+                           "'%(id)s'") %
+                         {'resource': resource, 'id': resource_id})
+    # 404 is used to simulate server side behavior
+    raise exceptions.NeutronClientException(
+        message=not_found_message, status_code=404)
 
 
 def _find_resourceid_by_name(client, resource, name):
@@ -73,6 +78,13 @@ def _find_resourceid_by_name(client, resource, name):
             message=not_found_message, status_code=404)
     else:
         return info[0]['id']
+
+
+def find_resourceid_by_name_or_id(client, resource, name_or_id):
+    try:
+        return find_resourceid_by_id(client, resource, name_or_id)
+    except exceptions.NeutronClientException:
+        return _find_resourceid_by_name(client, resource, name_or_id)
 
 
 def add_show_list_common_argument(parser):
@@ -420,6 +432,7 @@ class UpdateCommand(NeutronCommand):
     api = 'network'
     resource = None
     log = None
+    allow_names = True
 
     def get_parser(self, prog_name):
         parser = super(UpdateCommand, self).get_parser(prog_name)
@@ -444,9 +457,12 @@ class UpdateCommand(NeutronCommand):
         if not body[self.resource]:
             raise exceptions.CommandError(
                 "Must specify new values to update %s" % self.resource)
-        _id = find_resourceid_by_name_or_id(neutron_client,
-                                            self.resource,
-                                            parsed_args.id)
+        if self.allow_names:
+            _id = find_resourceid_by_name_or_id(
+                neutron_client, self.resource, parsed_args.id)
+        else:
+            _id = find_resourceid_by_id(
+                neutron_client, self.resource, parsed_args.id)
         obj_updator = getattr(neutron_client,
                               "update_%s" % self.resource)
         obj_updator(_id, body)
