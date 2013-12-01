@@ -207,7 +207,7 @@ class CLITestV20Base(testtools.TestCase):
             body[resource].update(extra_body)
         body[resource].update(kwargs)
 
-        for i in xrange(len(position_names)):
+        for i in range(len(position_names)):
             body[resource].update({position_names[i]: position_values[i]})
         ress = {resource:
                 {self.id_field: myid}, }

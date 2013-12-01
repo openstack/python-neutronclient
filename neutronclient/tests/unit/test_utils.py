@@ -147,7 +147,7 @@ class ToPrimitiveTestCase(testtools.TestCase):
             '1920-02-03 04:05:06.000007')
 
     def test_iter(self):
-        x = xrange(1, 6)
+        x = range(1, 6)
         self.assertEqual(utils.to_primitive(x), [1, 2, 3, 4, 5])
 
     def test_iteritems(self):
