@@ -162,7 +162,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         netid = 'netid'
         args = ['--no-security-group', netid]
         position_names = ['network_id', 'security_groups']
-        position_values = [netid, None]
+        position_values = [netid, []]
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
@@ -373,7 +373,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['--no-security-groups', 'myid'],
-                                   {'security_groups': None})
+                                   {'security_groups': []})
 
     def test_show_port(self):
         """Show port: --fields id --fields name myid."""

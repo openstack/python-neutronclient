@@ -97,7 +97,7 @@ class UpdatePortSecGroupMixin(object):
             port['security_groups'] = [self._resolv_sgid(sg) for sg
                                        in parsed_args.security_groups]
         elif parsed_args.no_security_groups:
-            port['security_groups'] = None
+            port['security_groups'] = []
 
 
 class UpdateExtraDhcpOptMixin(object):
