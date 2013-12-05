@@ -306,6 +306,7 @@ class XMLDeserializer(TextDeserializer):
     def _from_xml_node(self, node, listnames):
         """Convert a minidom node to a simple Python type.
 
+        :param node: minidom node name
         :param listnames: list of XML node names whose subnodes should
                           be considered list items.
 
