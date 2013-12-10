@@ -466,7 +466,7 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
     def _test_extend_list(self, mox_calls):
         data = [{'id': 'netid%d' % i, 'name': 'net%d' % i,
                  'subnets': ['mysubid%d' % i]}
-                for i in range(0, 10)]
+                for i in range(10)]
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         path = getattr(self.client, 'subnets_path')
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
