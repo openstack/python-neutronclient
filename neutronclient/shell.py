@@ -292,6 +292,10 @@ class HelpAction(argparse.Action):
 
 class NeutronShell(app.App):
 
+    # verbose logging levels
+    WARNING_LEVEL = 0
+    INFO_LEVEL = 1
+    DEBUG_LEVEL = 2
     CONSOLE_MESSAGE_FORMAT = '%(message)s'
     DEBUG_MESSAGE_FORMAT = '%(levelname)s: %(name)s %(message)s'
     log = logging.getLogger(__name__)
@@ -329,11 +333,12 @@ class NeutronShell(app.App):
             action='version',
             version=__version__, )
         parser.add_argument(
-            '-v', '--verbose',
+            '-v', '--verbose', '--debug',
             action='count',
             dest='verbose_level',
             default=self.DEFAULT_VERBOSE_LEVEL,
-            help=_('Increase verbosity of output. Can be repeated.'))
+            help=_('Increase verbosity of output and show tracebacks on'
+                   ' errors. Can be repeated.'))
         parser.add_argument(
             '-q', '--quiet',
             action='store_const',
@@ -346,11 +351,6 @@ class NeutronShell(app.App):
             nargs=0,
             default=self,  # tricky
             help=_("Show this help message and exit"))
-        parser.add_argument(
-            '--debug',
-            default=False,
-            action='store_true',
-            help=_('Show tracebacks on errors'))
         # Global arguments
         parser.add_argument(
             '--os-auth-strategy', metavar='<auth-strategy>',
@@ -496,7 +496,7 @@ class NeutronShell(app.App):
             self.interactive_mode = not remainder
             self.initialize_app(remainder)
         except Exception as err:
-            if self.options.debug:
+            if self.options.verbose_level == self.DEBUG_LEVEL:
                 self.log.exception(unicode(err))
                 raise
             else:
@@ -526,24 +526,24 @@ class NeutronShell(app.App):
             cmd_parser = cmd.get_parser(full_name)
             return run_command(cmd, cmd_parser, sub_argv)
         except Exception as err:
-            if self.options.debug:
+            if self.options.verbose_level == self.DEBUG_LEVEL:
                 self.log.exception(unicode(err))
             else:
                 self.log.error(unicode(err))
             try:
                 self.clean_up(cmd, result, err)
             except Exception as err2:
-                if self.options.debug:
+                if self.options.verbose_level == self.DEBUG_LEVEL:
                     self.log.exception(unicode(err2))
                 else:
                     self.log.error(_('Could not clean up: %s'), unicode(err2))
-            if self.options.debug:
+            if self.options.verbose_level == self.DEBUG_LEVEL:
                 raise
         else:
             try:
                 self.clean_up(cmd, result, None)
             except Exception as err3:
-                if self.options.debug:
+                if self.options.verbose_level == self.DEBUG_LEVEL:
                     self.log.exception(unicode(err3))
                 else:
                     self.log.error(_('Could not clean up: %s'), unicode(err3))
@@ -646,9 +646,9 @@ class NeutronShell(app.App):
 
         # Send higher-level messages to the console via stderr
         console = logging.StreamHandler(self.stderr)
-        console_level = {0: logging.WARNING,
-                         1: logging.INFO,
-                         2: logging.DEBUG,
+        console_level = {self.WARNING_LEVEL: logging.WARNING,
+                         self.INFO_LEVEL: logging.INFO,
+                         self.DEBUG_LEVEL: logging.DEBUG,
                          }.get(self.options.verbose_level, logging.DEBUG)
         console.setLevel(console_level)
         if logging.DEBUG == console_level:
