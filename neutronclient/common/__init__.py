@@ -16,7 +16,11 @@
 import gettext
 
 t = gettext.translation('neutronclient', fallback=True)
+try:
+    ugettext = t.ugettext  # Python 2
+except AttributeError:
+    ugettext = t.gettext   # Python 3
 
 
 def _(msg):
-    return t.ugettext(msg)
+    return ugettext(msg)
