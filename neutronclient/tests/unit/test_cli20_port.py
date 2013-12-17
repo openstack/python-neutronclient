@@ -60,7 +60,6 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
             args += ['--extra-dhcp-opt',
                      ('opt_name=%(opt_name)s,opt_value=%(opt_value)s' %
                       dhcp_opt)]
-        print args
         position_names = ['network_id', 'extra_dhcp_opts']
         position_values = [netid, extra_dhcp_opts]
         position_values.extend([netid])
