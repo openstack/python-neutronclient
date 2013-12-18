@@ -21,11 +21,6 @@ except ImportError:
     import simplejson as json
 import logging
 import os
-import urlparse
-# Python 2.5 compat fix
-if not hasattr(urlparse, 'parse_qsl'):
-    import cgi
-    urlparse.parse_qsl = cgi.parse_qsl
 
 import httplib2
 
