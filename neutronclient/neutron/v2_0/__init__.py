@@ -341,8 +341,11 @@ class NeutronCommand(command.OpenStackCommand):
 
     def __init__(self, app, app_args):
         super(NeutronCommand, self).__init__(app, app_args)
-        if hasattr(self, 'formatters'):
-            self.formatters['table'] = TableFormater()
+        # NOTE(markmcclain): This is no longer supported in cliff version 1.5.2
+        # see https://bugs.launchpad.net/python-neutronclient/+bug/1265926
+
+        #if hasattr(self, 'formatters'):
+            #self.formatters['table'] = TableFormater()
 
     def get_client(self):
         return self.app.client_manager.neutron
