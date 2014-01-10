@@ -30,6 +30,10 @@ from neutronclient.openstack.common.gettextutils import _
 
 _logger = logging.getLogger(__name__)
 
+# httplib2 retries requests on socket.timeout which
+# is not idempotent and can lead to orhan objects.
+# See: https://code.google.com/p/httplib2/issues/detail?id=124
+httplib2.RETRIES = 1
 
 if os.environ.get('NEUTRONCLIENT_DEBUG'):
     ch = logging.StreamHandler()
