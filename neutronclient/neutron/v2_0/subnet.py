@@ -49,7 +49,7 @@ def _format_host_routes(subnet):
 
 
 class ListSubnet(neutronV20.ListCommand):
-    """List networks that belong to a given tenant."""
+    """List subnets that belong to a given tenant."""
 
     resource = 'subnet'
     log = logging.getLogger(__name__ + '.ListSubnet')
