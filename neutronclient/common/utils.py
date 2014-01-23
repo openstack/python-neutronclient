@@ -149,6 +149,8 @@ def str2dict(strdict):
         :param strdict: key1=value1,key2=value2
         '''
         _info = {}
+        if not strdict:
+            return _info
         for kv_str in strdict.split(","):
             k, v = kv_str.split("=", 1)
             _info.update({k: v})
