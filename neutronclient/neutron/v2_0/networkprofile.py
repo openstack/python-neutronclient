@@ -14,6 +14,8 @@
 #@author Sergey Sudakovich, Cisco Systems
 #@author Rudrajit Tapadar, Cisco Systems
 
+from __future__ import print_function
+
 import logging
 
 from neutronclient.neutron import v2_0 as neutronV20
@@ -128,7 +130,7 @@ class UpdateNetworkProfileV2(neutronV20.NeutronCommand):
             data[self.resource]['remove_tenant'] = parsed_args.remove_tenant
         neutron_client.update_network_profile(parsed_args.id,
                                               {self.resource: data})
-        print >>self.app.stdout, (
-            _('Updated %(resource)s: %(id)s') %
-            {'id': parsed_args.id, 'resource': self.resource})
+        print((_('Updated %(resource)s: %(id)s') %
+               {'id': parsed_args.id, 'resource': self.resource}),
+              file=self.app.stdout)
         return

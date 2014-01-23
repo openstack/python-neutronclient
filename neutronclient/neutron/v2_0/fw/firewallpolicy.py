@@ -16,6 +16,8 @@
 # @author: KC Wang, Big Switch Networks
 #
 
+from __future__ import print_function
+
 import argparse
 import logging
 import string
@@ -174,9 +176,8 @@ class FirewallPolicyInsertRule(neutronv20.UpdateCommand):
                                                        self.resource,
                                                        parsed_args.id)
         self.call_api(neutron_client, _id, body)
-        print >>self.app.stdout, (
-            _('Inserted firewall rule in firewall policy %(id)s') %
-            {'id': parsed_args.id})
+        print((_('Inserted firewall rule in firewall policy %(id)s') %
+               {'id': parsed_args.id}), file=self.app.stdout)
 
 
 class FirewallPolicyRemoveRule(neutronv20.UpdateCommand):
@@ -216,6 +217,5 @@ class FirewallPolicyRemoveRule(neutronv20.UpdateCommand):
                                                        self.resource,
                                                        parsed_args.id)
         self.call_api(neutron_client, _id, body)
-        print >>self.app.stdout, (
-            _('Removed firewall rule from firewall policy %(id)s') %
-            {'id': parsed_args.id})
+        print((_('Removed firewall rule from firewall policy %(id)s') %
+               {'id': parsed_args.id}), file=self.app.stdout)

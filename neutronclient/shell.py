@@ -18,6 +18,8 @@
 Command-line interface to the Neutron APIs
 """
 
+from __future__ import print_function
+
 import argparse
 import logging
 import os
@@ -459,7 +461,7 @@ class NeutronShell(app.App):
             cmd_parser = cmd.get_parser('')
             for option, _action in cmd_parser._option_string_actions.items():
                 options.add(option)
-        print ' '.join(commands | options)
+        print(' '.join(commands | options))
 
     def run(self, argv):
         """Equivalent to the main program for the application.
@@ -666,7 +668,7 @@ def main(argv=sys.argv[1:]):
     except exc.NeutronClientException:
         return 1
     except Exception as e:
-        print unicode(e)
+        print(unicode(e))
         return 1
 
 
