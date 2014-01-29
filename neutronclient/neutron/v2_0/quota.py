@@ -175,6 +175,19 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
         parser.add_argument(
             '--security-group-rule', metavar='security_group_rules',
             help=_('The limit of security groups rules'))
+        parser.add_argument(
+            '--vip', metavar='vips',
+            help=_('the limit of vips'))
+        parser.add_argument(
+            '--pool', metavar='pools',
+            help=_('the limit of pools'))
+        parser.add_argument(
+            '--member', metavar='members',
+            help=_('the limit of pool members'))
+        parser.add_argument(
+            '--health-monitor', metavar='health_monitors',
+            help=_('the limit of health monitors'))
+
         return parser
 
     def _validate_int(self, name, value):
@@ -189,7 +202,8 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
     def args2body(self, parsed_args):
         quota = {}
         for resource in ('network', 'subnet', 'port', 'router', 'floatingip',
-                         'security_group', 'security_group_rule'):
+                         'security_group', 'security_group_rule',
+                         'vip', 'pool', 'member', 'health_monitor'):
             if getattr(parsed_args, resource):
                 quota[resource] = self._validate_int(
                     resource,
