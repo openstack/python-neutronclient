@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-# Copyright 2013 Nicira Inc.
+# Copyright 2013 VMware Inc.
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -18,13 +18,13 @@
 
 import sys
 
-from neutronclient.neutron.v2_0 import nvp_qos_queue as qos
+from neutronclient.neutron.v2_0.nsx import qos_queue as qos
 from neutronclient.tests.unit import test_cli20
 
 
-class CLITestV20NvpQosQueueJSON(test_cli20.CLITestV20Base):
+class CLITestV20QosQueueJSON(test_cli20.CLITestV20Base):
     def setUp(self):
-        super(CLITestV20NvpQosQueueJSON, self).setUp(
+        super(CLITestV20QosQueueJSON, self).setUp(
             plurals={'qos_queues': 'qos_queue'})
 
     def test_create_qos_queue(self):
@@ -84,5 +84,5 @@ class CLITestV20NvpQosQueueJSON(test_cli20.CLITestV20Base):
         self._test_delete_resource(resource, cmd, myid, args)
 
 
-class CLITestV20NvpQosQueueXML(CLITestV20NvpQosQueueJSON):
+class CLITestV20QosQueueXML(CLITestV20QosQueueJSON):
     format = 'xml'

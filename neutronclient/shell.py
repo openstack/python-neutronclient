@@ -45,8 +45,8 @@ from neutronclient.neutron.v2_0.lb import vip as lb_vip
 from neutronclient.neutron.v2_0 import metering
 from neutronclient.neutron.v2_0 import network
 from neutronclient.neutron.v2_0 import networkprofile
-from neutronclient.neutron.v2_0 import nvp_qos_queue
-from neutronclient.neutron.v2_0 import nvpnetworkgateway
+from neutronclient.neutron.v2_0.nsx import networkgateway
+from neutronclient.neutron.v2_0.nsx import qos_queue
 from neutronclient.neutron.v2_0 import policyprofile
 from neutronclient.neutron.v2_0 import port
 from neutronclient.neutron.v2_0 import quota
@@ -167,21 +167,21 @@ COMMAND_V2 = {
     'lb-healthmonitor-disassociate': (
         lb_healthmonitor.DisassociateHealthMonitor
     ),
-    'queue-create': nvp_qos_queue.CreateQoSQueue,
-    'queue-delete': nvp_qos_queue.DeleteQoSQueue,
-    'queue-show': nvp_qos_queue.ShowQoSQueue,
-    'queue-list': nvp_qos_queue.ListQoSQueue,
+    'queue-create': qos_queue.CreateQoSQueue,
+    'queue-delete': qos_queue.DeleteQoSQueue,
+    'queue-show': qos_queue.ShowQoSQueue,
+    'queue-list': qos_queue.ListQoSQueue,
     'agent-list': agent.ListAgent,
     'agent-show': agent.ShowAgent,
     'agent-delete': agent.DeleteAgent,
     'agent-update': agent.UpdateAgent,
-    'net-gateway-create': nvpnetworkgateway.CreateNetworkGateway,
-    'net-gateway-update': nvpnetworkgateway.UpdateNetworkGateway,
-    'net-gateway-delete': nvpnetworkgateway.DeleteNetworkGateway,
-    'net-gateway-show': nvpnetworkgateway.ShowNetworkGateway,
-    'net-gateway-list': nvpnetworkgateway.ListNetworkGateway,
-    'net-gateway-connect': nvpnetworkgateway.ConnectNetworkGateway,
-    'net-gateway-disconnect': nvpnetworkgateway.DisconnectNetworkGateway,
+    'net-gateway-create': networkgateway.CreateNetworkGateway,
+    'net-gateway-update': networkgateway.UpdateNetworkGateway,
+    'net-gateway-delete': networkgateway.DeleteNetworkGateway,
+    'net-gateway-show': networkgateway.ShowNetworkGateway,
+    'net-gateway-list': networkgateway.ListNetworkGateway,
+    'net-gateway-connect': networkgateway.ConnectNetworkGateway,
+    'net-gateway-disconnect': networkgateway.DisconnectNetworkGateway,
     'dhcp-agent-network-add': agentscheduler.AddNetworkToDhcpAgent,
     'dhcp-agent-network-remove': agentscheduler.RemoveNetworkFromDhcpAgent,
     'net-list-on-dhcp-agent': agentscheduler.ListNetworksOnDhcpAgent,

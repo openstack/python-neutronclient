@@ -1,6 +1,6 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-# Copyright 2011, Nicira Networks, Inc.
+# Copyright 2011, VMware, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -16,7 +16,6 @@
 #
 # Borrowed from nova code base, more utilities will be added/borrowed as and
 # when needed.
-# @author: Somik Behera, Nicira Networks, Inc.
 
 """Utilities and helper functions."""
 
