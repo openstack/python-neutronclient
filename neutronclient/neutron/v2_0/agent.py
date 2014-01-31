@@ -36,7 +36,8 @@ class ListAgent(neutronV20.ListCommand):
 
     def extend_list(self, data, parsed_args):
         for agent in data:
-            agent['alive'] = ":-)" if agent['alive'] else 'xxx'
+            if 'alive' in agent:
+                agent['alive'] = ":-)" if agent['alive'] else 'xxx'
 
 
 class ShowAgent(neutronV20.ShowCommand):
