@@ -221,6 +221,8 @@ class Client(object):
     firewall_policy_remove_path = "/fw/firewall_policies/%s/remove_rule"
     firewalls_path = "/fw/firewalls"
     firewall_path = "/fw/firewalls/%s"
+    net_partitions_path = "/net-partitions"
+    net_partition_path = "/net-partitions/%s"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -243,7 +245,8 @@ class Client(object):
                      'firewall_policies': 'firewall_policy',
                      'firewalls': 'firewall',
                      'metering_labels': 'metering_label',
-                     'metering_label_rules': 'metering_label_rule'
+                     'metering_label_rules': 'metering_label_rule',
+                     'net_partitions': 'net_partition'
                      }
     # 8192 Is the default max URI len for eventlet.wsgi.server
     MAX_URI_LEN = 8192
@@ -1109,6 +1112,27 @@ class Client(object):
         """Fetches information of a certain metering label rule."""
         return self.get(self.metering_label_rule_path %
                         (metering_label_rule), params=_params)
+
+    @APIParamsCall
+    def list_net_partitions(self, **params):
+        """Fetch a list of all network partitions for a tenant."""
+        return self.get(self.net_partitions_path, params=params)
+
+    @APIParamsCall
+    def show_net_partition(self, netpartition, **params):
+        """Fetch a network partition."""
+        return self.get(self.net_partition_path % (netpartition),
+                        params=params)
+
+    @APIParamsCall
+    def create_net_partition(self, body=None):
+        """Create a network partition."""
+        return self.post(self.net_partitions_path, body=body)
+
+    @APIParamsCall
+    def delete_net_partition(self, netpartition):
+        """Delete the network partition."""
+        return self.delete(self.net_partition_path % netpartition)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
