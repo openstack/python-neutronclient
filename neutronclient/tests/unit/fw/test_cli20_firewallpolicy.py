@@ -15,7 +15,6 @@
 #
 # @author: KC Wang, Big Switch Networks Inc.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import sys
 

@@ -15,7 +15,6 @@
 #
 # @author: KC Wang, Big Switch Networks
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import argparse
 import logging
