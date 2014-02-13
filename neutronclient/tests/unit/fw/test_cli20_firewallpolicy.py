@@ -18,7 +18,7 @@
 
 import sys
 
-import mox
+from mox3 import mox
 
 from neutronclient.neutron.v2_0.fw import firewallpolicy
 from neutronclient import shell

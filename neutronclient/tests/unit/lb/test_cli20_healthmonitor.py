@@ -18,7 +18,7 @@
 
 import sys
 
-import mox
+from mox3 import mox
 
 from neutronclient.neutron.v2_0.lb import healthmonitor
 from neutronclient.tests.unit import test_cli20

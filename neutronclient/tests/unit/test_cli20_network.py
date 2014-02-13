@@ -15,7 +15,7 @@
 
 import sys
 
-import mox
+from mox3 import mox
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils

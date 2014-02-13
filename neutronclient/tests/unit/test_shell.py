@@ -21,7 +21,7 @@ import re
 import sys
 
 import fixtures
-import mox
+from mox3 import mox
 import testtools
 from testtools import matchers
 

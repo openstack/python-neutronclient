@@ -15,7 +15,7 @@
 
 import sys
 
-import mox
+from mox3 import mox
 
 from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0.nec import packetfilter as pf

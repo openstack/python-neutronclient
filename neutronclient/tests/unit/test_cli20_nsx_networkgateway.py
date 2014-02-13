@@ -16,7 +16,7 @@
 
 import sys
 
-import mox
+from mox3 import mox
 
 from neutronclient.neutron.v2_0.nsx import networkgateway as nwgw
 from neutronclient.tests.unit import test_cli20
