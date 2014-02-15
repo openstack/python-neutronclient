@@ -65,7 +65,7 @@ class DeleteQuota(neutronV20.NeutronCommand):
 
 
 class ListQuota(neutronV20.NeutronCommand, lister.Lister):
-    """List defined quotas of all tenants."""
+    """List quotas of all tenants who have non-default quota values."""
 
     api = 'network'
     resource = 'quota'
