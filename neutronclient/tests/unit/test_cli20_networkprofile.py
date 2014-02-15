@@ -108,3 +108,28 @@ class CLITestV20NetworkProfile(test_cli20.CLITestV20Base):
                     '--sub_type': 'vlan'}]
         self._test_list_resources(resources, cmd, True,
                                   response_contents=contents)
+
+    def test_create_networkprofile_multi_tenants(self):
+        """Create networkprofile with mulitple tenants: myid."""
+        resource = 'network_profile'
+        cmd = networkprofile.CreateNetworkProfile(test_cli20.
+                                                  MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        segment_type = 'vlan'
+        args = [name, segment_type, '--add-tenant', 'demo',
+                '--add-tenant', 'admin']
+        position_names = ['name', 'segment_type', 'add_tenants']
+        position_values = [name, segment_type, ['demo', 'admin']]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
+    def test_update_networkprofile_multi_tenants(self):
+        resource = 'network_profile'
+        cmd = networkprofile.UpdateNetworkProfile(test_cli20.
+                                                  MyApp(sys.stdout), None)
+        args = ['myid', '--add-tenant', 'service', '--add-tenant', 'demo',
+                '--remove-tenant', 'demo']
+        extrafields = {'add_tenants': ['service', 'demo'],
+                       'remove_tenants': ['demo']}
+        self._test_update_resource(resource, cmd, 'myid', args, extrafields)
