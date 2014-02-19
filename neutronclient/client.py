@@ -234,22 +234,22 @@ class HTTPClient(httplib2.Http):
         tmp_follow_all_redirects = self.follow_all_redirects
         self.follow_all_redirects = True
         try:
-            resp, body = self._cs_request(token_url, "POST",
-                                          body=json.dumps(body),
-                                          content_type="application/json")
+            resp, resp_body = self._cs_request(token_url, "POST",
+                                               body=json.dumps(body),
+                                               content_type="application/json")
         finally:
             self.follow_all_redirects = tmp_follow_all_redirects
         status_code = self.get_status_code(resp)
         if status_code != 200:
-            raise exceptions.Unauthorized(message=body)
-        if body:
+            raise exceptions.Unauthorized(message=resp_body)
+        if resp_body:
             try:
-                body = json.loads(body)
+                resp_body = json.loads(resp_body)
             except ValueError:
                 pass
         else:
-            body = None
-        self._extract_service_catalog(body)
+            resp_body = None
+        self._extract_service_catalog(resp_body)
 
     def _get_endpoint_url(self):
         url = self.auth_url + '/tokens/%s/endpoints' % self.auth_token
