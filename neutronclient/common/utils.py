@@ -190,7 +190,8 @@ def safe_encode_list(data):
 
 
 def safe_encode_dict(data):
-    def _encode_item((k, v)):
+    def _encode_item(item):
+        k, v = item
         if isinstance(v, list):
             return (k, safe_encode_list(v))
         elif isinstance(v, dict):
