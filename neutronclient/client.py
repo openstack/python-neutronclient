@@ -47,7 +47,7 @@ class ServiceCatalog(object):
         self.catalog = resource_dict
 
     def get_token(self):
-        """Fetch token details fron service catalog."""
+        """Fetch token details from service catalog."""
         token = {'id': self.catalog['access']['token']['id'],
                  'expires': self.catalog['access']['token']['expires'], }
         try:
