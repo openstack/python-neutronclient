@@ -388,7 +388,7 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
 
-        self.assertTrue('myid1' in _str)
+        self.assertIn('myid1', _str)
 
     def test_list_external_nets_detail(self):
         """list external nets: -D."""

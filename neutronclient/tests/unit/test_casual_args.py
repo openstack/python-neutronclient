@@ -44,8 +44,8 @@ class CLITestArgs(testtools.TestCase):
     def test_nargs(self):
         _specs = ['--tag', 'x', 'y', '--arg1', 'value1']
         _mydict = neutronV20.parse_args_to_dict(_specs)
-        self.assertTrue('x' in _mydict['tag'])
-        self.assertTrue('y' in _mydict['tag'])
+        self.assertIn('x', _mydict['tag'])
+        self.assertIn('y', _mydict['tag'])
 
     def test_badarg(self):
         _specs = ['--tag=t', 'x', 'y', '--arg1', 'value1']
