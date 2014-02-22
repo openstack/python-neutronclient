@@ -100,7 +100,7 @@ class CLITestArgs(testtools.TestCase):
     def test_clear_action(self):
         _specs = ['--anyarg', 'action=clear']
         args = neutronV20.parse_args_to_dict(_specs)
-        self.assertEqual(None, args['anyarg'])
+        self.assertIsNone(args['anyarg'])
 
     def test_bad_values_str(self):
         _specs = ['--strarg', 'type=str']
