@@ -29,9 +29,9 @@ class CLITestV20MeteringJSON(test_cli20.CLITestV20Base):
         name = 'my label'
         myid = 'myid'
         description = 'my description'
-        args = [name, '--description', description]
-        position_names = ['name', 'description']
-        position_values = [name, description]
+        args = [name, '--description', description, '--shared']
+        position_names = ['name', 'description', 'shared']
+        position_values = [name, description, True]
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 

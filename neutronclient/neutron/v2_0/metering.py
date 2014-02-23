@@ -25,7 +25,7 @@ class ListMeteringLabel(neutronv20.ListCommand):
 
     resource = 'metering_label'
     log = logging.getLogger(__name__ + '.ListMeteringLabel')
-    list_columns = ['id', 'name', 'description']
+    list_columns = ['id', 'name', 'description', 'shared']
     pagination_support = True
     sorting_support = True
 
@@ -51,6 +51,10 @@ class CreateMeteringLabel(neutronv20.CreateCommand):
         parser.add_argument(
             '--description',
             help=_('Description of metering label to create'))
+        parser.add_argument(
+            '--shared',
+            action='store_true',
+            help=_('Set the label as shared'))
 
     def args2body(self, parsed_args):
         body = {'metering_label': {
@@ -61,6 +65,9 @@ class CreateMeteringLabel(neutronv20.CreateCommand):
         if parsed_args.description:
             body['metering_label'].update(
                 {'description': parsed_args.description})
+        if parsed_args.shared:
+            body['metering_label'].update(
+                {'shared': True})
         return body
 
 
