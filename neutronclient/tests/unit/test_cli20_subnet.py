@@ -336,6 +336,99 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
 
+    def test_create_subnet_with_ipv6_ra_mode(self):
+        resource = 'subnet'
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--ip-version', '6',
+                '--ipv6-ra-mode', 'dhcpv6-stateful',
+                netid, cidr]
+        position_names = ['ip_version', 'ipv6_ra_mode',
+                          'network_id', 'cidr']
+        position_values = [6, 'dhcpv6-stateful', netid, cidr]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
+
+    def test_create_subnet_with_ipv6_address_mode(self):
+        resource = 'subnet'
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--ip-version', '6',
+                '--ipv6-address-mode', 'dhcpv6-stateful',
+                netid, cidr]
+        position_names = ['ip_version', 'ipv6_address_mode',
+                          'network_id', 'cidr']
+        position_values = [6, 'dhcpv6-stateful', netid, cidr]
+
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
+
+    def test_create_subnet_with_ipv6_modes(self):
+        resource = 'subnet'
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--ip-version', '6',
+                '--ipv6-address-mode', 'slaac',
+                '--ipv6-ra-mode', 'slaac',
+                netid, cidr]
+        position_names = ['ip_version', 'ipv6_address_mode',
+                          'ipv6_ra_mode', 'network_id', 'cidr']
+        position_values = [6, 'slaac', 'slaac', netid, cidr]
+
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
+
+    def test_create_subnet_with_ipv6_ra_mode_ipv4(self):
+        resource = 'subnet'
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--ip-version', '4',
+                '--ipv6-ra-mode', 'slaac',
+                netid, cidr]
+        position_names = ['ip_version', 'ipv6_ra_mode',
+                          'network_id', 'cidr']
+        position_values = [4, None, netid, cidr]
+        self.assertRaises(exceptions.CommandError, self._test_create_resource,
+                          resource, cmd, name, myid, args, position_names,
+                          position_values, tenant_id='tenantid')
+
+    def test_create_subnet_with_ipv6_address_mode_ipv4(self):
+        resource = 'subnet'
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--ip-version', '4',
+                '--ipv6-address-mode', 'slaac',
+                netid, cidr]
+        position_names = ['ip_version', 'ipv6_address_mode',
+                          'network_id', 'cidr']
+        position_values = [4, None, netid, cidr]
+        self.assertRaises(exceptions.CommandError, self._test_create_resource,
+                          resource, cmd, name, myid, args, position_names,
+                          position_values, tenant_id='tenantid')
+
     def test_list_subnets_detail(self):
         """List subnets: -D."""
         resources = "subnets"

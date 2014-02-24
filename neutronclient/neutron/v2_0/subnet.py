@@ -84,6 +84,14 @@ def add_updatable_arguments(parser):
         '--enable-dhcp',
         action='store_true',
         help=_('Enable DHCP for this subnet.'))
+    parser.add_argument(
+        '--ipv6-ra-mode',
+        choices=['dhcpv6-stateful', 'dhcpv6-stateless', 'slaac'],
+        help=_('IPv6 RA (Router Advertisement) mode.'))
+    parser.add_argument(
+        '--ipv6-address-mode',
+        choices=['dhcpv6-stateful', 'dhcpv6-stateless', 'slaac'],
+        help=_('IPv6 address mode.'))
 
 
 def updatable_args2body(parsed_args, body):
@@ -111,6 +119,17 @@ def updatable_args2body(parsed_args, body):
         body['subnet']['host_routes'] = parsed_args.host_routes
     if parsed_args.dns_nameservers:
         body['subnet']['dns_nameservers'] = parsed_args.dns_nameservers
+    if parsed_args.ipv6_ra_mode:
+        if parsed_args.ip_version == 4:
+            raise exceptions.CommandError(_("--ipv6-ra-mode is invalid "
+                                            "when --ip-version is 4"))
+        body['subnet']['ipv6_ra_mode'] = parsed_args.ipv6_ra_mode
+    if parsed_args.ipv6_address_mode:
+        if parsed_args.ip_version == 4:
+            raise exceptions.CommandError(_("--ipv6-address-mode is "
+                                            "invalid when --ip-version "
+                                            "is 4"))
+        body['subnet']['ipv6_address_mode'] = parsed_args.ipv6_address_mode
 
 
 class ListSubnet(neutronV20.ListCommand):
