@@ -28,7 +28,7 @@ class ListMember(neutronV20.ListCommand):
     resource = 'member'
     log = logging.getLogger(__name__ + '.ListMember')
     list_columns = [
-        'id', 'address', 'protocol_port', 'admin_state_up', 'status'
+        'id', 'address', 'protocol_port', 'weight', 'admin_state_up', 'status'
     ]
     pagination_support = True
     sorting_support = True
