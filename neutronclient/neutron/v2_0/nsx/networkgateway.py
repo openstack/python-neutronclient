@@ -49,12 +49,10 @@ class CreateNetworkGateway(neutronV20.CreateCommand):
             'name', metavar='NAME',
             help=_('Name of network gateway to create'))
         parser.add_argument(
-            '--device',
+            '--device', metavar='id=ID,interface_name=NAME_OR_ID',
             action='append',
-            help=_('Device info for this gateway '
-            'device_id=<device identifier>,'
-            'interface_name=<name_or_identifier> '
-            'It can be repeated for multiple devices for HA gateways'))
+            help=_('Device info for this gateway, '
+            'can be repeated for multiple devices for HA gateways'))
 
     def args2body(self, parsed_args):
         body = {self.resource: {
