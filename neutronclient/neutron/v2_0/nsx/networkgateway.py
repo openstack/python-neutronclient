@@ -22,13 +22,138 @@ from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
 
-RESOURCE = 'network_gateway'
+GW_RESOURCE = 'network_gateway'
+DEV_RESOURCE = 'gateway_device'
+CONNECTOR_TYPE_HELP = _("Type of the transport zone connector to use for this "
+                        "device. Valid values are gre, stt, ipsecgre, "
+                        "ipsecstt, and bridge. Defaults to stt")
+CONNECTOR_IP_HELP = _("IP address for this device's transport connector. "
+                      "It must correspond to the IP address of the interface "
+                      "used for tenant traffic on the NSX gateway node")
+CLIENT_CERT_HELP = _("PEM certificate used by the NSX gateway transport node "
+                     "to authenticate with the NSX controller")
+CLIENT_CERT_FILE_HELP = _("File containing the PEM certificate used by the "
+                          "NSX gateway transport node to authenticate with "
+                          "the NSX controller")
+
+
+class ListGatewayDevice(neutronV20.ListCommand):
+    """List network gateway devices for a given tenant."""
+
+    resource = DEV_RESOURCE
+    log = logging.getLogger(__name__ + '.ListGatewayDevice')
+    list_columns = ['id', 'name']
+
+
+class ShowGatewayDevice(neutronV20.ShowCommand):
+    """Show information for a given network gateway device."""
+
+    resource = DEV_RESOURCE
+    log = logging.getLogger(__name__ + '.ShowGatewayDevice')
+
+
+def read_cert_file(cert_file):
+    return open(cert_file, 'rb').read()
+
+
+def gateway_device_args2body(parsed_args):
+    body = {}
+    if parsed_args.name:
+        body['name'] = parsed_args.name
+    if parsed_args.connector_type:
+        body['connector_type'] = parsed_args.connector_type
+    if parsed_args.connector_ip:
+        body['connector_ip'] = parsed_args.connector_ip
+    cert_data = None
+    if parsed_args.cert_file:
+        cert_data = read_cert_file(parsed_args.cert_file)
+    elif parsed_args.cert_data:
+        cert_data = parsed_args.cert_data
+    if cert_data:
+        body['client_certificate'] = cert_data
+    if getattr(parsed_args, 'tenant_id', None):
+        body['tenant_id'] = parsed_args.tenant_id
+    return {DEV_RESOURCE: body}
+
+
+class CreateGatewayDevice(neutronV20.CreateCommand):
+    """Create a network gateway device."""
+
+    resource = DEV_RESOURCE
+    log = logging.getLogger(__name__ + '.CreateGatewayDevice')
+
+    def add_known_arguments(self, parser):
+        parser.add_argument(
+            'name', metavar='NAME',
+            help='Name of network gateway device to create')
+        parser.add_argument(
+            '--connector-type',
+            default='stt',
+            choices=['stt', 'gre', 'ipsecgre', 'ipsecstt', 'bridge'],
+            help=CONNECTOR_TYPE_HELP)
+        parser.add_argument(
+            '--connector-ip',
+            required=True,
+            help=CONNECTOR_IP_HELP)
+        client_cert_group = parser.add_mutually_exclusive_group(
+            required=True)
+        client_cert_group.add_argument(
+            '--client-certificate',
+            dest='cert_data',
+            help=CLIENT_CERT_HELP)
+        client_cert_group.add_argument(
+            '--client-certificate-file',
+            dest='cert_file',
+            help=CLIENT_CERT_FILE_HELP)
+
+    def args2body(self, parsed_args):
+        return gateway_device_args2body(parsed_args)
+
+
+class UpdateGatewayDevice(neutronV20.UpdateCommand):
+    """Update a network gateway device."""
+
+    resource = DEV_RESOURCE
+    log = logging.getLogger(__name__ + '.UpdateGatewayDevice')
+
+    def add_known_arguments(self, parser):
+        parser.add_argument(
+            '--name', metavar='NAME',
+            help='New name for network gateway device')
+        parser.add_argument(
+            '--connector-type',
+            required=False,
+            choices=['stt', 'gre', 'ipsecgre', 'ipsecstt', 'bridge'],
+            help=CONNECTOR_TYPE_HELP)
+        parser.add_argument(
+            '--connector-ip',
+            required=False,
+            help=CONNECTOR_IP_HELP)
+        client_cert_group = parser.add_mutually_exclusive_group()
+        client_cert_group.add_argument(
+            '--client-certificate',
+            dest='cert_data',
+            help=CLIENT_CERT_HELP)
+        client_cert_group.add_argument(
+            '--client-certificate-file',
+            dest='cert_file',
+            help=CLIENT_CERT_FILE_HELP)
+
+    def args2body(self, parsed_args):
+        return gateway_device_args2body(parsed_args)
+
+
+class DeleteGatewayDevice(neutronV20.DeleteCommand):
+    """Delete a given network gateway device."""
+
+    resource = DEV_RESOURCE
+    log = logging.getLogger(__name__ + '.DeleteGatewayDevice')
 
 
 class ListNetworkGateway(neutronV20.ListCommand):
     """List network gateways for a given tenant."""
 
-    resource = RESOURCE
+    resource = GW_RESOURCE
     log = logging.getLogger(__name__ + '.ListNetworkGateway')
     list_columns = ['id', 'name']
 
@@ -36,14 +161,14 @@ class ListNetworkGateway(neutronV20.ListCommand):
 class ShowNetworkGateway(neutronV20.ShowCommand):
     """Show information of a given network gateway."""
 
-    resource = RESOURCE
+    resource = GW_RESOURCE
     log = logging.getLogger(__name__ + '.ShowNetworkGateway')
 
 
 class CreateNetworkGateway(neutronV20.CreateCommand):
     """Create a network gateway."""
 
-    resource = RESOURCE
+    resource = GW_RESOURCE
     log = logging.getLogger(__name__ + '.CreateNetworkGateway')
 
     def add_known_arguments(self, parser):
@@ -73,21 +198,21 @@ class CreateNetworkGateway(neutronV20.CreateCommand):
 class DeleteNetworkGateway(neutronV20.DeleteCommand):
     """Delete a given network gateway."""
 
-    resource = RESOURCE
+    resource = GW_RESOURCE
     log = logging.getLogger(__name__ + '.DeleteNetworkGateway')
 
 
 class UpdateNetworkGateway(neutronV20.UpdateCommand):
     """Update the name for a network gateway."""
 
-    resource = RESOURCE
+    resource = GW_RESOURCE
     log = logging.getLogger(__name__ + '.UpdateNetworkGateway')
 
 
 class NetworkGatewayInterfaceCommand(neutronV20.NeutronCommand):
     """Base class for connecting/disconnecting networks to/from a gateway."""
 
-    resource = RESOURCE
+    resource = GW_RESOURCE
 
     def get_parser(self, prog_name):
         parser = super(NetworkGatewayInterfaceCommand,

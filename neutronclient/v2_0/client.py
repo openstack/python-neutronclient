@@ -191,6 +191,8 @@ class Client(object):
     agent_path = "/agents/%s"
     network_gateways_path = "/network-gateways"
     network_gateway_path = "/network-gateways/%s"
+    gateway_devices_path = "/gateway-devices"
+    gateway_device_path = "/gateway-devices/%s"
     service_providers_path = "/service-providers"
     credentials_path = "/credentials"
     credential_path = "/credentials/%s"
@@ -825,6 +827,33 @@ class Client(object):
         """Disconnect a network from the specified gateway."""
         base_uri = self.network_gateway_path % gateway_id
         return self.put("%s/disconnect_network" % base_uri, body=body)
+
+    @APIParamsCall
+    def list_gateway_devices(self, **_params):
+        """Retrieve gateway devices."""
+        return self.get(self.gateway_devices_path, params=_params)
+
+    @APIParamsCall
+    def show_gateway_device(self, gateway_device_id, **_params):
+        """Fetch a gateway device."""
+        return self.get(self.gateway_device_path % gateway_device_id,
+                        params=_params)
+
+    @APIParamsCall
+    def create_gateway_device(self, body=None):
+        """Create a new gateway device."""
+        return self.post(self.gateway_devices_path, body=body)
+
+    @APIParamsCall
+    def update_gateway_device(self, gateway_device_id, body=None):
+        """Updates a new gateway device."""
+        return self.put(self.gateway_device_path % gateway_device_id,
+                        body=body)
+
+    @APIParamsCall
+    def delete_gateway_device(self, gateway_device_id):
+        """Delete the specified gateway device."""
+        return self.delete(self.gateway_device_path % gateway_device_id)
 
     @APIParamsCall
     def list_dhcp_agent_hosting_networks(self, network, **_params):
