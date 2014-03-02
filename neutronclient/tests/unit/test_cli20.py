@@ -527,13 +527,84 @@ class ClientV2UnicodeTestXML(ClientV2UnicodeTestJson):
 
 class CLITestV20ExceptionHandler(CLITestV20Base):
 
+    def _test_exception_handler_v20(
+        self, expected_exception, status_code, expected_msg,
+        error_type=None, error_msg=None, error_detail=None,
+        error_content=None):
+        if error_content is None:
+            error_content = {'NeutronError': {'type': error_type,
+                                              'message': error_msg,
+                                              'detail': error_detail}}
+
+        e = self.assertRaises(expected_exception,
+                              client.exception_handler_v20,
+                              status_code, error_content)
+        self.assertEqual(status_code, e.status_code)
+
+        if expected_msg is None:
+            if error_detail:
+                expected_msg = '\n'.join([error_msg, error_detail])
+            else:
+                expected_msg = error_msg
+        self.assertEqual(expected_msg, e.message)
+
     def test_exception_handler_v20_ip_address_in_use(self):
-        # Tests that an IpAddressInUse exception from the server is
-        # translated to an IpAddressInUseClient exception in the client.
         err_msg = ('Unable to complete operation for network '
                    'fake-network-uuid. The IP address fake-ip is in use.')
-        err_data = {'type': 'IpAddressInUse', 'message': err_msg, 'detail': ''}
-        error_content = {'NeutronError': err_data}
-        self.assertRaises(exceptions.IpAddressInUseClient,
-                          client.exception_handler_v20,
-                          409, error_content)
+        self._test_exception_handler_v20(
+            exceptions.IpAddressInUseClient, 409, err_msg,
+            'IpAddressInUse', err_msg, '')
+
+    def test_exception_handler_v20_neutron_known_error(self):
+        error_msg = 'Network not found'
+        error_detail = 'Network detail'
+        self._test_exception_handler_v20(
+            exceptions.NetworkNotFoundClient, 404,
+            error_msg + '\n' + error_detail,
+            'NetworkNotFound', error_msg, error_detail)
+
+    def test_exception_handler_v20_neutron_known_error_without_detail(self):
+        error_msg = 'Network not found'
+        error_detail = ''
+        self._test_exception_handler_v20(
+            exceptions.NetworkNotFoundClient, 404,
+            error_msg,
+            'NetworkNotFound', error_msg, error_detail)
+
+    def test_exception_handler_v20_neutron_unknown_error(self):
+        error_msg = 'Unknown error'
+        error_detail = 'This is detail'
+        self._test_exception_handler_v20(
+            exceptions.NeutronClientException, 400,
+            error_msg + '\n' + error_detail,
+            'UnknownError', error_msg, error_detail)
+
+    def test_exception_handler_v20_bad_neutron_error(self):
+        error_content = {'NeutronError': {'unknown_key': 'UNKNOWN'}}
+        self._test_exception_handler_v20(
+            exceptions.NeutronClientException, 500,
+            expected_msg={'unknown_key': 'UNKNOWN'},
+            error_content=error_content)
+
+    def test_exception_handler_v20_error_dict_contains_message(self):
+        error_content = {'message': 'This is an error message'}
+        self._test_exception_handler_v20(
+            exceptions.NeutronClientException, 500,
+            expected_msg='This is an error message',
+            error_content=error_content)
+
+    def test_exception_handler_v20_error_dict_not_contain_message(self):
+        error_content = {'error': 'This is an error message'}
+        expected_msg = '%s-%s' % (500, error_content)
+        self._test_exception_handler_v20(
+            exceptions.NeutronClientException, 500,
+            expected_msg=expected_msg,
+            error_content=error_content)
+
+    def test_exception_handler_v20_default_fallback(self):
+        error_content = 'This is an error message'
+        expected_msg = '%s-%s' % (500, error_content)
+        self._test_exception_handler_v20(
+            exceptions.NeutronClientException, 500,
+            expected_msg=expected_msg,
+            error_content=error_content)

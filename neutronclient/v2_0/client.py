@@ -30,6 +30,18 @@ from neutronclient.common import utils
 
 _logger = logging.getLogger(__name__)
 
+NEUTRON_ERRORS = {
+    'NetworkNotFound': exceptions.NetworkNotFoundClient,
+    'NetworkInUse': exceptions.NetworkInUseClient,
+    'PortNotFound': exceptions.PortNotFoundClient,
+    'RequestedStateInvalid': exceptions.StateInvalidClient,
+    'PortInUse': exceptions.PortInUseClient,
+    'IpAddressInUse': exceptions.IpAddressInUseClient,
+    'AlreadyAttached': exceptions.AlreadyAttachedClient,
+    'IpAddressGenerationFailure': exceptions.IpAddressGenerationFailureClient,
+    'ExternalIpAddressExhausted': exceptions.ExternalIpAddressExhaustedClient,
+}
+
 
 def exception_handler_v20(status_code, error_content):
     """Exception handler for API v2.0 client
@@ -41,20 +53,6 @@ def exception_handler_v20(status_code, error_content):
         :param status_code: HTTP error status code
         :param error_content: deserialized body of error response
     """
-
-    neutron_errors = {
-        'NetworkNotFound': exceptions.NetworkNotFoundClient,
-        'NetworkInUse': exceptions.NetworkInUseClient,
-        'PortNotFound': exceptions.PortNotFoundClient,
-        'RequestedStateInvalid': exceptions.StateInvalidClient,
-        'PortInUse': exceptions.PortInUseClient,
-        'IpAddressInUse': exceptions.IpAddressInUseClient,
-        'AlreadyAttached': exceptions.AlreadyAttachedClient,
-        'IpAddressGenerationFailure':
-        exceptions.IpAddressGenerationFailureClient,
-        'ExternalIpAddressExhausted':
-        exceptions.ExternalIpAddressExhaustedClient, }
-
     error_dict = None
     if isinstance(error_content, dict):
         error_dict = error_content.get('NeutronError')
@@ -65,27 +63,26 @@ def exception_handler_v20(status_code, error_content):
         # a 'message' and 'type' keys?
         try:
             error_type = error_dict['type']
-            error_message = (error_dict['message'] + "\n" +
-                             error_dict['detail'])
+            error_message = error_dict['message']
+            if error_dict['detail']:
+                error_message += "\n" + error_dict['detail']
         except Exception:
             bad_neutron_error_flag = True
         if not bad_neutron_error_flag:
-            ex = None
             try:
                 # raise the appropriate error!
-                ex = neutron_errors[error_type](message=error_message,
-                                                status_code=status_code)
-            except Exception:
-                pass
-            if ex:
-                raise ex
+                raise NEUTRON_ERRORS[error_type](message=error_message,
+                                                 status_code=status_code)
+            except KeyError:
+                raise exceptions.NeutronClientException(
+                    status_code=status_code, message=error_message)
         else:
             raise exceptions.NeutronClientException(status_code=status_code,
                                                     message=error_dict)
     else:
         message = None
         if isinstance(error_content, dict):
-            message = error_content.get('message', None)
+            message = error_content.get('message')
         if message:
             raise exceptions.NeutronClientException(status_code=status_code,
                                                     message=message)
