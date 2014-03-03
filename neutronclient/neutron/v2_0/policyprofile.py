@@ -13,7 +13,10 @@
 #@author Abhishek Raut, Cisco Systems
 #@author Sergey Sudakovich, Cisco Systems
 
+from __future__ import print_function
+
 import logging
+
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.neutron.v2_0 import parse_args_to_dict
 from neutronclient.openstack.common.gettextutils import _
@@ -71,7 +74,7 @@ class UpdatePolicyProfileV2(neutronV20.UpdateCommand):
             data[self.resource]['remove_tenant'] = parsed_args.remove_tenant
         neutron_client.update_policy_profile(parsed_args.id,
                                              {self.resource: data})
-        print >>self.app.stdout, (
-            _('Updated %(resource)s: %(id)s') %
-            {'id': parsed_args.id, 'resource': self.resource})
+        print((_('Updated %(resource)s: %(id)s') %
+               {'id': parsed_args.id, 'resource': self.resource}),
+              file=self.app.stdout)
         return

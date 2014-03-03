@@ -14,6 +14,8 @@
 #    under the License.
 #
 
+from __future__ import print_function
+
 import logging
 
 from neutronclient.common import utils
@@ -131,8 +133,8 @@ class ConnectNetworkGateway(NetworkGatewayInterfaceCommand):
                          'segmentation_id': parsed_args.segmentation_id})
         # TODO(Salvatore-Orlando): Do output formatting as
         # any other command
-        print >>self.app.stdout, (
-            _('Connected network to gateway %s') % gateway_id)
+        print(_('Connected network to gateway %s') % gateway_id,
+              file=self.app.stdout)
 
 
 class DisconnectNetworkGateway(NetworkGatewayInterfaceCommand):
@@ -152,5 +154,5 @@ class DisconnectNetworkGateway(NetworkGatewayInterfaceCommand):
                          'segmentation_id': parsed_args.segmentation_id})
         # TODO(Salvatore-Orlando): Do output formatting as
         # any other command
-        print >>self.app.stdout, (
-            _('Disconnected network from gateway %s') % gateway_id)
+        print(_('Disconnected network from gateway %s') % gateway_id,
+              file=self.app.stdout)

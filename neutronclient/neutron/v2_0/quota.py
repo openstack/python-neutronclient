@@ -14,6 +14,8 @@
 #    under the License.
 #
 
+from __future__ import print_function
+
 import argparse
 import logging
 
@@ -57,9 +59,10 @@ class DeleteQuota(neutronV20.NeutronCommand):
         obj_deleter = getattr(neutron_client,
                               "delete_%s" % self.resource)
         obj_deleter(tenant_id)
-        print >>self.app.stdout, (_('Deleted %(resource)s: %(tenant_id)s')
-                                  % {'tenant_id': tenant_id,
-                                     'resource': self.resource})
+        print((_('Deleted %(resource)s: %(tenant_id)s')
+               % {'tenant_id': tenant_id,
+                  'resource': self.resource}),
+              file=self.app.stdout)
         return
 
 

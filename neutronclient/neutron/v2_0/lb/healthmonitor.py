@@ -16,6 +16,8 @@
 # @author: Ilya Shakhat, Mirantis Inc.
 #
 
+from __future__ import print_function
+
 import logging
 
 from neutronclient.neutron import v2_0 as neutronV20
@@ -141,8 +143,9 @@ class AssociateHealthMonitor(neutronV20.NeutronCommand):
         pool_id = neutronV20.find_resourceid_by_name_or_id(
             neutron_client, 'pool', parsed_args.pool_id)
         neutron_client.associate_health_monitor(pool_id, body)
-        print >>self.app.stdout, (_('Associated health monitor '
-                                    '%s') % parsed_args.health_monitor_id)
+        print((_('Associated health monitor '
+                 '%s') % parsed_args.health_monitor_id),
+              file=self.app.stdout)
 
 
 class DisassociateHealthMonitor(neutronV20.NeutronCommand):
@@ -169,5 +172,6 @@ class DisassociateHealthMonitor(neutronV20.NeutronCommand):
         neutron_client.disassociate_health_monitor(pool_id,
                                                    parsed_args
                                                    .health_monitor_id)
-        print >>self.app.stdout, (_('Disassociated health monitor '
-                                    '%s') % parsed_args.health_monitor_id)
+        print((_('Disassociated health monitor '
+                 '%s') % parsed_args.health_monitor_id),
+              file=self.app.stdout)

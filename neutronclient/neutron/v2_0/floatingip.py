@@ -14,6 +14,8 @@
 #    under the License.
 #
 
+from __future__ import print_function
+
 import argparse
 import logging
 
@@ -122,8 +124,8 @@ class AssociateFloatingIP(neutronV20.NeutronCommand):
             update_dict['fixed_ip_address'] = parsed_args.fixed_ip_address
         neutron_client.update_floatingip(parsed_args.floatingip_id,
                                          {'floatingip': update_dict})
-        print >>self.app.stdout, (
-            _('Associated floatingip %s') % parsed_args.floatingip_id)
+        print(_('Associated floatingip %s') % parsed_args.floatingip_id,
+              file=self.app.stdout)
 
 
 class DisassociateFloatingIP(neutronV20.NeutronCommand):
@@ -147,5 +149,5 @@ class DisassociateFloatingIP(neutronV20.NeutronCommand):
         neutron_client.format = parsed_args.request_format
         neutron_client.update_floatingip(parsed_args.floatingip_id,
                                          {'floatingip': {'port_id': None}})
-        print >>self.app.stdout, (
-            _('Disassociated floatingip %s') % parsed_args.floatingip_id)
+        print(_('Disassociated floatingip %s') % parsed_args.floatingip_id,
+              file=self.app.stdout)

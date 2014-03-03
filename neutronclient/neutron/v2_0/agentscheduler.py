@@ -14,12 +14,16 @@
 #    under the License.
 #
 
+from __future__ import print_function
+
 import logging
 
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.neutron.v2_0 import network
 from neutronclient.neutron.v2_0 import router
 from neutronclient.openstack.common.gettextutils import _
+
+
 PERFECT_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 
 
@@ -46,8 +50,8 @@ class AddNetworkToDhcpAgent(neutronV20.NeutronCommand):
             neutron_client, 'network', parsed_args.network)
         neutron_client.add_network_to_dhcp_agent(parsed_args.dhcp_agent,
                                                  {'network_id': _net_id})
-        print >>self.app.stdout, (
-            _('Added network %s to DHCP agent') % parsed_args.network)
+        print(_('Added network %s to DHCP agent') % parsed_args.network,
+              file=self.app.stdout)
 
 
 class RemoveNetworkFromDhcpAgent(neutronV20.NeutronCommand):
@@ -72,8 +76,8 @@ class RemoveNetworkFromDhcpAgent(neutronV20.NeutronCommand):
             neutron_client, 'network', parsed_args.network)
         neutron_client.remove_network_from_dhcp_agent(
             parsed_args.dhcp_agent, _net_id)
-        print >>self.app.stdout, (
-            _('Removed network %s to DHCP agent') % parsed_args.network)
+        print(_('Removed network %s to DHCP agent') % parsed_args.network,
+              file=self.app.stdout)
 
 
 class ListNetworksOnDhcpAgent(network.ListNetwork):
@@ -149,8 +153,8 @@ class AddRouterToL3Agent(neutronV20.NeutronCommand):
             neutron_client, 'router', parsed_args.router)
         neutron_client.add_router_to_l3_agent(parsed_args.l3_agent,
                                               {'router_id': _id})
-        print >>self.app.stdout, (
-            _('Added router %s to L3 agent') % parsed_args.router)
+        print(_('Added router %s to L3 agent') % parsed_args.router,
+              file=self.app.stdout)
 
 
 class RemoveRouterFromL3Agent(neutronV20.NeutronCommand):
@@ -176,8 +180,8 @@ class RemoveRouterFromL3Agent(neutronV20.NeutronCommand):
             neutron_client, 'router', parsed_args.router)
         neutron_client.remove_router_from_l3_agent(
             parsed_args.l3_agent, _id)
-        print >>self.app.stdout, (
-            _('Removed Router %s to L3 agent') % parsed_args.router)
+        print(_('Removed Router %s to L3 agent') % parsed_args.router,
+              file=self.app.stdout)
 
 
 class ListRoutersOnL3Agent(neutronV20.ListCommand):

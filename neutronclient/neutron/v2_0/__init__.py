@@ -14,6 +14,8 @@
 #    under the License.
 #
 
+from __future__ import print_function
+
 import argparse
 import logging
 import re
@@ -421,7 +423,8 @@ class CreateCommand(NeutronCommand, show.ShowOne):
         # {u'network': {u'id': u'e9424a76-6db4-4c93-97b6-ec311cd51f19'}}
         info = self.resource in data and data[self.resource] or None
         if info:
-            print >>self.app.stdout, _('Created a new %s:') % self.resource
+            print(_('Created a new %s:') % self.resource,
+                  file=self.app.stdout)
         else:
             info = {'': ''}
         return zip(*sorted(info.iteritems()))
@@ -468,9 +471,9 @@ class UpdateCommand(NeutronCommand):
         obj_updator = getattr(neutron_client,
                               "update_%s" % self.resource)
         obj_updator(_id, body)
-        print >>self.app.stdout, (
-            _('Updated %(resource)s: %(id)s') %
-            {'id': parsed_args.id, 'resource': self.resource})
+        print((_('Updated %(resource)s: %(id)s') %
+               {'id': parsed_args.id, 'resource': self.resource}),
+              file=self.app.stdout)
         return
 
 
@@ -507,9 +510,10 @@ class DeleteCommand(NeutronCommand):
         else:
             _id = parsed_args.id
         obj_deleter(_id)
-        print >>self.app.stdout, (_('Deleted %(resource)s: %(id)s')
-                                  % {'id': parsed_args.id,
-                                     'resource': self.resource})
+        print((_('Deleted %(resource)s: %(id)s')
+               % {'id': parsed_args.id,
+                  'resource': self.resource}),
+              file=self.app.stdout)
         return
 
 

@@ -14,6 +14,8 @@
 #    under the License.
 #
 
+from __future__ import print_function
+
 import argparse
 import logging
 
@@ -141,8 +143,8 @@ class RouterInterfaceCommand(neutronV20.NeutronCommand):
         body = {'%s_id' % resource: _interface_id}
 
         portinfo = self.call_api(neutron_client, _router_id, body)
-        print >>self.app.stdout, self.success_message(parsed_args.router_id,
-                                                      portinfo)
+        print(self.success_message(parsed_args.router_id, portinfo),
+              file=self.app.stdout)
 
 
 class AddInterfaceRouter(RouterInterfaceCommand):
@@ -203,8 +205,8 @@ class SetGatewayRouter(neutronV20.NeutronCommand):
         if parsed_args.disable_snat:
             router_dict['enable_snat'] = False
         neutron_client.add_gateway_router(_router_id, router_dict)
-        print >>self.app.stdout, (
-            _('Set gateway for router %s') % parsed_args.router_id)
+        print(_('Set gateway for router %s') % parsed_args.router_id,
+              file=self.app.stdout)
 
 
 class RemoveGatewayRouter(neutronV20.NeutronCommand):
@@ -228,5 +230,5 @@ class RemoveGatewayRouter(neutronV20.NeutronCommand):
         _router_id = neutronV20.find_resourceid_by_name_or_id(
             neutron_client, self.resource, parsed_args.router_id)
         neutron_client.remove_gateway_router(_router_id)
-        print >>self.app.stdout, (
-            _('Removed gateway from router %s') % parsed_args.router_id)
+        print(_('Removed gateway from router %s') % parsed_args.router_id,
+              file=self.app.stdout)
