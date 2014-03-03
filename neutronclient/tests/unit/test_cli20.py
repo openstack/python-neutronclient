@@ -48,8 +48,9 @@ class FakeStdout:
 
 
 class MyResp(object):
-    def __init__(self, status):
+    def __init__(self, status, reason=None):
         self.status = status
+        self.reason = reason
 
 
 class MyApp(object):
@@ -485,8 +486,8 @@ class CLITestV20Base(testtools.TestCase):
         self.assertIn(myid, _str)
 
 
-class ClientV2UnicodeTestJson(CLITestV20Base):
-    def test_do_request(self):
+class ClientV2TestJson(CLITestV20Base):
+    def test_do_request_unicode(self):
         self.client.format = self.format
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         unicode_text = u'\u7f51\u7edc'
@@ -520,8 +521,29 @@ class ClientV2UnicodeTestJson(CLITestV20Base):
         # test response with unicode
         self.assertEqual(res_body, body)
 
+    def test_do_request_error_without_response_body(self):
+        self.client.format = self.format
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        params = {'test': 'value'}
+        expect_query = urllib.urlencode(params)
+        self.client.httpclient.auth_token = 'token'
 
-class ClientV2UnicodeTestXML(ClientV2UnicodeTestJson):
+        self.client.httpclient.request(
+            end_url('/test', query=expect_query, format=self.format),
+            'PUT', body='',
+            headers=mox.ContainsKeyValue('X-Auth-Token', 'token')
+        ).AndReturn((MyResp(400, 'An error'), ''))
+
+        self.mox.ReplayAll()
+        error = self.assertRaises(exceptions.NeutronClientException,
+                                  self.client.do_request, 'PUT', '/test',
+                                  body='', params=params)
+        self.assertEqual("An error", str(error))
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
+
+
+class ClientV2UnicodeTestXML(ClientV2TestJson):
     format = 'xml'
 
 

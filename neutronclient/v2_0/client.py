@@ -1161,6 +1161,8 @@ class Client(object):
                            httplib.NO_CONTENT):
             return self.deserialize(replybody, status_code)
         else:
+            if not replybody:
+                replybody = resp.reason
             self._handle_fault_response(status_code, replybody)
 
     def get_auth_info(self):
