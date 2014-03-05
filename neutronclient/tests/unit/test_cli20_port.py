@@ -365,6 +365,28 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, myid, args, updatedfields)
 
+    def test_delete_extra_dhcp_opts_from_port(self):
+        resource = 'port'
+        myid = 'myid'
+        args = [myid,
+                '--extra-dhcp-opt',
+                "opt_name=bootfile-name,opt_value=null",
+                '--extra-dhcp-opt',
+                "opt_name=tftp-server,opt_value=123.123.123.123",
+                '--extra-dhcp-opt',
+                "opt_name=server-ip-address,opt_value=123.123.123.45"
+                ]
+        # the client code will change the null to None and send to server,
+        # where its interpreted as delete the DHCP option on the port.
+        updatedfields = {'extra_dhcp_opts': [{'opt_name': 'bootfile-name',
+                                             'opt_value': None},
+                                             {'opt_name': 'tftp-server',
+                                              'opt_value': '123.123.123.123'},
+                                             {'opt_name': 'server-ip-address',
+                                              'opt_value': '123.123.123.45'}]}
+        cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, myid, args, updatedfields)
+
     def test_update_port_security_group_off(self):
         """Update port: --no-security-groups myid."""
         resource = 'port'

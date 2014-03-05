@@ -126,6 +126,8 @@ class UpdateExtraDhcpOptMixin(object):
                     opt_ele.update(utils.str2dict(opt))
                     if (('opt_name' in opt_ele) and
                         ('opt_value' in opt_ele)):
+                        if opt_ele['opt_value'] == 'null':
+                            opt_ele['opt_value'] = None
                         ops.append(opt_ele)
                         opt_ele = {}
                     else:
