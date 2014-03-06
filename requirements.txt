@@ -1,8 +1,8 @@
-pbr>=0.5.21,<1.0
+pbr>=0.6,<1.0
 argparse
 cliff>=1.4.3
 httplib2>=0.7.5
-iso8601>=0.1.4
+iso8601>=0.1.8
 simplejson>=2.0.9
-six>=1.4.1
+six>=1.5.2
 Babel>=1.3
