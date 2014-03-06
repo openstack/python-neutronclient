@@ -117,13 +117,15 @@ class ShellTest(testtools.TestCase):
                          'either --os-url or env[OS_URL]', stderr.strip())
 
     def test_auth(self):
+        #import pdb; pdb.set_trace()
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)
         self.mox.StubOutWithMock(clientmanager.ClientManager, '__init__')
         self.mox.StubOutWithMock(neutron_shell, 'run_subcommand')
         clientmanager.ClientManager.__init__(
             token='', url='', auth_url='http://127.0.0.1:5000/',
-            tenant_name='test', tenant_id='tenant_id', username='test',
+            tenant_name='test', tenant_id='tenant_id',
+            username='test', user_id='',
             password='test', region_name='', api_version={'network': '2.0'},
             auth_strategy='keystone', service_type='network',
             endpoint_type='publicURL', insecure=False, ca_cert=None,

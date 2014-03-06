@@ -94,7 +94,8 @@ class HTTPClient(httplib2.Http):
 
     USER_AGENT = 'python-neutronclient'
 
-    def __init__(self, username=None, tenant_name=None, tenant_id=None,
+    def __init__(self, username=None, user_id=None,
+                 tenant_name=None, tenant_id=None,
                  password=None, auth_url=None,
                  token=None, region_name=None, timeout=None,
                  endpoint_url=None, insecure=False,
@@ -105,6 +106,7 @@ class HTTPClient(httplib2.Http):
         super(HTTPClient, self).__init__(timeout=timeout, ca_certs=ca_cert)
 
         self.username = username
+        self.user_id = user_id
         self.tenant_name = tenant_name
         self.tenant_id = tenant_id
         self.password = password
@@ -219,15 +221,18 @@ class HTTPClient(httplib2.Http):
                 endpoint_type=self.endpoint_type)
 
     def _authenticate_keystone(self):
+        if self.user_id:
+            creds = {'userId': self.user_id,
+                     'password': self.password}
+        else:
+            creds = {'username': self.username,
+                     'password': self.password}
+
         if self.tenant_id:
-            body = {'auth': {'passwordCredentials':
-                             {'username': self.username,
-                              'password': self.password, },
+            body = {'auth': {'passwordCredentials': creds,
                              'tenantId': self.tenant_id, }, }
         else:
-            body = {'auth': {'passwordCredentials':
-                             {'username': self.username,
-                              'password': self.password, },
+            body = {'auth': {'passwordCredentials': creds,
                              'tenantName': self.tenant_name, }, }
 
         if self.auth_url is None:
