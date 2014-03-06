@@ -61,3 +61,25 @@ class TestHTTPClient(testtools.TestCase):
 
         self.assertEqual(rv_should_be, self.http._cs_request(URL, METHOD))
         self.mox.VerifyAll()
+
+    def test_request_unauthorized(self):
+        rv_should_be = MyResp(401), 'unauthorized message'
+        httplib2.Http.request(
+            URL, METHOD, headers=mox.IgnoreArg()
+        ).AndReturn(rv_should_be)
+        self.mox.ReplayAll()
+
+        e = self.assertRaises(exceptions.Unauthorized,
+                              self.http._cs_request, URL, METHOD)
+        self.assertEqual('unauthorized message', e.message)
+        self.mox.VerifyAll()
+
+    def test_request_forbidden_is_returned_to_caller(self):
+        rv_should_be = MyResp(403), 'forbidden message'
+        httplib2.Http.request(
+            URL, METHOD, headers=mox.IgnoreArg()
+        ).AndReturn(rv_should_be)
+        self.mox.ReplayAll()
+
+        self.assertEqual(rv_should_be, self.http._cs_request(URL, METHOD))
+        self.mox.VerifyAll()

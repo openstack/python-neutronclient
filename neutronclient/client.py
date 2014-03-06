@@ -161,8 +161,6 @@ class HTTPClient(httplib2.Http):
         status_code = self.get_status_code(resp)
         if status_code == 401:
             raise exceptions.Unauthorized(message=body)
-        elif status_code == 403:
-            raise exceptions.Forbidden(message=body)
         return resp, body
 
     def _strip_credentials(self, kwargs):
