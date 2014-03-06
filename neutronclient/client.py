@@ -226,6 +226,9 @@ class HTTPClient(httplib2.Http):
                               'password': self.password, },
                              'tenantName': self.tenant_name, }, }
 
+        if self.auth_url is None:
+            raise exceptions.NoAuthURLProvided()
+
         token_url = self.auth_url + "/tokens"
 
         # Make sure we follow redirects when trying to reach Keystone
@@ -250,6 +253,9 @@ class HTTPClient(httplib2.Http):
         self._extract_service_catalog(resp_body)
 
     def _get_endpoint_url(self):
+        if self.auth_url is None:
+            raise exceptions.NoAuthURLProvided()
+
         url = self.auth_url + '/tokens/%s/endpoints' % self.auth_token
         try:
             resp, body = self._cs_request(url, "GET")
