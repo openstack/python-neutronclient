@@ -18,7 +18,8 @@ import httplib
 import logging
 import time
 import urllib
-import urlparse
+
+import six.moves.urllib.parse as urlparse
 
 from neutronclient import client
 from neutronclient.common import _
