@@ -60,10 +60,12 @@ class ClientManager(object):
                  insecure=False,
                  ca_cert=None,
                  log_credentials=False,
+                 service_type=None,
                  ):
         self._token = token
         self._url = url
         self._auth_url = auth_url
+        self._service_type = service_type
         self._endpoint_type = endpoint_type
         self._tenant_name = tenant_name
         self._tenant_id = tenant_id
@@ -87,6 +89,7 @@ class ClientManager(object):
                 password=self._password,
                 region_name=self._region_name,
                 auth_url=self._auth_url,
+                service_type=self._service_type,
                 endpoint_type=self._endpoint_type,
                 insecure=self._insecure,
                 ca_cert=self._ca_cert,
