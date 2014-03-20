@@ -4,6 +4,7 @@ cliff>=1.4.3
 iso8601>=0.1.9
 netaddr>=0.7.6
 requests>=1.1
+python-keystoneclient>=0.9.0
 simplejson>=2.0.9
 six>=1.6.0
 Babel>=1.3

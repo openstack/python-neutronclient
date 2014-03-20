@@ -21,6 +21,7 @@ except ImportError:
 import logging
 import os
 
+from keystoneclient import access
 import requests
 
 from neutronclient.common import exceptions
@@ -38,55 +39,6 @@ else:
     _requests_log_level = logging.WARNING
 
 logging.getLogger("requests").setLevel(_requests_log_level)
-
-
-class ServiceCatalog(object):
-    """Helper methods for dealing with a Keystone Service Catalog."""
-
-    def __init__(self, resource_dict):
-        self.catalog = resource_dict
-
-    def get_token(self):
-        """Fetch token details from service catalog."""
-        token = {'id': self.catalog['access']['token']['id'],
-                 'expires': self.catalog['access']['token']['expires'], }
-        try:
-            token['user_id'] = self.catalog['access']['user']['id']
-            token['tenant_id'] = (
-                self.catalog['access']['token']['tenant']['id'])
-        except Exception:
-            # just leave the tenant and user out if it doesn't exist
-            pass
-        return token
-
-    def url_for(self, attr=None, filter_value=None,
-                service_type='network', endpoint_type='publicURL'):
-        """Fetch the URL from the Neutron service for
-        a particular endpoint type. If none given, return
-        publicURL.
-        """
-
-        catalog = self.catalog['access'].get('serviceCatalog', [])
-        matching_endpoints = []
-        for service in catalog:
-            if service['type'] != service_type:
-                continue
-
-            endpoints = service['endpoints']
-            for endpoint in endpoints:
-                if not filter_value or endpoint.get(attr) == filter_value:
-                    matching_endpoints.append(endpoint)
-
-        if not matching_endpoints:
-            raise exceptions.EndpointNotFound()
-        elif len(matching_endpoints) > 1:
-            raise exceptions.AmbiguousEndpoints(
-                matching_endpoints=matching_endpoints)
-        else:
-            if endpoint_type not in matching_endpoints[0]:
-                raise exceptions.EndpointTypeNotFound(type_=endpoint_type)
-
-            return matching_endpoints[0][endpoint_type]
 
 
 class HTTPClient(object):
@@ -219,14 +171,12 @@ class HTTPClient(object):
 
     def _extract_service_catalog(self, body):
         """Set the client's service catalog from the response data."""
-        self.service_catalog = ServiceCatalog(body)
-        try:
-            sc = self.service_catalog.get_token()
-            self.auth_token = sc['id']
-            self.auth_tenant_id = sc.get('tenant_id')
-            self.auth_user_id = sc.get('user_id')
-        except KeyError:
-            raise exceptions.Unauthorized()
+        self.auth_ref = access.AccessInfo.factory(body=body)
+        self.service_catalog = self.auth_ref.service_catalog
+        self.auth_token = self.auth_ref.auth_token
+        self.auth_tenant_id = self.auth_ref.tenant_id
+        self.auth_user_id = self.auth_ref.user_id
+
         if not self.endpoint_url:
             self.endpoint_url = self.service_catalog.url_for(
                 attr='region', filter_value=self.region_name,
