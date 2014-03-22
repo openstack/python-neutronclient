@@ -557,12 +557,26 @@ class CLITestV20ExceptionHandler(CLITestV20Base):
             'IpAddressInUse', err_msg, '')
 
     def test_exception_handler_v20_neutron_known_error(self):
-        error_msg = 'Network not found'
-        error_detail = 'Network detail'
-        self._test_exception_handler_v20(
-            exceptions.NetworkNotFoundClient, 404,
-            error_msg + '\n' + error_detail,
-            'NetworkNotFound', error_msg, error_detail)
+        known_error_map = [
+            ('NetworkNotFound', exceptions.NetworkNotFoundClient, 404),
+            ('PortNotFound', exceptions.PortNotFoundClient, 404),
+            ('NetworkInUse', exceptions.NetworkInUseClient, 409),
+            ('PortInUse', exceptions.PortInUseClient, 409),
+            ('StateInvalid', exceptions.StateInvalidClient, 400),
+            ('IpAddressInUse', exceptions.IpAddressInUseClient, 409),
+            ('IpAddressGenerationFailure',
+             exceptions.IpAddressGenerationFailureClient, 409),
+            ('ExternalIpAddressExhausted',
+             exceptions.ExternalIpAddressExhaustedClient, 400),
+        ]
+
+        error_msg = 'dummy exception message'
+        error_detail = 'sample detail'
+        for server_exc, client_exc, status_code in known_error_map:
+            self._test_exception_handler_v20(
+                client_exc, status_code,
+                error_msg + '\n' + error_detail,
+                server_exc, error_msg, error_detail)
 
     def test_exception_handler_v20_neutron_known_error_without_detail(self):
         error_msg = 'Network not found'
@@ -572,11 +586,20 @@ class CLITestV20ExceptionHandler(CLITestV20Base):
             error_msg,
             'NetworkNotFound', error_msg, error_detail)
 
-    def test_exception_handler_v20_neutron_unknown_error(self):
+    def test_exception_handler_v20_unknown_error_to_per_code_exception(self):
+        for status_code, client_exc in exceptions.HTTP_EXCEPTION_MAP.items():
+            error_msg = 'Unknown error'
+            error_detail = 'This is detail'
+            self._test_exception_handler_v20(
+                client_exc, status_code,
+                error_msg + '\n' + error_detail,
+                'UnknownError', error_msg, error_detail)
+
+    def test_exception_handler_v20_neutron_unknown_status_code(self):
         error_msg = 'Unknown error'
         error_detail = 'This is detail'
         self._test_exception_handler_v20(
-            exceptions.NeutronClientException, 400,
+            exceptions.NeutronClientException, 501,
             error_msg + '\n' + error_detail,
             'UnknownError', error_msg, error_detail)
 
