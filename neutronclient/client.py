@@ -217,7 +217,8 @@ class HTTPClient(httplib2.Http):
 
     def authenticate(self):
         if self.auth_strategy != 'keystone':
-            raise exceptions.Unauthorized(message=_('Unknown auth strategy'))
+            err_msg = _('Unknown auth strategy: %s') % self.auth_strategy
+            raise exceptions.Unauthorized(message=err_msg)
         if self.tenant_id:
             body = {'auth': {'passwordCredentials':
                              {'username': self.username,
