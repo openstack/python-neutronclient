@@ -31,18 +31,6 @@ from neutronclient.common import utils
 
 _logger = logging.getLogger(__name__)
 
-NEUTRON_ERRORS = {
-    'NetworkNotFound': exceptions.NetworkNotFoundClient,
-    'NetworkInUse': exceptions.NetworkInUseClient,
-    'PortNotFound': exceptions.PortNotFoundClient,
-    'RequestedStateInvalid': exceptions.StateInvalidClient,
-    'PortInUse': exceptions.PortInUseClient,
-    'IpAddressInUse': exceptions.IpAddressInUseClient,
-    'AlreadyAttached': exceptions.AlreadyAttachedClient,
-    'IpAddressGenerationFailure': exceptions.IpAddressGenerationFailureClient,
-    'ExternalIpAddressExhausted': exceptions.ExternalIpAddressExhaustedClient,
-}
-
 
 def exception_handler_v20(status_code, error_content):
     """Exception handler for API v2.0 client
@@ -70,11 +58,15 @@ def exception_handler_v20(status_code, error_content):
         except Exception:
             bad_neutron_error_flag = True
         if not bad_neutron_error_flag:
-            try:
-                # raise the appropriate error!
-                raise NEUTRON_ERRORS[error_type](message=error_message,
-                                                 status_code=status_code)
-            except KeyError:
+            # If corresponding exception is defined, use it.
+            client_exc = getattr(exceptions, '%sClient' % error_type, None)
+            # Otherwise look up per status-code client exception
+            if not client_exc:
+                client_exc = exceptions.HTTP_EXCEPTION_MAP.get(status_code)
+            if client_exc:
+                raise client_exc(message=error_message,
+                                 status_code=status_code)
+            else:
                 raise exceptions.NeutronClientException(
                     status_code=status_code, message=error_message)
         else:

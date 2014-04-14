@@ -80,10 +80,11 @@ class ServiceCatalog(object):
         if not matching_endpoints:
             raise exceptions.EndpointNotFound()
         elif len(matching_endpoints) > 1:
-            raise exceptions.AmbiguousEndpoints(message=matching_endpoints)
+            raise exceptions.AmbiguousEndpoints(
+                matching_endpoints=matching_endpoints)
         else:
             if endpoint_type not in matching_endpoints[0]:
-                raise exceptions.EndpointTypeNotFound(message=endpoint_type)
+                raise exceptions.EndpointTypeNotFound(type_=endpoint_type)
 
             return matching_endpoints[0][endpoint_type]
 
@@ -290,7 +291,7 @@ class HTTPClient(httplib2.Http):
                 endpoint.get('region') == self.region_name):
                 if self.endpoint_type not in endpoint:
                     raise exceptions.EndpointTypeNotFound(
-                        message=self.endpoint_type)
+                        type_=self.endpoint_type)
                 return endpoint[self.endpoint_type]
 
         raise exceptions.EndpointNotFound()

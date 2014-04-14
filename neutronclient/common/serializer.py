@@ -224,7 +224,7 @@ class JSONDeserializer(TextDeserializer):
             return jsonutils.loads(datastring)
         except ValueError:
             msg = _("Cannot understand JSON")
-            raise exception.MalformedRequestBody(reason=msg)
+            raise exception.MalformedResponseBody(reason=msg)
 
     def default(self, datastring):
         return {'body': self._from_json(datastring)}
@@ -297,7 +297,7 @@ class XMLDeserializer(TextDeserializer):
                 parseError = True
             if parseError:
                 msg = _("Cannot understand XML")
-                raise exception.MalformedRequestBody(reason=msg)
+                raise exception.MalformedResponseBody(reason=msg)
             else:
                 raise
 
