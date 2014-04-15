@@ -14,11 +14,11 @@
 #    under the License.
 #
 
-import httplib
 import logging
 import time
 import urllib
 
+import requests
 import six.moves.urllib.parse as urlparse
 
 from neutronclient import client
@@ -1231,10 +1231,10 @@ class Client(object):
         self.httpclient.content_type = self.content_type()
         resp, replybody = self.httpclient.do_request(action, method, body=body)
         status_code = self.get_status_code(resp)
-        if status_code in (httplib.OK,
-                           httplib.CREATED,
-                           httplib.ACCEPTED,
-                           httplib.NO_CONTENT):
+        if status_code in (requests.codes.ok,
+                           requests.codes.created,
+                           requests.codes.accepted,
+                           requests.codes.no_content):
             return self.deserialize(replybody, status_code)
         else:
             if not replybody:
@@ -1247,13 +1247,13 @@ class Client(object):
     def get_status_code(self, response):
         """Returns the integer status code from the response.
 
-        Either a Webob.Response (used in testing) or httplib.Response
+        Either a Webob.Response (used in testing) or requests.Response
         is returned.
         """
         if hasattr(response, 'status_int'):
             return response.status_int
         else:
-            return response.status
+            return response.status_code
 
     def serialize(self, data):
         """Serializes a dictionary into either xml or json.

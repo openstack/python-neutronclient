@@ -15,11 +15,11 @@
 #
 
 import copy
-import httplib2
 import json
 import uuid
 
 import mox
+import requests
 import testtools
 
 from neutronclient import client
@@ -68,6 +68,13 @@ ENDPOINTS_RESULT = {
 }
 
 
+def get_response(status_code, headers=None):
+    response = mox.Mox().CreateMock(requests.Response)
+    response.headers = headers or {}
+    response.status_code = status_code
+    return response
+
+
 class CLITestAuthNoAuth(testtools.TestCase):
 
     def setUp(self):
@@ -86,8 +93,7 @@ class CLITestAuthNoAuth(testtools.TestCase):
     def test_get_noauth(self):
         self.mox.StubOutWithMock(self.client, "request")
 
-        res200 = self.mox.CreateMock(httplib2.Response)
-        res200.status = 200
+        res200 = get_response(200)
 
         self.client.request(
             mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
@@ -136,8 +142,7 @@ class CLITestAuthKeystone(testtools.TestCase):
     def test_get_token(self):
         self.mox.StubOutWithMock(self.client, "request")
 
-        res200 = self.mox.CreateMock(httplib2.Response)
-        res200.status = 200
+        res200 = get_response(200)
 
         self.client.request(
             AUTH_URL + '/tokens', 'POST',
@@ -159,10 +164,8 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.client.auth_token = TOKEN
         self.client.endpoint_url = ENDPOINT_URL
 
-        res200 = self.mox.CreateMock(httplib2.Response)
-        res200.status = 200
-        res401 = self.mox.CreateMock(httplib2.Response)
-        res401.status = 401
+        res200 = get_response(200)
+        res401 = get_response(401)
 
         # If a token is expired, neutron server retruns 401
         self.client.request(
@@ -187,8 +190,7 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.client.auth_token = TOKEN
         self.client.endpoint_url = ENDPOINT_URL
 
-        res401 = self.mox.CreateMock(httplib2.Response)
-        res401.status = 401
+        res401 = get_response(401)
 
         # If a token is expired, neutron server returns 401
         self.client.request(
@@ -212,8 +214,7 @@ class CLITestAuthKeystone(testtools.TestCase):
 
         self.client.auth_token = TOKEN
 
-        res200 = self.mox.CreateMock(httplib2.Response)
-        res200.status = 200
+        res200 = get_response(200)
 
         self.client.request(
             mox.StrContains(AUTH_URL + '/tokens/%s/endpoints' % TOKEN), 'GET',
@@ -236,9 +237,7 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.mox.StubOutWithMock(self.client, "request")
 
         self.client.auth_token = TOKEN
-
-        res200 = self.mox.CreateMock(httplib2.Response)
-        res200.status = 200
+        res200 = get_response(200)
 
         self.client.request(
             mox.StrContains(ENDPOINT_OVERRIDE + '/resource'), 'GET',
@@ -255,9 +254,7 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.mox.StubOutWithMock(self.client, "request")
 
         self.client.auth_token = TOKEN
-
-        res200 = self.mox.CreateMock(httplib2.Response)
-        res200.status = 200
+        res200 = get_response(200)
 
         self.client.request(
             mox.StrContains(AUTH_URL + '/tokens/%s/endpoints' % TOKEN), 'GET',
@@ -274,10 +271,8 @@ class CLITestAuthKeystone(testtools.TestCase):
 
         self.client.auth_token = TOKEN
 
-        res200 = self.mox.CreateMock(httplib2.Response)
-        res200.status = 200
-        res401 = self.mox.CreateMock(httplib2.Response)
-        res401.status = 401
+        res200 = get_response(200)
+        res401 = get_response(401)
 
         self.client.request(
             mox.StrContains(AUTH_URL + '/tokens/%s/endpoints' % TOKEN), 'GET',
@@ -433,8 +428,7 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.mox.StubOutWithMock(self.client, "request")
         self.mox.StubOutWithMock(utils, "http_log_req")
 
-        res200 = self.mox.CreateMock(httplib2.Response)
-        res200.status = 200
+        res200 = get_response(200)
 
         utils.http_log_req(mox.IgnoreArg(), mox.IgnoreArg(), mox.Func(
             verify_no_credentials))

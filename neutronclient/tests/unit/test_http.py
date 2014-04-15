@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import httplib2
 import mox
 import testtools
 
@@ -33,13 +32,13 @@ class TestHTTPClient(testtools.TestCase):
         super(TestHTTPClient, self).setUp()
 
         self.mox = mox.Mox()
-        self.mox.StubOutWithMock(httplib2.Http, 'request')
+        self.mox.StubOutWithMock(HTTPClient, 'request')
         self.addCleanup(self.mox.UnsetStubs)
 
         self.http = HTTPClient(token=AUTH_TOKEN, endpoint_url=END_URL)
 
     def test_request_error(self):
-        httplib2.Http.request(
+        HTTPClient.request(
             URL, METHOD, headers=mox.IgnoreArg()
         ).AndRaise(Exception('error msg'))
         self.mox.ReplayAll()
@@ -54,7 +53,7 @@ class TestHTTPClient(testtools.TestCase):
     def test_request_success(self):
         rv_should_be = MyResp(200), 'test content'
 
-        httplib2.Http.request(
+        HTTPClient.request(
             URL, METHOD, headers=mox.IgnoreArg()
         ).AndReturn(rv_should_be)
         self.mox.ReplayAll()
@@ -64,7 +63,7 @@ class TestHTTPClient(testtools.TestCase):
 
     def test_request_unauthorized(self):
         rv_should_be = MyResp(401), 'unauthorized message'
-        httplib2.Http.request(
+        HTTPClient.request(
             URL, METHOD, headers=mox.IgnoreArg()
         ).AndReturn(rv_should_be)
         self.mox.ReplayAll()
@@ -76,7 +75,7 @@ class TestHTTPClient(testtools.TestCase):
 
     def test_request_forbidden_is_returned_to_caller(self):
         rv_should_be = MyResp(403), 'forbidden message'
-        httplib2.Http.request(
+        HTTPClient.request(
             URL, METHOD, headers=mox.IgnoreArg()
         ).AndReturn(rv_should_be)
         self.mox.ReplayAll()
