@@ -37,6 +37,14 @@ class TestUtils(testtools.TestCase):
         expected = {'key1': 'value1', 'key2': 'value2'}
         self.assertEqual(expected, utils.str2dict(input_str))
 
+    def test_none_string_to_dictionary(self):
+        input_str = ''
+        expected = {}
+        self.assertEqual(expected, utils.str2dict(input_str))
+        input_str = None
+        expected = {}
+        self.assertEqual(expected, utils.str2dict(input_str))
+
     def test_get_dict_item_properties(self):
         item = {'name': 'test_name', 'id': 'test_id'}
         fields = ('name', 'id')
