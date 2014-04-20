@@ -45,24 +45,24 @@ class CreateQoSQueue(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'name', metavar='NAME',
-            help=_('Name of queue'))
+            help=_('Name of queue.'))
         parser.add_argument(
             '--min',
-            help=_('min-rate')),
+            help=_('Minimum rate.')),
         parser.add_argument(
             '--max',
-            help=_('max-rate')),
+            help=_('Maximum rate.')),
         parser.add_argument(
             '--qos-marking',
-            help=_('QOS marking untrusted/trusted')),
+            help=_('QOS marking as untrusted or trusted.')),
         parser.add_argument(
             '--default',
             default=False,
-            help=_('If true all ports created with be the size of this queue'
-                   ' if queue is not specified')),
+            help=_('If true all created ports will be the size of this queue, '
+                   'if queue is not specified')),
         parser.add_argument(
             '--dscp',
-            help=_('Differentiated Services Code Point')),
+            help=_('Differentiated Services Code Point.')),
 
     def args2body(self, parsed_args):
         params = {'name': parsed_args.name,

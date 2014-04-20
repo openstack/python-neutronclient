@@ -50,19 +50,19 @@ def _format_host_routes(subnet):
 def add_updatable_arguments(parser):
     parser.add_argument(
         '--name',
-        help=_('Name of this subnet'))
+        help=_('Name of this subnet.'))
     parser.add_argument(
         '--gateway', metavar='GATEWAY_IP',
-        help=_('Gateway ip of this subnet'))
+        help=_('Gateway IP of this subnet.'))
     parser.add_argument(
         '--no-gateway',
         action='store_true',
-        help=_('No distribution of gateway'))
+        help=_('No distribution of gateway.'))
     parser.add_argument(
         '--allocation-pool', metavar='start=IP_ADDR,end=IP_ADDR',
         action='append', dest='allocation_pools', type=utils.str2dict,
         help=_('Allocation pool IP addresses for this subnet '
-        '(This option can be repeated)'))
+        '(This option can be repeated).'))
     parser.add_argument(
         '--allocation_pool',
         action='append', dest='allocation_pools', type=utils.str2dict,
@@ -70,20 +70,20 @@ def add_updatable_arguments(parser):
     parser.add_argument(
         '--host-route', metavar='destination=CIDR,nexthop=IP_ADDR',
         action='append', dest='host_routes', type=utils.str2dict,
-        help=_('Additional route (This option can be repeated)'))
+        help=_('Additional route (This option can be repeated).'))
     parser.add_argument(
         '--dns-nameserver', metavar='DNS_NAMESERVER',
         action='append', dest='dns_nameservers',
         help=_('DNS name server for this subnet '
-        '(This option can be repeated)'))
+        '(This option can be repeated).'))
     parser.add_argument(
         '--disable-dhcp',
         action='store_true',
-        help=_('Disable DHCP for this subnet'))
+        help=_('Disable DHCP for this subnet.'))
     parser.add_argument(
         '--enable-dhcp',
         action='store_true',
-        help=_('Enable DHCP for this subnet'))
+        help=_('Enable DHCP for this subnet.'))
 
 
 def updatable_args2body(parsed_args, body):
@@ -145,7 +145,7 @@ class CreateSubnet(neutronV20.CreateCommand):
             '--ip-version',
             type=int,
             default=4, choices=[4, 6],
-            help=_('IP version with default 4'))
+            help=_('IP version to use, default is 4.'))
         parser.add_argument(
             '--ip_version',
             type=int,
@@ -153,10 +153,10 @@ class CreateSubnet(neutronV20.CreateCommand):
             help=argparse.SUPPRESS)
         parser.add_argument(
             'network_id', metavar='NETWORK',
-            help=_('Network id or name this subnet belongs to'))
+            help=_('Network ID or name this subnet belongs to.'))
         parser.add_argument(
             'cidr', metavar='CIDR',
-            help=_('CIDR of subnet to create'))
+            help=_('CIDR of subnet to create.'))
 
     def args2body(self, parsed_args):
         _network_id = neutronV20.find_resourceid_by_name_or_id(

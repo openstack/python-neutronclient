@@ -26,15 +26,15 @@ GW_RESOURCE = 'network_gateway'
 DEV_RESOURCE = 'gateway_device'
 CONNECTOR_TYPE_HELP = _("Type of the transport zone connector to use for this "
                         "device. Valid values are gre, stt, ipsecgre, "
-                        "ipsecstt, and bridge. Defaults to stt")
+                        "ipsecstt, and bridge. Defaults to stt.")
 CONNECTOR_IP_HELP = _("IP address for this device's transport connector. "
                       "It must correspond to the IP address of the interface "
-                      "used for tenant traffic on the NSX gateway node")
+                      "used for tenant traffic on the NSX gateway node.")
 CLIENT_CERT_HELP = _("PEM certificate used by the NSX gateway transport node "
-                     "to authenticate with the NSX controller")
+                     "to authenticate with the NSX controller.")
 CLIENT_CERT_FILE_HELP = _("File containing the PEM certificate used by the "
                           "NSX gateway transport node to authenticate with "
-                          "the NSX controller")
+                          "the NSX controller.")
 
 
 class ListGatewayDevice(neutronV20.ListCommand):
@@ -85,7 +85,7 @@ class CreateGatewayDevice(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'name', metavar='NAME',
-            help='Name of network gateway device to create')
+            help='Name of network gateway device to create.')
         parser.add_argument(
             '--connector-type',
             default='stt',
@@ -119,7 +119,7 @@ class UpdateGatewayDevice(neutronV20.UpdateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--name', metavar='NAME',
-            help='New name for network gateway device')
+            help='New name for network gateway device.')
         parser.add_argument(
             '--connector-type',
             required=False,
@@ -174,12 +174,12 @@ class CreateNetworkGateway(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'name', metavar='NAME',
-            help=_('Name of network gateway to create'))
+            help=_('Name of network gateway to create.'))
         parser.add_argument(
             '--device', metavar='id=ID,interface_name=NAME_OR_ID',
             action='append',
             help=_('Device info for this gateway. You can repeat this '
-            'option for multiple devices for HA gateways'))
+            'option for multiple devices for HA gateways.'))
 
     def args2body(self, parsed_args):
         body = {self.resource: {
@@ -219,18 +219,18 @@ class NetworkGatewayInterfaceCommand(neutronV20.NeutronCommand):
                        self).get_parser(prog_name)
         parser.add_argument(
             'net_gateway_id', metavar='NET-GATEWAY-ID',
-            help=_('ID of the network gateway'))
+            help=_('ID of the network gateway.'))
         parser.add_argument(
             'network_id', metavar='NETWORK-ID',
-            help=_('ID of the internal network to connect on the gateway'))
+            help=_('ID of the internal network to connect on the gateway.'))
         parser.add_argument(
             '--segmentation-type',
             help=_('L2 segmentation strategy on the external side of '
-                   'the gateway (e.g.: VLAN, FLAT)'))
+                   'the gateway (e.g.: VLAN, FLAT).'))
         parser.add_argument(
             '--segmentation-id',
             help=_('Identifier for the L2 segment on the external side '
-                   'of the gateway'))
+                   'of the gateway.'))
         return parser
 
     def retrieve_ids(self, client, args):

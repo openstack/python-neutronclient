@@ -44,7 +44,7 @@ class DeleteQuota(neutronV20.NeutronCommand):
         parser = super(DeleteQuota, self).get_parser(prog_name)
         parser.add_argument(
             '--tenant-id', metavar='tenant-id',
-            help=_('The owner tenant ID'))
+            help=_('The owner tenant ID.'))
         parser.add_argument(
             '--tenant_id',
             help=argparse.SUPPRESS)
@@ -96,7 +96,7 @@ class ListQuota(neutronV20.NeutronCommand, lister.Lister):
 
 
 class ShowQuota(neutronV20.NeutronCommand, show.ShowOne):
-    """Show quotas of a given tenant
+    """Show quotas of a given tenant.
 
     """
     api = 'network'
@@ -107,7 +107,7 @@ class ShowQuota(neutronV20.NeutronCommand, show.ShowOne):
         parser = super(ShowQuota, self).get_parser(prog_name)
         parser.add_argument(
             '--tenant-id', metavar='tenant-id',
-            help=_('The owner tenant ID'))
+            help=_('The owner tenant ID.'))
         parser.add_argument(
             '--tenant_id',
             help=argparse.SUPPRESS)
@@ -152,43 +152,43 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
         parser = super(UpdateQuota, self).get_parser(prog_name)
         parser.add_argument(
             '--tenant-id', metavar='tenant-id',
-            help=_('The owner tenant ID'))
+            help=_('The owner tenant ID.'))
         parser.add_argument(
             '--tenant_id',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--network', metavar='networks',
-            help=_('The limit of networks'))
+            help=_('The limit of networks.'))
         parser.add_argument(
             '--subnet', metavar='subnets',
-            help=_('The limit of subnets'))
+            help=_('The limit of subnets.'))
         parser.add_argument(
             '--port', metavar='ports',
-            help=_('The limit of ports'))
+            help=_('The limit of ports.'))
         parser.add_argument(
             '--router', metavar='routers',
-            help=_('The limit of routers'))
+            help=_('The limit of routers.'))
         parser.add_argument(
             '--floatingip', metavar='floatingips',
-            help=_('The limit of floating IPs'))
+            help=_('The limit of floating IPs.'))
         parser.add_argument(
             '--security-group', metavar='security_groups',
-            help=_('The limit of security groups'))
+            help=_('The limit of security groups.'))
         parser.add_argument(
             '--security-group-rule', metavar='security_group_rules',
-            help=_('The limit of security groups rules'))
+            help=_('The limit of security groups rules.'))
         parser.add_argument(
             '--vip', metavar='vips',
-            help=_('the limit of vips'))
+            help=_('The limit of vips.'))
         parser.add_argument(
             '--pool', metavar='pools',
-            help=_('the limit of pools'))
+            help=_('The limit of pools.'))
         parser.add_argument(
             '--member', metavar='members',
-            help=_('the limit of pool members'))
+            help=_('The limit of pool members.'))
         parser.add_argument(
             '--health-monitor', metavar='health_monitors',
-            help=_('the limit of health monitors'))
+            help=_('The limit of health monitors.'))
 
         return parser
 

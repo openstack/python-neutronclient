@@ -98,14 +98,14 @@ def validate_lifetime_dict(lifetime_dict):
 
 
 def lifetime_help(policy):
-    lifetime = _("%s Lifetime Attributes."
-                 "'units'-seconds,default:seconds. "
+    lifetime = _("%s lifetime attributes. "
+                 "'units'-seconds, default:seconds. "
                  "'value'-non negative integer, default:3600.") % policy
     return lifetime
 
 
 def dpd_help(policy):
-    dpd = _(" %s Dead Peer Detection Attributes. "
+    dpd = _(" %s Dead Peer Detection attributes."
             " 'action'-hold,clear,disabled,restart,restart-by-peer."
             " 'interval' and 'timeout' are non negative integers. "
             " 'interval' should be less than 'timeout' value. "

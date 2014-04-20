@@ -55,33 +55,33 @@ class CreatePool(neutronV20.CreateCommand):
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help=_('Set admin state up to false'))
+            help=_('Set admin state up to false.'))
         parser.add_argument(
             '--description',
-            help=_('Description of the pool'))
+            help=_('Description of the pool.'))
         parser.add_argument(
             '--lb-method',
             required=True,
             choices=['ROUND_ROBIN', 'LEAST_CONNECTIONS', 'SOURCE_IP'],
             help=_('The algorithm used to distribute load between the members '
-                   'of the pool'))
+                   'of the pool.'))
         parser.add_argument(
             '--name',
             required=True,
-            help=_('The name of the pool'))
+            help=_('The name of the pool.'))
         parser.add_argument(
             '--protocol',
             required=True,
             choices=['HTTP', 'HTTPS', 'TCP'],
-            help=_('Protocol for balancing'))
+            help=_('Protocol for balancing.'))
         parser.add_argument(
             '--subnet-id', metavar='SUBNET',
             required=True,
             help=_('The subnet on which the members of the pool will be '
-                   'located'))
+                   'located.'))
         parser.add_argument(
             '--provider',
-            help=_('Provider name of loadbalancer service'))
+            help=_('Provider name of loadbalancer service.'))
 
     def args2body(self, parsed_args):
         _subnet_id = neutronV20.find_resourceid_by_name_or_id(

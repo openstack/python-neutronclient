@@ -55,7 +55,7 @@ class ListRouterPort(neutronV20.ListCommand):
         parser = super(ListRouterPort, self).get_parser(prog_name)
         parser.add_argument(
             'id', metavar='router',
-            help=_('ID or name of router to look up'))
+            help=_('ID or name of router to look up.'))
         return parser
 
     def get_data(self, parsed_args):
@@ -85,7 +85,7 @@ class UpdatePortSecGroupMixin(object):
         group_sg.add_argument(
             '--no-security-groups',
             action='store_true',
-            help=_('Associate no security groups with the port'))
+            help=_('Associate no security groups with the port.'))
 
     def _resolv_sgid(self, secgroup):
         return neutronV20.find_resourceid_by_name_or_id(
@@ -149,24 +149,24 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--name',
-            help=_('Name of this port'))
+            help=_('Name of this port.'))
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help=_('Set admin state up to false'))
+            help=_('Set admin state up to false.'))
         parser.add_argument(
             '--admin_state_down',
             dest='admin_state', action='store_false',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--mac-address',
-            help=_('MAC address of this port'))
+            help=_('MAC address of this port.'))
         parser.add_argument(
             '--mac_address',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--device-id',
-            help=_('Device id of this port'))
+            help=_('Device ID of this port.'))
         parser.add_argument(
             '--device_id',
             help=argparse.SUPPRESS)
@@ -186,7 +186,7 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
 
         parser.add_argument(
             'network_id', metavar='NETWORK',
-            help=_('Network id or name this port belongs to'))
+            help=_('Network ID or name this port belongs to.'))
 
     def args2body(self, parsed_args):
         _network_id = neutronV20.find_resourceid_by_name_or_id(

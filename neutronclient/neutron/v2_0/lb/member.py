@@ -50,23 +50,23 @@ class CreateMember(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'pool_id', metavar='POOL',
-            help=_('Pool id or name this vip belongs to'))
+            help=_('Pool ID or name this vip belongs to.'))
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help=_('Set admin state up to false'))
+            help=_('Set admin state up to false.'))
         parser.add_argument(
             '--weight',
-            help=_('Weight of pool member in the pool (default:1, [0..256])'))
+            help=_('Weight of pool member in the pool (default:1, [0..256]).'))
         parser.add_argument(
             '--address',
             required=True,
-            help=_('IP address of the pool member on the pool network. '))
+            help=_('IP address of the pool member on the pool network.'))
         parser.add_argument(
             '--protocol-port',
             required=True,
             help=_('Port on which the pool member listens for requests or '
-                   'connections. '))
+                   'connections.'))
 
     def args2body(self, parsed_args):
         _pool_id = neutronV20.find_resourceid_by_name_or_id(

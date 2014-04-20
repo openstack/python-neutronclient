@@ -50,23 +50,23 @@ class CreateFirewall(neutronv20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'firewall_policy_id', metavar='POLICY',
-            help=_('Firewall policy id'))
+            help=_('Firewall policy ID.'))
         parser.add_argument(
             '--name',
-            help=_('Name for the firewall'))
+            help=_('Name for the firewall.'))
         parser.add_argument(
             '--description',
-            help=_('Description for the firewall rule'))
+            help=_('Description for the firewall rule.'))
         parser.add_argument(
             '--shared',
             action='store_true',
-            help=_('Set shared to True (default False)'),
+            help=_('Set shared to True (default is False).'),
             default=argparse.SUPPRESS)
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state',
             action='store_false',
-            help=_('Set admin state up to false'))
+            help=_('Set admin state up to false.'))
 
     def args2body(self, parsed_args):
         _policy_id = neutronv20.find_resourceid_by_name_or_id(

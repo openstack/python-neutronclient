@@ -45,7 +45,7 @@ class CreateNetPartition(CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'name', metavar='name',
-            help='Name of NetPartition to create')
+            help='Name of netpartition to create.')
 
     def args2body(self, parsed_args):
         body = {'net_partition': {'name': parsed_args.name}, }

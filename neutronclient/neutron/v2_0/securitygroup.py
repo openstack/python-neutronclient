@@ -48,10 +48,10 @@ class CreateSecurityGroup(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'name', metavar='NAME',
-            help=_('Name of security group'))
+            help=_('Name of security group.'))
         parser.add_argument(
             '--description',
-            help=_('Description of security group'))
+            help=_('Description of security group.'))
 
     def args2body(self, parsed_args):
         body = {'security_group': {
@@ -81,10 +81,10 @@ class UpdateSecurityGroup(neutronV20.UpdateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--name',
-            help=_('Name of security group'))
+            help=_('Name of security group.'))
         parser.add_argument(
             '--description',
-            help=_('Description of security group'))
+            help=_('Description of security group.'))
 
     def args2body(self, parsed_args):
         body = {'security_group': {}}
@@ -113,7 +113,7 @@ class ListSecurityGroupRule(neutronV20.ListCommand):
         parser = super(ListSecurityGroupRule, self).get_parser(prog_name)
         parser.add_argument(
             '--no-nameconv', action='store_true',
-            help=_('Do not convert security group ID to its name'))
+            help=_('Do not convert security group ID to its name.'))
         return parser
 
     @staticmethod
@@ -183,39 +183,39 @@ class CreateSecurityGroupRule(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'security_group_id', metavar='SECURITY_GROUP',
-            help=_('Security group name or id to add rule.'))
+            help=_('Security group name or ID to add rule.'))
         parser.add_argument(
             '--direction',
             default='ingress', choices=['ingress', 'egress'],
-            help=_('Direction of traffic: ingress/egress'))
+            help=_('Direction of traffic: ingress/egress.'))
         parser.add_argument(
             '--ethertype',
             default='IPv4',
             help=_('IPv4/IPv6'))
         parser.add_argument(
             '--protocol',
-            help=_('Protocol of packet'))
+            help=_('Protocol of packet.'))
         parser.add_argument(
             '--port-range-min',
-            help=_('Starting port range'))
+            help=_('Starting port range.'))
         parser.add_argument(
             '--port_range_min',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--port-range-max',
-            help=_('Ending port range'))
+            help=_('Ending port range.'))
         parser.add_argument(
             '--port_range_max',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--remote-ip-prefix',
-            help=_('CIDR to match on'))
+            help=_('CIDR to match on.'))
         parser.add_argument(
             '--remote_ip_prefix',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--remote-group-id', metavar='REMOTE_GROUP',
-            help=_('Remote security group name or id to apply rule'))
+            help=_('Remote security group name or ID to apply rule.'))
         parser.add_argument(
             '--remote_group_id',
             help=argparse.SUPPRESS)

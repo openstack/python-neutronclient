@@ -512,28 +512,28 @@ class Client(object):
 
     @APIParamsCall
     def list_vpnservices(self, retrieve_all=True, **_params):
-        """Fetches a list of all configured VPNServices for a tenant."""
+        """Fetches a list of all configured VPN services for a tenant."""
         return self.list('vpnservices', self.vpnservices_path, retrieve_all,
                          **_params)
 
     @APIParamsCall
     def show_vpnservice(self, vpnservice, **_params):
-        """Fetches information of a specific VPNService."""
+        """Fetches information of a specific VPN service."""
         return self.get(self.vpnservice_path % (vpnservice), params=_params)
 
     @APIParamsCall
     def create_vpnservice(self, body=None):
-        """Creates a new VPNService."""
+        """Creates a new VPN service."""
         return self.post(self.vpnservices_path, body=body)
 
     @APIParamsCall
     def update_vpnservice(self, vpnservice, body=None):
-        """Updates a VPNService."""
+        """Updates a VPN service."""
         return self.put(self.vpnservice_path % (vpnservice), body=body)
 
     @APIParamsCall
     def delete_vpnservice(self, vpnservice):
-        """Deletes the specified VPNService."""
+        """Deletes the specified VPN service."""
         return self.delete(self.vpnservice_path % (vpnservice))
 
     @APIParamsCall

@@ -76,43 +76,44 @@ class CreateFirewallRule(neutronv20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--name',
-            help=_('Name for the firewall rule'))
+            help=_('Name for the firewall rule.'))
         parser.add_argument(
             '--description',
-            help=_('Description for the firewall rule'))
+            help=_('Description for the firewall rule.'))
         parser.add_argument(
             '--shared',
             dest='shared',
             action='store_true',
-            help=_('Set shared to True (default False)'),
+            help=_('Set shared to True (default is False).'),
             default=argparse.SUPPRESS)
         parser.add_argument(
             '--source-ip-address',
-            help=_('Source ip address or subnet'))
+            help=_('Source IP address or subnet.'))
         parser.add_argument(
             '--destination-ip-address',
-            help=_('Destination ip address or subnet'))
+            help=_('Destination IP address or subnet.'))
         parser.add_argument(
             '--source-port',
-            help=_('Source port (integer in [1, 65535] or range in a:b)'))
+            help=_('Source port (integer in [1, 65535] or range in a:b).'))
         parser.add_argument(
             '--destination-port',
-            help=_('Destination port (integer in [1, 65535] or range in a:b)'))
+            help=_('Destination port (integer in [1, 65535] or range in '
+                   'a:b).'))
         parser.add_argument(
             '--disabled',
             dest='enabled',
             action='store_false',
-            help=_('To disable this rule'),
+            help=_('To disable this rule.'),
             default=argparse.SUPPRESS)
         parser.add_argument(
             '--protocol', choices=['tcp', 'udp', 'icmp', 'any'],
             required=True,
-            help=_('Protocol for the firewall rule'))
+            help=_('Protocol for the firewall rule.'))
         parser.add_argument(
             '--action',
             required=True,
             choices=['allow', 'deny'],
-            help=_('Action for the firewall rule'))
+            help=_('Action for the firewall rule.'))
 
     def args2body(self, parsed_args):
         body = {
@@ -140,7 +141,7 @@ class UpdateFirewallRule(neutronv20.UpdateCommand):
         parser.add_argument(
             '--protocol', choices=['tcp', 'udp', 'icmp', 'any'],
             required=False,
-            help=_('Protocol for the firewall rule'))
+            help=_('Protocol for the firewall rule.'))
 
     def args2body(self, parsed_args):
         body = {
