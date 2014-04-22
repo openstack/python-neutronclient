@@ -146,10 +146,11 @@ class CLITestV20NetworkGatewayJSON(test_cli20.CLITestV20Base):
             args.extend(['--client-certificate', client_certificate_file])
         args.append(name)
         if must_raise:
-            self.assertRaises(
-                SystemExit, self._test_create_resource,
-                self.dev_resource, cmd, name, myid, args,
-                position_names, position_values, extra_body=extra_body)
+            with test_cli20.capture_std_streams():
+                self.assertRaises(
+                    SystemExit, self._test_create_resource,
+                    self.dev_resource, cmd, name, myid, args,
+                    position_names, position_values, extra_body=extra_body)
         else:
             self._test_create_resource(
                 self.dev_resource, cmd, name, myid, args,
@@ -213,10 +214,11 @@ class CLITestV20NetworkGatewayJSON(test_cli20.CLITestV20Base):
             args.extend(['--client-certificate-file',
                          client_certificate_file])
         if must_raise:
-            self.assertRaises(
-                SystemExit, self._test_update_resource,
-                self.dev_resource, cmd, myid, args,
-                extrafields=extra_body)
+            with test_cli20.capture_std_streams():
+                self.assertRaises(
+                    SystemExit, self._test_update_resource,
+                    self.dev_resource, cmd, myid, args,
+                    extrafields=extra_body)
         else:
             self._test_update_resource(
                 self.dev_resource, cmd, myid, args,

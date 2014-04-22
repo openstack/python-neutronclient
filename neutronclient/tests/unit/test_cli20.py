@@ -16,8 +16,11 @@
 
 import urllib
 
+import contextlib
+import cStringIO
 import fixtures
 import mox
+import sys
 import testtools
 
 from neutronclient.common import constants
@@ -30,6 +33,17 @@ API_VERSION = "2.0"
 FORMAT = 'json'
 TOKEN = 'testtoken'
 ENDURL = 'localurl'
+
+
+@contextlib.contextmanager
+def capture_std_streams():
+    fake_stdout, fake_stderr = cStringIO.StringIO(), cStringIO.StringIO()
+    stdout, stderr = sys.stdout, sys.stderr
+    try:
+        sys.stdout, sys.stderr = fake_stdout, fake_stderr
+        yield fake_stdout, fake_stderr
+    finally:
+        sys.stdout, sys.stderr = stdout, stderr
 
 
 class FakeStdout:
