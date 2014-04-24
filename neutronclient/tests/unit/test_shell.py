@@ -128,8 +128,8 @@ class ShellTest(testtools.TestCase):
             username='test', user_id='',
             password='test', region_name='', api_version={'network': '2.0'},
             auth_strategy='keystone', service_type='network',
-            endpoint_type='publicURL', insecure=False, ca_cert=None,
-            log_credentials=True, timeout=None)
+            endpoint_type='publicURL', insecure=False, ca_cert=None, retries=0,
+            raise_errors=False, log_credentials=True, timeout=None)
         neutron_shell.run_subcommand(['quota-list'])
         self.mox.ReplayAll()
         cmdline = ('--os-username test '

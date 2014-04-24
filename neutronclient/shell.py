@@ -97,6 +97,17 @@ def env(*_vars, **kwargs):
     return kwargs.get('default', '')
 
 
+def check_non_negative_int(value):
+    try:
+        value = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(_("invalid int value: %r") % value)
+    if value < 0:
+        raise argparse.ArgumentTypeError(_("input value %d is negative") %
+                                         value)
+    return value
+
+
 COMMAND_V2 = {
     'net-list': network.ListNetwork,
     'net-external-list': network.ListExternalNetwork,
@@ -368,6 +379,13 @@ class NeutronShell(app.App):
             nargs=0,
             default=self,  # tricky
             help=_("Show this help message and exit."))
+        parser.add_argument(
+            '-r', '--retries',
+            metavar="NUM",
+            type=check_non_negative_int,
+            default=0,
+            help=_("How many times the request to the Neutron server should "
+                   "be retried if it fails."))
         # Global arguments
         parser.add_argument(
             '--os-auth-strategy', metavar='<auth-strategy>',
@@ -650,6 +668,8 @@ class NeutronShell(app.App):
             insecure=self.options.insecure,
             ca_cert=self.options.os_cacert,
             timeout=self.options.timeout,
+            retries=self.options.retries,
+            raise_errors=False,
             log_credentials=True)
         return
 

@@ -64,7 +64,9 @@ class ClientManager(object):
                  ca_cert=None,
                  log_credentials=False,
                  service_type=None,
-                 timeout=None
+                 timeout=None,
+                 retries=0,
+                 raise_errors=True
                  ):
         self._token = token
         self._url = url
@@ -84,7 +86,8 @@ class ClientManager(object):
         self._ca_cert = ca_cert
         self._log_credentials = log_credentials
         self._timeout = timeout
-        return
+        self._retries = retries
+        self._raise_errors = raise_errors
 
     def initialize(self):
         if not self._url:

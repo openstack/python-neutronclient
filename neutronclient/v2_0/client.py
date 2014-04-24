@@ -129,6 +129,12 @@ class Client(object):
                             http requests. (optional)
     :param bool insecure: SSL certificate validation. (optional)
     :param string ca_cert: SSL CA bundle file to use. (optional)
+    :param integer retries: How many times idempotent (GET, PUT, DELETE)
+                            requests to Neutron server should be retried if
+                            they fail (default: 0).
+    :param bool raise_errors: If True then exceptions caused by connection
+                              failure are propagated to the caller.
+                              (default: True)
 
     Example::
 
@@ -1194,7 +1200,8 @@ class Client(object):
         self.version = '2.0'
         self.format = 'json'
         self.action_prefix = "/v%s" % (self.version)
-        self.retries = 0
+        self.retries = kwargs.get('retries', 0)
+        self.raise_errors = kwargs.get('raise_errors', True)
         self.retry_interval = 1
 
     def _handle_fault_response(self, status_code, response_body):
@@ -1303,8 +1310,16 @@ class Client(object):
                 if i < self.retries:
                     _logger.debug('Retrying connection to Neutron service')
                     time.sleep(self.retry_interval)
+                elif self.raise_errors:
+                    raise
 
-        raise exceptions.ConnectionFailed(reason=_("Maximum attempts reached"))
+        if self.retries:
+            msg = (_("Failed to connect to Neutron server after %d attempts")
+                   % max_attempts)
+        else:
+            msg = _("Failed to connect Neutron server")
+
+        raise exceptions.ConnectionFailed(reason=msg)
 
     def delete(self, action, body=None, headers=None, params=None):
         return self.retry_request("DELETE", action, body=body,
