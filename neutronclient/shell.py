@@ -39,6 +39,7 @@ from neutronclient.neutron.v2_0 import floatingip
 from neutronclient.neutron.v2_0.fw import firewall
 from neutronclient.neutron.v2_0.fw import firewallpolicy
 from neutronclient.neutron.v2_0.fw import firewallrule
+from neutronclient.neutron.v2_0 import grouppolicy
 from neutronclient.neutron.v2_0.lb import healthmonitor as lb_healthmonitor
 from neutronclient.neutron.v2_0.lb import member as lb_member
 from neutronclient.neutron.v2_0.lb import pool as lb_pool
@@ -277,6 +278,16 @@ COMMAND_V2 = {
     'nec-packet-filter-create': packetfilter.CreatePacketFilter,
     'nec-packet-filter-update': packetfilter.UpdatePacketFilter,
     'nec-packet-filter-delete': packetfilter.DeletePacketFilter,
+    'endpoint-create': grouppolicy.CreateEndpoint,
+    'endpoint-delete': grouppolicy.DeleteEndpoint,
+    'endpoint-update': grouppolicy.UpdateEndpoint,
+    'endpoint-list': grouppolicy.ListEndpoint,
+    'endpoint-show': grouppolicy.ShowEndpoint,
+    'endpoint-group-create': grouppolicy.CreateEndpointGroup,
+    'endpoint-group-delete': grouppolicy.DeleteEndpointGroup,
+    'endpoint-group-update': grouppolicy.UpdateEndpointGroup,
+    'endpoint-group-list': grouppolicy.ListEndpointGroup,
+    'endpoint-group-show': grouppolicy.ShowEndpointGroup,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}

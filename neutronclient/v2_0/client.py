@@ -221,6 +221,10 @@ class Client(object):
     firewall_path = "/fw/firewalls/%s"
     net_partitions_path = "/net-partitions"
     net_partition_path = "/net-partitions/%s"
+    endpoints_path = "/endpoints"
+    endpoint_path = "/endpoints/%s"
+    endpoint_groups_path = "/endpoint_groups"
+    endpoint_group_path = "/endpoint_groups/%s"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -246,6 +250,8 @@ class Client(object):
                      'metering_label_rules': 'metering_label_rule',
                      'net_partitions': 'net_partition',
                      'packet_filters': 'packet_filter',
+                     'endpoints': 'endpoint',
+                     'endpoint_groups': 'endpoint_group',
                      }
     # 8192 Is the default max URI len for eventlet.wsgi.server
     MAX_URI_LEN = 8192
@@ -1186,6 +1192,62 @@ class Client(object):
     def delete_packet_filter(self, packet_filter_id):
         """Delete the specified packet filter."""
         return self.delete(self.packet_filter_path % packet_filter_id)
+
+    @APIParamsCall
+    def list_endpoints(self, retrieve_all=True, **_params):
+        """Fetches a list of all endpoints for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('endpoints', self.endpoints_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_endpoint(self, endpoint, **_params):
+        """Fetches information of a certain endpoint."""
+        return self.get(self.endpoint_path % (endpoint), params=_params)
+
+    @APIParamsCall
+    def create_endpoint(self, body=None):
+        """Creates a new endpoint."""
+        return self.post(self.endpoints_path, body=body)
+
+    @APIParamsCall
+    def update_endpoint(self, endpoint, body=None):
+        """Updates a endpoint."""
+        return self.put(self.endpoint_path % (endpoint), body=body)
+
+    @APIParamsCall
+    def delete_endpoint(self, endpoint):
+        """Deletes the specified endpoint."""
+        return self.delete(self.endpoint_path % (endpoint))
+
+    @APIParamsCall
+    def list_endpoint_groups(self, retrieve_all=True, **_params):
+        """Fetches a list of all endpoint_groups for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('endpoint_groups', self.endpoint_groups_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_endpoint_group(self, endpoint_group, **_params):
+        """Fetches information of a certain endpoint_group."""
+        return self.get(self.endpoint_group_path % (endpoint_group),
+                        params=_params)
+
+    @APIParamsCall
+    def create_endpoint_group(self, body=None):
+        """Creates a new endpoint_group."""
+        return self.post(self.endpoint_groups_path, body=body)
+
+    @APIParamsCall
+    def update_endpoint_group(self, endpoint_group, body=None):
+        """Updates a endpoint_group."""
+        return self.put(self.endpoint_group_path % (endpoint_group),
+                        body=body)
+
+    @APIParamsCall
+    def delete_endpoint_group(self, endpoint_group):
+        """Deletes the specified endpoint_group."""
+        return self.delete(self.endpoint_group_path % (endpoint_group))
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
