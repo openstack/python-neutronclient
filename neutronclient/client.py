@@ -21,7 +21,7 @@ except ImportError:
 import logging
 import os
 
-import httplib2
+import requests
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
@@ -29,15 +29,15 @@ from neutronclient.openstack.common.gettextutils import _
 
 _logger = logging.getLogger(__name__)
 
-# httplib2 retries requests on socket.timeout which
-# is not idempotent and can lead to orhan objects.
-# See: https://code.google.com/p/httplib2/issues/detail?id=124
-httplib2.RETRIES = 1
-
 if os.environ.get('NEUTRONCLIENT_DEBUG'):
     ch = logging.StreamHandler()
     _logger.setLevel(logging.DEBUG)
     _logger.addHandler(ch)
+    _requests_log_level = logging.DEBUG
+else:
+    _requests_log_level = logging.WARNING
+
+logging.getLogger("requests").setLevel(_requests_log_level)
 
 
 class ServiceCatalog(object):
@@ -89,7 +89,7 @@ class ServiceCatalog(object):
             return matching_endpoints[0][endpoint_type]
 
 
-class HTTPClient(httplib2.Http):
+class HTTPClient(object):
     """Handles the REST calls and responses, include authn."""
 
     USER_AGENT = 'python-neutronclient'
@@ -102,7 +102,6 @@ class HTTPClient(httplib2.Http):
                  auth_strategy='keystone', ca_cert=None, log_credentials=False,
                  service_type='network',
                  **kwargs):
-        super(HTTPClient, self).__init__(timeout=timeout, ca_certs=ca_cert)
 
         self.username = username
         self.tenant_name = tenant_name
@@ -112,6 +111,7 @@ class HTTPClient(httplib2.Http):
         self.service_type = service_type
         self.endpoint_type = endpoint_type
         self.region_name = region_name
+        self.timeout = timeout
         self.auth_token = token
         self.auth_tenant_id = None
         self.auth_user_id = None
@@ -119,8 +119,10 @@ class HTTPClient(httplib2.Http):
         self.endpoint_url = endpoint_url
         self.auth_strategy = auth_strategy
         self.log_credentials = log_credentials
-        # httplib2 overrides
-        self.disable_ssl_certificate_validation = insecure
+        if insecure:
+            self.verify_cert = False
+        else:
+            self.verify_cert = ca_cert if ca_cert else True
 
     def _cs_request(self, *args, **kwargs):
         kargs = {}
@@ -147,7 +149,7 @@ class HTTPClient(httplib2.Http):
         utils.http_log_req(_logger, args, log_kargs)
         try:
             resp, body = self.request(*args, **kargs)
-        except httplib2.SSLHandshakeError as e:
+        except requests.exceptions.SSLError as e:
             raise exceptions.SslCertificateValidationError(reason=e)
         except Exception as e:
             # Wrap the low-level connection error (socket timeout, redirect
@@ -155,11 +157,6 @@ class HTTPClient(httplib2.Http):
             # connection exception (it is excepted in the upper layers of code)
             _logger.debug("throwing ConnectionFailed : %s", e)
             raise exceptions.ConnectionFailed(reason=e)
-        finally:
-            # Temporary Fix for gate failures. RPC calls and HTTP requests
-            # seem to be stepping on each other resulting in bogus fd's being
-            # picked up for making http requests
-            self.connections.clear()
         utils.http_log_resp(_logger, resp, body)
         status_code = self.get_status_code(resp)
         if status_code == 401:
@@ -180,6 +177,22 @@ class HTTPClient(httplib2.Http):
             self.authenticate()
         elif not self.endpoint_url:
             self.endpoint_url = self._get_endpoint_url()
+
+    def request(self, url, method, **kwargs):
+        kwargs.setdefault('headers', kwargs.get('headers', {}))
+        kwargs['headers']['User-Agent'] = self.USER_AGENT
+        kwargs['headers']['Accept'] = 'application/json'
+        if 'body' in kwargs:
+            kwargs['headers']['Content-Type'] = 'application/json'
+            kwargs['data'] = kwargs['body']
+            del kwargs['body']
+        resp = requests.request(
+            method,
+            url,
+            verify=self.verify_cert,
+            **kwargs)
+
+        return resp, resp.text
 
     def do_request(self, url, method, **kwargs):
         self.authenticate_and_fetch_endpoint_url()
@@ -234,16 +247,10 @@ class HTTPClient(httplib2.Http):
             raise exceptions.NoAuthURLProvided()
 
         token_url = self.auth_url + "/tokens"
-
-        # Make sure we follow redirects when trying to reach Keystone
-        tmp_follow_all_redirects = self.follow_all_redirects
-        self.follow_all_redirects = True
-        try:
-            resp, resp_body = self._cs_request(token_url, "POST",
-                                               body=json.dumps(body),
-                                               content_type="application/json")
-        finally:
-            self.follow_all_redirects = tmp_follow_all_redirects
+        resp, resp_body = self._cs_request(token_url, "POST",
+                                           body=json.dumps(body),
+                                           content_type="application/json",
+                                           allow_redirects=True)
         status_code = self.get_status_code(resp)
         if status_code != 200:
             raise exceptions.Unauthorized(message=resp_body)
@@ -305,10 +312,10 @@ class HTTPClient(httplib2.Http):
     def get_status_code(self, response):
         """Returns the integer status code from the response.
 
-        Either a Webob.Response (used in testing) or httplib.Response
+        Either a Webob.Response (used in testing) or requests.Response
         is returned.
         """
         if hasattr(response, 'status_int'):
             return response.status_int
         else:
-            return response.status
+            return response.status_code

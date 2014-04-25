@@ -178,7 +178,10 @@ def http_log_req(_logger, args, kwargs):
 def http_log_resp(_logger, resp, body):
     if not _logger.isEnabledFor(logging.DEBUG):
         return
-    _logger.debug(_("RESP:%(resp)s %(body)s\n"), {'resp': resp, 'body': body})
+    _logger.debug(_("RESP:%(code)s %(headers)s %(body)s\n"),
+                  {'code': resp.status_code,
+                   'headers': resp.headers,
+                   'body': body})
 
 
 def _safe_encode_without_obj(data):

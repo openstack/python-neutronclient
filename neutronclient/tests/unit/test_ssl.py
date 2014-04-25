@@ -14,8 +14,8 @@
 #    under the License.
 
 import fixtures
-import httplib2
 import mox
+import requests
 import testtools
 
 from neutronclient.client import HTTPClient
@@ -126,10 +126,10 @@ class TestSSL(testtools.TestCase):
     def test_proper_exception_is_raised_when_cert_validation_fails(self):
         http = HTTPClient(token=AUTH_TOKEN, endpoint_url=END_URL)
 
-        self.mox.StubOutWithMock(httplib2.Http, 'request')
-        httplib2.Http.request(
+        self.mox.StubOutWithMock(HTTPClient, 'request')
+        HTTPClient.request(
             URL, METHOD, headers=mox.IgnoreArg()
-        ).AndRaise(httplib2.SSLHandshakeError)
+        ).AndRaise(requests.exceptions.SSLError)
         self.mox.ReplayAll()
 
         self.assertRaises(

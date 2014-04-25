@@ -48,8 +48,9 @@ class FakeStdout:
 
 
 class MyResp(object):
-    def __init__(self, status, reason=None):
-        self.status = status
+    def __init__(self, status_code, headers=None, reason=None):
+        self.status_code = status_code
+        self.headers = headers or {}
         self.reason = reason
 
 
@@ -533,7 +534,7 @@ class ClientV2TestJson(CLITestV20Base):
             end_url('/test', query=expect_query, format=self.format),
             'PUT', body='',
             headers=mox.ContainsKeyValue('X-Auth-Token', 'token')
-        ).AndReturn((MyResp(400, 'An error'), ''))
+        ).AndReturn((MyResp(400, reason='An error'), ''))
 
         self.mox.ReplayAll()
         error = self.assertRaises(exceptions.NeutronClientException,
