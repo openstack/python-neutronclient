@@ -28,8 +28,9 @@ from neutronclient.common import utils
 
 
 USERNAME = 'testuser'
+USER_ID = 'testuser_id'
 TENANT_NAME = 'testtenant'
-TENANT_ID = 'testtenantid'
+TENANT_ID = 'testtenant_id'
 PASSWORD = 'password'
 AUTH_URL = 'authurl'
 ENDPOINT_URL = 'localurl'
@@ -107,8 +108,10 @@ class CLITestAuthNoAuth(testtools.TestCase):
 
 class CLITestAuthKeystone(testtools.TestCase):
 
-    # Auth Body expected when using tenant name
-    auth_type = 'tenantName'
+    # Auth Body expected
+    auth_body = ('{"auth": {"tenantName": "testtenant", '
+                 '"passwordCredentials": '
+                 '{"username": "testuser", "password": "password"}}}')
 
     def setUp(self):
         """Prepare the test environment."""
@@ -127,7 +130,6 @@ class CLITestAuthKeystone(testtools.TestCase):
            instantiated with predefined token.
         """
         client_ = client.HTTPClient(username=USERNAME,
-                                    tenant_id=TENANT_ID,
                                     tenant_name=TENANT_NAME,
                                     token=TOKEN,
                                     password=PASSWORD,
@@ -146,7 +148,7 @@ class CLITestAuthKeystone(testtools.TestCase):
 
         self.client.request(
             AUTH_URL + '/tokens', 'POST',
-            body=mox.StrContains(self.auth_type), headers=mox.IsA(dict)
+            body=self.auth_body, headers=mox.IsA(dict)
         ).AndReturn((res200, json.dumps(KS_TOKEN_RESULT)))
         self.client.request(
             mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
@@ -447,13 +449,15 @@ class CLITestAuthKeystone(testtools.TestCase):
 
 class CLITestAuthKeystoneWithId(CLITestAuthKeystone):
 
-    # Auth Body expected when using tenant Id
-    auth_type = 'tenantId'
+    # Auth Body expected
+    auth_body = ('{"auth": {"passwordCredentials": '
+                 '{"password": "password", "userId": "testuser_id"}, '
+                 '"tenantId": "testtenant_id"}}')
 
     def setUp(self):
         """Prepare the test environment."""
         super(CLITestAuthKeystoneWithId, self).setUp()
-        self.client = client.HTTPClient(username=USERNAME,
+        self.client = client.HTTPClient(user_id=USER_ID,
                                         tenant_id=TENANT_ID,
                                         password=PASSWORD,
                                         auth_url=AUTH_URL,
@@ -462,13 +466,16 @@ class CLITestAuthKeystoneWithId(CLITestAuthKeystone):
 
 class CLITestAuthKeystoneWithIdandName(CLITestAuthKeystone):
 
-    # Auth Body expected when using tenant Id
-    auth_type = 'tenantId'
+    # Auth Body expected
+    auth_body = ('{"auth": {"passwordCredentials": '
+                 '{"password": "password", "userId": "testuser_id"}, '
+                 '"tenantId": "testtenant_id"}}')
 
     def setUp(self):
         """Prepare the test environment."""
         super(CLITestAuthKeystoneWithIdandName, self).setUp()
         self.client = client.HTTPClient(username=USERNAME,
+                                        user_id=USER_ID,
                                         tenant_id=TENANT_ID,
                                         tenant_name=TENANT_NAME,
                                         password=PASSWORD,

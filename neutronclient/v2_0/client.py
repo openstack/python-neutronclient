@@ -108,6 +108,7 @@ class Client(object):
     """Client for the OpenStack Neutron v2.0 API.
 
     :param string username: Username for authentication. (optional)
+    :param string user_id: User ID for authentication. (optional)
     :param string password: Password for authentication. (optional)
     :param string token: Token for authentication. (optional)
     :param string tenant_name: Tenant name. (optional)

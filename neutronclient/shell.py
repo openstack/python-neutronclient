@@ -398,7 +398,7 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-tenant-id', metavar='<auth-tenant-id>',
             default=env('OS_TENANT_ID'),
-            help=_('Authentication tenant name (Env: OS_TENANT_ID)'))
+            help=_('Authentication tenant ID (Env: OS_TENANT_ID)'))
 
         parser.add_argument(
             '--os-username', metavar='<auth-username>',
@@ -407,6 +407,11 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os_username',
             help=argparse.SUPPRESS)
+
+        parser.add_argument(
+            '--os-user-id', metavar='<auth-user-id>',
+            default=env('OS_USER_ID'),
+            help=_('Authentication user ID (Env: OS_USER_ID)'))
 
         parser.add_argument(
             '--os-password', metavar='<auth-password>',
@@ -590,10 +595,12 @@ class NeutronShell(app.App):
 
             else:
                 # Validate password flow auth
-                if not self.options.os_username:
+                if (not self.options.os_username
+                    and not self.options.os_user_id):
                     raise exc.CommandError(
-                        _("You must provide a username via"
-                          " either --os-username or env[OS_USERNAME]"))
+                        _("You must provide a username or user ID via"
+                          "  --os-username, env[OS_USERNAME] or"
+                          "  --os-user_id, env[OS_USER_ID]"))
 
                 if not self.options.os_password:
                     raise exc.CommandError(
@@ -624,6 +631,7 @@ class NeutronShell(app.App):
             tenant_name=self.options.os_tenant_name,
             tenant_id=self.options.os_tenant_id,
             username=self.options.os_username,
+            user_id=self.options.os_user_id,
             password=self.options.os_password,
             region_name=self.options.os_region_name,
             api_version=self.api_version,
