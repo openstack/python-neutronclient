@@ -355,7 +355,7 @@ class NeutronShell(app.App):
             dest='verbose_level',
             default=self.DEFAULT_VERBOSE_LEVEL,
             help=_('Increase verbosity of output and show tracebacks on'
-                   ' errors. Can be repeated.'))
+                   ' errors. You can repeat this option.'))
         parser.add_argument(
             '-q', '--quiet',
             action='store_const',

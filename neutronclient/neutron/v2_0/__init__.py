@@ -106,8 +106,8 @@ def add_show_list_common_argument(parser):
     parser.add_argument(
         '-F', '--field',
         dest='fields', metavar='FIELD',
-        help=_('Specify the field(s) to be returned by server,'
-               ' can be repeated'),
+        help=_('Specify the field(s) to be returned by server. You can '
+               'repeat this option.'),
         action='append',
         default=[])
 
@@ -126,16 +126,17 @@ def add_sorting_argument(parser):
         '--sort-key',
         dest='sort_key', metavar='FIELD',
         action='append',
-        help=_("Sort list by specified fields (This option can be repeated), "
-               "The number of sort_dir and sort_key should match each other, "
-               "more sort_dir specified will be omitted, less will be filled "
-               "with asc as default direction "),
+        help=_("Sorts the list by the specified fields in the specified "
+               "directions. You can repeat this option, but you must "
+               "specify an equal number of sort_dir and sort_key values. "
+               "Extra sort_dir options are ignored. Missing sort_dir options "
+               "use the default asc value."),
         default=[])
     parser.add_argument(
         '--sort-dir',
         dest='sort_dir', metavar='{asc,desc}',
-        help=_("Sort list in specified directions "
-               "(This option can be repeated)"),
+        help=_("Sorts the list in the specified direction. You can repeat "
+               "this option."),
         action='append',
         default=[],
         choices=['asc', 'desc'])

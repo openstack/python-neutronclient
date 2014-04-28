@@ -80,8 +80,8 @@ class UpdatePortSecGroupMixin(object):
         group_sg.add_argument(
             '--security-group', metavar='SECURITY_GROUP',
             default=[], action='append', dest='security_groups',
-            help=_('Security group associated with the port '
-            '(This option can be repeated)'))
+            help=_('Security group associated with the port. You can '
+                   'repeat this option.'))
         group_sg.add_argument(
             '--no-security-groups',
             action='store_true',
@@ -108,8 +108,8 @@ class UpdateExtraDhcpOptMixin(object):
             action='append',
             dest='extra_dhcp_opts',
             help=_('Extra dhcp options to be assigned to this port: '
-                   'opt_name=<dhcp_option_name>,opt_value=<value>, '
-                   '(This option can be repeated.)'))
+                   'opt_name=<dhcp_option_name>,opt_value=<value>. You can '
+                   'repeat this option.'))
 
     def args2body_extradhcpopt(self, parsed_args, port):
         ops = []
@@ -119,8 +119,8 @@ class UpdateExtraDhcpOptMixin(object):
             # both must be thrown out.
             opt_ele = {}
             edo_err_msg = _("Invalid --extra-dhcp-opt option, can only be: "
-                            "opt_name=<dhcp_option_name>,opt_value=<value>, "
-                            "(This option can be repeated.")
+                            "opt_name=<dhcp_option_name>,opt_value=<value>. "
+                            "You can repeat this option.")
             for opt in parsed_args.extra_dhcp_opts:
                 if opt.split('=')[0] in ['opt_value', 'opt_name']:
                     opt_ele.update(utils.str2dict(opt))
@@ -174,8 +174,8 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
             '--fixed-ip', metavar='subnet_id=SUBNET,ip_address=IP_ADDR',
             action='append',
             help=_('Desired IP and/or subnet for this port: '
-                   'subnet_id=<name_or_id>,ip_address=<ip>, '
-                   '(This option can be repeated.)'))
+                   'subnet_id=<name_or_id>,ip_address=<ip>.'
+                   'You can repeat this option.'))
         parser.add_argument(
             '--fixed_ip',
             action='append',
