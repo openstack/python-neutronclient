@@ -79,7 +79,7 @@ class CreateEndpoint(neutronV20.CreateCommand, UpdateEndpointPortMixin):
                                ['name', 'tenant_id', 'description'])
         if parsed_args.endpoint_group:
             body[self.resource]['endpoint_group_id'] = \
-                neutronV20_find_resourceid_by_name_or_id(
+                neutronV20.find_resourceid_by_name_or_id(
                     self.get_client(), 'endpoint_group',
                     parsed_args.endpoint_group)
 
@@ -192,7 +192,7 @@ class CreateEndpointGroup(neutronV20.CreateCommand,
 
         if parsed_args.bridge_domain:
             body[self.resource]['bridge_domain_id'] = \
-                neutronV20_find_resourceid_by_name_or_id(
+                neutronV20.find_resourceid_by_name_or_id(
                     self.get_client(), 'bridge_domain',
                     parsed_args.bridge_domain)
 
@@ -260,7 +260,7 @@ class CreateContract(neutronV20.CreateCommand):
 
         if parsed_args.policy_rules:
             body[self.resource]['policy_rules'] = [
-                neutronV20_find_resourceid_by_name_or_id(
+                neutronV20.find_resourceid_by_name_or_id(
                     self.get_client(),
                     'policy_rule',
                     elem) for elem in parsed_args.policy_rules]
@@ -333,7 +333,7 @@ class CreatePolicyRule(neutronV20.CreateCommand):
 
         if parsed_args.actions:
             body[self.resource]['actions'] = [
-                neutronV20_find_resourceid_by_name_or_id(
+                neutronV20.find_resourceid_by_name_or_id(
                     self.get_client(),
                     'action',
                     elem) for elem in parsed_args.actions]
@@ -535,7 +535,7 @@ class CreateBridgeDomain(neutronV20.CreateCommand):
                                ['name', 'tenant_id', 'description'])
         if parsed_args.routing_domain:
             body[self.resource]['routing_domain_id'] = \
-                neutronV20_find_resourceid_by_name_or_id(
+                neutronV20.find_resourceid_by_name_or_id(
                     self.get_client(), 'routing_domain',
                     parsed_args.routing_domain)
 
