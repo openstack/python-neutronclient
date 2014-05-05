@@ -48,7 +48,7 @@ class UpdateEndpointPortMixin(object):
 
     def args2body_port(self, parsed_args, endpoint):
         if parsed_args.port:
-            endpoint['port'] = neutronV20_find_resourceid_by_name_or_id(
+            endpoint['port'] = neutronV20.find_resourceid_by_name_or_id(
                 self.get_client(), 'port', parsed_args.port)
 
 
@@ -135,7 +135,7 @@ class UpdateEndpointGroupSubnetMixin(object):
 
     def args2body_subnet(self, parsed_args, endpoint):
         if parsed_args.subnet:
-            endpoint['subnet'] = neutronV20_find_resourceid_by_name_or_id(
+            endpoint['subnet'] = neutronV20.find_resourceid_by_name_or_id(
                 self.get_client(), 'subnet', parsed_args.subnet)
 
 
@@ -184,7 +184,7 @@ class CreateEndpointGroup(neutronV20.CreateCommand,
         for attr_name, res_name in attr_map.items():
             if getattr(parsed_args, attr_name):
                 _uuids = [
-                    neutronV20_find_resourceid_by_name_or_id(
+                    neutronV20.find_resourceid_by_name_or_id(
                         self.get_client(),
                         res_name,
                         elem) for elem in getattr(parsed_args, attr_name)]
