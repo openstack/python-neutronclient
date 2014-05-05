@@ -25,6 +25,13 @@ import logging
 import os
 import sys
 
+from keystoneclient.auth.identity import v2 as v2_auth
+from keystoneclient.auth.identity import v3 as v3_auth
+from keystoneclient import discover
+from keystoneclient.openstack.common.apiclient import exceptions as ks_exc
+from keystoneclient import session
+import six.moves.urllib.parse as urlparse
+
 from cliff import app
 from cliff import commandmanager
 
@@ -386,13 +393,50 @@ class NeutronShell(app.App):
             default=0,
             help=_("How many times the request to the Neutron server should "
                    "be retried if it fails."))
-        # Global arguments
+        # FIXME(bklei): this method should come from python-keystoneclient
+        self._append_global_identity_args(parser)
+
+        return parser
+
+    def _append_global_identity_args(self, parser):
+        # FIXME(bklei): these are global identity (Keystone) arguments which
+        # should be consistent and shared by all service clients. Therefore,
+        # they should be provided by python-keystoneclient. We will need to
+        # refactor this code once this functionality is available in
+        # python-keystoneclient.
+        #
+        # Note: At that time we'll need to decide if we can just abandon
+        #       the deprecated args (--service-type and --endpoint-type).
+
+        parser.add_argument(
+            '--os-service-type', metavar='<os-service-type>',
+            default=env('OS_NETWORK_SERVICE_TYPE', default='network'),
+            help=_('Defaults to env[OS_NETWORK_SERVICE_TYPE] or network.'))
+
+        parser.add_argument(
+            '--os-endpoint-type', metavar='<os-endpoint-type>',
+            default=env('OS_ENDPOINT_TYPE', default='publicURL'),
+            help=_('Defaults to env[OS_ENDPOINT_TYPE] or publicURL.'))
+
+        # FIXME(bklei): --service-type is deprecated but kept in for
+        # backward compatibility.
+        parser.add_argument(
+            '--service-type', metavar='<service-type>',
+            default=env('OS_NETWORK_SERVICE_TYPE', default='network'),
+            help=_('DEPRECATED! Use --os-service-type.'))
+
+        # FIXME(bklei): --endpoint-type is deprecated but kept in for
+        # backward compatibility.
+        parser.add_argument(
+            '--endpoint-type', metavar='<endpoint-type>',
+            default=env('OS_ENDPOINT_TYPE', default='publicURL'),
+            help=_('DEPRECATED! Use --os-endpoint-type.'))
+
         parser.add_argument(
             '--os-auth-strategy', metavar='<auth-strategy>',
             default=env('OS_AUTH_STRATEGY', default='keystone'),
-            help=_('Authentication strategy, defaults to '
-            'env[OS_AUTH_STRATEGY] or keystone. For now, any '
-            'other value will disable the authentication.'))
+            help=_('DEPRECATED! Only keystone is supported.'))
+
         parser.add_argument(
             '--os_auth_strategy',
             help=argparse.SUPPRESS)
@@ -405,20 +449,39 @@ class NeutronShell(app.App):
             '--os_auth_url',
             help=argparse.SUPPRESS)
 
-        parser.add_argument(
+        project_name_group = parser.add_mutually_exclusive_group()
+        project_name_group.add_argument(
             '--os-tenant-name', metavar='<auth-tenant-name>',
             default=env('OS_TENANT_NAME'),
             help=_('Authentication tenant name, defaults to '
                    'env[OS_TENANT_NAME].'))
+        project_name_group.add_argument(
+            '--os-project-name',
+            metavar='<auth-project-name>',
+            default=utils.env('OS_PROJECT_NAME'),
+            help='Another way to specify tenant name. '
+                 'This option is mutually exclusive with '
+                 ' --os-tenant-name. '
+                 'Defaults to env[OS_PROJECT_NAME].')
+
         parser.add_argument(
             '--os_tenant_name',
             help=argparse.SUPPRESS)
 
-        parser.add_argument(
+        project_id_group = parser.add_mutually_exclusive_group()
+        project_id_group.add_argument(
             '--os-tenant-id', metavar='<auth-tenant-id>',
             default=env('OS_TENANT_ID'),
             help=_('Authentication tenant ID, defaults to '
                    'env[OS_TENANT_ID].'))
+        project_id_group.add_argument(
+            '--os-project-id',
+            metavar='<auth-project-id>',
+            default=utils.env('OS_PROJECT_ID'),
+            help='Another way to specify tenant ID. '
+            'This option is mutually exclusive with '
+            ' --os-tenant-id. '
+            'Defaults to env[OS_PROJECT_ID].')
 
         parser.add_argument(
             '--os-username', metavar='<auth-username>',
@@ -432,6 +495,78 @@ class NeutronShell(app.App):
             '--os-user-id', metavar='<auth-user-id>',
             default=env('OS_USER_ID'),
             help=_('Authentication user ID (Env: OS_USER_ID)'))
+
+        parser.add_argument(
+            '--os_user_id',
+            help=argparse.SUPPRESS)
+
+        parser.add_argument(
+            '--os-user-domain-id',
+            metavar='<auth-user-domain-id>',
+            default=utils.env('OS_USER_DOMAIN_ID'),
+            help='OpenStack user domain ID. '
+            'Defaults to env[OS_USER_DOMAIN_ID].')
+
+        parser.add_argument(
+            '--os_user_domain_id',
+            help=argparse.SUPPRESS)
+
+        parser.add_argument(
+            '--os-user-domain-name',
+            metavar='<auth-user-domain-name>',
+            default=utils.env('OS_USER_DOMAIN_NAME'),
+            help='OpenStack user domain name. '
+                 'Defaults to env[OS_USER_DOMAIN_NAME].')
+
+        parser.add_argument(
+            '--os_user_domain_name',
+            help=argparse.SUPPRESS)
+
+        parser.add_argument(
+            '--os_project_id',
+            help=argparse.SUPPRESS)
+
+        parser.add_argument(
+            '--os_project_name',
+            help=argparse.SUPPRESS)
+
+        parser.add_argument(
+            '--os-project-domain-id',
+            metavar='<auth-project-domain-id>',
+            default=utils.env('OS_PROJECT_DOMAIN_ID'),
+            help='Defaults to env[OS_PROJECT_DOMAIN_ID].')
+
+        parser.add_argument(
+            '--os-project-domain-name',
+            metavar='<auth-project-domain-name>',
+            default=utils.env('OS_PROJECT_DOMAIN_NAME'),
+            help='Defaults to env[OS_PROJECT_DOMAIN_NAME].')
+
+        parser.add_argument(
+            '--os-cert',
+            metavar='<certificate>',
+            default=utils.env('OS_CERT'),
+            help=_("Path of certificate file to use in SSL "
+                   "connection. This file can optionally be "
+                   "prepended with the private key. Defaults "
+                   "to env[OS_CERT]"))
+
+        parser.add_argument(
+            '--os-cacert',
+            metavar='<ca-certificate>',
+            default=env('OS_CACERT', default=None),
+            help=_("Specify a CA bundle file to use in "
+                   "verifying a TLS (https) server certificate. "
+                   "Defaults to env[OS_CACERT]"))
+
+        parser.add_argument(
+            '--os-key',
+            metavar='<key>',
+            default=utils.env('OS_KEY'),
+            help=_("Path of client key to use in SSL "
+                   "connection. This option is not necessary "
+                   "if your key is prepended to your certificate "
+                   "file. Defaults to env[OS_KEY]"))
 
         parser.add_argument(
             '--os-password', metavar='<auth-password>',
@@ -459,20 +594,10 @@ class NeutronShell(app.App):
             help=argparse.SUPPRESS)
 
         parser.add_argument(
-            '--service-type', metavar='<service-type>',
-            default=env('OS_NETWORK_SERVICE_TYPE', default='network'),
-            help=_('Defaults to env[OS_NETWORK_SERVICE_TYPE] or network.'))
-
-        parser.add_argument(
             '--timeout', metavar='<seconds>',
             default=env('OS_NETWORK_TIMEOUT', default=None), type=float,
             help=_('Timeout in seconds to wait for an HTTP response. Defaults '
                    'to env[OS_NETWORK_TIMEOUT] or None if not specified.'))
-
-        parser.add_argument(
-            '--endpoint-type', metavar='<endpoint-type>',
-            default=env('OS_ENDPOINT_TYPE', default='publicURL'),
-            help=_('Defaults to env[OS_ENDPOINT_TYPE] or publicURL.'))
 
         parser.add_argument(
             '--os-url', metavar='<url>',
@@ -483,14 +608,6 @@ class NeutronShell(app.App):
             help=argparse.SUPPRESS)
 
         parser.add_argument(
-            '--os-cacert',
-            metavar='<ca-certificate>',
-            default=env('OS_CACERT', default=None),
-            help=_("Specify a CA bundle file to use in "
-                   "verifying a TLS (https) server certificate. "
-                   "Defaults to env[OS_CACERT]."))
-
-        parser.add_argument(
             '--insecure',
             action='store_true',
             default=env('NEUTRONCLIENT_INSECURE', default=False),
@@ -498,8 +615,6 @@ class NeutronShell(app.App):
                    "SSL (https) requests. The server's certificate will "
                    "not be verified against any certificate authorities. "
                    "This option should be used with caution."))
-
-        return parser
 
     def _bash_completion(self):
         """Prints all of the commands and options for bash-completion."""
@@ -622,6 +737,13 @@ class NeutronShell(app.App):
 
             else:
                 # Validate password flow auth
+                project_info = (self.options.os_tenant_name or
+                                self.options.os_tenant_id or
+                                (self.options.os_project_name and
+                                    (self.options.project_domain_name or
+                                     self.options.project_domain_id)) or
+                                self.options.os_project_id)
+
                 if (not self.options.os_username
                     and not self.options.os_user_id):
                     raise exc.CommandError(
@@ -634,12 +756,19 @@ class NeutronShell(app.App):
                         _("You must provide a password via"
                           " either --os-password or env[OS_PASSWORD]"))
 
-                if (not self.options.os_tenant_name
-                    and not self.options.os_tenant_id):
+                if (not project_info):
+                    # tenent is deprecated in Keystone v3. Use the latest
+                    # terminology instead.
                     raise exc.CommandError(
-                        _("You must provide a tenant_name or tenant_id via"
-                          "  --os-tenant-name, env[OS_TENANT_NAME]"
-                          "  --os-tenant-id, or via env[OS_TENANT_ID]"))
+                        _("You must provide a project_id or project_name ("
+                          "with project_domain_name or project_domain_id) "
+                          "via "
+                          "  --os-project-id (env[OS_PROJECT_ID])"
+                          "  --os-project-name (env[OS_PROJECT_NAME]),"
+                          "  --os-project-domain-id "
+                          "(env[OS_PROJECT_DOMAIN_ID])"
+                          "  --os-project-domain-name "
+                          "(env[OS_PROJECT_DOMAIN_NAME])"))
 
                 if not self.options.os_auth_url:
                     raise exc.CommandError(
@@ -650,6 +779,8 @@ class NeutronShell(app.App):
                 raise exc.CommandError(
                     _("You must provide a service URL via"
                       " either --os-url or env[OS_URL]"))
+
+        auth_session = self._get_keystone_session()
 
         self.client_manager = clientmanager.ClientManager(
             token=self.options.os_token,
@@ -663,13 +794,18 @@ class NeutronShell(app.App):
             region_name=self.options.os_region_name,
             api_version=self.api_version,
             auth_strategy=self.options.os_auth_strategy,
-            service_type=self.options.service_type,
-            endpoint_type=self.options.endpoint_type,
+            # FIXME (bklei) honor deprecated service_type and
+            # endpoint type until they are removed
+            service_type=self.options.os_service_type or
+            self.options.service_type,
+            endpoint_type=self.options.os_endpoint_type or self.endpoint_type,
             insecure=self.options.insecure,
             ca_cert=self.options.os_cacert,
             timeout=self.options.timeout,
             retries=self.options.retries,
             raise_errors=False,
+            session=auth_session,
+            auth=auth_session.auth,
             log_credentials=True)
         return
 
@@ -720,6 +856,89 @@ class NeutronShell(app.App):
         console.setFormatter(formatter)
         root_logger.addHandler(console)
         return
+
+    def get_v2_auth(self, v2_auth_url):
+        return v2_auth.Password(
+            v2_auth_url,
+            username=self.options.os_username,
+            password=self.options.os_password,
+            tenant_id=self.options.os_tenant_id,
+            tenant_name=self.options.os_tenant_name)
+
+    def get_v3_auth(self, v3_auth_url):
+        project_id = self.options.os_project_id or self.options.os_tenant_id
+        project_name = (self.options.os_project_name or
+                        self.options.os_tenant_name)
+
+        return v3_auth.Password(
+            v3_auth_url,
+            username=self.options.os_username,
+            password=self.options.os_password,
+            user_id=self.options.os_user_id,
+            user_domain_name=self.options.os_user_domain_name,
+            user_domain_id=self.options.os_user_domain_id,
+            project_id=project_id,
+            project_name=project_name,
+            project_domain_name=self.options.os_project_domain_name,
+            project_domain_id=self.options.os_project_domain_id
+        )
+
+    def _discover_auth_versions(self, session, auth_url):
+        # discover the API versions the server is supporting base on the
+        # given URL
+        try:
+            ks_discover = discover.Discover(session=session, auth_url=auth_url)
+            return (ks_discover.url_for('2.0'), ks_discover.url_for('3.0'))
+        except ks_exc.ClientException:
+            # Identity service may not support discover API version.
+            # Lets try to figure out the API version from the original URL.
+            url_parts = urlparse.urlparse(auth_url)
+            (scheme, netloc, path, params, query, fragment) = url_parts
+            path = path.lower()
+            if path.startswith('/v3'):
+                return (None, auth_url)
+            elif path.startswith('/v2'):
+                return (auth_url, None)
+            else:
+                # not enough information to determine the auth version
+                msg = _('Unable to determine the Keystone version '
+                        'to authenticate with using the given '
+                        'auth_url. Identity service may not support API '
+                        'version discovery. Please provide a versioned '
+                        'auth_url instead.')
+                raise exc.CommandError(msg)
+
+    def _get_keystone_session(self):
+        # first create a Keystone session
+        cacert = self.options.os_cacert or None
+        cert = self.options.os_cert or None
+        key = self.options.os_key or None
+        insecure = self.options.insecure or False
+        ks_session = session.Session.construct(dict(cacert=cacert,
+                                                    cert=cert,
+                                                    key=key,
+                                                    insecure=insecure))
+        # discover the supported keystone versions using the given url
+        (v2_auth_url, v3_auth_url) = self._discover_auth_versions(
+            session=ks_session,
+            auth_url=self.options.os_auth_url)
+
+        # Determine which authentication plugin to use. First inspect the
+        # auth_url to see the supported version. If both v3 and v2 are
+        # supported, then use the highest version if possible.
+        user_domain_name = self.options.os_user_domain_name or None
+        user_domain_id = self.options.os_user_domain_id or None
+        project_domain_name = self.options.os_project_domain_name or None
+        project_domain_id = self.options.os_project_domain_id or None
+        domain_info = (user_domain_name or user_domain_id or
+                       project_domain_name or project_domain_id)
+
+        if (v2_auth_url and not domain_info) or not v3_auth_url:
+            ks_session.auth = self.get_v2_auth(v2_auth_url)
+        else:
+            ks_session.auth = self.get_v3_auth(v3_auth_url)
+
+        return ks_session
 
 
 def main(argv=sys.argv[1:]):

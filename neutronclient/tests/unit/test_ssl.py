@@ -14,15 +14,17 @@
 #    under the License.
 
 import fixtures
-from mox3 import mox
 import requests
 import testtools
+
+import httpretty
+from mox3 import mox
 
 from neutronclient.client import HTTPClient
 from neutronclient.common.clientmanager import ClientManager
 from neutronclient.common import exceptions
 from neutronclient import shell as openstack_shell
-
+from neutronclient.tests.unit import test_auth as auth
 
 AUTH_TOKEN = 'test_token'
 END_URL = 'test_url'
@@ -41,7 +43,13 @@ class TestSSL(testtools.TestCase):
         self.mox = mox.Mox()
         self.addCleanup(self.mox.UnsetStubs)
 
+    @httpretty.activate
     def test_ca_cert_passed(self):
+        # emulate Keystone version discovery
+        httpretty.register_uri(httpretty.GET,
+                               auth.V3_URL,
+                               body=auth.V3_VERSION_ENTRY)
+
         self.mox.StubOutWithMock(ClientManager, '__init__')
         self.mox.StubOutWithMock(openstack_shell.NeutronShell, 'interact')
 
@@ -66,14 +74,27 @@ class TestSSL(testtools.TestCase):
             raise_errors=mox.IgnoreArg(),
             log_credentials=mox.IgnoreArg(),
             timeout=mox.IgnoreArg(),
+            auth=mox.IgnoreArg(),
+            session=mox.IgnoreArg()
         )
         openstack_shell.NeutronShell.interact().AndReturn(0)
         self.mox.ReplayAll()
 
-        openstack_shell.NeutronShell('2.0').run(['--os-cacert', CA_CERT])
+        cmdline = (
+            '--os-cacert %s --os-auth-url %s' %
+            (CA_CERT, auth.V3_URL))
+
+        openstack_shell.NeutronShell('2.0').run(cmdline.split())
         self.mox.VerifyAll()
 
+    @httpretty.activate
     def test_ca_cert_passed_as_env_var(self):
+
+        # emulate Keystone version discovery
+        httpretty.register_uri(httpretty.GET,
+                               auth.V3_URL,
+                               body=auth.V3_VERSION_ENTRY)
+
         self.useFixture(fixtures.EnvironmentVariable('OS_CACERT', CA_CERT))
 
         self.mox.StubOutWithMock(ClientManager, '__init__')
@@ -100,11 +121,15 @@ class TestSSL(testtools.TestCase):
             raise_errors=mox.IgnoreArg(),
             log_credentials=mox.IgnoreArg(),
             timeout=mox.IgnoreArg(),
+            auth=mox.IgnoreArg(),
+            session=mox.IgnoreArg()
         )
         openstack_shell.NeutronShell.interact().AndReturn(0)
         self.mox.ReplayAll()
 
-        openstack_shell.NeutronShell('2.0').run([])
+        cmdline = ('--os-auth-url %s' % auth.V3_URL)
+        openstack_shell.NeutronShell('2.0').run(cmdline.split())
+
         self.mox.VerifyAll()
 
     def test_client_manager_properly_creates_httpclient_instance(self):
@@ -121,8 +146,12 @@ class TestSSL(testtools.TestCase):
             tenant_name=mox.IgnoreArg(),
             token=mox.IgnoreArg(),
             username=mox.IgnoreArg(),
-            retries=mox.IgnoreArg(),
-            raise_errors=mox.IgnoreArg(),
+            user_id=mox.IgnoreArg(),
+            tenant_id=mox.IgnoreArg(),
+            timeout=mox.IgnoreArg(),
+            log_credentials=mox.IgnoreArg(),
+            service_type=mox.IgnoreArg(),
+            endpoint_type=mox.IgnoreArg()
         )
         self.mox.ReplayAll()
 

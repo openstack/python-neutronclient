@@ -20,13 +20,19 @@ import re
 import sys
 
 import fixtures
+import httpretty
 from mox3 import mox
 import six
 import testtools
 from testtools import matchers
 
+from keystoneclient.auth.identity import v2 as v2_auth
+from keystoneclient.auth.identity import v3 as v3_auth
+from keystoneclient import session
+
 from neutronclient.common import clientmanager
 from neutronclient import shell as openstack_shell
+from neutronclient.tests.unit import test_auth as auth
 
 
 DEFAULT_USERNAME = 'username'
@@ -91,6 +97,14 @@ class ShellTest(testtools.TestCase):
             matchers.MatchesRegex(required))
         self.assertFalse(stderr)
 
+    def test_bash_completion(self):
+        required = '.*os_user_domain_id.*'
+        bash_completion, stderr = self.shell('bash-completion')
+        self.assertThat(
+            bash_completion,
+            matchers.MatchesRegex(required))
+        self.assertFalse(stderr)
+
     def test_help_on_subcommand(self):
         required = [
             '.*?^usage: .* quota-list']
@@ -116,27 +130,287 @@ class ShellTest(testtools.TestCase):
         self.assertEqual('You must provide a service URL via '
                          'either --os-url or env[OS_URL]', stderr.strip())
 
+    @httpretty.activate
     def test_auth(self):
-        #import pdb; pdb.set_trace()
+        # emulate Keystone version discovery
+        httpretty.register_uri(httpretty.GET,
+                               auth.V3_URL,
+                               body=auth.V3_VERSION_ENTRY)
+
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)
         self.mox.StubOutWithMock(clientmanager.ClientManager, '__init__')
         self.mox.StubOutWithMock(neutron_shell, 'run_subcommand')
         clientmanager.ClientManager.__init__(
-            token='', url='', auth_url='http://127.0.0.1:5000/',
+            token='', url='', auth_url=auth.V3_URL,
             tenant_name='test', tenant_id='tenant_id',
             username='test', user_id='',
             password='test', region_name='', api_version={'network': '2.0'},
             auth_strategy='keystone', service_type='network',
-            endpoint_type='publicURL', insecure=False, ca_cert=None, retries=0,
-            raise_errors=False, log_credentials=True, timeout=None)
+            endpoint_type='publicURL', insecure=False, ca_cert=None,
+            timeout=None,
+            raise_errors=False,
+            retries=0,
+            auth=mox.IsA(v3_auth.Password),
+            session=mox.IsA(session.Session),
+            log_credentials=True)
         neutron_shell.run_subcommand(['quota-list'])
         self.mox.ReplayAll()
         cmdline = ('--os-username test '
                    '--os-password test '
                    '--os-tenant-name test '
-                   '--os-auth-url http://127.0.0.1:5000/ '
-                   '--os-auth-strategy keystone quota-list')
+                   '--os-auth-url %s '
+                   '--os-auth-strategy keystone quota-list'
+                   % auth.V3_URL)
+        neutron_shell.run(cmdline.split())
+        self.mox.VerifyAll()
+
+    @httpretty.activate
+    def test_auth_cert_and_key(self):
+        # emulate Keystone version discovery
+        httpretty.register_uri(httpretty.GET,
+                               auth.V3_URL,
+                               body=auth.V3_VERSION_ENTRY)
+
+        neutron_shell = openstack_shell.NeutronShell('2.0')
+        self.addCleanup(self.mox.UnsetStubs)
+        self.mox.StubOutWithMock(clientmanager.ClientManager, '__init__')
+        self.mox.StubOutWithMock(neutron_shell, 'run_subcommand')
+        clientmanager.ClientManager.__init__(
+            token='', url='', auth_url=auth.V3_URL,
+            tenant_name='test', tenant_id='tenant_id',
+            username='test', user_id='',
+            password='test', region_name='', api_version={'network': '2.0'},
+            auth_strategy='keystone', service_type='network',
+            raise_errors=False,
+            endpoint_type='publicURL', insecure=False, ca_cert=None, retries=0,
+            timeout=None,
+            auth=mox.IsA(v3_auth.Password),
+            session=mox.IsA(session.Session),
+            log_credentials=True)
+        neutron_shell.run_subcommand(['quota-list'])
+        self.mox.ReplayAll()
+        cmdline = ('--os-username test '
+                   '--os-password test '
+                   '--os-tenant-name test '
+                   '--os-cert test '
+                   '--os-key test '
+                   '--os-auth-url %s '
+                   '--os-auth-strategy keystone quota-list'
+                   % auth.V3_URL)
+        neutron_shell.run(cmdline.split())
+        self.mox.VerifyAll()
+
+    @httpretty.activate
+    def test_v2_auth(self):
+        # emulate Keystone version discovery
+        httpretty.register_uri(httpretty.GET,
+                               auth.V2_URL,
+                               body=auth.V2_VERSION_ENTRY)
+
+        neutron_shell = openstack_shell.NeutronShell('2.0')
+        self.addCleanup(self.mox.UnsetStubs)
+        self.mox.StubOutWithMock(clientmanager.ClientManager, '__init__')
+        self.mox.StubOutWithMock(neutron_shell, 'run_subcommand')
+        clientmanager.ClientManager.__init__(
+            token='', url='', auth_url=auth.V2_URL,
+            tenant_name='test', tenant_id='tenant_id',
+            username='test', user_id='',
+            password='test', region_name='', api_version={'network': '2.0'},
+            auth_strategy='keystone', service_type='network',
+            endpoint_type='publicURL', insecure=False, ca_cert=None,
+            timeout=None,
+            raise_errors=False,
+            retries=0,
+            auth=mox.IsA(v2_auth.Password),
+            session=mox.IsA(session.Session),
+            log_credentials=True)
+        neutron_shell.run_subcommand(['quota-list'])
+        self.mox.ReplayAll()
+        cmdline = ('--os-username test '
+                   '--os-password test '
+                   '--os-tenant-name test '
+                   '--os-auth-url %s '
+                   '--os-auth-strategy keystone quota-list'
+                   % auth.V2_URL)
+        neutron_shell.run(cmdline.split())
+        self.mox.VerifyAll()
+
+    @httpretty.activate
+    def test_failed_auth_version_discovery_v3_auth_url(self):
+        # emulate Keystone version discovery
+        httpretty.register_uri(httpretty.GET,
+                               auth.V3_URL,
+                               status=405)
+
+        neutron_shell = openstack_shell.NeutronShell('2.0')
+        self.addCleanup(self.mox.UnsetStubs)
+        self.mox.StubOutWithMock(clientmanager.ClientManager, '__init__')
+        self.mox.StubOutWithMock(neutron_shell, 'run_subcommand')
+        clientmanager.ClientManager.__init__(
+            token='', url='', auth_url=auth.V3_URL,
+            tenant_name='test', tenant_id='tenant_id',
+            username='test', user_id='',
+            password='test', region_name='', api_version={'network': '2.0'},
+            auth_strategy='keystone', service_type='network',
+            endpoint_type='publicURL', insecure=False, ca_cert=None,
+            timeout=None,
+            raise_errors=False,
+            retries=0,
+            auth=mox.IsA(v3_auth.Password),
+            session=mox.IsA(session.Session),
+            log_credentials=True)
+        neutron_shell.run_subcommand(['quota-list'])
+        self.mox.ReplayAll()
+        cmdline = ('--os-username test '
+                   '--os-password test '
+                   '--os-user-domain-name test '
+                   '--os-tenant-name test '
+                   '--os-auth-url %s '
+                   '--os-auth-strategy keystone quota-list'
+                   % auth.V3_URL)
+        neutron_shell.run(cmdline.split())
+        self.mox.VerifyAll()
+
+    @httpretty.activate
+    def test_failed_auth_version_discovery_v2_auth_url(self):
+        # emulate Keystone version discovery
+        httpretty.register_uri(httpretty.GET,
+                               auth.V2_URL,
+                               status=405)
+
+        neutron_shell = openstack_shell.NeutronShell('2.0')
+        self.addCleanup(self.mox.UnsetStubs)
+        self.mox.StubOutWithMock(clientmanager.ClientManager, '__init__')
+        self.mox.StubOutWithMock(neutron_shell, 'run_subcommand')
+        clientmanager.ClientManager.__init__(
+            token='', url='', auth_url=auth.V2_URL,
+            tenant_name='test', tenant_id='tenant_id',
+            username='test', user_id='',
+            password='test', region_name='', api_version={'network': '2.0'},
+            auth_strategy='keystone', service_type='network',
+            endpoint_type='publicURL', insecure=False, ca_cert=None,
+            timeout=None,
+            raise_errors=False,
+            retries=0,
+            auth=mox.IsA(v2_auth.Password),
+            session=mox.IsA(session.Session),
+            log_credentials=True)
+        neutron_shell.run_subcommand(['quota-list'])
+        self.mox.ReplayAll()
+        cmdline = ('--os-username test '
+                   '--os-password test '
+                   '--os-tenant-name test '
+                   '--os-auth-url %s '
+                   '--os-auth-strategy keystone quota-list'
+                   % auth.V2_URL)
+        neutron_shell.run(cmdline.split())
+        self.mox.VerifyAll()
+
+    @httpretty.activate
+    def test_auth_version_discovery_v3(self):
+        # emulate Keystone version discovery
+        httpretty.register_uri(httpretty.GET,
+                               auth.BASE_URL,
+                               body=auth.V3_VERSION_LIST)
+
+        neutron_shell = openstack_shell.NeutronShell('2.0')
+        self.addCleanup(self.mox.UnsetStubs)
+        self.mox.StubOutWithMock(clientmanager.ClientManager, '__init__')
+        self.mox.StubOutWithMock(neutron_shell, 'run_subcommand')
+        clientmanager.ClientManager.__init__(
+            token='', url='', auth_url=auth.BASE_URL,
+            tenant_name='test', tenant_id='tenant_id',
+            username='test', user_id='',
+            password='test', region_name='', api_version={'network': '2.0'},
+            auth_strategy='keystone', service_type='network',
+            endpoint_type='publicURL', insecure=False, ca_cert=None,
+            timeout=None,
+            raise_errors=False,
+            retries=0,
+            auth=mox.IsA(v3_auth.Password),
+            session=mox.IsA(session.Session),
+            log_credentials=True)
+        neutron_shell.run_subcommand(['quota-list'])
+        self.mox.ReplayAll()
+        cmdline = ('--os-username test '
+                   '--os-password test '
+                   '--os-user-domain-name test '
+                   '--os-tenant-name test '
+                   '--os-auth-url %s '
+                   '--os-auth-strategy keystone quota-list'
+                   % auth.BASE_URL)
+        neutron_shell.run(cmdline.split())
+        self.mox.VerifyAll()
+
+    @httpretty.activate
+    def test_auth_version_discovery_v2(self):
+        # emulate Keystone version discovery
+        httpretty.register_uri(httpretty.GET,
+                               auth.BASE_URL,
+                               body=auth.V3_VERSION_LIST)
+
+        neutron_shell = openstack_shell.NeutronShell('2.0')
+        self.addCleanup(self.mox.UnsetStubs)
+        self.mox.StubOutWithMock(clientmanager.ClientManager, '__init__')
+        self.mox.StubOutWithMock(neutron_shell, 'run_subcommand')
+        clientmanager.ClientManager.__init__(
+            token='', url='', auth_url=auth.BASE_URL,
+            tenant_name='test', tenant_id='tenant_id',
+            username='test', user_id='',
+            password='test', region_name='', api_version={'network': '2.0'},
+            auth_strategy='keystone', service_type='network',
+            endpoint_type='publicURL', insecure=False, ca_cert=None,
+            timeout=None,
+            raise_errors=False,
+            retries=0,
+            auth=mox.IsA(v2_auth.Password),
+            session=mox.IsA(session.Session),
+            log_credentials=True)
+        neutron_shell.run_subcommand(['quota-list'])
+        self.mox.ReplayAll()
+        cmdline = ('--os-username test '
+                   '--os-password test '
+                   '--os-tenant-name test '
+                   '--os-auth-url %s '
+                   '--os-auth-strategy keystone quota-list'
+                   % auth.BASE_URL)
+        neutron_shell.run(cmdline.split())
+        self.mox.VerifyAll()
+
+    @httpretty.activate
+    def test_insecure_auth(self):
+        # emulate Keystone version discovery
+        httpretty.register_uri(httpretty.GET,
+                               auth.V2_URL,
+                               body=auth.V2_VERSION_ENTRY)
+
+        neutron_shell = openstack_shell.NeutronShell('2.0')
+        self.addCleanup(self.mox.UnsetStubs)
+        self.mox.StubOutWithMock(clientmanager.ClientManager, '__init__')
+        self.mox.StubOutWithMock(neutron_shell, 'run_subcommand')
+        clientmanager.ClientManager.__init__(
+            token='', url='', auth_url=auth.V2_URL,
+            tenant_name='test', tenant_id='tenant_id',
+            username='test', user_id='',
+            password='test', region_name='', api_version={'network': '2.0'},
+            auth_strategy='keystone', service_type='network',
+            endpoint_type='publicURL', insecure=True, ca_cert=None,
+            timeout=None,
+            raise_errors=False,
+            retries=0,
+            auth=mox.IgnoreArg(),
+            session=mox.IgnoreArg(),
+            log_credentials=True)
+        neutron_shell.run_subcommand(['quota-list'])
+        self.mox.ReplayAll()
+        cmdline = ('--os-username test '
+                   '--os-password test '
+                   '--os-tenant-name test '
+                   '--insecure '
+                   '--os-auth-url %s '
+                   '--os-auth-strategy keystone quota-list'
+                   % auth.V2_URL)
         neutron_shell.run(cmdline.split())
         self.mox.VerifyAll()
 
@@ -162,13 +436,13 @@ class ShellTest(testtools.TestCase):
         shell = openstack_shell.NeutronShell('2.0')
         parser = shell.build_option_parser('descr', '2.0')
 
-        # Neither $OS_ENDPOINT_TYPE nor --endpoint-type
+        # Neither $OS_ENDPOINT_TYPE nor --os-endpoint-type
         namespace = parser.parse_args([])
-        self.assertEqual('publicURL', namespace.endpoint_type)
+        self.assertEqual('publicURL', namespace.os_endpoint_type)
 
         # --endpoint-type but not $OS_ENDPOINT_TYPE
-        namespace = parser.parse_args(['--endpoint-type=admin'])
-        self.assertEqual('admin', namespace.endpoint_type)
+        namespace = parser.parse_args(['--os-endpoint-type=admin'])
+        self.assertEqual('admin', namespace.os_endpoint_type)
 
     def test_endpoint_environment_variable(self):
         fixture = fixtures.EnvironmentVariable("OS_ENDPOINT_TYPE",
@@ -180,7 +454,7 @@ class ShellTest(testtools.TestCase):
 
         # $OS_ENDPOINT_TYPE but not --endpoint-type
         namespace = parser.parse_args([])
-        self.assertEqual("public", namespace.endpoint_type)
+        self.assertEqual("public", namespace.os_endpoint_type)
 
         # --endpoint-type and $OS_ENDPOINT_TYPE
         namespace = parser.parse_args(['--endpoint-type=admin'])

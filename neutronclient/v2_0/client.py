@@ -135,6 +135,8 @@ class Client(object):
     :param bool raise_errors: If True then exceptions caused by connection
                               failure are propagated to the caller.
                               (default: True)
+    :param session: Keystone client auth session to use. (optional)
+    :param auth: Keystone auth plugin to use. (optional)
 
     Example::
 
@@ -1196,12 +1198,12 @@ class Client(object):
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
         super(Client, self).__init__()
-        self.httpclient = client.HTTPClient(**kwargs)
+        self.retries = kwargs.pop('retries', 0)
+        self.raise_errors = kwargs.pop('raise_errors', True)
+        self.httpclient = client.construct_http_client(**kwargs)
         self.version = '2.0'
         self.format = 'json'
         self.action_prefix = "/v%s" % (self.version)
-        self.retries = kwargs.get('retries', 0)
-        self.raise_errors = kwargs.get('raise_errors', True)
         self.retry_interval = 1
 
     def _handle_fault_response(self, status_code, response_body):

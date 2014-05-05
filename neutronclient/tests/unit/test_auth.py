@@ -14,18 +14,25 @@
 #    under the License.
 #
 
-import copy
 import json
 import uuid
 
-from keystoneclient import exceptions as k_exceptions
+import httpretty
 from mox3 import mox
 import requests
 import testtools
 
+from keystoneclient.auth.identity import v2 as ks_v2_auth
+from keystoneclient.auth.identity import v3 as ks_v3_auth
+from keystoneclient import exceptions as ks_exceptions
+from keystoneclient.fixture import v2 as ks_v2_fixture
+from keystoneclient.fixture import v3 as ks_v3_fixture
+from keystoneclient import session
+
 from neutronclient import client
 from neutronclient.common import exceptions
 from neutronclient.common import utils
+from neutronclient.openstack.common import jsonutils
 
 
 USERNAME = 'testuser'
@@ -33,11 +40,14 @@ USER_ID = 'testuser_id'
 TENANT_NAME = 'testtenant'
 TENANT_ID = 'testtenant_id'
 PASSWORD = 'password'
-AUTH_URL = 'authurl'
 ENDPOINT_URL = 'localurl'
+PUBLIC_ENDPOINT_URL = 'public_%s' % ENDPOINT_URL
+ADMIN_ENDPOINT_URL = 'admin_%s' % ENDPOINT_URL
+INTERNAL_ENDPOINT_URL = 'internal_%s' % ENDPOINT_URL
 ENDPOINT_OVERRIDE = 'otherurl'
 TOKEN = 'tokentoken'
-REGION = 'RegionTest'
+TOKENID = uuid.uuid4().hex
+REGION = 'RegionOne'
 NOAUTH = 'noauth'
 
 KS_TOKEN_RESULT = {
@@ -69,12 +79,104 @@ ENDPOINTS_RESULT = {
     }]
 }
 
+BASE_HOST = 'http://keystone.example.com'
+BASE_URL = "%s:5000/" % BASE_HOST
+UPDATED = '2013-03-06T00:00:00Z'
+
+# FIXME (bklei): A future release of keystoneclient will support
+# a discovery fixture which can replace these constants and clean
+# this up.
+V2_URL = "%sv2.0" % BASE_URL
+V2_DESCRIBED_BY_HTML = {'href': 'http://docs.openstack.org/api/'
+                                'openstack-identity-service/2.0/content/',
+                        'rel': 'describedby',
+                        'type': 'text/html'}
+
+V2_DESCRIBED_BY_PDF = {'href': 'http://docs.openstack.org/api/openstack-ident'
+                               'ity-service/2.0/identity-dev-guide-2.0.pdf',
+                       'rel': 'describedby',
+                       'type': 'application/pdf'}
+
+V2_VERSION = {'id': 'v2.0',
+              'links': [{'href': V2_URL, 'rel': 'self'},
+                        V2_DESCRIBED_BY_HTML, V2_DESCRIBED_BY_PDF],
+              'status': 'stable',
+              'updated': UPDATED}
+
+V3_URL = "%sv3" % BASE_URL
+V3_MEDIA_TYPES = [{'base': 'application/json',
+                   'type': 'application/vnd.openstack.identity-v3+json'},
+                  {'base': 'application/xml',
+                   'type': 'application/vnd.openstack.identity-v3+xml'}]
+
+V3_VERSION = {'id': 'v3.0',
+              'links': [{'href': V3_URL, 'rel': 'self'}],
+              'media-types': V3_MEDIA_TYPES,
+              'status': 'stable',
+              'updated': UPDATED}
+
+
+def _create_version_entry(version):
+    return jsonutils.dumps({'version': version})
+
+
+def _create_version_list(versions):
+    return jsonutils.dumps({'versions': {'values': versions}})
+
+
+V3_VERSION_LIST = _create_version_list([V3_VERSION, V2_VERSION])
+V3_VERSION_ENTRY = _create_version_entry(V3_VERSION)
+V2_VERSION_ENTRY = _create_version_entry(V2_VERSION)
+
 
 def get_response(status_code, headers=None):
     response = mox.Mox().CreateMock(requests.Response)
     response.headers = headers or {}
     response.status_code = status_code
     return response
+
+
+def setup_keystone_v2():
+    v2_token = ks_v2_fixture.Token(token_id=TOKENID)
+    service = v2_token.add_service('network')
+    service.add_endpoint(PUBLIC_ENDPOINT_URL, region=REGION)
+
+    httpretty.register_uri(httpretty.POST,
+                           '%s/tokens' % (V2_URL),
+                           body=json.dumps(v2_token))
+
+    auth_session = session.Session()
+    auth_plugin = ks_v2_auth.Password(V2_URL, 'xx', 'xx')
+    return auth_session, auth_plugin
+
+
+def setup_keystone_v3():
+    httpretty.register_uri(httpretty.GET,
+                           V3_URL,
+                           body=V3_VERSION_ENTRY)
+
+    v3_token = ks_v3_fixture.Token()
+    service = v3_token.add_service('network')
+    service.add_standard_endpoints(public=PUBLIC_ENDPOINT_URL,
+                                   admin=ADMIN_ENDPOINT_URL,
+                                   internal=INTERNAL_ENDPOINT_URL,
+                                   region=REGION)
+
+    httpretty.register_uri(httpretty.POST,
+                           '%s/auth/tokens' % (V3_URL),
+                           body=json.dumps(v3_token),
+                           adding_headers={'X-Subject-Token': TOKENID})
+
+    auth_session = session.Session()
+    auth_plugin = ks_v3_auth.Password(V3_URL,
+                                      username='xx',
+                                      user_id='xx',
+                                      user_domain_name='xx',
+                                      user_domain_id='xx')
+    return auth_session, auth_plugin
+
+
+AUTH_URL = V2_URL
 
 
 class CLITestAuthNoAuth(testtools.TestCase):
@@ -109,20 +211,18 @@ class CLITestAuthNoAuth(testtools.TestCase):
 
 class CLITestAuthKeystone(testtools.TestCase):
 
-    # Auth Body expected
-    auth_body = ('{"auth": {"tenantName": "testtenant", '
-                 '"passwordCredentials": '
-                 '{"username": "testuser", "password": "password"}}}')
-
     def setUp(self):
         """Prepare the test environment."""
         super(CLITestAuthKeystone, self).setUp()
         self.mox = mox.Mox()
-        self.client = client.HTTPClient(username=USERNAME,
-                                        tenant_name=TENANT_NAME,
-                                        password=PASSWORD,
-                                        auth_url=AUTH_URL,
-                                        region_name=REGION)
+
+        self.client = client.construct_http_client(
+            username=USERNAME,
+            tenant_name=TENANT_NAME,
+            password=PASSWORD,
+            auth_url=AUTH_URL,
+            region_name=REGION)
+
         self.addCleanup(self.mox.VerifyAll)
         self.addCleanup(self.mox.UnsetStubs)
 
@@ -142,24 +242,30 @@ class CLITestAuthKeystone(testtools.TestCase):
                     'endpoint_url': self.client.endpoint_url}
         self.assertEqual(client_.get_auth_info(), expected)
 
+    @httpretty.activate
     def test_get_token(self):
-        self.mox.StubOutWithMock(self.client, "request")
+        auth_session, auth_plugin = setup_keystone_v2()
 
+        self.client = client.construct_http_client(
+            username=USERNAME,
+            tenant_name=TENANT_NAME,
+            password=PASSWORD,
+            auth_url=AUTH_URL,
+            region_name=REGION,
+            session=auth_session,
+            auth=auth_plugin)
+
+        self.mox.StubOutWithMock(self.client, "request")
         res200 = get_response(200)
 
         self.client.request(
-            AUTH_URL + '/tokens', 'POST',
-            body=self.auth_body, headers=mox.IsA(dict)
-        ).AndReturn((res200, json.dumps(KS_TOKEN_RESULT)))
-        self.client.request(
-            mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
-            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+            '/resource', 'GET',
+            authenticated=True
         ).AndReturn((res200, ''))
+
         self.mox.ReplayAll()
 
         self.client.do_request('/resource', 'GET')
-        self.assertEqual(self.client.endpoint_url, ENDPOINT_URL)
-        self.assertEqual(self.client.auth_token, TOKEN)
 
     def test_refresh_token(self):
         self.mox.StubOutWithMock(self.client, "request")
@@ -292,53 +398,55 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
 
+    @httpretty.activate
     def test_endpoint_type(self):
-        resources = copy.deepcopy(KS_TOKEN_RESULT)
-        endpoints = resources['access']['serviceCatalog'][0]['endpoints'][0]
-        endpoints['internalURL'] = 'internal'
-        endpoints['adminURL'] = 'admin'
-        endpoints['publicURL'] = 'public'
+        auth_session, auth_plugin = setup_keystone_v3()
 
         # Test default behavior is to choose public.
-        self.client = client.HTTPClient(
+        self.client = client.construct_http_client(
             username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
-            auth_url=AUTH_URL, region_name=REGION)
+            auth_url=AUTH_URL, region_name=REGION,
+            session=auth_session, auth=auth_plugin)
 
-        self.client._extract_service_catalog(resources)
-        self.assertEqual(self.client.endpoint_url, 'public')
+        self.client.authenticate()
+        self.assertEqual(self.client.endpoint_url, PUBLIC_ENDPOINT_URL)
 
         # Test admin url
-        self.client = client.HTTPClient(
+        self.client = client.construct_http_client(
             username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
-            auth_url=AUTH_URL, region_name=REGION, endpoint_type='adminURL')
+            auth_url=AUTH_URL, region_name=REGION, endpoint_type='adminURL',
+            session=auth_session, auth=auth_plugin)
 
-        self.client._extract_service_catalog(resources)
-        self.assertEqual(self.client.endpoint_url, 'admin')
+        self.client.authenticate()
+        self.assertEqual(self.client.endpoint_url, ADMIN_ENDPOINT_URL)
 
         # Test public url
-        self.client = client.HTTPClient(
+        self.client = client.construct_http_client(
             username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
-            auth_url=AUTH_URL, region_name=REGION, endpoint_type='publicURL')
+            auth_url=AUTH_URL, region_name=REGION, endpoint_type='publicURL',
+            session=auth_session, auth=auth_plugin)
 
-        self.client._extract_service_catalog(resources)
-        self.assertEqual(self.client.endpoint_url, 'public')
+        self.client.authenticate()
+        self.assertEqual(self.client.endpoint_url, PUBLIC_ENDPOINT_URL)
 
         # Test internal url
-        self.client = client.HTTPClient(
+        self.client = client.construct_http_client(
             username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
-            auth_url=AUTH_URL, region_name=REGION, endpoint_type='internalURL')
+            auth_url=AUTH_URL, region_name=REGION, endpoint_type='internalURL',
+            session=auth_session, auth=auth_plugin)
 
-        self.client._extract_service_catalog(resources)
-        self.assertEqual(self.client.endpoint_url, 'internal')
+        self.client.authenticate()
+        self.assertEqual(self.client.endpoint_url, INTERNAL_ENDPOINT_URL)
 
         # Test url that isn't found in the service catalog
-        self.client = client.HTTPClient(
+        self.client = client.construct_http_client(
             username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
-            auth_url=AUTH_URL, region_name=REGION, endpoint_type='privateURL')
+            auth_url=AUTH_URL, region_name=REGION, endpoint_type='privateURL',
+            session=auth_session, auth=auth_plugin)
 
-        self.assertRaises(k_exceptions.EndpointNotFound,
-                          self.client._extract_service_catalog,
-                          resources)
+        self.assertRaises(
+            ks_exceptions.EndpointNotFound,
+            self.client.authenticate)
 
     def test_strip_credentials_from_log(self):
         def verify_no_credentials(kwargs):
@@ -370,11 +478,6 @@ class CLITestAuthKeystone(testtools.TestCase):
 
 class CLITestAuthKeystoneWithId(CLITestAuthKeystone):
 
-    # Auth Body expected
-    auth_body = ('{"auth": {"passwordCredentials": '
-                 '{"password": "password", "userId": "testuser_id"}, '
-                 '"tenantId": "testtenant_id"}}')
-
     def setUp(self):
         """Prepare the test environment."""
         super(CLITestAuthKeystoneWithId, self).setUp()
@@ -387,11 +490,6 @@ class CLITestAuthKeystoneWithId(CLITestAuthKeystone):
 
 class CLITestAuthKeystoneWithIdandName(CLITestAuthKeystone):
 
-    # Auth Body expected
-    auth_body = ('{"auth": {"passwordCredentials": '
-                 '{"password": "password", "userId": "testuser_id"}, '
-                 '"tenantId": "testtenant_id"}}')
-
     def setUp(self):
         """Prepare the test environment."""
         super(CLITestAuthKeystoneWithIdandName, self).setUp()
@@ -402,3 +500,61 @@ class CLITestAuthKeystoneWithIdandName(CLITestAuthKeystone):
                                         password=PASSWORD,
                                         auth_url=AUTH_URL,
                                         region_name=REGION)
+
+
+class TestKeystoneClientVersions(testtools.TestCase):
+
+    def setUp(self):
+        """Prepare the test environment."""
+        super(TestKeystoneClientVersions, self).setUp()
+        self.mox = mox.Mox()
+        self.addCleanup(self.mox.VerifyAll)
+        self.addCleanup(self.mox.UnsetStubs)
+
+    @httpretty.activate
+    def test_v2_auth(self):
+        auth_session, auth_plugin = setup_keystone_v2()
+        res200 = get_response(200)
+
+        self.client = client.construct_http_client(
+            username=USERNAME,
+            tenant_name=TENANT_NAME,
+            password=PASSWORD,
+            auth_url=AUTH_URL,
+            region_name=REGION,
+            session=auth_session,
+            auth=auth_plugin)
+
+        self.mox.StubOutWithMock(self.client, "request")
+
+        self.client.request(
+            '/resource', 'GET',
+            authenticated=True
+        ).AndReturn((res200, ''))
+
+        self.mox.ReplayAll()
+        self.client.do_request('/resource', 'GET')
+
+    @httpretty.activate
+    def test_v3_auth(self):
+        auth_session, auth_plugin = setup_keystone_v3()
+        res200 = get_response(200)
+
+        self.client = client.construct_http_client(
+            user_id=USER_ID,
+            tenant_id=TENANT_ID,
+            password=PASSWORD,
+            auth_url=V3_URL,
+            region_name=REGION,
+            session=auth_session,
+            auth=auth_plugin)
+
+        self.mox.StubOutWithMock(self.client, "request")
+
+        self.client.request(
+            '/resource', 'GET',
+            authenticated=True
+        ).AndReturn((res200, ''))
+
+        self.mox.ReplayAll()
+        self.client.do_request('/resource', 'GET')

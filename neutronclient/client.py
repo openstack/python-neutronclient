@@ -22,6 +22,7 @@ import logging
 import os
 
 from keystoneclient import access
+from keystoneclient.auth.identity.base import BaseIdentityPlugin
 import requests
 
 from neutronclient.common import exceptions
@@ -41,10 +42,24 @@ else:
 logging.getLogger("requests").setLevel(_requests_log_level)
 
 
-class HTTPClient(object):
-    """Handles the REST calls and responses, include authn."""
+class NeutronClientMixin(object):
 
     USER_AGENT = 'python-neutronclient'
+
+    def get_status_code(self, response):
+        """Returns the integer status code from the response.
+
+        Either a Webob.Response (used in testing) or requests.Response
+        is returned.
+        """
+        if hasattr(response, 'status_int'):
+            return response.status_int
+        else:
+            return response.status_code
+
+
+class HTTPClient(NeutronClientMixin):
+    """Handles the REST calls and responses, include authn."""
 
     def __init__(self, username=None, user_id=None,
                  tenant_name=None, tenant_id=None,
@@ -265,13 +280,122 @@ class HTTPClient(object):
                 'auth_user_id': self.auth_user_id,
                 'endpoint_url': self.endpoint_url}
 
-    def get_status_code(self, response):
-        """Returns the integer status code from the response.
 
-        Either a Webob.Response (used in testing) or requests.Response
-        is returned.
-        """
-        if hasattr(response, 'status_int'):
-            return response.status_int
-        else:
-            return response.status_code
+class SessionClient(NeutronClientMixin):
+
+    def __init__(self,
+                 session,
+                 auth,
+                 interface=None,
+                 service_type=None,
+                 region_name=None):
+
+        self.session = session
+        self.auth = auth
+        self.interface = interface
+        self.service_type = service_type
+        self.region_name = region_name
+        self.auth_token = None
+        self.endpoint_url = None
+
+    def request(self, url, method, **kwargs):
+        kwargs.setdefault('user_agent', self.USER_AGENT)
+        kwargs.setdefault('auth', self.auth)
+        kwargs.setdefault('authenticated', False)
+
+        try:
+            kwargs['data'] = kwargs.pop('body')
+        except KeyError:
+            pass
+
+        endpoint_filter = kwargs.setdefault('endpoint_filter', {})
+        endpoint_filter.setdefault('interface', self.interface)
+        endpoint_filter.setdefault('service_type', self.service_type)
+        endpoint_filter.setdefault('region_name', self.region_name)
+
+        kwargs = utils.safe_encode_dict(kwargs)
+        resp = self.session.request(url, method, **kwargs)
+        return resp, resp.text
+
+    def do_request(self, url, method, **kwargs):
+        kwargs.setdefault('authenticated', True)
+        return self.request(url, method, **kwargs)
+
+    def authenticate(self):
+        # This method is provided for backward compatibility only.
+        # We only care about setting the service endpoint.
+        self.endpoint_url = self.session.get_endpoint(
+            self.auth,
+            service_type=self.service_type,
+            region_name=self.region_name,
+            interface=self.interface)
+
+    def authenticate_and_fetch_endpoint_url(self):
+        # This method is provided for backward compatibility only.
+        # We only care about setting the service endpoint.
+        self.authenticate()
+
+    def get_auth_info(self):
+        # This method is provided for backward compatibility only.
+        if not isinstance(self.auth, BaseIdentityPlugin):
+            msg = ('Auth info not available. Auth plugin is not an identity '
+                   'auth plugin.')
+            raise exceptions.NeutronClientException(message=msg)
+        access_info = self.auth.get_access(self.session)
+        endpoint_url = self.auth.get_endpoint(self.session,
+                                              service_type=self.service_type,
+                                              region_name=self.region_name,
+                                              interface=self.interface)
+        return {'auth_token': access_info.auth_token,
+                'auth_tenant_id': access_info.tenant_id,
+                'auth_user_id': access_info.user_id,
+                'endpoint_url': endpoint_url}
+
+
+# FIXME(bklei): Should refactor this to use kwargs and only
+# explicitly list arguments that are not None.
+def construct_http_client(username=None,
+                          user_id=None,
+                          tenant_name=None,
+                          tenant_id=None,
+                          password=None,
+                          auth_url=None,
+                          token=None,
+                          region_name=None,
+                          timeout=None,
+                          endpoint_url=None,
+                          insecure=False,
+                          endpoint_type='publicURL',
+                          log_credentials=None,
+                          auth_strategy='keystone',
+                          ca_cert=None,
+                          service_type='network',
+                          session=None,
+                          auth=None):
+
+    if session:
+        return SessionClient(session=session,
+                             auth=auth,
+                             interface=endpoint_type,
+                             service_type=service_type,
+                             region_name=region_name)
+    else:
+        # FIXME(bklei): username and password are now optional. Need
+        # to test that they were provided in this mode.  Should also
+        # refactor to use kwargs.
+        return HTTPClient(username=username,
+                          password=password,
+                          tenant_id=tenant_id,
+                          tenant_name=tenant_name,
+                          user_id=user_id,
+                          auth_url=auth_url,
+                          token=token,
+                          endpoint_url=endpoint_url,
+                          insecure=insecure,
+                          timeout=timeout,
+                          region_name=region_name,
+                          endpoint_type=endpoint_type,
+                          service_type=service_type,
+                          ca_cert=ca_cert,
+                          log_credentials=log_credentials,
+                          auth_strategy=auth_strategy)
