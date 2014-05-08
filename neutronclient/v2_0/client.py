@@ -221,6 +221,32 @@ class Client(object):
     firewall_path = "/fw/firewalls/%s"
     net_partitions_path = "/net-partitions"
     net_partition_path = "/net-partitions/%s"
+    endpoints_path = "/gp/endpoints"
+    endpoint_path = "/gp/endpoints/%s"
+    endpoint_groups_path = "/gp/endpoint_groups"
+    endpoint_group_path = "/gp/endpoint_groups/%s"
+    contracts_path = "/gp/contracts"
+    contract_path = "/gp/contracts/%s"
+    contract_providing_scopes_path = "/gp/contract_providing_scopes"
+    contract_providing_scope_path = "/gp/contract_providing_scopes/%s"
+    contract_consuming_scopes_path = "/gp/contract_consuming_scopes"
+    contract_consuming_scope_path = "/gp/contract_consuming_scopes/%s"
+    policy_rules_path = "/gp/policy_rules"
+    policy_rule_path = "/gp/policy_rules/%s"
+    filters_path = "/gp/filters"
+    filter_path = "/gp/filters/%s"
+    policy_classifiers_path = "/gp/policy_classifiers"
+    policy_classifier_path = "/gp/policy_classifiers/%s"
+    policy_actions_path = "/gp/policy_actions"
+    policy_action_path = "/gp/policy_actions/%s"
+    selectors_path = "/gp/selectors"
+    selector_path = "/gp/selectors/%s"
+    policy_labels_path = "/gp/policy_labels"
+    policy_label_path = "/gp/policy_labels/%s"
+    bridge_domains_path = "/gp/bridge_domains"
+    bridge_domain_path = "/gp/bridge_domains/%s"
+    routing_domains_path = "/gp/routing_domains"
+    routing_domain_path = "/gp/routing_domains/%s"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -246,6 +272,19 @@ class Client(object):
                      'metering_label_rules': 'metering_label_rule',
                      'net_partitions': 'net_partition',
                      'packet_filters': 'packet_filter',
+                     'endpoints': 'endpoint',
+                     'endpoint_groups': 'endpoint_group',
+                     'contracts': 'contract',
+                     'contract_providing_scopes': 'contract_providing_scope',
+                     'contract_consuming_scopes': 'contract_consuming_scope',
+                     'policy_rules': 'policy_rule',
+                     'filters': 'filter',
+                     'policy_classifiers': 'policy_classifier',
+                     'policy_actions': 'policy_action',
+                     'selectors': 'selector',
+                     'policy_labels': 'policy_label',
+                     'bridge_domains': 'bridge_domain',
+                     'routing_domains': 'routing_domain',
                      }
     # 8192 Is the default max URI len for eventlet.wsgi.server
     MAX_URI_LEN = 8192
@@ -1186,6 +1225,375 @@ class Client(object):
     def delete_packet_filter(self, packet_filter_id):
         """Delete the specified packet filter."""
         return self.delete(self.packet_filter_path % packet_filter_id)
+
+    @APIParamsCall
+    def list_endpoints(self, retrieve_all=True, **_params):
+        """Fetches a list of all endpoints for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('endpoints', self.endpoints_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_endpoint(self, endpoint, **_params):
+        """Fetches information of a certain endpoint."""
+        return self.get(self.endpoint_path % (endpoint), params=_params)
+
+    @APIParamsCall
+    def create_endpoint(self, body=None):
+        """Creates a new endpoint."""
+        return self.post(self.endpoints_path, body=body)
+
+    @APIParamsCall
+    def update_endpoint(self, endpoint, body=None):
+        """Updates a endpoint."""
+        return self.put(self.endpoint_path % (endpoint), body=body)
+
+    @APIParamsCall
+    def delete_endpoint(self, endpoint):
+        """Deletes the specified endpoint."""
+        return self.delete(self.endpoint_path % (endpoint))
+
+    @APIParamsCall
+    def list_endpoint_groups(self, retrieve_all=True, **_params):
+        """Fetches a list of all endpoint_groups for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('endpoint_groups', self.endpoint_groups_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_endpoint_group(self, endpoint_group, **_params):
+        """Fetches information of a certain endpoint_group."""
+        return self.get(self.endpoint_group_path % (endpoint_group),
+                        params=_params)
+
+    @APIParamsCall
+    def create_endpoint_group(self, body=None):
+        """Creates a new endpoint_group."""
+        return self.post(self.endpoint_groups_path, body=body)
+
+    @APIParamsCall
+    def update_endpoint_group(self, endpoint_group, body=None):
+        """Updates a endpoint_group."""
+        return self.put(self.endpoint_group_path % (endpoint_group),
+                        body=body)
+
+    @APIParamsCall
+    def delete_endpoint_group(self, endpoint_group):
+        """Deletes the specified endpoint_group."""
+        return self.delete(self.endpoint_group_path % (endpoint_group))
+
+    @APIParamsCall
+    def list_contracts(self, retrieve_all=True, **_params):
+        """Fetches a list of all contracts for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('contracts', self.contracts_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_contract(self, contract, **_params):
+        """Fetches information of a certain contract."""
+        return self.get(self.contract_path % (contract), params=_params)
+
+    @APIParamsCall
+    def create_contract(self, body=None):
+        """Creates a new contract."""
+        return self.post(self.contracts_path, body=body)
+
+    @APIParamsCall
+    def update_contract(self, contract, body=None):
+        """Updates a contract."""
+        return self.put(self.contract_path % (contract), body=body)
+
+    @APIParamsCall
+    def delete_contract(self, contract):
+        """Deletes the specified contract."""
+        return self.delete(self.contract_path % (contract))
+
+    @APIParamsCall
+    def list_contract_providing_scopes(self, retrieve_all=True, **_params):
+        """Fetches a list of all contract_providing_scopes for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('contract_providing_scopes',
+                         self.contract_providing_scopes_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_contract_providing_scope(self, contract_providing_scope,
+                                      **_params):
+        """Fetches information of a certain contract_providing_scope."""
+        return self.get(self.contract_providing_scope_path %
+                        (contract_providing_scope), params=_params)
+
+    @APIParamsCall
+    def create_contract_providing_scope(self, body=None):
+        """Creates a new contract_providing_scope."""
+        return self.post(self.contract_providing_scopes_path, body=body)
+
+    @APIParamsCall
+    def update_contract_providing_scope(self, contract_providing_scope,
+                                        body=None):
+        """Updates a contract_providing_scope."""
+        return self.put(self.contract_providing_scope_path %
+                        (contract_providing_scope), body=body)
+
+    @APIParamsCall
+    def delete_contract_providing_scope(self, contract_providing_scope):
+        """Deletes the specified contract_providing_scope."""
+        return self.delete(self.contract_providing_scope_path %
+                           (contract_providing_scope))
+
+    @APIParamsCall
+    def list_contract_consuming_scopes(self, retrieve_all=True, **_params):
+        """Fetches a list of all contract_consuming_scopes for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('contract_consuming_scopes',
+                         self.contract_consuming_scopes_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_contract_consuming_scope(self, contract_consuming_scope,
+                                      **_params):
+        """Fetches information of a certain contract_consuming_scope."""
+        return self.get(self.contract_consuming_scope_path %
+                        (contract_consuming_scope), params=_params)
+
+    @APIParamsCall
+    def create_contract_consuming_scope(self, body=None):
+        """Creates a new contract_consuming_scope."""
+        return self.post(self.contract_consuming_scopes_path, body=body)
+
+    @APIParamsCall
+    def update_contract_consuming_scope(self, contract_consuming_scope,
+                                        body=None):
+        """Updates a contract_consuming_scope."""
+        return self.put(self.contract_consuming_scope_path %
+                        (contract_consuming_scope), body=body)
+
+    @APIParamsCall
+    def delete_contract_consuming_scope(self, contract_consuming_scope):
+        """Deletes the specified contract_consuming_scope."""
+        return self.delete(self.contract_consuming_scope_path %
+                           (contract_consuming_scope))
+
+    @APIParamsCall
+    def list_policy_rules(self, retrieve_all=True, **_params):
+        """Fetches a list of all policy_rules for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('policy_rules', self.policy_rules_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_policy_rule(self, policy_rule, **_params):
+        """Fetches information of a certain policy_rule."""
+        return self.get(self.policy_rule_path % (policy_rule), params=_params)
+
+    @APIParamsCall
+    def create_policy_rule(self, body=None):
+        """Creates a new policy_rule."""
+        return self.post(self.policy_rules_path, body=body)
+
+    @APIParamsCall
+    def update_policy_rule(self, policy_rule, body=None):
+        """Updates a policy_rule."""
+        return self.put(self.policy_rule_path % (policy_rule), body=body)
+
+    @APIParamsCall
+    def delete_policy_rule(self, policy_rule):
+        """Deletes the specified policy_rule."""
+        return self.delete(self.policy_rule_path % (policy_rule))
+
+    @APIParamsCall
+    def list_filters(self, retrieve_all=True, **_params):
+        """Fetches a list of all filters for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('filters', self.filters_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_filter(self, gp_filter, **_params):
+        """Fetches information of a certain filter."""
+        return self.get(self.filter_path % (gp_filter), params=_params)
+
+    @APIParamsCall
+    def create_filter(self, body=None):
+        """Creates a new filter."""
+        return self.post(self.filters_path, body=body)
+
+    @APIParamsCall
+    def update_filter(self, gp_filter, body=None):
+        """Updates a filter."""
+        return self.put(self.filter_path % (gp_filter), body=body)
+
+    @APIParamsCall
+    def delete_filter(self, gp_filter):
+        """Deletes the specified filter."""
+        return self.delete(self.filter_path % (gp_filter))
+
+    @APIParamsCall
+    def list_policy_classifiers(self, retrieve_all=True, **_params):
+        """Fetches a list of all policy_classifiers for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('policy_classifiers', self.policy_classifiers_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_policy_classifier(self, policy_classifier, **_params):
+        """Fetches information of a certain policy_classifier."""
+        return self.get(self.policy_classifier_path % (policy_classifier), params=_params)
+
+    @APIParamsCall
+    def create_policy_classifier(self, body=None):
+        """Creates a new policy_classifier."""
+        return self.post(self.policy_classifiers_path, body=body)
+
+    @APIParamsCall
+    def update_policy_classifier(self, policy_classifier, body=None):
+        """Updates a policy_classifier."""
+        return self.put(self.policy_classifier_path % (policy_classifier), body=body)
+
+    @APIParamsCall
+    def delete_policy_classifier(self, policy_classifier):
+        """Deletes the specified policy_classifier."""
+        return self.delete(self.policy_classifier_path % (policy_classifier))
+
+    @APIParamsCall
+    def list_policy_actions(self, retrieve_all=True, **_params):
+        """Fetches a list of all policy_actions for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('policy_actions', self.policy_actions_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_policy_action(self, policy_action, **_params):
+        """Fetches information of a certain policy_action."""
+        return self.get(self.policy_action_path % (policy_action), params=_params)
+
+    @APIParamsCall
+    def create_policy_action(self, body=None):
+        """Creates a new policy_action."""
+        return self.post(self.policy_actions_path, body=body)
+
+    @APIParamsCall
+    def update_policy_action(self, policy_action, body=None):
+        """Updates a policy_action."""
+        return self.put(self.policy_action_path % (policy_action), body=body)
+
+    @APIParamsCall
+    def delete_policy_action(self, policy_action):
+        """Deletes the specified policy_action."""
+        return self.delete(self.policy_action_path % (policy_action))
+
+    @APIParamsCall
+    def list_selectors(self, retrieve_all=True, **_params):
+        """Fetches a list of all selectors for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('selectors', self.selectors_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_selector(self, selector, **_params):
+        """Fetches information of a certain selector."""
+        return self.get(self.selector_path % (selector), params=_params)
+
+    @APIParamsCall
+    def create_selector(self, body=None):
+        """Creates a new selector."""
+        return self.post(self.selectors_path, body=body)
+
+    @APIParamsCall
+    def update_selector(self, selector, body=None):
+        """Updates a selector."""
+        return self.put(self.selector_path % (selector), body=body)
+
+    @APIParamsCall
+    def delete_selector(self, selector):
+        """Deletes the specified selector."""
+        return self.delete(self.selector_path % (selector))
+
+    @APIParamsCall
+    def list_policy_labels(self, retrieve_all=True, **_params):
+        """Fetches a list of all policy_labels for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('policy_labels', self.policy_labels_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_policy_label(self, policy_label, **_params):
+        """Fetches information of a certain policy_label."""
+        return self.get(self.policy_label_path % (policy_label),
+                        params=_params)
+
+    @APIParamsCall
+    def create_policy_label(self, body=None):
+        """Creates a new policy_label."""
+        return self.post(self.policy_labels_path, body=body)
+
+    @APIParamsCall
+    def update_policy_label(self, policy_label, body=None):
+        """Updates a policy_label."""
+        return self.put(self.policy_label_path % (policy_label), body=body)
+
+    @APIParamsCall
+    def delete_policy_label(self, policy_label):
+        """Deletes the specified policy_label."""
+        return self.delete(self.policy_label_path % (policy_label))
+
+    @APIParamsCall
+    def list_bridge_domains(self, retrieve_all=True, **_params):
+        """Fetches a list of all bridge_domains for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('bridge_domains', self.bridge_domains_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_bridge_domain(self, bridge_domain, **_params):
+        """Fetches information of a certain bridge_domain."""
+        return self.get(self.bridge_domain_path % (bridge_domain),
+                        params=_params)
+
+    @APIParamsCall
+    def create_bridge_domain(self, body=None):
+        """Creates a new bridge_domain."""
+        return self.post(self.bridge_domains_path, body=body)
+
+    @APIParamsCall
+    def update_bridge_domain(self, bridge_domain, body=None):
+        """Updates a bridge_domain."""
+        return self.put(self.bridge_domain_path % (bridge_domain), body=body)
+
+    @APIParamsCall
+    def delete_bridge_domain(self, bridge_domain):
+        """Deletes the specified bridge_domain."""
+        return self.delete(self.bridge_domain_path % (bridge_domain))
+
+    @APIParamsCall
+    def list_routing_domains(self, retrieve_all=True, **_params):
+        """Fetches a list of all routing_domains for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('routing_domains', self.routing_domains_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_routing_domain(self, routing_domain, **_params):
+        """Fetches information of a certain routing_domain."""
+        return self.get(self.routing_domain_path % (routing_domain),
+                        params=_params)
+
+    @APIParamsCall
+    def create_routing_domain(self, body=None):
+        """Creates a new routing_domain."""
+        return self.post(self.routing_domains_path, body=body)
+
+    @APIParamsCall
+    def update_routing_domain(self, routing_domain, body=None):
+        """Updates a routing_domain."""
+        return self.put(self.routing_domain_path % (routing_domain),
+                        body=body)
+
+    @APIParamsCall
+    def delete_routing_domain(self, routing_domain):
+        """Deletes the specified routing_domain."""
+        return self.delete(self.routing_domain_path % (routing_domain))
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""

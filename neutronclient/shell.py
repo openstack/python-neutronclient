@@ -39,6 +39,7 @@ from neutronclient.neutron.v2_0 import floatingip
 from neutronclient.neutron.v2_0.fw import firewall
 from neutronclient.neutron.v2_0.fw import firewallpolicy
 from neutronclient.neutron.v2_0.fw import firewallrule
+from neutronclient.neutron.v2_0 import grouppolicy
 from neutronclient.neutron.v2_0.lb import healthmonitor as lb_healthmonitor
 from neutronclient.neutron.v2_0.lb import member as lb_member
 from neutronclient.neutron.v2_0.lb import pool as lb_pool
@@ -277,6 +278,46 @@ COMMAND_V2 = {
     'nec-packet-filter-create': packetfilter.CreatePacketFilter,
     'nec-packet-filter-update': packetfilter.UpdatePacketFilter,
     'nec-packet-filter-delete': packetfilter.DeletePacketFilter,
+    'endpoint-create': grouppolicy.CreateEndpoint,
+    'endpoint-delete': grouppolicy.DeleteEndpoint,
+    'endpoint-update': grouppolicy.UpdateEndpoint,
+    'endpoint-list': grouppolicy.ListEndpoint,
+    'endpoint-show': grouppolicy.ShowEndpoint,
+    'endpoint-group-create': grouppolicy.CreateEndpointGroup,
+    'endpoint-group-delete': grouppolicy.DeleteEndpointGroup,
+    'endpoint-group-update': grouppolicy.UpdateEndpointGroup,
+    'endpoint-group-list': grouppolicy.ListEndpointGroup,
+    'endpoint-group-show': grouppolicy.ShowEndpointGroup,
+    'bridge-domain-create': grouppolicy.CreateBridgeDomain,
+    'bridge-domain-delete': grouppolicy.DeleteBridgeDomain,
+    'bridge-domain-update': grouppolicy.UpdateBridgeDomain,
+    'bridge-domain-list': grouppolicy.ListBridgeDomain,
+    'bridge-domain-show': grouppolicy.ShowBridgeDomain,
+    'routing-domain-create': grouppolicy.CreateRoutingDomain,
+    'routing-domain-delete': grouppolicy.DeleteRoutingDomain,
+    'routing-domain-update': grouppolicy.UpdateRoutingDomain,
+    'routing-domain-list': grouppolicy.ListRoutingDomain,
+    'routing-domain-show': grouppolicy.ShowRoutingDomain,
+    'contract-create': grouppolicy.CreateContract,
+    'contract-delete': grouppolicy.DeleteContract,
+    'contract-update': grouppolicy.UpdateContract,
+    'contract-list': grouppolicy.ListContract,
+    'contract-show': grouppolicy.ShowContract,
+    'policy-rule-create': grouppolicy.CreatePolicyRule,
+    'policy-rule-delete': grouppolicy.DeletePolicyRule,
+    'policy-rule-update': grouppolicy.UpdatePolicyRule,
+    'policy-rule-list': grouppolicy.ListPolicyRule,
+    'policy-rule-show': grouppolicy.ShowPolicyRule,
+    'policy-classifier-create': grouppolicy.CreatePolicyClassifier,
+    'policy-classifier-delete': grouppolicy.DeletePolicyClassifier,
+    'policy-classifier-update': grouppolicy.UpdatePolicyClassifier,
+    'policy-classifier-list': grouppolicy.ListPolicyClassifier,
+    'policy-classifier-show': grouppolicy.ShowPolicyClassifier,
+    'policy-action-create': grouppolicy.CreatePolicyAction,
+    'policy-action-delete': grouppolicy.DeletePolicyAction,
+    'policy-action-update': grouppolicy.UpdatePolicyAction,
+    'policy-action-list': grouppolicy.ListPolicyAction,
+    'policy-action-show': grouppolicy.ShowPolicyAction,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}
