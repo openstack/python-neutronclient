@@ -159,19 +159,19 @@ class CreateEndpointGroup(neutronV20.CreateCommand,
         parser.add_argument(
             '--endpoints', type=string.split,
             default=[],
-            help=_('Parent endpoint_group uuid'))
+            help=_('List of endpoints in the group'))
         parser.add_argument(
             '--bridge-domain', metavar='BRIDGE DOMAIN',
             default='',
             help=_('Bridge domain uuid'))
         parser.add_argument(
             '--provided_contract_scopes', type=string.split,
-            default=[],
-            help=_('Parent endpoint_group uuid'))
+            default={},
+            help=_('Dictionary of provided contract scopes'))
         parser.add_argument(
             '--consumed_contract_scopes', type=string.split,
-            default=[],
-            help=_('Parent endpoint_group uuid'))
+            default={},
+            help=_('Dictionary of consumed contract scopes'))
 
         self.add_arguments_subnet(parser)
 
@@ -250,7 +250,7 @@ class CreateContract(neutronV20.CreateCommand):
         parser.add_argument(
             '--policy-rules', type=string.split,
             #default=[],
-            help=_('list of policy rules'))
+            help=_('List of policy rules'))
         parser.add_argument(
             'name', metavar='NAME',
             help=_('Name of contract to create'))
@@ -319,11 +319,11 @@ class CreatePolicyRule(neutronV20.CreateCommand):
             help=_('Enable flag'))
         parser.add_argument(
             '--classifier-id',
-            help=_('uuid of classifier'))
+            help=_('uuid of policy classifier'))
         parser.add_argument(
             '--actions', type=string.split,
             #default=[],
-            help=_('list of actions'))
+            help=_('List of policy actions'))
         parser.add_argument(
             'name', metavar='NAME',
             help=_('Name of policy_rule to create'))
@@ -359,11 +359,11 @@ class UpdatePolicyRule(neutronV20.UpdateCommand):
     log = logging.getLogger(__name__ + '.UpdatePolicyRule')
 
 
-class ListClassifier(neutronV20.ListCommand):
+class ListPolicyClassifier(neutronV20.ListCommand):
     """List classifiers that belong to a given tenant."""
 
-    resource = 'classifier'
-    log = logging.getLogger(__name__ + '.ListClassifier')
+    resource = 'policy_classifier'
+    log = logging.getLogger(__name__ + '.ListPolicyClassifier')
     _formatters = {}
     list_columns = ['id', 'name', 'description', 'protocol', 'port_range',
                     'direction']
@@ -371,23 +371,23 @@ class ListClassifier(neutronV20.ListCommand):
     sorting_support = True
 
 
-class ShowClassifier(neutronV20.ShowCommand):
+class ShowPolicyClassifier(neutronV20.ShowCommand):
     """Show information of a given classifier."""
 
-    resource = 'classifier'
-    log = logging.getLogger(__name__ + '.ShowClassifier')
+    resource = 'policy_classifier'
+    log = logging.getLogger(__name__ + '.ShowPolicyClassifier')
 
 
-class CreateClassifier(neutronV20.CreateCommand):
+class CreatePolicyClassifier(neutronV20.CreateCommand):
     """Create a classifier for a given tenant."""
 
-    resource = 'classifier'
-    log = logging.getLogger(__name__ + '.CreateClassifier')
+    resource = 'policy_classifier'
+    log = logging.getLogger(__name__ + '.CreatePolicyClassifier')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--description',
-            help=_('Description of the classifier'))
+            help=_('Description of the policy classifier'))
         parser.add_argument(
             '--protocol',
             choices=['tcp', 'udp', 'icmp'],
@@ -413,48 +413,48 @@ class CreateClassifier(neutronV20.CreateCommand):
         return body
 
 
-class DeleteClassifier(neutronV20.DeleteCommand):
+class DeletePolicyClassifier(neutronV20.DeleteCommand):
     """Delete a given classifier."""
 
-    resource = 'classifier'
-    log = logging.getLogger(__name__ + '.DeleteClassifier')
+    resource = 'policy_classifier'
+    log = logging.getLogger(__name__ + '.DeletePolicyClassifier')
 
 
-class UpdateClassifier(neutronV20.UpdateCommand):
+class UpdatePolicyClassifier(neutronV20.UpdateCommand):
     """Update classifier's information."""
 
-    resource = 'classifier'
-    log = logging.getLogger(__name__ + '.UpdateClassifier')
+    resource = 'policy_classifier'
+    log = logging.getLogger(__name__ + '.UpdatePolicyClassifier')
 
 
-class ListAction(neutronV20.ListCommand):
+class ListPolicyAction(neutronV20.ListCommand):
     """List actions that belong to a given tenant."""
 
-    resource = 'action'
-    log = logging.getLogger(__name__ + '.ListAction')
+    resource = 'policy_action'
+    log = logging.getLogger(__name__ + '.ListPolicyAction')
     _formatters = {}
     list_columns = ['id', 'name', 'description', 'action_type', 'action_value']
     pagination_support = True
     sorting_support = True
 
 
-class ShowAction(neutronV20.ShowCommand):
+class ShowPolicyAction(neutronV20.ShowCommand):
     """Show information of a given action."""
 
-    resource = 'action'
-    log = logging.getLogger(__name__ + '.ShowAction')
+    resource = 'policy_action'
+    log = logging.getLogger(__name__ + '.ShowPolicyAction')
 
 
-class CreateAction(neutronV20.CreateCommand):
+class CreatePolicyAction(neutronV20.CreateCommand):
     """Create a action for a given tenant."""
 
-    resource = 'action'
-    log = logging.getLogger(__name__ + '.CreateAction')
+    resource = 'policy_action'
+    log = logging.getLogger(__name__ + '.CreatePolicyAction')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--description',
-            help=_('Description of the action'))
+            help=_('Description of the policy action'))
         parser.add_argument(
             '--action-type',
             #default='allow',
@@ -478,18 +478,18 @@ class CreateAction(neutronV20.CreateCommand):
         return body
 
 
-class DeleteAction(neutronV20.DeleteCommand):
+class DeletePolicyAction(neutronV20.DeleteCommand):
     """Delete a given action."""
 
-    resource = 'action'
-    log = logging.getLogger(__name__ + '.DeleteAction')
+    resource = 'policy_action'
+    log = logging.getLogger(__name__ + '.DeletePolicyAction')
 
 
-class UpdateAction(neutronV20.UpdateCommand):
+class UpdatePolicyAction(neutronV20.UpdateCommand):
     """Update action's information."""
 
-    resource = 'action'
-    log = logging.getLogger(__name__ + '.UpdateAction')
+    resource = 'policy_action'
+    log = logging.getLogger(__name__ + '.UpdatePolicyAction')
 
 
 class ListBridgeDomain(neutronV20.ListCommand):
@@ -588,7 +588,7 @@ class CreateRoutingDomain(neutronV20.CreateCommand):
             '--ip-version',
             type=int,
             default=4, choices=[4, 6],
-            help=_('IP version with default 4'))
+            help=_('IP version, default is 4'))
         parser.add_argument(
             '--ip-supernet',
             help=_('CIDR of supernet to create'))
@@ -596,7 +596,7 @@ class CreateRoutingDomain(neutronV20.CreateCommand):
             '--subnet-prefix-length',
             type=int,
             default=24,
-            help=_('Subnet prefix length [24]'))
+            help=_('Subnet prefix length, default is 24'))
         parser.add_argument(
             'name', metavar='NAME',
             help=_('Name of routing_domain to create'))

@@ -235,10 +235,10 @@ class Client(object):
     policy_rule_path = "/gp/policy_rules/%s"
     filters_path = "/gp/filters"
     filter_path = "/gp/filters/%s"
-    classifiers_path = "/gp/classifiers"
-    classifier_path = "/gp/classifiers/%s"
-    actions_path = "/gp/actions"
-    action_path = "/gp/actions/%s"
+    policy_classifiers_path = "/gp/policy_classifiers"
+    policy_classifier_path = "/gp/policy_classifiers/%s"
+    policy_actions_path = "/gp/policy_actions"
+    policy_action_path = "/gp/policy_actions/%s"
     selectors_path = "/gp/selectors"
     selector_path = "/gp/selectors/%s"
     policy_labels_path = "/gp/policy_labels"
@@ -279,8 +279,8 @@ class Client(object):
                      'contract_consuming_scopes': 'contract_consuming_scope',
                      'policy_rules': 'policy_rule',
                      'filters': 'filter',
-                     'classifiers': 'classifier',
-                     'actions': 'action',
+                     'policy_classifiers': 'policy_classifier',
+                     'policy_actions': 'policy_action',
                      'selectors': 'selector',
                      'policy_labels': 'policy_label',
                      'bridge_domains': 'bridge_domain',
@@ -1430,58 +1430,58 @@ class Client(object):
         return self.delete(self.filter_path % (gp_filter))
 
     @APIParamsCall
-    def list_classifiers(self, retrieve_all=True, **_params):
-        """Fetches a list of all classifiers for a tenant."""
+    def list_policy_classifiers(self, retrieve_all=True, **_params):
+        """Fetches a list of all policy_classifiers for a tenant."""
         # Pass filters in "params" argument to do_request
-        return self.list('classifiers', self.classifiers_path, retrieve_all,
+        return self.list('policy_classifiers', self.policy_classifiers_path, retrieve_all,
                          **_params)
 
     @APIParamsCall
-    def show_classifier(self, classifier, **_params):
-        """Fetches information of a certain classifier."""
-        return self.get(self.classifier_path % (classifier), params=_params)
+    def show_policy_classifier(self, policy_classifier, **_params):
+        """Fetches information of a certain policy_classifier."""
+        return self.get(self.policy_classifier_path % (policy_classifier), params=_params)
 
     @APIParamsCall
-    def create_classifier(self, body=None):
-        """Creates a new classifier."""
-        return self.post(self.classifiers_path, body=body)
+    def create_policy_classifier(self, body=None):
+        """Creates a new policy_classifier."""
+        return self.post(self.policy_classifiers_path, body=body)
 
     @APIParamsCall
-    def update_classifier(self, classifier, body=None):
-        """Updates a classifier."""
-        return self.put(self.classifier_path % (classifier), body=body)
+    def update_policy_classifier(self, policy_classifier, body=None):
+        """Updates a policy_classifier."""
+        return self.put(self.policy_classifier_path % (policy_classifier), body=body)
 
     @APIParamsCall
-    def delete_classifier(self, classifier):
-        """Deletes the specified classifier."""
-        return self.delete(self.classifier_path % (classifier))
+    def delete_policy_classifier(self, policy_classifier):
+        """Deletes the specified policy_classifier."""
+        return self.delete(self.policy_classifier_path % (policy_classifier))
 
     @APIParamsCall
-    def list_actions(self, retrieve_all=True, **_params):
-        """Fetches a list of all actions for a tenant."""
+    def list_policy_actions(self, retrieve_all=True, **_params):
+        """Fetches a list of all policy_actions for a tenant."""
         # Pass filters in "params" argument to do_request
-        return self.list('actions', self.actions_path, retrieve_all,
+        return self.list('policy_actions', self.policy_actions_path, retrieve_all,
                          **_params)
 
     @APIParamsCall
-    def show_action(self, action, **_params):
-        """Fetches information of a certain action."""
-        return self.get(self.action_path % (action), params=_params)
+    def show_policy_action(self, policy_action, **_params):
+        """Fetches information of a certain policy_action."""
+        return self.get(self.policy_action_path % (policy_action), params=_params)
 
     @APIParamsCall
-    def create_action(self, body=None):
-        """Creates a new action."""
-        return self.post(self.actions_path, body=body)
+    def create_policy_action(self, body=None):
+        """Creates a new policy_action."""
+        return self.post(self.policy_actions_path, body=body)
 
     @APIParamsCall
-    def update_action(self, action, body=None):
-        """Updates a action."""
-        return self.put(self.action_path % (action), body=body)
+    def update_policy_action(self, policy_action, body=None):
+        """Updates a policy_action."""
+        return self.put(self.policy_action_path % (policy_action), body=body)
 
     @APIParamsCall
-    def delete_action(self, action):
-        """Deletes the specified action."""
-        return self.delete(self.action_path % (action))
+    def delete_policy_action(self, policy_action):
+        """Deletes the specified policy_action."""
+        return self.delete(self.policy_action_path % (policy_action))
 
     @APIParamsCall
     def list_selectors(self, retrieve_all=True, **_params):
