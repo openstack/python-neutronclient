@@ -1,7 +1,6 @@
 pbr>=0.6,!=0.7,<1.0
 argparse
 cliff>=1.4.3
-httplib2>=0.7.5
 iso8601>=0.1.9
 netaddr>=0.7.6
 requests>=1.1
