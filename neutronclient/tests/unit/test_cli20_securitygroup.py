@@ -17,7 +17,10 @@
 import sys
 
 from mox3 import mox
+import six
 
+from neutronclient.common import exceptions
+from neutronclient.common import utils
 from neutronclient.neutron.v2_0 import securitygroup
 from neutronclient.tests.unit import test_cli20
 
@@ -185,6 +188,100 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         securitygroup.ListSecurityGroupRule.extend_list(mox.IsA(list),
                                                         mox.IgnoreArg())
         self._test_list_resources(resources, cmd, True)
+
+    def _test_extend_list(self, mox_calls):
+        resources = "security_groups"
+
+        data = [{'name': 'default',
+                 'security_group_id': 'secgroupid%02d' % i,
+                 'remote_group_id': 'remgroupid%02d' % i}
+                for i in range(10)]
+
+        cmd = securitygroup.ListSecurityGroupRule(
+            test_cli20.MyApp(sys.stdout), None)
+        self.mox.StubOutWithMock(cmd, "get_client")
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+
+        cmd.get_client().MultipleTimes().AndReturn(self.client)
+        path = getattr(self.client, resources + '_path')
+        mox_calls(path, data)
+        self.mox.ReplayAll()
+        known_args, _vs = cmd.get_parser(
+            'list' + resources).parse_known_args()
+
+        cmd.extend_list(data, known_args)
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
+
+    def _build_test_data(self, data, excess=0):
+        # Length of a query filter on security group rule id
+        # in these testcases, id='secgroupid%02d' (with len(id)=12)
+        sec_group_id_filter_len = 12
+
+        response = []
+        replace_rules = {'security_group_id': 'security_group',
+                         'remote_group_id': 'remote_group'}
+
+        search_opts = {'fields': ['id', 'name']}
+        sec_group_ids = set()
+        for rule in data:
+            for key in replace_rules:
+                sec_group_ids.add(rule[key])
+                response.append({'id': rule[key], 'name': 'default'})
+        sec_group_ids = list(sec_group_ids)
+
+        result = []
+
+        sec_group_count = len(sec_group_ids)
+        max_size = ((sec_group_id_filter_len * sec_group_count) - excess)
+        chunk_size = max_size / sec_group_id_filter_len
+
+        for i in range(0, sec_group_count, chunk_size):
+            search_opts['id'] = sec_group_ids[i: i + chunk_size]
+            params = utils.safe_encode_dict(search_opts)
+            resp_str = self.client.serialize({'security_groups': response})
+
+            result.append({
+                'filter': six.moves.urllib.parse.urlencode(params, doseq=1),
+                'response': (test_cli20.MyResp(200), resp_str),
+            })
+
+        return result
+
+    def test_extend_list(self):
+        def mox_calls(path, data):
+            responses = self._build_test_data(data)
+            self.client.httpclient.request(
+                test_cli20.MyUrlComparator(test_cli20.end_url(
+                    path, responses[0]['filter']), self.client),
+                'GET',
+                body=None,
+                headers=mox.ContainsKeyValue(
+                    'X-Auth-Token', test_cli20.TOKEN)).AndReturn(
+                        responses[0]['response'])
+
+        self._test_extend_list(mox_calls)
+
+    def test_extend_list_exceed_max_uri_len(self):
+        def mox_calls(path, data):
+            # 1 char of extra URI len will cause a split in 2 requests
+            self.mox.StubOutWithMock(self.client, '_check_uri_length')
+            self.client._check_uri_length(mox.IgnoreArg()).AndRaise(
+                exceptions.RequestURITooLong(excess=1))
+            responses = self._build_test_data(data, excess=1)
+
+            for item in responses:
+                self.client._check_uri_length(
+                    mox.IgnoreArg()).AndReturn(None)
+                self.client.httpclient.request(
+                    test_cli20.end_url(path, item['filter']),
+                    'GET',
+                    body=None,
+                    headers=mox.ContainsKeyValue(
+                        'X-Auth-Token', test_cli20.TOKEN)).AndReturn(
+                            item['response'])
+
+        self._test_extend_list(mox_calls)
 
     def test_list_security_group_rules_pagination(self):
         resources = "security_group_rules"
