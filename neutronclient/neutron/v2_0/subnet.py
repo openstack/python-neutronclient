@@ -47,6 +47,72 @@ def _format_host_routes(subnet):
         return ''
 
 
+def add_updatable_arguments(parser):
+    parser.add_argument(
+        '--name',
+        help=_('Name of this subnet'))
+    parser.add_argument(
+        '--gateway', metavar='GATEWAY_IP',
+        help=_('Gateway ip of this subnet'))
+    parser.add_argument(
+        '--no-gateway',
+        action='store_true',
+        help=_('No distribution of gateway'))
+    parser.add_argument(
+        '--allocation-pool', metavar='start=IP_ADDR,end=IP_ADDR',
+        action='append', dest='allocation_pools', type=utils.str2dict,
+        help=_('Allocation pool IP addresses for this subnet '
+        '(This option can be repeated)'))
+    parser.add_argument(
+        '--allocation_pool',
+        action='append', dest='allocation_pools', type=utils.str2dict,
+        help=argparse.SUPPRESS)
+    parser.add_argument(
+        '--host-route', metavar='destination=CIDR,nexthop=IP_ADDR',
+        action='append', dest='host_routes', type=utils.str2dict,
+        help=_('Additional route (This option can be repeated)'))
+    parser.add_argument(
+        '--dns-nameserver', metavar='DNS_NAMESERVER',
+        action='append', dest='dns_nameservers',
+        help=_('DNS name server for this subnet '
+        '(This option can be repeated)'))
+    parser.add_argument(
+        '--disable-dhcp',
+        action='store_true',
+        help=_('Disable DHCP for this subnet'))
+    parser.add_argument(
+        '--enable-dhcp',
+        action='store_true',
+        help=_('Enable DHCP for this subnet'))
+
+
+def updatable_args2body(parsed_args, body):
+    if parsed_args.gateway and parsed_args.no_gateway:
+        raise exceptions.CommandError(_("--gateway option and "
+                                      "--no-gateway option can "
+                                      "not be used same time"))
+    if parsed_args.disable_dhcp and parsed_args.enable_dhcp:
+        raise exceptions.CommandError(_("--enable-dhcp and --disable-dhcp can "
+                                      "not be used in the same command."))
+
+    if parsed_args.no_gateway:
+        body['subnet'].update({'gateway_ip': None})
+    if parsed_args.gateway:
+        body['subnet'].update({'gateway_ip': parsed_args.gateway})
+    if parsed_args.name:
+        body['subnet'].update({'name': parsed_args.name})
+    if parsed_args.disable_dhcp:
+        body['subnet'].update({'enable_dhcp': False})
+    if parsed_args.enable_dhcp:
+        body['subnet'].update({'enable_dhcp': True})
+    if parsed_args.allocation_pools:
+        body['subnet']['allocation_pools'] = parsed_args.allocation_pools
+    if parsed_args.host_routes:
+        body['subnet']['host_routes'] = parsed_args.host_routes
+    if parsed_args.dns_nameservers:
+        body['subnet']['dns_nameservers'] = parsed_args.dns_nameservers
+
+
 class ListSubnet(neutronV20.ListCommand):
     """List subnets that belong to a given tenant."""
 
@@ -74,9 +140,7 @@ class CreateSubnet(neutronV20.CreateCommand):
     log = logging.getLogger(__name__ + '.CreateSubnet')
 
     def add_known_arguments(self, parser):
-        parser.add_argument(
-            '--name',
-            help=_('Name of this subnet'))
+        add_updatable_arguments(parser)
         parser.add_argument(
             '--ip-version',
             type=int,
@@ -87,35 +151,6 @@ class CreateSubnet(neutronV20.CreateCommand):
             type=int,
             choices=[4, 6],
             help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--gateway', metavar='GATEWAY_IP',
-            help=_('Gateway ip of this subnet'))
-        parser.add_argument(
-            '--no-gateway',
-            action='store_true',
-            help=_('No distribution of gateway'))
-        parser.add_argument(
-            '--allocation-pool', metavar='start=IP_ADDR,end=IP_ADDR',
-            action='append', dest='allocation_pools', type=utils.str2dict,
-            help=_('Allocation pool IP addresses for this subnet '
-            '(This option can be repeated)'))
-        parser.add_argument(
-            '--allocation_pool',
-            action='append', dest='allocation_pools', type=utils.str2dict,
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--host-route', metavar='destination=CIDR,nexthop=IP_ADDR',
-            action='append', dest='host_routes', type=utils.str2dict,
-            help=_('Additional route (This option can be repeated)'))
-        parser.add_argument(
-            '--dns-nameserver', metavar='DNS_NAMESERVER',
-            action='append', dest='dns_nameservers',
-            help=_('DNS name server for this subnet '
-            '(This option can be repeated)'))
-        parser.add_argument(
-            '--disable-dhcp',
-            action='store_true',
-            help=_('Disable DHCP for this subnet'))
         parser.add_argument(
             'network_id', metavar='NETWORK',
             help=_('Network id or name this subnet belongs to'))
@@ -130,26 +165,9 @@ class CreateSubnet(neutronV20.CreateCommand):
                            'network_id': _network_id,
                            'ip_version': parsed_args.ip_version, }, }
 
-        if parsed_args.gateway and parsed_args.no_gateway:
-            raise exceptions.CommandError(_("--gateway option and "
-                                          "--no-gateway option can "
-                                          "not be used same time"))
-        if parsed_args.no_gateway:
-            body['subnet'].update({'gateway_ip': None})
-        if parsed_args.gateway:
-            body['subnet'].update({'gateway_ip': parsed_args.gateway})
+        updatable_args2body(parsed_args, body)
         if parsed_args.tenant_id:
             body['subnet'].update({'tenant_id': parsed_args.tenant_id})
-        if parsed_args.name:
-            body['subnet'].update({'name': parsed_args.name})
-        if parsed_args.disable_dhcp:
-            body['subnet'].update({'enable_dhcp': False})
-        if parsed_args.allocation_pools:
-            body['subnet']['allocation_pools'] = parsed_args.allocation_pools
-        if parsed_args.host_routes:
-            body['subnet']['host_routes'] = parsed_args.host_routes
-        if parsed_args.dns_nameservers:
-            body['subnet']['dns_nameservers'] = parsed_args.dns_nameservers
 
         return body
 
@@ -166,3 +184,11 @@ class UpdateSubnet(neutronV20.UpdateCommand):
 
     resource = 'subnet'
     log = logging.getLogger(__name__ + '.UpdateSubnet')
+
+    def add_known_arguments(self, parser):
+        add_updatable_arguments(parser)
+
+    def args2body(self, parsed_args):
+        body = {'subnet': {}}
+        updatable_args2body(parsed_args, body)
+        return body
