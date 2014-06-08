@@ -31,7 +31,8 @@ class ListAgent(neutronV20.ListCommand):
 
     resource = 'agent'
     log = logging.getLogger(__name__ + '.ListAgent')
-    list_columns = ['id', 'agent_type', 'host', 'alive', 'admin_state_up']
+    list_columns = ['id', 'agent_type', 'host', 'alive', 'admin_state_up',
+                    'binary']
     _formatters = {'heartbeat_timestamp': _format_timestamp}
     sorting_support = True
 
