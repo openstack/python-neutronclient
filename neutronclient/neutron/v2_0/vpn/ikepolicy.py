@@ -60,10 +60,7 @@ class CreateIKEPolicy(neutronv20.CreateCommand):
                    'Default:sha1'))
         parser.add_argument(
             '--encryption-algorithm',
-            default='aes-128', choices=['3des',
-                                        'aes-128',
-                                        'aes-192',
-                                        'aes-256'],
+            default='aes-128',
             help=_('Encryption algorithm in lowercase, default:aes-128'))
         parser.add_argument(
             '--phase1-negotiation-mode',

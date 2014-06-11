@@ -62,10 +62,7 @@ class CreateIPsecPolicy(neutronv20.CreateCommand):
             help=_('Authentication algorithm in lowercase, default:sha1'))
         parser.add_argument(
             '--encryption-algorithm',
-            default='aes-128', choices=['3des',
-                                        'aes-128',
-                                        'aes-192',
-                                        'aes-256'],
+            default='aes-128',
             help=_('Encryption algorithm in lowercase, default:aes-128'))
         parser.add_argument(
             '--encapsulation-mode',
