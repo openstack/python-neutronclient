@@ -18,6 +18,7 @@ import copy
 import json
 import uuid
 
+from keystoneclient import exceptions as k_exceptions
 import mox
 import requests
 import testtools
@@ -291,86 +292,6 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
 
-    def test_url_for(self):
-        resources = copy.deepcopy(KS_TOKEN_RESULT)
-
-        endpoints = resources['access']['serviceCatalog'][0]['endpoints'][0]
-        endpoints['publicURL'] = 'public'
-        endpoints['internalURL'] = 'internal'
-        endpoints['adminURL'] = 'admin'
-        catalog = client.ServiceCatalog(resources)
-
-        # endpoint_type not specified
-        url = catalog.url_for(attr='region',
-                              filter_value=REGION)
-        self.assertEqual('public', url)
-
-        # endpoint type specified (3 cases)
-        url = catalog.url_for(attr='region',
-                              filter_value=REGION,
-                              endpoint_type='adminURL')
-        self.assertEqual('admin', url)
-
-        url = catalog.url_for(attr='region',
-                              filter_value=REGION,
-                              endpoint_type='publicURL')
-        self.assertEqual('public', url)
-
-        url = catalog.url_for(attr='region',
-                              filter_value=REGION,
-                              endpoint_type='internalURL')
-        self.assertEqual('internal', url)
-
-        # endpoint_type requested does not exist.
-        self.assertRaises(exceptions.EndpointTypeNotFound,
-                          catalog.url_for,
-                          attr='region',
-                          filter_value=REGION,
-                          endpoint_type='privateURL')
-
-    # Test scenario with url_for when the service catalog only has publicURL.
-    def test_url_for_only_public_url(self):
-        resources = copy.deepcopy(KS_TOKEN_RESULT)
-        catalog = client.ServiceCatalog(resources)
-
-        # Remove endpoints from the catalog.
-        endpoints = resources['access']['serviceCatalog'][0]['endpoints'][0]
-        del endpoints['internalURL']
-        del endpoints['adminURL']
-        endpoints['publicURL'] = 'public'
-
-        # Use publicURL when specified explicitly.
-        url = catalog.url_for(attr='region',
-                              filter_value=REGION,
-                              endpoint_type='publicURL')
-        self.assertEqual('public', url)
-
-        # Use publicURL when specified explicitly.
-        url = catalog.url_for(attr='region',
-                              filter_value=REGION)
-        self.assertEqual('public', url)
-
-    # Test scenario with url_for when the service catalog only has adminURL.
-    def test_url_for_only_admin_url(self):
-        resources = copy.deepcopy(KS_TOKEN_RESULT)
-        catalog = client.ServiceCatalog(resources)
-        endpoints = resources['access']['serviceCatalog'][0]['endpoints'][0]
-        del endpoints['internalURL']
-        del endpoints['publicURL']
-        endpoints['adminURL'] = 'admin'
-
-        # Use publicURL when specified explicitly.
-        url = catalog.url_for(attr='region',
-                              filter_value=REGION,
-                              endpoint_type='adminURL')
-        self.assertEqual('admin', url)
-
-        # But not when nothing is specified.
-        self.assertRaises(exceptions.EndpointTypeNotFound,
-                          catalog.url_for,
-                          attr='region',
-                          filter_value=REGION)
-
     def test_endpoint_type(self):
         resources = copy.deepcopy(KS_TOKEN_RESULT)
         endpoints = resources['access']['serviceCatalog'][0]['endpoints'][0]
@@ -415,7 +336,7 @@ class CLITestAuthKeystone(testtools.TestCase):
             username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
             auth_url=AUTH_URL, region_name=REGION, endpoint_type='privateURL')
 
-        self.assertRaises(exceptions.EndpointTypeNotFound,
+        self.assertRaises(k_exceptions.EndpointNotFound,
                           self.client._extract_service_catalog,
                           resources)
 
