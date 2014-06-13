@@ -31,17 +31,29 @@ This module provides a few things:
 '''
 
 
+import codecs
 import datetime
 import functools
 import inspect
 import itertools
-import json
-import types
-import xmlrpclib
+import sys
+
+if sys.version_info < (2, 7):
+    # On Python <= 2.6, json module is not C boosted, so try to use
+    # simplejson module if available
+    try:
+        import simplejson as json
+    except ImportError:
+        import json
+else:
+    import json
 
 import six
+import six.moves.xmlrpc_client as xmlrpclib
 
+from neutronclient.openstack.common import gettextutils
 from neutronclient.openstack.common import importutils
+from neutronclient.openstack.common import strutils
 from neutronclient.openstack.common import timeutils
 
 netaddr = importutils.try_import("netaddr")
@@ -52,7 +64,8 @@ _nasty_type_tests = [inspect.ismodule, inspect.isclass, inspect.ismethod,
                      inspect.iscode, inspect.isbuiltin, inspect.isroutine,
                      inspect.isabstract]
 
-_simple_types = (types.NoneType, int, basestring, bool, float, long)
+_simple_types = (six.string_types + six.integer_types
+                 + (type(None), bool, float))
 
 
 def to_primitive(value, convert_instances=False, convert_datetime=True,
@@ -117,7 +130,7 @@ def to_primitive(value, convert_instances=False, convert_datetime=True,
                                       level=level,
                                       max_depth=max_depth)
         if isinstance(value, dict):
-            return dict((k, recursive(v)) for k, v in value.iteritems())
+            return dict((k, recursive(v)) for k, v in six.iteritems(value))
         elif isinstance(value, (list, tuple)):
             return [recursive(lv) for lv in value]
 
@@ -129,6 +142,8 @@ def to_primitive(value, convert_instances=False, convert_datetime=True,
 
         if convert_datetime and isinstance(value, datetime.datetime):
             return timeutils.strtime(value)
+        elif isinstance(value, gettextutils.Message):
+            return value.data
         elif hasattr(value, 'iteritems'):
             return recursive(dict(value.iteritems()), level=level + 1)
         elif hasattr(value, '__iter__'):
@@ -153,12 +168,12 @@ def dumps(value, default=to_primitive, **kwargs):
     return json.dumps(value, default=default, **kwargs)
 
 
-def loads(s):
-    return json.loads(s)
+def loads(s, encoding='utf-8'):
+    return json.loads(strutils.safe_decode(s, encoding))
 
 
-def load(s):
-    return json.load(s)
+def load(fp, encoding='utf-8'):
+    return json.load(codecs.getreader(encoding)(fp))
 
 
 try:
