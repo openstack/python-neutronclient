@@ -4,20 +4,34 @@ function die() {
     local exitcode=$?
     set +o xtrace
     echo $@
+    cleanup
     exit $exitcode
 }
 
+net_name=mynet1
+subnet_name=mysubnet1
+port_name=myport1
+function cleanup() {
+    echo Removing test port, subnet and net...
+    neutron port-delete $port_name
+    neutron subnet-delete $subnet_name
+    neutron net-delete $net_name
+}
+
 noauth_tenant_id=me
-if [ $1 == 'noauth' ]; then
+if [ "$1" == "noauth" ]; then
     NOAUTH="--tenant_id $noauth_tenant_id"
 else
     NOAUTH=
 fi
 
+echo "NOTE: User should be admin in order to perform all operations."
+sleep 3
+
 FORMAT=" --request-format xml"
 
 # test the CRUD of network
-network=mynet1
+network=$net_name
 neutron net-create $FORMAT $NOAUTH $network || die "fail to create network $network"
 temp=`neutron net-list $FORMAT -- --name $network --fields id | wc -l`
 echo $temp
@@ -36,8 +50,8 @@ neutron  net-update $FORMAT $network_id --admin_state_up True  ||  die "fail to 
 neutron net-list $FORMAT -c id -- --id fakeid  || die "fail to list networks with column selection on empty list"
 
 # test the CRUD of subnet
-subnet=mysubnet1
-cidr=10.0.1.3/24
+subnet=$subnet_name
+cidr=10.0.1.0/24
 neutron subnet-create $FORMAT $NOAUTH $network $cidr --name $subnet  || die "fail to create subnet $subnet"
 tempsubnet=`neutron subnet-list $FORMAT -- --name $subnet --fields id | wc -l`
 echo $tempsubnet
@@ -49,11 +63,11 @@ echo "ID of subnet with name $subnet is $subnet_id"
 neutron subnet-show $FORMAT $subnet ||  die "fail to show subnet $subnet"
 neutron subnet-show $FORMAT $subnet_id ||  die "fail to show subnet $subnet_id"
 
-neutron  subnet-update $FORMAT $subnet --dns_namesevers host1  ||  die "fail to update subnet $subnet"
-neutron  subnet-update $FORMAT $subnet_id --dns_namesevers host2  ||  die "fail to update subnet $subnet_id"
+neutron  subnet-update $FORMAT $subnet --dns_nameservers list=true 1.1.1.11 1.1.1.12  ||  die "fail to update subnet $subnet"
+neutron  subnet-update $FORMAT $subnet_id --dns_nameservers list=true 2.2.2.21 2.2.2.22  ||  die "fail to update subnet $subnet_id"
 
 # test the crud of ports
-port=myport1
+port=$port_name
 neutron port-create $FORMAT $NOAUTH $network --name $port  || die "fail to create port $port"
 tempport=`neutron port-list $FORMAT -- --name $port --fields id | wc -l`
 echo $tempport
@@ -126,3 +140,7 @@ else
     fi
     neutron quota-list $FORMAT || die "fail to update quota for self"
 fi
+
+cleanup
+echo "Success! :)"
+
