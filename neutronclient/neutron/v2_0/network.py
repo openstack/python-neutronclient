@@ -114,7 +114,7 @@ class CreateNetwork(neutronV20.CreateCommand):
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help=_('Set Admin State Up to false'))
+            help=_('Set admin state up to false.'))
         parser.add_argument(
             '--admin_state_down',
             dest='admin_state', action='store_false',
@@ -122,11 +122,11 @@ class CreateNetwork(neutronV20.CreateCommand):
         parser.add_argument(
             '--shared',
             action='store_true',
-            help=_('Set the network as shared'),
+            help=_('Set the network as shared.'),
             default=argparse.SUPPRESS)
         parser.add_argument(
             'name', metavar='NAME',
-            help=_('Name of network to create'))
+            help=_('Name of network to create.'))
 
     def args2body(self, parsed_args):
         body = {'network': {

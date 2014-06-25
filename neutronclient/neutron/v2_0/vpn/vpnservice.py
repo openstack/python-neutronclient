@@ -23,7 +23,7 @@ from neutronclient.openstack.common.gettextutils import _
 
 
 class ListVPNService(neutronv20.ListCommand):
-    """List VPNService configurations that belong to a given tenant."""
+    """List VPN service configurations that belong to a given tenant."""
 
     resource = 'vpnservice'
     log = logging.getLogger(__name__ + '.ListVPNService')
@@ -36,14 +36,14 @@ class ListVPNService(neutronv20.ListCommand):
 
 
 class ShowVPNService(neutronv20.ShowCommand):
-    """Show information of a given VPNService."""
+    """Show information of a given VPN service."""
 
     resource = 'vpnservice'
     log = logging.getLogger(__name__ + '.ShowVPNService')
 
 
 class CreateVPNService(neutronv20.CreateCommand):
-    """Create a VPNService."""
+    """Create a VPN service."""
     resource = 'vpnservice'
     log = logging.getLogger(__name__ + '.CreateVPNService')
 
@@ -51,19 +51,19 @@ class CreateVPNService(neutronv20.CreateCommand):
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help=_('Set admin state up to false'))
+            help=_('Set admin state up to false.'))
         parser.add_argument(
             '--name',
-            help=_('Set a name for the vpnservice'))
+            help=_('Set a name for the VPN service.'))
         parser.add_argument(
             '--description',
-            help=_('Set a description for the vpnservice'))
+            help=_('Set a description for the VPN service.'))
         parser.add_argument(
             'router', metavar='ROUTER',
-            help=_('Router unique identifier for the vpnservice'))
+            help=_('Router unique identifier for the VPN service.'))
         parser.add_argument(
             'subnet', metavar='SUBNET',
-            help=_('Subnet unique identifier for the vpnservice deployment'))
+            help=_('Subnet unique identifier for the VPN service deployment.'))
 
     def args2body(self, parsed_args):
         _subnet_id = neutronv20.find_resourceid_by_name_or_id(
@@ -84,14 +84,14 @@ class CreateVPNService(neutronv20.CreateCommand):
 
 
 class UpdateVPNService(neutronv20.UpdateCommand):
-    """Update a given VPNService."""
+    """Update a given VPN service."""
 
     resource = 'vpnservice'
     log = logging.getLogger(__name__ + '.UpdateVPNService')
 
 
 class DeleteVPNService(neutronv20.DeleteCommand):
-    """Delete a given VPNService."""
+    """Delete a given VPN service."""
 
     resource = 'vpnservice'
     log = logging.getLogger(__name__ + '.DeleteVPNService')

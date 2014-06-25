@@ -44,16 +44,16 @@ class CreateCredential(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'credential_name',
-            help=_('Name/Ip address for Credential'))
+            help=_('Name/IP address for credential.'))
         parser.add_argument(
             'credential_type',
-            help=_('Type of the Credential'))
+            help=_('Type of the credential.'))
         parser.add_argument(
             '--username',
-            help=_('Username for the credential'))
+            help=_('Username for the credential.'))
         parser.add_argument(
             '--password',
-            help=_('Password for the credential'))
+            help=_('Password for the credential.'))
 
     def args2body(self, parsed_args):
         body = {'credential': {

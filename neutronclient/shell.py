@@ -361,20 +361,20 @@ class NeutronShell(app.App):
             action='store_const',
             dest='verbose_level',
             const=0,
-            help=_('Suppress output except warnings and errors'))
+            help=_('Suppress output except warnings and errors.'))
         parser.add_argument(
             '-h', '--help',
             action=HelpAction,
             nargs=0,
             default=self,  # tricky
-            help=_("Show this help message and exit"))
+            help=_("Show this help message and exit."))
         # Global arguments
         parser.add_argument(
             '--os-auth-strategy', metavar='<auth-strategy>',
             default=env('OS_AUTH_STRATEGY', default='keystone'),
-            help=_('Authentication strategy (Env: OS_AUTH_STRATEGY'
-            ', default keystone). For now, any other value will'
-            ' disable the authentication'))
+            help=_('Authentication strategy, defaults to '
+            'env[OS_AUTH_STRATEGY] or keystone. For now, any '
+            'other value will disable the authentication.'))
         parser.add_argument(
             '--os_auth_strategy',
             help=argparse.SUPPRESS)
@@ -382,7 +382,7 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-auth-url', metavar='<auth-url>',
             default=env('OS_AUTH_URL'),
-            help=_('Authentication URL (Env: OS_AUTH_URL)'))
+            help=_('Authentication URL, defaults to env[OS_AUTH_URL].'))
         parser.add_argument(
             '--os_auth_url',
             help=argparse.SUPPRESS)
@@ -390,7 +390,8 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-tenant-name', metavar='<auth-tenant-name>',
             default=env('OS_TENANT_NAME'),
-            help=_('Authentication tenant name (Env: OS_TENANT_NAME)'))
+            help=_('Authentication tenant name, defaults to '
+                   'env[OS_TENANT_NAME].'))
         parser.add_argument(
             '--os_tenant_name',
             help=argparse.SUPPRESS)
@@ -398,12 +399,13 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-tenant-id', metavar='<auth-tenant-id>',
             default=env('OS_TENANT_ID'),
-            help=_('Authentication tenant ID (Env: OS_TENANT_ID)'))
+            help=_('Authentication tenant ID, defaults to '
+                   'env[OS_TENANT_ID].'))
 
         parser.add_argument(
             '--os-username', metavar='<auth-username>',
             default=utils.env('OS_USERNAME'),
-            help=_('Authentication username (Env: OS_USERNAME)'))
+            help=_('Authentication username, defaults to env[OS_USERNAME].'))
         parser.add_argument(
             '--os_username',
             help=argparse.SUPPRESS)
@@ -416,7 +418,7 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-password', metavar='<auth-password>',
             default=utils.env('OS_PASSWORD'),
-            help=_('Authentication password (Env: OS_PASSWORD)'))
+            help=_('Authentication password, defaults to env[OS_PASSWORD].'))
         parser.add_argument(
             '--os_password',
             help=argparse.SUPPRESS)
@@ -424,7 +426,8 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-region-name', metavar='<auth-region-name>',
             default=env('OS_REGION_NAME'),
-            help=_('Authentication region name (Env: OS_REGION_NAME)'))
+            help=_('Authentication region name, defaults to '
+                   'env[OS_REGION_NAME].'))
         parser.add_argument(
             '--os_region_name',
             help=argparse.SUPPRESS)
@@ -432,7 +435,7 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-token', metavar='<token>',
             default=env('OS_TOKEN'),
-            help=_('Defaults to env[OS_TOKEN]'))
+            help=_('Authentication token, defaults to env[OS_TOKEN].'))
         parser.add_argument(
             '--os_token',
             help=argparse.SUPPRESS)
@@ -450,7 +453,7 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-url', metavar='<url>',
             default=env('OS_URL'),
-            help=_('Defaults to env[OS_URL]'))
+            help=_('Defaults to env[OS_URL].'))
         parser.add_argument(
             '--os_url',
             help=argparse.SUPPRESS)
@@ -461,7 +464,7 @@ class NeutronShell(app.App):
             default=env('OS_CACERT', default=None),
             help=_("Specify a CA bundle file to use in "
                    "verifying a TLS (https) server certificate. "
-                   "Defaults to env[OS_CACERT]"))
+                   "Defaults to env[OS_CACERT]."))
 
         parser.add_argument(
             '--insecure',

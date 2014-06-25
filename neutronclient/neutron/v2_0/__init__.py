@@ -91,7 +91,7 @@ def find_resourceid_by_name_or_id(client, resource, name_or_id):
 def add_show_list_common_argument(parser):
     parser.add_argument(
         '-D', '--show-details',
-        help=_('Show detailed info'),
+        help=_('Show detailed info.'),
         action='store_true',
         default=False, )
     parser.add_argument(
@@ -117,7 +117,7 @@ def add_pagination_argument(parser):
         '-P', '--page-size',
         dest='page_size', metavar='SIZE', type=int,
         help=_("Specify retrieve unit of each request, then split one request "
-               "to several requests"),
+               "to several requests."),
         default=None)
 
 
@@ -356,7 +356,7 @@ class NeutronCommand(command.OpenStackCommand):
         parser = super(NeutronCommand, self).get_parser(prog_name)
         parser.add_argument(
             '--request-format',
-            help=_('The xml or json request format'),
+            help=_('The xml or json request format.'),
             default='json',
             choices=['json', 'xml', ], )
         parser.add_argument(
@@ -401,7 +401,7 @@ class CreateCommand(NeutronCommand, show.ShowOne):
         parser = super(CreateCommand, self).get_parser(prog_name)
         parser.add_argument(
             '--tenant-id', metavar='TENANT_ID',
-            help=_('The owner tenant ID'), )
+            help=_('The owner tenant ID.'), )
         parser.add_argument(
             '--tenant_id',
             help=argparse.SUPPRESS)
@@ -444,7 +444,7 @@ class UpdateCommand(NeutronCommand):
         parser = super(UpdateCommand, self).get_parser(prog_name)
         parser.add_argument(
             'id', metavar=self.resource.upper(),
-            help=_('ID or name of %s to update') % self.resource)
+            help=_('ID or name of %s to update.') % self.resource)
         self.add_known_arguments(parser)
         return parser
 
@@ -491,9 +491,9 @@ class DeleteCommand(NeutronCommand):
     def get_parser(self, prog_name):
         parser = super(DeleteCommand, self).get_parser(prog_name)
         if self.allow_names:
-            help_str = _('ID or name of %s to delete')
+            help_str = _('ID or name of %s to delete.')
         else:
-            help_str = _('ID of %s to delete')
+            help_str = _('ID of %s to delete.')
         parser.add_argument(
             'id', metavar=self.resource.upper(),
             help=help_str % self.resource)
@@ -631,9 +631,9 @@ class ShowCommand(NeutronCommand, show.ShowOne):
         parser = super(ShowCommand, self).get_parser(prog_name)
         add_show_list_common_argument(parser)
         if self.allow_names:
-            help_str = _('ID or name of %s to look up')
+            help_str = _('ID or name of %s to look up.')
         else:
-            help_str = _('ID of %s to look up')
+            help_str = _('ID of %s to look up.')
         parser.add_argument(
             'id', metavar=self.resource.upper(),
             help=help_str % self.resource)

@@ -36,14 +36,14 @@ class ListIPsecPolicy(neutronv20.ListCommand):
 
 
 class ShowIPsecPolicy(neutronv20.ShowCommand):
-    """Show information of a given ipsecpolicy."""
+    """Show information of a given IPsec policy."""
 
     resource = 'ipsecpolicy'
     log = logging.getLogger(__name__ + '.ShowIPsecPolicy')
 
 
 class CreateIPsecPolicy(neutronv20.CreateCommand):
-    """Create an ipsecpolicy."""
+    """Create an IPsec policy."""
 
     resource = 'ipsecpolicy'
     log = logging.getLogger(__name__ + '.CreateIPsecPolicy')
@@ -51,11 +51,11 @@ class CreateIPsecPolicy(neutronv20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--description',
-            help=_('Description of the IPsecPolicy'))
+            help=_('Description of the IPsec policy.'))
         parser.add_argument(
             '--transform-protocol',
             default='esp', choices=['esp', 'ah', 'ah-esp'],
-            help=_('Transform Protocol in lowercase, default:esp'))
+            help=_('Transform protocol in lowercase, default:esp'))
         parser.add_argument(
             '--auth-algorithm',
             default='sha1', choices=['sha1'],
@@ -66,11 +66,11 @@ class CreateIPsecPolicy(neutronv20.CreateCommand):
                                         'aes-128',
                                         'aes-192',
                                         'aes-256'],
-            help=_('Encryption Algorithm in lowercase, default:aes-128'))
+            help=_('Encryption algorithm in lowercase, default:aes-128'))
         parser.add_argument(
             '--encapsulation-mode',
             default='tunnel', choices=['tunnel', 'transport'],
-            help=_('Encapsulation Mode in lowercase, default:tunnel'))
+            help=_('Encapsulation mode in lowercase, default:tunnel'))
         parser.add_argument(
             '--pfs',
             default='group5', choices=['group2', 'group5', 'group14'],
@@ -82,7 +82,7 @@ class CreateIPsecPolicy(neutronv20.CreateCommand):
             help=vpn_utils.lifetime_help("IPsec"))
         parser.add_argument(
             'name', metavar='NAME',
-            help=_('Name of the IPsecPolicy'))
+            help=_('Name of the IPsec policy.'))
 
     def args2body(self, parsed_args):
 
@@ -108,7 +108,7 @@ class CreateIPsecPolicy(neutronv20.CreateCommand):
 
 
 class UpdateIPsecPolicy(neutronv20.UpdateCommand):
-    """Update a given ipsec policy."""
+    """Update a given IPsec policy."""
 
     resource = 'ipsecpolicy'
     log = logging.getLogger(__name__ + '.UpdateIPsecPolicy')
@@ -131,7 +131,7 @@ class UpdateIPsecPolicy(neutronv20.UpdateCommand):
 
 
 class DeleteIPsecPolicy(neutronv20.DeleteCommand):
-    """Delete a given ipsecpolicy."""
+    """Delete a given IPsec policy."""
 
     resource = 'ipsecpolicy'
     log = logging.getLogger(__name__ + '.DeleteIPsecPolicy')
