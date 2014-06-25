@@ -77,7 +77,7 @@ class CreateFirewallPolicy(neutronv20.CreateCommand):
         parser.add_argument(
             '--firewall-rules', type=string.split,
             help=_('Ordered list of whitespace-delimited firewall rule '
-            'names or IDs; e.g., --firewall-rules \"rule1 rule2\"'))
+                   'names or IDs; e.g., --firewall-rules \"rule1 rule2\"'))
         parser.add_argument(
             '--audited',
             action='store_true',
@@ -91,10 +91,10 @@ class CreateFirewallPolicy(neutronv20.CreateCommand):
                 _firewall_rules.append(
                     neutronv20.find_resourceid_by_name_or_id(
                         self.get_client(), 'firewall_rule', f))
-                body = {self.resource: {
-                        'firewall_rules': _firewall_rules,
-                        },
-                        }
+            body = {self.resource: {
+                    'firewall_rules': _firewall_rules,
+                    },
+                    }
         else:
             body = {self.resource: {}}
         neutronv20.update_dict(parsed_args, body[self.resource],
