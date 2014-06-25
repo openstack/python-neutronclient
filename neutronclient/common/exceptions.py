@@ -60,6 +60,8 @@ class NeutronClientException(NeutronException):
     blocks. The actual error message is the one generated on the server side.
     """
 
+    status_code = 0
+
     def __init__(self, message=None, **kwargs):
         if 'status_code' in kwargs:
             self.status_code = kwargs['status_code']

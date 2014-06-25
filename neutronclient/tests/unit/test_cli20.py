@@ -20,6 +20,7 @@ import contextlib
 import cStringIO
 import fixtures
 import mox
+import requests
 import sys
 import testtools
 
@@ -670,3 +671,37 @@ class CLITestV20ExceptionHandler(CLITestV20Base):
             exceptions.NeutronClientException, 500,
             expected_msg=expected_msg,
             error_content=error_content)
+
+    def test_exception_status(self):
+        e = exceptions.BadRequest()
+        self.assertEqual(e.status_code, 400)
+
+        e = exceptions.BadRequest(status_code=499)
+        self.assertEqual(e.status_code, 499)
+
+        # SslCertificateValidationError has no explicit status_code,
+        # but should have a 'safe' defined fallback.
+        e = exceptions.SslCertificateValidationError()
+        self.assertIsNotNone(e.status_code)
+
+        e = exceptions.SslCertificateValidationError(status_code=599)
+        self.assertEqual(e.status_code, 599)
+
+    def test_connection_failed(self):
+        self.mox.StubOutWithMock(self.client.httpclient, 'request')
+        self.client.httpclient.auth_token = 'token'
+
+        self.client.httpclient.request(
+            end_url('/test'), 'GET',
+            headers=mox.ContainsKeyValue('X-Auth-Token', 'token')
+        ).AndRaise(requests.exceptions.ConnectionError('Connection refused'))
+
+        self.mox.ReplayAll()
+
+        error = self.assertRaises(exceptions.ConnectionFailed,
+                                  self.client.get, '/test')
+        # NB: ConnectionFailed has no explicit status_code, so this
+        # tests that there is a fallback defined.
+        self.assertIsNotNone(error.status_code)
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
