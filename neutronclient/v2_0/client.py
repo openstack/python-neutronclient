@@ -1199,7 +1199,7 @@ class Client(object):
 
     def _handle_fault_response(self, status_code, response_body):
         # Create exception with HTTP status code and message
-        _logger.debug(_("Error message: %s"), response_body)
+        _logger.debug("Error message: %s", response_body)
         # Add deserialized error message to exception arguments
         try:
             des_error_body = self.deserialize(response_body, status_code)
@@ -1301,7 +1301,7 @@ class Client(object):
             except exceptions.ConnectionFailed:
                 # Exception has already been logged by do_request()
                 if i < self.retries:
-                    _logger.debug(_('Retrying connection to Neutron service'))
+                    _logger.debug('Retrying connection to Neutron service')
                     time.sleep(self.retry_interval)
 
         raise exceptions.ConnectionFailed(reason=_("Maximum attempts reached"))

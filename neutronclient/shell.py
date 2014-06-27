@@ -669,7 +669,7 @@ class NeutronShell(app.App):
     def clean_up(self, cmd, result, err):
         self.log.debug('clean_up %s', cmd.__class__.__name__)
         if err:
-            self.log.debug(_('Got an error: %s'), unicode(err))
+            self.log.debug('Got an error: %s', unicode(err))
 
     def configure_logging(self):
         """Create logging handlers for any log output."""

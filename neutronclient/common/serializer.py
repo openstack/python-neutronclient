@@ -191,7 +191,7 @@ class XMLDictSerializer(DictSerializer):
                 result.set(
                     constants.TYPE_ATTR,
                     constants.TYPE_FLOAT)
-            LOG.debug(_("Data %(data)s type is %(type)s"),
+            LOG.debug("Data %(data)s type is %(type)s",
                       {'data': data,
                        'type': type(data)})
             if isinstance(data, str):
