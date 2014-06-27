@@ -1257,7 +1257,7 @@ class Client(object):
             return response.status_code
 
     def serialize(self, data):
-        """Serializes a dictionary into either XML or json.
+        """Serializes a dictionary into either XML or JSON.
 
         A dictionary with a single key can be passed and
         it can contain any structure.
@@ -1272,7 +1272,7 @@ class Client(object):
                             type(data))
 
     def deserialize(self, data, status_code):
-        """Deserializes an XML or json string into a dictionary."""
+        """Deserializes an XML or JSON string into a dictionary."""
         if status_code == 204:
             return data
         return serializer.Serializer(self.get_attr_metadata()).deserialize(
