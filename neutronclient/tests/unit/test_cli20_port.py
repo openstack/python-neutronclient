@@ -16,7 +16,7 @@
 
 import sys
 
-import mox
+from mox3 import mox
 
 from neutronclient.neutron.v2_0 import port
 from neutronclient import shell

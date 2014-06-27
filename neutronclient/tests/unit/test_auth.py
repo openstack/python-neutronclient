@@ -19,7 +19,7 @@ import json
 import uuid
 
 from keystoneclient import exceptions as k_exceptions
-import mox
+from mox3 import mox
 import requests
 import testtools
 

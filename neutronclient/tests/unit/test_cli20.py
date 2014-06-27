@@ -19,7 +19,7 @@ import urllib
 import contextlib
 import cStringIO
 import fixtures
-import mox
+from mox3 import mox
 import requests
 import sys
 import testtools

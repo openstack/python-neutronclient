@@ -14,7 +14,7 @@
 #    under the License.
 
 import fixtures
-import mox
+from mox3 import mox
 import requests
 import testtools
 

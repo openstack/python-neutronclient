@@ -16,7 +16,7 @@
 
 import uuid
 
-import mox
+from mox3 import mox
 import testtools
 
 from neutronclient.common import exceptions
