@@ -34,7 +34,7 @@ def _format_peer_cidrs(ipsec_site_connection):
 
 
 class ListIPsecSiteConnection(neutronv20.ListCommand):
-    """List IPsecSiteConnections that belong to a given tenant."""
+    """List IPsec site connections that belong to a given tenant."""
 
     resource = 'ipsec_site_connection'
     log = logging.getLogger(__name__ + '.ListIPsecSiteConnection')
@@ -47,7 +47,7 @@ class ListIPsecSiteConnection(neutronv20.ListCommand):
 
 
 class ShowIPsecSiteConnection(neutronv20.ShowCommand):
-    """Show information of a given IPsecSiteConnection."""
+    """Show information of a given IPsec site connection."""
 
     resource = 'ipsec_site_connection'
     log = logging.getLogger(__name__ + '.ShowIPsecSiteConnection')
@@ -162,7 +162,7 @@ class CreateIPsecSiteConnection(neutronv20.CreateCommand):
 
 
 class UpdateIPsecSiteConnection(neutronv20.UpdateCommand):
-    """Update a given IPsecSiteConnection."""
+    """Update a given IPsec site connection."""
 
     resource = 'ipsec_site_connection'
     log = logging.getLogger(__name__ + '.UpdateIPsecSiteConnection')
@@ -173,7 +173,7 @@ class UpdateIPsecSiteConnection(neutronv20.UpdateCommand):
             '--dpd',
             metavar="action=ACTION,interval=INTERVAL,timeout=TIMEOUT",
             type=utils.str2dict,
-            help=vpn_utils.dpd_help("IPsec connection"))
+            help=vpn_utils.dpd_help("IPsec connection."))
 
     def args2body(self, parsed_args):
         body = {'ipsec_site_connection': {
@@ -186,7 +186,7 @@ class UpdateIPsecSiteConnection(neutronv20.UpdateCommand):
 
 
 class DeleteIPsecSiteConnection(neutronv20.DeleteCommand):
-    """Delete a given IPsecSiteConnection."""
+    """Delete a given IPsec site connection."""
 
     resource = 'ipsec_site_connection'
     log = logging.getLogger(__name__ + '.DeleteIPsecSiteConnection')
