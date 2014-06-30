@@ -61,10 +61,13 @@ def find_resourceid_by_id(client, resource, resource_id):
         message=not_found_message, status_code=404)
 
 
-def _find_resourceid_by_name(client, resource, name):
+def _find_resourceid_by_name(client, resource, name, project_id=None):
     resource_plural = _get_resource_plural(resource, client)
     obj_lister = getattr(client, "list_%s" % resource_plural)
-    data = obj_lister(name=name, fields='id')
+    params = {'name': name, 'fields': 'id'}
+    if project_id:
+        params['tenant_id'] = project_id
+    data = obj_lister(**params)
     collection = resource_plural
     info = data[collection]
     if len(info) > 1:
@@ -81,11 +84,13 @@ def _find_resourceid_by_name(client, resource, name):
         return info[0]['id']
 
 
-def find_resourceid_by_name_or_id(client, resource, name_or_id):
+def find_resourceid_by_name_or_id(client, resource, name_or_id,
+                                  project_id=None):
     try:
         return find_resourceid_by_id(client, resource, name_or_id)
     except exceptions.NeutronClientException:
-        return _find_resourceid_by_name(client, resource, name_or_id)
+        return _find_resourceid_by_name(client, resource, name_or_id,
+                                        project_id)
 
 
 def add_show_list_common_argument(parser):
