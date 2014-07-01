@@ -100,10 +100,9 @@ class CreateFirewallRule(neutronv20.CreateCommand):
             help=_('Destination port (integer in [1, 65535] or range in '
                    'a:b).'))
         parser.add_argument(
-            '--disabled',
-            dest='enabled',
-            action='store_false',
-            help=_('To disable this rule.'),
+            '--enabled',
+            dest='enabled', choices=['True', 'False'],
+            help=_('To enable or disable this rule'),
             default=argparse.SUPPRESS)
         parser.add_argument(
             '--protocol', choices=['tcp', 'udp', 'icmp', 'any'],

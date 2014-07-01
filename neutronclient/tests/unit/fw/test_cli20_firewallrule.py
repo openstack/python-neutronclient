@@ -34,12 +34,11 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
         my_id = 'myid'
         protocol = 'tcp'
         action = 'allow'
-        enabled_flag = '--enabled' if enabled else '--disabled'
         args = ['--tenant-id', tenant_id,
                 '--admin-state-up',
                 '--protocol', protocol,
                 '--action', action,
-                enabled_flag]
+                '--enabled', enabled]
         position_names = []
         position_values = []
         self._test_create_resource(resource, cmd, name, my_id, args,
@@ -48,10 +47,10 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
                                    enabled=enabled, tenant_id=tenant_id)
 
     def test_create_enabled_firewall_rule_with_mandatory_params(self):
-        self._test_create_firewall_rule_with_mandatory_params(enabled=True)
+        self._test_create_firewall_rule_with_mandatory_params(enabled='True')
 
     def test_create_disabled_firewall_rule_with_mandatory_params(self):
-        self._test_create_firewall_rule_with_mandatory_params(enabled=False)
+        self._test_create_firewall_rule_with_mandatory_params(enabled='False')
 
     def _setup_create_firewall_rule_with_all_params(self, protocol='tcp'):
         """firewall-rule-create with all params set."""
@@ -67,6 +66,7 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
         action = 'allow'
         tenant_id = 'my-tenant'
         my_id = 'myid'
+        enabled = 'True'
         args = ['--description', description,
                 '--shared',
                 '--protocol', protocol,
@@ -75,7 +75,7 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
                 '--source-port', source_port,
                 '--destination-port', destination_port,
                 '--action', action,
-                '--enabled',
+                '--enabled', enabled,
                 '--admin-state-up',
                 '--tenant-id', tenant_id]
         position_names = []
@@ -90,7 +90,7 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
                                    destination_ip_address=destination_ip,
                                    source_port=source_port,
                                    destination_port=destination_port,
-                                   action=action, enabled=True,
+                                   action=action, enabled='True',
                                    tenant_id=tenant_id)
 
     def test_create_firewall_rule_with_all_params(self):
