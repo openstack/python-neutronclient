@@ -133,6 +133,18 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
                                    ['myid', '--name', 'newname'],
                                    {'name': 'newname', })
 
+    def test_update_firewall_policy_with_rules(self):
+        """firewall-policy-update myid --firewall-rules "rule1 rule2"."""
+        resource = 'firewall_policy'
+        cmd = firewallpolicy.UpdateFirewallPolicy(test_cli20.MyApp(sys.stdout),
+                                                  None)
+        firewall_rules_arg = u'rule_id3 rule_id4'
+        firewall_rules_res = ['rule_id3', 'rule_id4']
+        self._test_update_resource(
+            resource, cmd, 'myid',
+            ['myid', '--firewall-rules', firewall_rules_arg],
+            {'firewall_rules': firewall_rules_res, })
+
     def test_delete_firewall_policy(self):
         """firewall-policy-delete my-id."""
         resource = 'firewall_policy'
