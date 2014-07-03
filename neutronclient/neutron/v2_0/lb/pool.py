@@ -18,6 +18,8 @@
 
 import logging
 
+import six
+
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
 
@@ -132,6 +134,6 @@ class RetrievePoolStats(neutronV20.ShowCommand):
         self.format_output_data(data)
         stats = data['stats']
         if 'stats' in data:
-            return zip(*sorted(stats.iteritems()))
+            return zip(*sorted(six.iteritems(stats)))
         else:
             return None

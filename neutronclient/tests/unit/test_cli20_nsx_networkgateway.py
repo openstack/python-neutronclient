@@ -17,6 +17,7 @@
 import sys
 
 from mox3 import mox
+import six
 
 from neutronclient.neutron.v2_0.nsx import networkgateway as nwgw
 from neutronclient.tests.unit import test_cli20
@@ -131,7 +132,7 @@ class CLITestV20NetworkGatewayJSON(test_cli20.CLITestV20Base):
         position_names = ['name', ]
         position_values = [name, ]
         args = []
-        for (k, v) in extra_body.iteritems():
+        for (k, v) in six.iteritems(extra_body):
             if (k == 'client_certificate' and client_certificate_file):
                 v = client_certificate_file
                 k = 'client_certificate_file'

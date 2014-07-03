@@ -16,6 +16,7 @@
 import datetime
 import sys
 
+import six
 import testtools
 
 from neutronclient.common import exceptions
@@ -162,7 +163,7 @@ class ToPrimitiveTestCase(testtools.TestCase):
 
         class IterItemsClass(object):
             def iteritems(self):
-                return d.iteritems()
+                return six.iteritems(d)
 
         x = IterItemsClass()
         p = utils.to_primitive(x)
