@@ -63,6 +63,7 @@ class TestSSL(testtools.TestCase):
             username=mox.IgnoreArg(),
             user_id=mox.IgnoreArg(),
             log_credentials=mox.IgnoreArg(),
+            timeout=mox.IgnoreArg(),
         )
         openstack_shell.NeutronShell.interact().AndReturn(0)
         self.mox.ReplayAll()
@@ -94,6 +95,7 @@ class TestSSL(testtools.TestCase):
             username=mox.IgnoreArg(),
             user_id=mox.IgnoreArg(),
             log_credentials=mox.IgnoreArg(),
+            timeout=mox.IgnoreArg(),
         )
         openstack_shell.NeutronShell.interact().AndReturn(0)
         self.mox.ReplayAll()

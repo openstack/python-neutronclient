@@ -64,6 +64,7 @@ class ClientManager(object):
                  ca_cert=None,
                  log_credentials=False,
                  service_type=None,
+                 timeout=None
                  ):
         self._token = token
         self._url = url
@@ -82,6 +83,7 @@ class ClientManager(object):
         self._insecure = insecure
         self._ca_cert = ca_cert
         self._log_credentials = log_credentials
+        self._timeout = timeout
         return
 
     def initialize(self):
@@ -98,7 +100,8 @@ class ClientManager(object):
                 endpoint_type=self._endpoint_type,
                 insecure=self._insecure,
                 ca_cert=self._ca_cert,
-                log_credentials=self._log_credentials)
+                log_credentials=self._log_credentials,
+                timeout=self._timeout)
             httpclient.authenticate()
             # Populate other password flow attributes
             self._token = httpclient.auth_token
