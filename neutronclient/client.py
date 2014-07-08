@@ -144,6 +144,7 @@ class HTTPClient(object):
             method,
             url,
             verify=self.verify_cert,
+            timeout=self.timeout,
             **kwargs)
 
         return resp, resp.text
