@@ -67,9 +67,9 @@ class XMLDictSerializer(DictSerializer):
     def __init__(self, metadata=None, xmlns=None):
         """XMLDictSerializer constructor.
 
-        :param metadata: information needed to deserialize xml into
+        :param metadata: information needed to deserialize XML into
                          a dictionary.
-        :param xmlns: XML namespace to include with serialized xml
+        :param xmlns: XML namespace to include with serialized XML
         """
         super(XMLDictSerializer, self).__init__()
         self.metadata = metadata or {}
@@ -123,7 +123,7 @@ class XMLDictSerializer(DictSerializer):
         return etree.tostring(node, encoding='UTF-8')
 
     #NOTE (ameade): the has_atom should be removed after all of the
-    # xml serializers and view builders have been updated to the current
+    # XML serializers and view builders have been updated to the current
     # spec that required all responses include the xmlns:atom, the has_atom
     # flag is to prevent current tests from breaking
     def _add_xmlns(self, node, used_prefixes, has_atom=False):
@@ -235,7 +235,7 @@ class XMLDeserializer(TextDeserializer):
     def __init__(self, metadata=None):
         """XMLDeserializer constructor.
 
-        :param metadata: information needed to deserialize xml into
+        :param metadata: information needed to deserialize XML into
                          a dictionary.
         """
         super(XMLDeserializer, self).__init__()
