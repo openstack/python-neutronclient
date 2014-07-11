@@ -421,7 +421,6 @@ class CreateCommand(NeutronCommand, show.ShowOne):
                               "create_%s" % self.resource)
         data = obj_creator(body)
         self.format_output_data(data)
-        # {u'network': {u'id': u'e9424a76-6db4-4c93-97b6-ec311cd51f19'}}
         info = self.resource in data and data[self.resource] or None
         if info:
             print(_('Created a new %s:') % self.resource,
