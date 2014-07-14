@@ -16,6 +16,8 @@
 
 import sys
 
+from mox3 import mox
+
 from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0 import subnet
 from neutronclient.tests.unit import test_cli20
@@ -314,6 +316,25 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values,
                                    tenant_id='tenantid')
+
+    def test_create_subnet_max_v4_cidr(self):
+        """Create subnet: --gateway gateway netid cidr."""
+        resource = 'subnet'
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = '192.168.0.1/32'
+        gateway = 'gatewayvalue'
+        args = ['--gateway', gateway, netid, cidr]
+        position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
+        position_values = [4, netid, cidr, gateway]
+        self.mox.StubOutWithMock(cmd.log, 'warning')
+        cmd.log.warning(mox.IgnoreArg())
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
 
     def test_list_subnets_detail(self):
         """List subnets: -D."""

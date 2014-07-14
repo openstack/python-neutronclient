@@ -159,6 +159,11 @@ class CreateSubnet(neutronV20.CreateCommand):
             help=_('CIDR of subnet to create.'))
 
     def args2body(self, parsed_args):
+        if parsed_args.ip_version == 4 and parsed_args.cidr.endswith('/32'):
+            self.log.warning(_("An IPv4 subnet with a /32 CIDR will have "
+                               "only one usable IP address so the device "
+                               "attached to it will not have any IP "
+                               "connectivity."))
         _network_id = neutronV20.find_resourceid_by_name_or_id(
             self.get_client(), 'network', parsed_args.network_id)
         body = {'subnet': {'cidr': parsed_args.cidr,
