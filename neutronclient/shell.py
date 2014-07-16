@@ -38,6 +38,7 @@ from cliff import app
 from cliff import commandmanager
 
 from neutronclient.common import clientmanager
+from neutronclient.common import command as openstack_command
 from neutronclient.common import exceptions as exc
 from neutronclient.common import utils
 from neutronclient.i18n import _
@@ -116,7 +117,12 @@ def check_non_negative_int(value):
     return value
 
 
+class BashCompletionCommand(openstack_command.OpenStackCommand):
+    """Prints all of the commands and options for bash-completion."""
+    resource = "bash_completion"
+
 COMMAND_V2 = {
+    'bash-completion': BashCompletionCommand,
     'net-list': network.ListNetwork,
     'net-external-list': network.ListExternalNetwork,
     'net-show': network.ShowNetwork,
@@ -344,6 +350,9 @@ class NeutronShell(app.App):
         self.commands = COMMANDS
         for k, v in self.commands[apiversion].items():
             self.command_manager.add_command(k, v)
+
+        # Pop the 'complete' to correct the outputs of 'neutron help'.
+        self.command_manager.commands.pop('complete')
 
         # This is instantiated in initialize_app() only when using
         # password flow auth
@@ -644,7 +653,7 @@ class NeutronShell(app.App):
             help_pos = -1
             help_command_pos = -1
             for arg in argv:
-                if arg == 'bash-completion':
+                if arg == 'bash-completion' and help_command_pos == -1:
                     self._bash_completion()
                     return 0
                 if arg in self.commands[self.api_version]:
