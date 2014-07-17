@@ -280,7 +280,7 @@ def parse_args_to_dict(values_specs):
     _args = _parser.parse_args(_values_specs)
 
     result_dict = {}
-    for opt in _options.iterkeys():
+    for opt in six.iterkeys(_options):
         _opt = opt.split('--', 2)[1]
         _opt = _opt.replace('-', '_')
         _value = getattr(_args, _opt)

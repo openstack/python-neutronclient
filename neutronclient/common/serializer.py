@@ -18,9 +18,10 @@
 ###
 
 import logging
-
 from xml.etree import ElementTree as etree
 from xml.parsers import expat
+
+import six
 
 from neutronclient.common import constants
 from neutronclient.common import exceptions as exception
@@ -93,7 +94,7 @@ class XMLDictSerializer(DictSerializer):
                 root_key = constants.VIRTUAL_ROOT_KEY
                 root_value = None
             else:
-                link_keys = [k for k in data.iterkeys() or []
+                link_keys = [k for k in six.iterkeys(data) or []
                              if k.endswith('_links')]
                 if link_keys:
                     links = data.pop(link_keys[0], None)
