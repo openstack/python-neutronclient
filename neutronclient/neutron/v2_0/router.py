@@ -38,7 +38,7 @@ class ListRouter(neutronV20.ListCommand):
     resource = 'router'
     log = logging.getLogger(__name__ + '.ListRouter')
     _formatters = {'external_gateway_info': _format_external_gateway_info, }
-    list_columns = ['id', 'name', 'external_gateway_info']
+    list_columns = ['id', 'name', 'external_gateway_info', 'distributed']
     pagination_support = True
     sorting_support = True
 
@@ -71,7 +71,7 @@ class CreateRouter(neutronV20.CreateCommand):
             help=_('Name of router to create.'))
         parser.add_argument(
             'distributed', action='store_true',
-            help=_('Create a distributed router (VMware NSX plugin only).'))
+            help=_('Create a distributed router.'))
 
     def args2body(self, parsed_args):
         body = {'router': {
