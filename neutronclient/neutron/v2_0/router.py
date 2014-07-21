@@ -66,13 +66,16 @@ class CreateRouter(neutronV20.CreateCommand):
             'name', metavar='NAME',
             help=_('Name of router to create.'))
         parser.add_argument(
-            'distributed', action='store_true',
+            '--distributed',
+            dest='distributed',
+            choices=['True', 'False'],
+            default=argparse.SUPPRESS,
             help=_('Create a distributed router.'))
 
     def args2body(self, parsed_args):
         body = {self.resource: {'admin_state_up': parsed_args.admin_state}}
         neutronV20.update_dict(parsed_args, body[self.resource],
-                               ['name', 'tenant_id'])
+                               ['name', 'tenant_id', 'distributed'])
         return body
 
 
