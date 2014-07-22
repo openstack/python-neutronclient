@@ -20,9 +20,9 @@ import contextlib
 import cStringIO
 import fixtures
 from mox3 import mox
+from oslotest import base
 import requests
 import sys
-import testtools
 
 from neutronclient.common import constants
 from neutronclient.common import exceptions
@@ -156,7 +156,7 @@ class MyComparator(mox.Comparator):
         return str(self.lhs)
 
 
-class CLITestV20Base(testtools.TestCase):
+class CLITestV20Base(base.BaseTestCase):
 
     format = 'json'
     test_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
