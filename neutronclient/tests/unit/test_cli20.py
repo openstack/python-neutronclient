@@ -604,6 +604,7 @@ class CLITestV20ExceptionHandler(CLITestV20Base):
             ('IpAddressInUse', exceptions.IpAddressInUseClient, 409),
             ('IpAddressGenerationFailure',
              exceptions.IpAddressGenerationFailureClient, 409),
+            ('MacAddressInUse', exceptions.MacAddressInUseClient, 409),
             ('ExternalIpAddressExhausted',
              exceptions.ExternalIpAddressExhaustedClient, 400),
             ('OverQuota', exceptions.OverQuotaClient, 409),

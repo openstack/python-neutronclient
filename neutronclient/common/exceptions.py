@@ -155,6 +155,10 @@ class IpAddressGenerationFailureClient(Conflict):
     pass
 
 
+class MacAddressInUseClient(Conflict):
+    pass
+
+
 class ExternalIpAddressExhaustedClient(BadRequest):
     pass
 
