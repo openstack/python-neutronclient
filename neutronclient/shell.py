@@ -689,6 +689,7 @@ class NeutronShell(app.App):
             formatter = logging.Formatter(self.DEBUG_MESSAGE_FORMAT)
         else:
             formatter = logging.Formatter(self.CONSOLE_MESSAGE_FORMAT)
+        logging.getLogger('urllib3.connectionpool').setLevel(logging.WARNING)
         console.setFormatter(formatter)
         root_logger.addHandler(console)
         return
