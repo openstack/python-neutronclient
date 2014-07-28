@@ -446,6 +446,12 @@ class NeutronShell(app.App):
             help=_('Defaults to env[OS_NETWORK_SERVICE_TYPE] or network.'))
 
         parser.add_argument(
+            '--timeout', metavar='<seconds>',
+            default=env('OS_NETWORK_TIMEOUT', default=None), type=float,
+            help=_('Timeout in seconds to wait for an HTTP response. Defaults '
+                   'to env[OS_NETWORK_TIMEOUT] or None if not specified.'))
+
+        parser.add_argument(
             '--endpoint-type', metavar='<endpoint-type>',
             default=env('OS_ENDPOINT_TYPE', default='publicURL'),
             help=_('Defaults to env[OS_ENDPOINT_TYPE] or publicURL.'))
@@ -643,6 +649,7 @@ class NeutronShell(app.App):
             endpoint_type=self.options.endpoint_type,
             insecure=self.options.insecure,
             ca_cert=self.options.os_cacert,
+            timeout=self.options.timeout,
             log_credentials=True)
         return
 

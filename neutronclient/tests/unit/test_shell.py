@@ -129,7 +129,7 @@ class ShellTest(testtools.TestCase):
             password='test', region_name='', api_version={'network': '2.0'},
             auth_strategy='keystone', service_type='network',
             endpoint_type='publicURL', insecure=False, ca_cert=None,
-            log_credentials=True)
+            log_credentials=True, timeout=None)
         neutron_shell.run_subcommand(['quota-list'])
         self.mox.ReplayAll()
         cmdline = ('--os-username test '
@@ -185,3 +185,26 @@ class ShellTest(testtools.TestCase):
         # --endpoint-type and $OS_ENDPOINT_TYPE
         namespace = parser.parse_args(['--endpoint-type=admin'])
         self.assertEqual('admin', namespace.endpoint_type)
+
+    def test_timeout_option(self):
+        shell = openstack_shell.NeutronShell('2.0')
+        parser = shell.build_option_parser('descr', '2.0')
+
+        # Neither $OS_ENDPOINT_TYPE nor --endpoint-type
+        namespace = parser.parse_args([])
+        self.assertIsNone(namespace.timeout)
+
+        # --endpoint-type but not $OS_ENDPOINT_TYPE
+        namespace = parser.parse_args(['--timeout=50'])
+        self.assertEqual(50, namespace.timeout)
+
+    def test_timeout_environment_variable(self):
+        fixture = fixtures.EnvironmentVariable("OS_NETWORK_TIMEOUT",
+                                               "50")
+        self.useFixture(fixture)
+
+        shell = openstack_shell.NeutronShell('2.0')
+        parser = shell.build_option_parser('descr', '2.0')
+
+        namespace = parser.parse_args([])
+        self.assertEqual(50, namespace.timeout)
