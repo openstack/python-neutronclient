@@ -76,7 +76,7 @@ class RemoveNetworkFromDhcpAgent(neutronV20.NeutronCommand):
             neutron_client, 'network', parsed_args.network)
         neutron_client.remove_network_from_dhcp_agent(
             parsed_args.dhcp_agent, _net_id)
-        print(_('Removed network %s to DHCP agent') % parsed_args.network,
+        print(_('Removed network %s from DHCP agent') % parsed_args.network,
               file=self.app.stdout)
 
 
@@ -180,7 +180,7 @@ class RemoveRouterFromL3Agent(neutronV20.NeutronCommand):
             neutron_client, 'router', parsed_args.router)
         neutron_client.remove_router_from_l3_agent(
             parsed_args.l3_agent, _id)
-        print(_('Removed Router %s to L3 agent') % parsed_args.router,
+        print(_('Removed router %s from L3 agent') % parsed_args.router,
               file=self.app.stdout)
 
 
