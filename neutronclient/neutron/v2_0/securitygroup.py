@@ -154,7 +154,7 @@ class ListSecurityGroupRule(neutronV20.ListCommand):
             sec_group_count = len(sec_group_ids)
             max_size = ((sec_group_id_filter_len * sec_group_count) -
                         uri_len_exc.excess)
-            chunk_size = max_size / sec_group_id_filter_len
+            chunk_size = max_size // sec_group_id_filter_len
             secgroups = []
             for i in range(0, sec_group_count, chunk_size):
                 secgroups.extend(

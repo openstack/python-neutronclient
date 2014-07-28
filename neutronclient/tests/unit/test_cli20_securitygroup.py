@@ -234,7 +234,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
 
         sec_group_count = len(sec_group_ids)
         max_size = ((sec_group_id_filter_len * sec_group_count) - excess)
-        chunk_size = max_size / sec_group_id_filter_len
+        chunk_size = max_size // sec_group_id_filter_len
 
         for i in range(0, sec_group_count, chunk_size):
             search_opts['id'] = sec_group_ids[i: i + chunk_size]

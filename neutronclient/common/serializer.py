@@ -30,6 +30,9 @@ from neutronclient.openstack.common import jsonutils
 
 LOG = logging.getLogger(__name__)
 
+if six.PY3:
+    long = int
+
 
 class ActionDispatcher(object):
     """Maps method name to local methods through action name."""
@@ -59,7 +62,7 @@ class JSONDictSerializer(DictSerializer):
 
     def default(self, data):
         def sanitizer(obj):
-            return unicode(obj)
+            return six.text_type(obj, 'utf8')
         return jsonutils.dumps(data, default=sanitizer)
 
 
@@ -100,7 +103,7 @@ class XMLDictSerializer(DictSerializer):
                     links = data.pop(link_keys[0], None)
                     has_atom = True
                 root_key = (len(data) == 1 and
-                            data.keys()[0] or constants.VIRTUAL_ROOT_KEY)
+                            list(data.keys())[0] or constants.VIRTUAL_ROOT_KEY)
                 root_value = data.get(root_key, data)
             doc = etree.Element("_temp_root")
             used_prefixes = []
@@ -195,10 +198,7 @@ class XMLDictSerializer(DictSerializer):
             LOG.debug("Data %(data)s type is %(type)s",
                       {'data': data,
                        'type': type(data)})
-            if isinstance(data, str):
-                result.text = unicode(data, 'utf-8')
-            else:
-                result.text = unicode(data)
+            result.text = six.text_type(data)
         return result
 
     def _create_link_nodes(self, xml_doc, links):

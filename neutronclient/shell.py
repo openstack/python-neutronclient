@@ -666,10 +666,10 @@ class NeutronShell(app.App):
             self.initialize_app(remainder)
         except Exception as err:
             if self.options.verbose_level >= self.DEBUG_LEVEL:
-                self.log.exception(unicode(err))
+                self.log.exception(err)
                 raise
             else:
-                self.log.error(unicode(err))
+                self.log.error(err)
             return 1
         if self.interactive_mode:
             _argv = [sys.argv[0]]
@@ -923,12 +923,12 @@ class NeutronShell(app.App):
 
 def main(argv=sys.argv[1:]):
     try:
-        return NeutronShell(NEUTRON_API_VERSION).run(map(strutils.safe_decode,
-                                                         argv))
+        return NeutronShell(NEUTRON_API_VERSION).run(
+            list(map(strutils.safe_decode, argv)))
     except exc.NeutronClientException:
         return 1
     except Exception as e:
-        print(unicode(e))
+        print(e)
         return 1
 
 

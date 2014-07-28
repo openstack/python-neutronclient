@@ -16,7 +16,6 @@
 
 import logging
 import time
-import urllib
 
 import requests
 import six.moves.urllib.parse as urlparse
@@ -1228,7 +1227,7 @@ class Client(object):
         action = self.action_prefix + action
         if type(params) is dict and params:
             params = utils.safe_encode_dict(params)
-            action += '?' + urllib.urlencode(params, doseq=1)
+            action += '?' + urlparse.urlencode(params, doseq=1)
         # Ensure client always has correct uri - do not guesstimate anything
         self.httpclient.authenticate_and_fetch_endpoint_url()
         self._check_uri_length(action)

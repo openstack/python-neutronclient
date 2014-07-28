@@ -173,7 +173,7 @@ class CLITestV20PacketFilterJSON(test_cli20.CLITestV20Base):
                                 self._test_update_resource,
                                 resource, cmd, 'myid', ['myid'], {})
         self.assertEqual('Must specify new values to update packet_filter',
-                         unicode(exc))
+                         str(exc))
 
     def test_delete_packetfilter(self):
         """Delete packetfilter: myid."""

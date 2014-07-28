@@ -21,6 +21,8 @@ import logging
 import os
 import sys
 
+import six
+
 from neutronclient.common import _
 from neutronclient.common import exceptions
 from neutronclient.openstack.common import strutils
@@ -134,8 +136,8 @@ def http_log_req(_logger, args, kwargs):
 
     if 'body' in kwargs and kwargs['body']:
         string_parts.append(" -d '%s'" % (kwargs['body']))
-    string_parts = safe_encode_list(string_parts)
-    _logger.debug("\nREQ: %s\n", "".join(string_parts))
+    req = strutils.safe_encode("".join(string_parts))
+    _logger.debug("\nREQ: %s\n", req)
 
 
 def http_log_resp(_logger, resp, body):
@@ -148,13 +150,13 @@ def http_log_resp(_logger, resp, body):
 
 
 def _safe_encode_without_obj(data):
-    if isinstance(data, basestring):
+    if isinstance(data, six.string_types):
         return strutils.safe_encode(data)
     return data
 
 
 def safe_encode_list(data):
-    return map(_safe_encode_without_obj, data)
+    return list(map(_safe_encode_without_obj, data))
 
 
 def safe_encode_dict(data):
@@ -166,4 +168,4 @@ def safe_encode_dict(data):
             return (k, safe_encode_dict(v))
         return (k, _safe_encode_without_obj(v))
 
-    return dict(map(_encode_item, data.items()))
+    return dict(list(map(_encode_item, data.items())))

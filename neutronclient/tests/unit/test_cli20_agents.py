@@ -52,5 +52,5 @@ class CLITestV20Agent(test_cli20.CLITestV20Base):
         self.assertEqual(1, len(returned_agents))
         ag = returned_agents[0]
         self.assertEqual(1, len(ag))
-        self.assertEqual("alive", ag.keys()[0])
-        self.assertEqual(smile, ag.values()[0])
+        self.assertIn("alive", ag.keys())
+        self.assertIn(smile, ag.values())
