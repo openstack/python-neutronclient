@@ -91,7 +91,7 @@ def find_resourceid_by_name_or_id(client, resource, name_or_id):
 def add_show_list_common_argument(parser):
     parser.add_argument(
         '-D', '--show-details',
-        help=_('Show detailed info.'),
+        help=_('Show detailed information.'),
         action='store_true',
         default=False, )
     parser.add_argument(
@@ -356,7 +356,7 @@ class NeutronCommand(command.OpenStackCommand):
         parser = super(NeutronCommand, self).get_parser(prog_name)
         parser.add_argument(
             '--request-format',
-            help=_('The xml or json request format.'),
+            help=_('The XML or JSON request format.'),
             default='json',
             choices=['json', 'xml', ], )
         parser.add_argument(
