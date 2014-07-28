@@ -118,7 +118,9 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         args = ['-c', 'id', '--', '--id', 'myfakeid']
         path = getattr(self.client, resources + "_path")
         self.client.httpclient.request(
-            test_cli20.end_url(path, query), 'GET',
+            test_cli20.MyUrlComparator(test_cli20.end_url(path, query),
+                                       self.client),
+            'GET',
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token',
@@ -202,7 +204,9 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
             resp = (test_cli20.MyResp(200), resstr)
             path = getattr(self.client, resources + '_path')
             self.client.httpclient.request(
-                test_cli20.end_url(path, query), 'GET',
+                test_cli20.MyUrlComparator(
+                    test_cli20.end_url(path, query), self.client),
+                'GET',
                 body=None,
                 headers=mox.ContainsKeyValue(
                     'X-Auth-Token', test_cli20.TOKEN)).AndReturn(resp)
@@ -312,7 +316,9 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         args = ['-c', 'id', '--', '--id', 'myfakeid']
         path = getattr(self.client, resources + "_path")
         self.client.httpclient.request(
-            test_cli20.end_url(path, query), 'GET',
+            test_cli20.MyUrlComparator(
+                test_cli20.end_url(path, query), self.client),
+            'GET',
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token',
@@ -377,7 +383,9 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         path = getattr(self.client, resources + "_path")
 
         self.client.httpclient.request(
-            test_cli20.end_url(path, query), 'GET',
+            test_cli20.MyUrlComparator(
+                test_cli20.end_url(path, query), self.client),
+            'GET',
             body=None,
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
         ).AndReturn((test_cli20.MyResp(200), resstr))
@@ -496,7 +504,8 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         def mox_calls(path, data):
             filters, response = self._build_test_data(data)
             self.client.httpclient.request(
-                test_cli20.end_url(path, 'fields=id&fields=cidr' + filters),
+                test_cli20.MyUrlComparator(test_cli20.end_url(
+                    path, 'fields=id&fields=cidr' + filters), self.client),
                 'GET',
                 body=None,
                 headers=mox.ContainsKeyValue(
@@ -518,8 +527,10 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                 filters, response = self._build_test_data(data)
                 self.client._check_uri_length(mox.IgnoreArg()).AndReturn(None)
                 self.client.httpclient.request(
-                    test_cli20.end_url(path,
-                                       'fields=id&fields=cidr%s' % filters),
+                    test_cli20.MyUrlComparator(
+                        test_cli20.end_url(
+                            path, 'fields=id&fields=cidr%s' % filters),
+                        self.client),
                     'GET',
                     body=None,
                     headers=mox.ContainsKeyValue(

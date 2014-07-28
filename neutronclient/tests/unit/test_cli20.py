@@ -23,6 +23,7 @@ from mox3 import mox
 from oslotest import base
 import requests
 import six
+import six.moves.urllib.parse as urlparse
 
 from neutronclient.common import constants
 from neutronclient.common import exceptions
@@ -85,7 +86,13 @@ class MyUrlComparator(mox.Comparator):
         self.client = client
 
     def equals(self, rhs):
-        return str(self) == rhs
+        lhsp = urlparse.urlparse(self.lhs)
+        rhsp = urlparse.urlparse(rhs)
+
+        return (lhsp.scheme == rhsp.scheme and
+                lhsp.netloc == rhsp.netloc and
+                lhsp.path == rhsp.path and
+                urlparse.parse_qs(lhsp.query) == urlparse.parse_qs(rhsp.query))
 
     def __str__(self):
         if self.client and self.client.format != FORMAT:
@@ -408,7 +415,8 @@ class CLITestV20Base(base.BaseTestCase):
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr1))
         self.client.httpclient.request(
-            end_url(path, fake_query, format=self.format), 'GET',
+            MyUrlComparator(end_url(path, fake_query, format=self.format),
+                            self.client), 'GET',
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr2))
@@ -571,7 +579,8 @@ class ClientV2TestJson(CLITestV20Base):
         self.client.httpclient.auth_token = 'token'
 
         self.client.httpclient.request(
-            end_url('/test', query=expect_query, format=self.format),
+            MyUrlComparator(end_url(
+                '/test', query=expect_query, format=self.format), self.client),
             'PUT', body='',
             headers=mox.ContainsKeyValue('X-Auth-Token', 'token')
         ).AndReturn((MyResp(400, reason='An error'), ''))

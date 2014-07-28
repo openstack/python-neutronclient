@@ -274,7 +274,10 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         query = query and query + '&device_id=%s' or 'device_id=%s'
         path = getattr(self.client, resources + "_path")
         self.client.httpclient.request(
-            test_cli20.end_url(path, query % myid), 'GET',
+            test_cli20.MyUrlComparator(
+                test_cli20.end_url(path, query % myid),
+                self.client),
+            'GET',
             body=None,
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
         ).AndReturn((test_cli20.MyResp(200), resstr))

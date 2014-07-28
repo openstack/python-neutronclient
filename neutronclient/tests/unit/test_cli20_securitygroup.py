@@ -235,7 +235,10 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
             resp = (test_cli20.MyResp(200), resstr)
             path = getattr(self.client, resources + '_path')
             self.client.httpclient.request(
-                test_cli20.end_url(path, query), 'GET',
+                test_cli20.MyUrlComparator(
+                    test_cli20.end_url(path, query),
+                    self.client),
+                'GET',
                 body=None,
                 headers=mox.ContainsKeyValue(
                     'X-Auth-Token', test_cli20.TOKEN)).AndReturn(resp)
