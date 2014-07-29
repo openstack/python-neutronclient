@@ -14,15 +14,16 @@
 #    under the License.
 #
 
-import urllib
-
 import contextlib
 import cStringIO
+import sys
+import urllib
+
 import fixtures
 from mox3 import mox
 from oslotest import base
 import requests
-import sys
+import six
 
 from neutronclient.common import constants
 from neutronclient.common import exceptions
@@ -112,7 +113,7 @@ class MyComparator(mox.Comparator):
     def _com_dict(self, lhs, rhs):
         if len(lhs) != len(rhs):
             return False
-        for key, value in lhs.iteritems():
+        for key, value in six.iteritems(lhs):
             if key not in rhs:
                 return False
             rhs_value = rhs[key]

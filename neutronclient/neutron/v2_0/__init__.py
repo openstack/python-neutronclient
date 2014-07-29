@@ -23,6 +23,7 @@ import re
 from cliff.formatters import table
 from cliff import lister
 from cliff import show
+import six
 
 from neutronclient.common import command
 from neutronclient.common import exceptions
@@ -279,7 +280,7 @@ def parse_args_to_dict(values_specs):
 
     # populate the parser with arguments
     _parser = argparse.ArgumentParser(add_help=False)
-    for opt, optspec in _options.iteritems():
+    for opt, optspec in six.iteritems(_options):
         _parser.add_argument(opt, **optspec)
     _args = _parser.parse_args(_values_specs)
 
@@ -303,7 +304,7 @@ def _merge_args(qCmd, parsed_args, _extra_values, value_specs):
     @param values_specs: the unparsed unknown parts
     """
     temp_values = _extra_values.copy()
-    for key, value in temp_values.iteritems():
+    for key, value in six.iteritems(temp_values):
         if hasattr(parsed_args, key):
             arg_value = getattr(parsed_args, key)
             if arg_value is not None and value is not None:
@@ -374,7 +375,7 @@ class NeutronCommand(command.OpenStackCommand):
     def format_output_data(self, data):
         # Modify data to make it more readable
         if self.resource in data:
-            for k, v in data[self.resource].iteritems():
+            for k, v in six.iteritems(data[self.resource]):
                 if isinstance(v, list):
                     value = '\n'.join(utils.dumps(
                         i, indent=self.json_indent) if isinstance(i, dict)
@@ -432,7 +433,7 @@ class CreateCommand(NeutronCommand, show.ShowOne):
                   file=self.app.stdout)
         else:
             info = {'': ''}
-        return zip(*sorted(info.iteritems()))
+        return zip(*sorted(six.iteritems(info)))
 
 
 class UpdateCommand(NeutronCommand):
@@ -664,6 +665,6 @@ class ShowCommand(NeutronCommand, show.ShowOne):
         self.format_output_data(data)
         resource = data[self.resource]
         if self.resource in data:
-            return zip(*sorted(resource.iteritems()))
+            return zip(*sorted(six.iteritems(resource)))
         else:
             return None

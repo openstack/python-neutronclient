@@ -21,6 +21,7 @@ import logging
 
 from cliff import lister
 from cliff import show
+import six
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
@@ -124,7 +125,7 @@ class ShowQuota(neutronV20.NeutronCommand, show.ShowOne):
                              "show_%s" % self.resource)
         data = obj_shower(tenant_id, **params)
         if self.resource in data:
-            for k, v in data[self.resource].iteritems():
+            for k, v in six.iteritems(data[self.resource]):
                 if isinstance(v, list):
                     value = ""
                     for _item in v:
@@ -137,7 +138,7 @@ class ShowQuota(neutronV20.NeutronCommand, show.ShowOne):
                     data[self.resource][k] = value
                 elif v is None:
                     data[self.resource][k] = ''
-            return zip(*sorted(data[self.resource].iteritems()))
+            return zip(*sorted(six.iteritems(data[self.resource])))
         else:
             return None
 
@@ -230,7 +231,7 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
                                   neutron_client)
         data = obj_updator(tenant_id, body)
         if self.resource in data:
-            for k, v in data[self.resource].iteritems():
+            for k, v in six.iteritems(data[self.resource]):
                 if isinstance(v, list):
                     value = ""
                     for _item in v:
@@ -243,6 +244,6 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
                     data[self.resource][k] = value
                 elif v is None:
                     data[self.resource][k] = ''
-            return zip(*sorted(data[self.resource].iteritems()))
+            return zip(*sorted(six.iteritems(data[self.resource])))
         else:
             return None
