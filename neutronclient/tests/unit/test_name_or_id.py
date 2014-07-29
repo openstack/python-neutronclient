@@ -129,3 +129,50 @@ class CLITestNameorID(testtools.TestCase):
         except exceptions.NeutronClientException as ex:
             self.assertIn('Unable to find', ex.message)
             self.assertEqual(404, ex.status_code)
+
+    def test_get_id_from_name_multiple_with_project(self):
+        name = 'web_server'
+        project = str(uuid.uuid4())
+        expect_id = str(uuid.uuid4())
+        reses = {'security_groups':
+                 [{'id': expect_id, 'tenant_id': project}]}
+        resstr = self.client.serialize(reses)
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        path = getattr(self.client, "security_groups_path")
+        self.client.httpclient.request(
+            test_cli20.end_url(path, "fields=id&name=%s&tenant_id=%s" %
+                               (name, project)),
+            'GET',
+            body=None,
+            headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
+        ).AndReturn((test_cli20.MyResp(200), resstr))
+        self.mox.ReplayAll()
+
+        observed_id = neutronV20.find_resourceid_by_name_or_id(
+            self.client, 'security_group', name, project)
+
+        self.assertEqual(expect_id, observed_id)
+
+    def test_get_id_from_name_multiple_with_project_not_found(self):
+        name = 'web_server'
+        project = str(uuid.uuid4())
+        reses = {'security_groups':
+                 [{'id': str(uuid.uuid4()), 'tenant_id': str(uuid.uuid4())}]}
+        resstr = self.client.serialize(reses)
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        path = getattr(self.client, "security_groups_path")
+        self.client.httpclient.request(
+            test_cli20.end_url(path, "fields=id&name=%s&tenant_id=%s" %
+                               (name, project)),
+            'GET',
+            body=None,
+            headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
+        ).AndReturn((test_cli20.MyResp(200), resstr))
+        self.mox.ReplayAll()
+
+        try:
+            neutronV20.find_resourceid_by_name_or_id(
+                self.client, 'security_group', name, project)
+        except exceptions.NeutronClientException as ex:
+            self.assertIn('Unable to find', ex.message)
+            self.assertEqual(404, ex.status_code)
