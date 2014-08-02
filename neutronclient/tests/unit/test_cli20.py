@@ -396,6 +396,7 @@ class CLITestV20Base(base.BaseTestCase):
         return _str
 
     def _test_list_resources_with_pagination(self, resources, cmd,
+                                             base_args=None,
                                              cmd_resources=None,
                                              parent_id=None):
         self.mox.StubOutWithMock(cmd, "get_client")
@@ -430,7 +431,8 @@ class CLITestV20Base(base.BaseTestCase):
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr2))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("list_" + cmd_resources)
-        args = ['--request-format', self.format]
+        args = base_args if base_args is not None else []
+        args.extend(['--request-format', self.format])
         shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
