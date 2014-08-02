@@ -44,7 +44,8 @@ def _get_resource_plural(resource, client):
     return resource + 's'
 
 
-def find_resourceid_by_id(client, resource, resource_id, cmd_resource=None):
+def find_resourceid_by_id(client, resource, resource_id, cmd_resource=None,
+                          parent_id=None):
     if not cmd_resource:
         cmd_resource = resource
     cmd_resource_plural = _get_resource_plural(cmd_resource, client)
@@ -54,7 +55,10 @@ def find_resourceid_by_id(client, resource, resource_id, cmd_resource=None):
     match = re.match(UUID_PATTERN, resource_id)
     collection = resource_plural
     if match:
-        data = obj_lister(id=resource_id, fields='id')
+        if parent_id:
+            data = obj_lister(parent_id, id=resource_id, fields='id')
+        else:
+            data = obj_lister(id=resource_id, fields='id')
         if data and data[collection]:
             return data[collection][0]['id']
     not_found_message = (_("Unable to find %(resource)s with id "
@@ -66,7 +70,7 @@ def find_resourceid_by_id(client, resource, resource_id, cmd_resource=None):
 
 
 def _find_resourceid_by_name(client, resource, name, project_id=None,
-                             cmd_resource=None):
+                             cmd_resource=None, parent_id=None):
     if not cmd_resource:
         cmd_resource = resource
     cmd_resource_plural = _get_resource_plural(cmd_resource, client)
@@ -75,7 +79,10 @@ def _find_resourceid_by_name(client, resource, name, project_id=None,
     params = {'name': name, 'fields': 'id'}
     if project_id:
         params['tenant_id'] = project_id
-    data = obj_lister(**params)
+    if parent_id:
+        data = obj_lister(parent_id, **params)
+    else:
+        data = obj_lister(**params)
     collection = resource_plural
     info = data[collection]
     if len(info) > 1:
@@ -93,13 +100,14 @@ def _find_resourceid_by_name(client, resource, name, project_id=None,
 
 
 def find_resourceid_by_name_or_id(client, resource, name_or_id,
-                                  project_id=None, cmd_resource=None):
+                                  project_id=None, cmd_resource=None,
+                                  parent_id=None):
     try:
         return find_resourceid_by_id(client, resource, name_or_id,
-                                     cmd_resource)
+                                     cmd_resource, parent_id)
     except exceptions.NeutronClientException:
         return _find_resourceid_by_name(client, resource, name_or_id,
-                                        project_id, cmd_resource)
+                                        project_id, cmd_resource, parent_id)
 
 
 def add_show_list_common_argument(parser):
@@ -356,6 +364,7 @@ class NeutronCommand(command.OpenStackCommand):
     json_indent = None
     resource = None
     shadow_resource = None
+    parent_id = None
 
     def __init__(self, app, app_args):
         super(NeutronCommand, self).__init__(app, app_args)
@@ -440,7 +449,10 @@ class CreateCommand(NeutronCommand, show.ShowOne):
         body[self.resource].update(_extra_values)
         obj_creator = getattr(neutron_client,
                               "create_%s" % self.cmd_resource)
-        data = obj_creator(body)
+        if self.parent_id:
+            data = obj_creator(self.parent_id, body)
+        else:
+            data = obj_creator(body)
         self.format_output_data(data)
         info = self.resource in data and data[self.resource] or None
         if info:
@@ -490,10 +502,13 @@ class UpdateCommand(NeutronCommand):
         else:
             _id = find_resourceid_by_id(
                 neutron_client, self.resource, parsed_args.id,
-                self.cmd_resource)
-        obj_updator = getattr(neutron_client,
+                self.cmd_resource, self.parent_id)
+        obj_updater = getattr(neutron_client,
                               "update_%s" % self.cmd_resource)
-        obj_updator(_id, body)
+        if self.parent_id:
+            obj_updater(_id, self.parent_id, body)
+        else:
+            obj_updater(_id, body)
         print((_('Updated %(resource)s: %(id)s') %
                {'id': parsed_args.id, 'resource': self.resource}),
               file=self.app.stdout)
@@ -527,7 +542,8 @@ class DeleteCommand(NeutronCommand):
         obj_deleter = getattr(neutron_client,
                               "delete_%s" % self.cmd_resource)
         if self.allow_names:
-            params = {'cmd_resource': self.cmd_resource}
+            params = {'cmd_resource': self.cmd_resource,
+                      'parent_id': self.parent_id}
             _id = find_resourceid_by_name_or_id(neutron_client,
                                                 self.resource,
                                                 parsed_args.id,
@@ -535,7 +551,10 @@ class DeleteCommand(NeutronCommand):
         else:
             _id = parsed_args.id
 
-        obj_deleter(_id)
+        if self.parent_id:
+            obj_deleter(_id, self.parent_id)
+        else:
+            obj_deleter(_id)
         print((_('Deleted %(resource)s: %(id)s')
                % {'id': parsed_args.id,
                   'resource': self.resource}),
@@ -578,7 +597,10 @@ class ListCommand(NeutronCommand, lister.Lister):
         resource_plural = _get_resource_plural(self.cmd_resource,
                                                neutron_client)
         obj_lister = getattr(neutron_client, "list_%s" % resource_plural)
-        data = obj_lister(**search_opts)
+        if self.parent_id:
+            data = obj_lister(self.parent_id, **search_opts)
+        else:
+            data = obj_lister(**search_opts)
         return data
 
     def retrieve_list(self, parsed_args):
@@ -674,14 +696,19 @@ class ShowCommand(NeutronCommand, show.ShowOne):
         if parsed_args.fields:
             params = {'fields': parsed_args.fields}
         if self.allow_names:
-            _id = find_resourceid_by_name_or_id(neutron_client, self.resource,
+            _id = find_resourceid_by_name_or_id(neutron_client,
+                                                self.resource,
                                                 parsed_args.id,
-                                                cmd_resource=self.cmd_resource)
+                                                cmd_resource=self.cmd_resource,
+                                                parent_id=self.parent_id)
         else:
             _id = parsed_args.id
 
         obj_shower = getattr(neutron_client, "show_%s" % self.cmd_resource)
-        data = obj_shower(_id, **params)
+        if self.parent_id:
+            data = obj_shower(_id, self.parent_id, **params)
+        else:
+            data = obj_shower(_id, **params)
         self.format_output_data(data)
         resource = data[self.resource]
         if self.resource in data:
