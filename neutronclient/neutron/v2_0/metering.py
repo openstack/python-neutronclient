@@ -14,8 +14,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import logging
-
 from neutronclient.neutron import v2_0 as neutronv20
 from neutronclient.openstack.common.gettextutils import _
 
@@ -24,7 +22,6 @@ class ListMeteringLabel(neutronv20.ListCommand):
     """List metering labels that belong to a given tenant."""
 
     resource = 'metering_label'
-    log = logging.getLogger(__name__ + '.ListMeteringLabel')
     list_columns = ['id', 'name', 'description', 'shared']
     pagination_support = True
     sorting_support = True
@@ -34,7 +31,6 @@ class ShowMeteringLabel(neutronv20.ShowCommand):
     """Show information of a given metering label."""
 
     resource = 'metering_label'
-    log = logging.getLogger(__name__ + '.ShowMeteringLabel')
     allow_names = True
 
 
@@ -42,7 +38,6 @@ class CreateMeteringLabel(neutronv20.CreateCommand):
     """Create a metering label for a given tenant."""
 
     resource = 'metering_label'
-    log = logging.getLogger(__name__ + '.CreateMeteringLabel')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -74,7 +69,6 @@ class CreateMeteringLabel(neutronv20.CreateCommand):
 class DeleteMeteringLabel(neutronv20.DeleteCommand):
     """Delete a given metering label."""
 
-    log = logging.getLogger(__name__ + '.DeleteMeteringLabel')
     resource = 'metering_label'
     allow_names = True
 
@@ -83,7 +77,6 @@ class ListMeteringLabelRule(neutronv20.ListCommand):
     """List metering labels that belong to a given label."""
 
     resource = 'metering_label_rule'
-    log = logging.getLogger(__name__ + '.ListMeteringLabelRule')
     list_columns = ['id', 'excluded', 'direction', 'remote_ip_prefix']
     pagination_support = True
     sorting_support = True
@@ -93,14 +86,12 @@ class ShowMeteringLabelRule(neutronv20.ShowCommand):
     """Show information of a given metering label rule."""
 
     resource = 'metering_label_rule'
-    log = logging.getLogger(__name__ + '.ShowMeteringLabelRule')
 
 
 class CreateMeteringLabelRule(neutronv20.CreateCommand):
     """Create a metering label rule for a given label."""
 
     resource = 'metering_label_rule'
-    log = logging.getLogger(__name__ + '.CreateMeteringLabelRule')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -141,5 +132,4 @@ class CreateMeteringLabelRule(neutronv20.CreateCommand):
 class DeleteMeteringLabelRule(neutronv20.DeleteCommand):
     """Delete a given metering label."""
 
-    log = logging.getLogger(__name__ + '.DeleteMeteringLabelRule')
     resource = 'metering_label_rule'

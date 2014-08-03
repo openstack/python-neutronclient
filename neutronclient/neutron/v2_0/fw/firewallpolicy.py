@@ -19,7 +19,6 @@
 from __future__ import print_function
 
 import argparse
-import logging
 import string
 
 from neutronclient.neutron import v2_0 as neutronv20
@@ -39,7 +38,6 @@ class ListFirewallPolicy(neutronv20.ListCommand):
     """List firewall policies that belong to a given tenant."""
 
     resource = 'firewall_policy'
-    log = logging.getLogger(__name__ + '.ListFirewallPolicy')
     list_columns = ['id', 'name', 'firewall_rules']
     _formatters = {'firewall_rules': _format_firewall_rules,
                    }
@@ -51,14 +49,12 @@ class ShowFirewallPolicy(neutronv20.ShowCommand):
     """Show information of a given firewall policy."""
 
     resource = 'firewall_policy'
-    log = logging.getLogger(__name__ + '.ShowFirewallPolicy')
 
 
 class CreateFirewallPolicy(neutronv20.CreateCommand):
     """Create a firewall policy."""
 
     resource = 'firewall_policy'
-    log = logging.getLogger(__name__ + '.CreateFirewallPolicy')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -107,21 +103,18 @@ class UpdateFirewallPolicy(neutronv20.UpdateCommand):
     """Update a given firewall policy."""
 
     resource = 'firewall_policy'
-    log = logging.getLogger(__name__ + '.UpdateFirewallPolicy')
 
 
 class DeleteFirewallPolicy(neutronv20.DeleteCommand):
     """Delete a given firewall policy."""
 
     resource = 'firewall_policy'
-    log = logging.getLogger(__name__ + '.DeleteFirewallPolicy')
 
 
 class FirewallPolicyInsertRule(neutronv20.UpdateCommand):
     """Insert a rule into a given firewall policy."""
 
     resource = 'firewall_policy'
-    log = logging.getLogger(__name__ + '.FirewallPolicyInsertRule')
 
     def call_api(self, neutron_client, firewall_policy_id, body):
         return neutron_client.firewall_policy_insert_rule(firewall_policy_id,
@@ -184,7 +177,6 @@ class FirewallPolicyRemoveRule(neutronv20.UpdateCommand):
     """Remove a rule from a given firewall policy."""
 
     resource = 'firewall_policy'
-    log = logging.getLogger(__name__ + '.FirewallPolicyRemoveRule')
 
     def call_api(self, neutron_client, firewall_policy_id, body):
         return neutron_client.firewall_policy_remove_rule(firewall_policy_id,

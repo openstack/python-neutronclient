@@ -17,7 +17,6 @@
 from __future__ import print_function
 
 import argparse
-import logging
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
@@ -36,7 +35,6 @@ class ListRouter(neutronV20.ListCommand):
     """List routers that belong to a given tenant."""
 
     resource = 'router'
-    log = logging.getLogger(__name__ + '.ListRouter')
     _formatters = {'external_gateway_info': _format_external_gateway_info, }
     list_columns = ['id', 'name', 'external_gateway_info', 'distributed']
     pagination_support = True
@@ -47,14 +45,12 @@ class ShowRouter(neutronV20.ShowCommand):
     """Show information of a given router."""
 
     resource = 'router'
-    log = logging.getLogger(__name__ + '.ShowRouter')
 
 
 class CreateRouter(neutronV20.CreateCommand):
     """Create a router for a given tenant."""
 
     resource = 'router'
-    log = logging.getLogger(__name__ + '.CreateRouter')
     _formatters = {'external_gateway_info': _format_external_gateway_info, }
 
     def add_known_arguments(self, parser):
@@ -85,14 +81,12 @@ class CreateRouter(neutronV20.CreateCommand):
 class DeleteRouter(neutronV20.DeleteCommand):
     """Delete a given router."""
 
-    log = logging.getLogger(__name__ + '.DeleteRouter')
     resource = 'router'
 
 
 class UpdateRouter(neutronV20.UpdateCommand):
     """Update router's information."""
 
-    log = logging.getLogger(__name__ + '.UpdateRouter')
     resource = 'router'
 
 
@@ -150,8 +144,6 @@ class RouterInterfaceCommand(neutronV20.NeutronCommand):
 class AddInterfaceRouter(RouterInterfaceCommand):
     """Add an internal network interface to a router."""
 
-    log = logging.getLogger(__name__ + '.AddInterfaceRouter')
-
     def call_api(self, neutron_client, router_id, body):
         return neutron_client.add_interface_router(router_id, body)
 
@@ -162,8 +154,6 @@ class AddInterfaceRouter(RouterInterfaceCommand):
 
 class RemoveInterfaceRouter(RouterInterfaceCommand):
     """Remove an internal network interface from a router."""
-
-    log = logging.getLogger(__name__ + '.RemoveInterfaceRouter')
 
     def call_api(self, neutron_client, router_id, body):
         return neutron_client.remove_interface_router(router_id, body)
@@ -176,7 +166,6 @@ class RemoveInterfaceRouter(RouterInterfaceCommand):
 class SetGatewayRouter(neutronV20.NeutronCommand):
     """Set the external network gateway for a router."""
 
-    log = logging.getLogger(__name__ + '.SetGatewayRouter')
     api = 'network'
     resource = 'router'
 
@@ -212,7 +201,6 @@ class SetGatewayRouter(neutronV20.NeutronCommand):
 class RemoveGatewayRouter(neutronV20.NeutronCommand):
     """Remove an external network gateway from a router."""
 
-    log = logging.getLogger(__name__ + '.RemoveGatewayRouter')
     api = 'network'
     resource = 'router'
 

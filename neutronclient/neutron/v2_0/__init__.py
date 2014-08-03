@@ -16,6 +16,7 @@
 
 from __future__ import print_function
 
+import abc
 import argparse
 import logging
 import re
@@ -341,9 +342,22 @@ class TableFormater(table.TableFormatter):
             stdout.write('\n')
 
 
+# command.OpenStackCommand is abstract class so that metaclass of
+# subclass must be subclass of metaclass of all its base.
+# otherwise metaclass conflict exception is raised.
+class NeutronCommandMeta(abc.ABCMeta):
+    def __new__(cls, name, bases, cls_dict):
+        if 'log' not in cls_dict:
+            cls_dict['log'] = logging.getLogger(
+                cls_dict['__module__'] + '.' + name)
+        return super(NeutronCommandMeta, cls).__new__(cls,
+                                                      name, bases, cls_dict)
+
+
+@six.add_metaclass(NeutronCommandMeta)
 class NeutronCommand(command.OpenStackCommand):
+
     api = 'network'
-    log = logging.getLogger(__name__ + '.NeutronCommand')
     values_specs = []
     json_indent = None
 

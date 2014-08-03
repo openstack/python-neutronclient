@@ -13,8 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import logging
-
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
 
@@ -23,7 +21,6 @@ class ListQoSQueue(neutronV20.ListCommand):
     """List queues that belong to a given tenant."""
 
     resource = 'qos_queue'
-    log = logging.getLogger(__name__ + '.ListQoSQueue')
     list_columns = ['id', 'name', 'min', 'max',
                     'qos_marking', 'dscp', 'default']
 
@@ -32,7 +29,6 @@ class ShowQoSQueue(neutronV20.ShowCommand):
     """Show information of a given queue."""
 
     resource = 'qos_queue'
-    log = logging.getLogger(__name__ + '.ShowQoSQueue')
     allow_names = True
 
 
@@ -40,7 +36,6 @@ class CreateQoSQueue(neutronV20.CreateCommand):
     """Create a queue."""
 
     resource = 'qos_queue'
-    log = logging.getLogger(__name__ + '.CreateQoSQueue')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -83,6 +78,5 @@ class CreateQoSQueue(neutronV20.CreateCommand):
 class DeleteQoSQueue(neutronV20.DeleteCommand):
     """Delete a given queue."""
 
-    log = logging.getLogger(__name__ + '.DeleteQoSQueue')
     resource = 'qos_queue'
     allow_names = True

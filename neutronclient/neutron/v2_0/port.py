@@ -15,7 +15,6 @@
 #
 
 import argparse
-import logging
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
@@ -34,7 +33,6 @@ class ListPort(neutronV20.ListCommand):
     """List ports that belong to a given tenant."""
 
     resource = 'port'
-    log = logging.getLogger(__name__ + '.ListPort')
     _formatters = {'fixed_ips': _format_fixed_ips, }
     list_columns = ['id', 'name', 'mac_address', 'fixed_ips']
     pagination_support = True
@@ -45,7 +43,6 @@ class ListRouterPort(neutronV20.ListCommand):
     """List ports that belong to a given tenant, with specified router."""
 
     resource = 'port'
-    log = logging.getLogger(__name__ + '.ListRouterPort')
     _formatters = {'fixed_ips': _format_fixed_ips, }
     list_columns = ['id', 'name', 'mac_address', 'fixed_ips']
     pagination_support = True
@@ -71,7 +68,6 @@ class ShowPort(neutronV20.ShowCommand):
     """Show information of a given port."""
 
     resource = 'port'
-    log = logging.getLogger(__name__ + '.ShowPort')
 
 
 class UpdatePortSecGroupMixin(object):
@@ -144,7 +140,6 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
     """Create a port for a given tenant."""
 
     resource = 'port'
-    log = logging.getLogger(__name__ + '.CreatePort')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -224,7 +219,6 @@ class DeletePort(neutronV20.DeleteCommand):
     """Delete a given port."""
 
     resource = 'port'
-    log = logging.getLogger(__name__ + '.DeletePort')
 
 
 class UpdatePort(neutronV20.UpdateCommand, UpdatePortSecGroupMixin,
@@ -232,7 +226,6 @@ class UpdatePort(neutronV20.UpdateCommand, UpdatePortSecGroupMixin,
     """Update port's information."""
 
     resource = 'port'
-    log = logging.getLogger(__name__ + '.UpdatePort')
 
     def add_known_arguments(self, parser):
         self.add_arguments_secgroup(parser)

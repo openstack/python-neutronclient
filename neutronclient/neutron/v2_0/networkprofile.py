@@ -16,8 +16,6 @@
 
 from __future__ import print_function
 
-import logging
-
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.neutron.v2_0 import parse_args_to_dict
 from neutronclient.openstack.common.gettextutils import _
@@ -30,7 +28,6 @@ class ListNetworkProfile(neutronV20.ListCommand):
     """List network profiles that belong to a given tenant."""
 
     resource = RESOURCE
-    log = logging.getLogger(__name__ + '.ListNetworkProfile')
     _formatters = {}
     list_columns = ['id', 'name', 'segment_type', 'sub_type', 'segment_range',
                     'physical_network', 'multicast_ip_index',
@@ -41,7 +38,6 @@ class ShowNetworkProfile(neutronV20.ShowCommand):
     """Show information of a given network profile."""
 
     resource = RESOURCE
-    log = logging.getLogger(__name__ + '.ShowNetworkProfile')
     allow_names = True
 
 
@@ -49,7 +45,6 @@ class CreateNetworkProfile(neutronV20.CreateCommand):
     """Creates a network profile."""
 
     resource = RESOURCE
-    log = logging.getLogger(__name__ + '.CreateNetworkProfile')
 
     def add_known_arguments(self, parser):
         parser.add_argument('name',
@@ -97,7 +92,6 @@ class CreateNetworkProfile(neutronV20.CreateCommand):
 class DeleteNetworkProfile(neutronV20.DeleteCommand):
     """Delete a given network profile."""
 
-    log = logging.getLogger(__name__ + '.DeleteNetworkProfile')
     resource = RESOURCE
     allow_names = True
 
@@ -106,13 +100,11 @@ class UpdateNetworkProfile(neutronV20.UpdateCommand):
     """Update network profile's information."""
 
     resource = RESOURCE
-    log = logging.getLogger(__name__ + '.UpdateNetworkProfile')
 
 
 class UpdateNetworkProfileV2(neutronV20.NeutronCommand):
 
     api = 'network'
-    log = logging.getLogger(__name__ + '.UpdateNetworkProfileV2')
     resource = RESOURCE
 
     def get_parser(self, prog_name):

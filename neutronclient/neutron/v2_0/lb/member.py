@@ -16,8 +16,6 @@
 # @author: Ilya Shakhat, Mirantis Inc.
 #
 
-import logging
-
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
 
@@ -26,7 +24,6 @@ class ListMember(neutronV20.ListCommand):
     """List members that belong to a given tenant."""
 
     resource = 'member'
-    log = logging.getLogger(__name__ + '.ListMember')
     list_columns = [
         'id', 'address', 'protocol_port', 'weight', 'admin_state_up', 'status'
     ]
@@ -38,14 +35,12 @@ class ShowMember(neutronV20.ShowCommand):
     """Show information of a given member."""
 
     resource = 'member'
-    log = logging.getLogger(__name__ + '.ShowMember')
 
 
 class CreateMember(neutronV20.CreateCommand):
     """Create a member."""
 
     resource = 'member'
-    log = logging.getLogger(__name__ + '.CreateMember')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -89,11 +84,9 @@ class UpdateMember(neutronV20.UpdateCommand):
     """Update a given member."""
 
     resource = 'member'
-    log = logging.getLogger(__name__ + '.UpdateMember')
 
 
 class DeleteMember(neutronV20.DeleteCommand):
     """Delete a given member."""
 
     resource = 'member'
-    log = logging.getLogger(__name__ + '.DeleteMember')

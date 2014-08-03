@@ -15,7 +15,6 @@
 #
 
 import argparse
-import logging
 
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
@@ -25,7 +24,6 @@ class ListSecurityGroup(neutronV20.ListCommand):
     """List security groups that belong to a given tenant."""
 
     resource = 'security_group'
-    log = logging.getLogger(__name__ + '.ListSecurityGroup')
     list_columns = ['id', 'name', 'description']
     pagination_support = True
     sorting_support = True
@@ -35,7 +33,6 @@ class ShowSecurityGroup(neutronV20.ShowCommand):
     """Show information of a given security group."""
 
     resource = 'security_group'
-    log = logging.getLogger(__name__ + '.ShowSecurityGroup')
     allow_names = True
 
 
@@ -43,7 +40,6 @@ class CreateSecurityGroup(neutronV20.CreateCommand):
     """Create a security group."""
 
     resource = 'security_group'
-    log = logging.getLogger(__name__ + '.CreateSecurityGroup')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -67,7 +63,6 @@ class CreateSecurityGroup(neutronV20.CreateCommand):
 class DeleteSecurityGroup(neutronV20.DeleteCommand):
     """Delete a given security group."""
 
-    log = logging.getLogger(__name__ + '.DeleteSecurityGroup')
     resource = 'security_group'
     allow_names = True
 
@@ -75,7 +70,6 @@ class DeleteSecurityGroup(neutronV20.DeleteCommand):
 class UpdateSecurityGroup(neutronV20.UpdateCommand):
     """Update a given security group."""
 
-    log = logging.getLogger(__name__ + '.UpdateSecurityGroup')
     resource = 'security_group'
 
     def add_known_arguments(self, parser):
@@ -101,7 +95,6 @@ class ListSecurityGroupRule(neutronV20.ListCommand):
     """List security group rules that belong to a given tenant."""
 
     resource = 'security_group_rule'
-    log = logging.getLogger(__name__ + '.ListSecurityGroupRule')
     list_columns = ['id', 'security_group_id', 'direction', 'protocol',
                     'remote_ip_prefix', 'remote_group_id']
     replace_rules = {'security_group_id': 'security_group',
@@ -170,7 +163,6 @@ class ShowSecurityGroupRule(neutronV20.ShowCommand):
     """Show information of a given security group rule."""
 
     resource = 'security_group_rule'
-    log = logging.getLogger(__name__ + '.ShowSecurityGroupRule')
     allow_names = False
 
 
@@ -178,7 +170,6 @@ class CreateSecurityGroupRule(neutronV20.CreateCommand):
     """Create a security group rule."""
 
     resource = 'security_group_rule'
-    log = logging.getLogger(__name__ + '.CreateSecurityGroupRule')
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -254,6 +245,5 @@ class CreateSecurityGroupRule(neutronV20.CreateCommand):
 class DeleteSecurityGroupRule(neutronV20.DeleteCommand):
     """Delete a given security group rule."""
 
-    log = logging.getLogger(__name__ + '.DeleteSecurityGroupRule')
     resource = 'security_group_rule'
     allow_names = False
