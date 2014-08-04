@@ -62,6 +62,8 @@ class TestSSL(testtools.TestCase):
             url=mox.IgnoreArg(),
             username=mox.IgnoreArg(),
             user_id=mox.IgnoreArg(),
+            retries=mox.IgnoreArg(),
+            raise_errors=mox.IgnoreArg(),
             log_credentials=mox.IgnoreArg(),
             timeout=mox.IgnoreArg(),
         )
@@ -94,6 +96,8 @@ class TestSSL(testtools.TestCase):
             url=mox.IgnoreArg(),
             username=mox.IgnoreArg(),
             user_id=mox.IgnoreArg(),
+            retries=mox.IgnoreArg(),
+            raise_errors=mox.IgnoreArg(),
             log_credentials=mox.IgnoreArg(),
             timeout=mox.IgnoreArg(),
         )
@@ -117,6 +121,8 @@ class TestSSL(testtools.TestCase):
             tenant_name=mox.IgnoreArg(),
             token=mox.IgnoreArg(),
             username=mox.IgnoreArg(),
+            retries=mox.IgnoreArg(),
+            raise_errors=mox.IgnoreArg(),
         )
         self.mox.ReplayAll()
 
