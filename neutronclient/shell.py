@@ -665,7 +665,7 @@ class NeutronShell(app.App):
             self.interactive_mode = not remainder
             self.initialize_app(remainder)
         except Exception as err:
-            if self.options.verbose_level == self.DEBUG_LEVEL:
+            if self.options.verbose_level >= self.DEBUG_LEVEL:
                 self.log.exception(unicode(err))
                 raise
             else:
@@ -695,24 +695,24 @@ class NeutronShell(app.App):
             cmd_parser = cmd.get_parser(full_name)
             return run_command(cmd, cmd_parser, sub_argv)
         except Exception as err:
-            if self.options.verbose_level == self.DEBUG_LEVEL:
+            if self.options.verbose_level >= self.DEBUG_LEVEL:
                 self.log.exception(unicode(err))
             else:
                 self.log.error(unicode(err))
             try:
                 self.clean_up(cmd, result, err)
             except Exception as err2:
-                if self.options.verbose_level == self.DEBUG_LEVEL:
+                if self.options.verbose_level >= self.DEBUG_LEVEL:
                     self.log.exception(unicode(err2))
                 else:
                     self.log.error(_('Could not clean up: %s'), unicode(err2))
-            if self.options.verbose_level == self.DEBUG_LEVEL:
+            if self.options.verbose_level >= self.DEBUG_LEVEL:
                 raise
         else:
             try:
                 self.clean_up(cmd, result, None)
             except Exception as err3:
-                if self.options.verbose_level == self.DEBUG_LEVEL:
+                if self.options.verbose_level >= self.DEBUG_LEVEL:
                     self.log.exception(unicode(err3))
                 else:
                     self.log.error(_('Could not clean up: %s'), unicode(err3))
