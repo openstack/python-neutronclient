@@ -20,8 +20,8 @@ import re
 import sys
 
 import fixtures
-import httpretty
 from mox3 import mox
+import requests_mock
 import six
 import testtools
 from testtools import matchers
@@ -134,12 +134,12 @@ class ShellTest(testtools.TestCase):
         self.assertEqual('You must provide a service URL via '
                          'either --os-url or env[OS_URL]', stderr.strip())
 
-    @httpretty.activate
-    def test_auth(self):
+    @requests_mock.Mocker()
+    def test_auth(self, mrequests):
         # emulate Keystone version discovery
-        httpretty.register_uri(httpretty.GET,
+        mrequests.register_uri('GET',
                                auth.V3_URL,
-                               body=auth.V3_VERSION_ENTRY)
+                               text=auth.V3_VERSION_ENTRY)
 
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)
@@ -169,12 +169,12 @@ class ShellTest(testtools.TestCase):
         neutron_shell.run(cmdline.split())
         self.mox.VerifyAll()
 
-    @httpretty.activate
-    def test_auth_cert_and_key(self):
+    @requests_mock.Mocker()
+    def test_auth_cert_and_key(self, mrequests):
         # emulate Keystone version discovery
-        httpretty.register_uri(httpretty.GET,
+        mrequests.register_uri('GET',
                                auth.V3_URL,
-                               body=auth.V3_VERSION_ENTRY)
+                               text=auth.V3_VERSION_ENTRY)
 
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)
@@ -205,12 +205,12 @@ class ShellTest(testtools.TestCase):
         neutron_shell.run(cmdline.split())
         self.mox.VerifyAll()
 
-    @httpretty.activate
-    def test_v2_auth(self):
+    @requests_mock.Mocker()
+    def test_v2_auth(self, mrequests):
         # emulate Keystone version discovery
-        httpretty.register_uri(httpretty.GET,
+        mrequests.register_uri('GET',
                                auth.V2_URL,
-                               body=auth.V2_VERSION_ENTRY)
+                               text=auth.V2_VERSION_ENTRY)
 
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)
@@ -240,12 +240,12 @@ class ShellTest(testtools.TestCase):
         neutron_shell.run(cmdline.split())
         self.mox.VerifyAll()
 
-    @httpretty.activate
-    def test_failed_auth_version_discovery_v3_auth_url(self):
+    @requests_mock.Mocker()
+    def test_failed_auth_version_discovery_v3_auth_url(self, mrequests):
         # emulate Keystone version discovery
-        httpretty.register_uri(httpretty.GET,
+        mrequests.register_uri('GET',
                                auth.V3_URL,
-                               status=405)
+                               status_code=405)
 
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)
@@ -276,12 +276,12 @@ class ShellTest(testtools.TestCase):
         neutron_shell.run(cmdline.split())
         self.mox.VerifyAll()
 
-    @httpretty.activate
-    def test_failed_auth_version_discovery_v2_auth_url(self):
+    @requests_mock.Mocker()
+    def test_failed_auth_version_discovery_v2_auth_url(self, mrequests):
         # emulate Keystone version discovery
-        httpretty.register_uri(httpretty.GET,
+        mrequests.register_uri('GET',
                                auth.V2_URL,
-                               status=405)
+                               status_code=405)
 
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)
@@ -311,12 +311,12 @@ class ShellTest(testtools.TestCase):
         neutron_shell.run(cmdline.split())
         self.mox.VerifyAll()
 
-    @httpretty.activate
-    def test_auth_version_discovery_v3(self):
+    @requests_mock.Mocker()
+    def test_auth_version_discovery_v3(self, mrequests):
         # emulate Keystone version discovery
-        httpretty.register_uri(httpretty.GET,
+        mrequests.register_uri('GET',
                                auth.BASE_URL,
-                               body=auth.V3_VERSION_LIST)
+                               text=auth.V3_VERSION_LIST)
 
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)
@@ -347,12 +347,12 @@ class ShellTest(testtools.TestCase):
         neutron_shell.run(cmdline.split())
         self.mox.VerifyAll()
 
-    @httpretty.activate
-    def test_auth_version_discovery_v2(self):
+    @requests_mock.Mocker()
+    def test_auth_version_discovery_v2(self, mrequests):
         # emulate Keystone version discovery
-        httpretty.register_uri(httpretty.GET,
+        mrequests.register_uri('GET',
                                auth.BASE_URL,
-                               body=auth.V3_VERSION_LIST)
+                               text=auth.V3_VERSION_LIST)
 
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)
@@ -382,12 +382,12 @@ class ShellTest(testtools.TestCase):
         neutron_shell.run(cmdline.split())
         self.mox.VerifyAll()
 
-    @httpretty.activate
-    def test_insecure_auth(self):
+    @requests_mock.Mocker()
+    def test_insecure_auth(self, mrequests):
         # emulate Keystone version discovery
-        httpretty.register_uri(httpretty.GET,
+        mrequests.register_uri('GET',
                                auth.V2_URL,
-                               body=auth.V2_VERSION_ENTRY)
+                               text=auth.V2_VERSION_ENTRY)
 
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)

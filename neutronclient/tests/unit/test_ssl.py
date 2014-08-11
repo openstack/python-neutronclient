@@ -17,8 +17,8 @@ import fixtures
 import requests
 import testtools
 
-import httpretty
 from mox3 import mox
+import requests_mock
 
 from neutronclient.client import HTTPClient
 from neutronclient.common.clientmanager import ClientManager
@@ -43,12 +43,12 @@ class TestSSL(testtools.TestCase):
         self.mox = mox.Mox()
         self.addCleanup(self.mox.UnsetStubs)
 
-    @httpretty.activate
-    def test_ca_cert_passed(self):
+    @requests_mock.Mocker()
+    def test_ca_cert_passed(self, mrequests):
         # emulate Keystone version discovery
-        httpretty.register_uri(httpretty.GET,
+        mrequests.register_uri('GET',
                                auth.V3_URL,
-                               body=auth.V3_VERSION_ENTRY)
+                               text=auth.V3_VERSION_ENTRY)
 
         self.mox.StubOutWithMock(ClientManager, '__init__')
         self.mox.StubOutWithMock(openstack_shell.NeutronShell, 'interact')
@@ -87,13 +87,13 @@ class TestSSL(testtools.TestCase):
         openstack_shell.NeutronShell('2.0').run(cmdline.split())
         self.mox.VerifyAll()
 
-    @httpretty.activate
-    def test_ca_cert_passed_as_env_var(self):
+    @requests_mock.Mocker()
+    def test_ca_cert_passed_as_env_var(self, mrequests):
 
         # emulate Keystone version discovery
-        httpretty.register_uri(httpretty.GET,
+        mrequests.register_uri('GET',
                                auth.V3_URL,
-                               body=auth.V3_VERSION_ENTRY)
+                               text=auth.V3_VERSION_ENTRY)
 
         self.useFixture(fixtures.EnvironmentVariable('OS_CACERT', CA_CERT))
 
