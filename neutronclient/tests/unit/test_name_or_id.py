@@ -44,7 +44,10 @@ class CLITestNameorID(testtools.TestCase):
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         path = getattr(self.client, "networks_path")
         self.client.httpclient.request(
-            test_cli20.end_url(path, "fields=id&id=" + _id), 'GET',
+            test_cli20.MyUrlComparator(
+                test_cli20.end_url(path, "fields=id&id=" + _id),
+                self.client),
+            'GET',
             body=None,
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
         ).AndReturn((test_cli20.MyResp(200), resstr))
@@ -61,12 +64,18 @@ class CLITestNameorID(testtools.TestCase):
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         path = getattr(self.client, "networks_path")
         self.client.httpclient.request(
-            test_cli20.end_url(path, "fields=id&id=" + _id), 'GET',
+            test_cli20.MyUrlComparator(
+                test_cli20.end_url(path, "fields=id&id=" + _id),
+                self.client),
+            'GET',
             body=None,
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
         ).AndReturn((test_cli20.MyResp(200), resstr1))
         self.client.httpclient.request(
-            test_cli20.end_url(path, "fields=id&name=" + _id), 'GET',
+            test_cli20.MyUrlComparator(
+                test_cli20.end_url(path, "fields=id&name=" + _id),
+                self.client),
+            'GET',
             body=None,
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
         ).AndReturn((test_cli20.MyResp(200), resstr))
@@ -83,7 +92,10 @@ class CLITestNameorID(testtools.TestCase):
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         path = getattr(self.client, "networks_path")
         self.client.httpclient.request(
-            test_cli20.end_url(path, "fields=id&name=" + name), 'GET',
+            test_cli20.MyUrlComparator(
+                test_cli20.end_url(path, "fields=id&name=" + name),
+                self.client),
+            'GET',
             body=None,
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
         ).AndReturn((test_cli20.MyResp(200), resstr))
@@ -100,7 +112,10 @@ class CLITestNameorID(testtools.TestCase):
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         path = getattr(self.client, "networks_path")
         self.client.httpclient.request(
-            test_cli20.end_url(path, "fields=id&name=" + name), 'GET',
+            test_cli20.MyUrlComparator(
+                test_cli20.end_url(path, "fields=id&name=" + name),
+                self.client),
+            'GET',
             body=None,
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
         ).AndReturn((test_cli20.MyResp(200), resstr))
@@ -118,7 +133,10 @@ class CLITestNameorID(testtools.TestCase):
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         path = getattr(self.client, "networks_path")
         self.client.httpclient.request(
-            test_cli20.end_url(path, "fields=id&name=" + name), 'GET',
+            test_cli20.MyUrlComparator(
+                test_cli20.end_url(path, "fields=id&name=" + name),
+                self.client),
+            'GET',
             body=None,
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
         ).AndReturn((test_cli20.MyResp(200), resstr))
@@ -140,8 +158,9 @@ class CLITestNameorID(testtools.TestCase):
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         path = getattr(self.client, "security_groups_path")
         self.client.httpclient.request(
-            test_cli20.end_url(path, "fields=id&name=%s&tenant_id=%s" %
-                               (name, project)),
+            test_cli20.MyUrlComparator(
+                test_cli20.end_url(path, "fields=id&name=%s&tenant_id=%s" %
+                                         (name, project)), self.client),
             'GET',
             body=None,
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
@@ -162,8 +181,9 @@ class CLITestNameorID(testtools.TestCase):
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         path = getattr(self.client, "security_groups_path")
         self.client.httpclient.request(
-            test_cli20.end_url(path, "fields=id&name=%s&tenant_id=%s" %
-                               (name, project)),
+            test_cli20.MyUrlComparator(
+                test_cli20.end_url(path, "fields=id&name=%s&tenant_id=%s" %
+                                         (name, project)), self.client),
             'GET',
             body=None,
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
