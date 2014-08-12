@@ -3,6 +3,7 @@ argparse
 cliff>=1.4.3
 httplib2
 iso8601>=0.1.4
+netaddr
 simplejson>=2.0.9
 six
 Babel>=0.9.6

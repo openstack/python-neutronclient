@@ -20,6 +20,10 @@ import sys
 from neutronclient.neutron.v2_0 import subnet
 from neutronclient.tests.unit import test_cli20
 
+cidrvalue = '1.1.1.0/24'
+gatewayvalue = '1.1.1.1'
+prefixvalue = '1.1.1.0/24'
+
 
 class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
     def setUp(self):
@@ -32,8 +36,8 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'cidrvalue'
-        gateway = 'gatewayvalue'
+        cidr = cidrvalue
+        gateway = gatewayvalue
         args = ['--gateway', gateway, netid, cidr]
         position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
         position_values = [4, netid, cidr, gateway]
@@ -47,7 +51,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'cidrvalue'
+        cidr = cidrvalue
         args = ['--no-gateway', netid, cidr]
         position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
         position_values = [4, netid, cidr, None]
@@ -61,8 +65,8 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'cidrvalue'
-        gateway = 'gatewayvalue'
+        cidr = cidrvalue
+        gateway = gatewayvalue
         args = ['--gateway', gateway, '--no-gateway', netid, cidr]
         position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
         position_values = [4, netid, cidr, None]
@@ -80,7 +84,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'prefixvalue'
+        cidr = prefixvalue
         args = ['--tenant_id', 'tenantid', netid, cidr]
         position_names = ['ip_version', 'network_id', 'cidr']
         position_values = [4, netid, cidr]
@@ -95,7 +99,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'prefixvalue'
+        cidr = prefixvalue
         args = [netid, cidr, '--tags', 'a', 'b']
         position_names = ['ip_version', 'network_id', 'cidr']
         position_values = [4, netid, cidr]
@@ -112,7 +116,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'prefixvalue'
+        cidr = prefixvalue
         args = ['--tenant_id', 'tenantid',
                 '--allocation_pool', 'start=1.1.1.10,end=1.1.1.20',
                 netid, cidr]
@@ -134,7 +138,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'prefixvalue'
+        cidr = prefixvalue
         args = ['--tenant_id', 'tenantid',
                 '--allocation_pool', 'start=1.1.1.10,end=1.1.1.20',
                 '--allocation_pool', 'start=1.1.1.30,end=1.1.1.40',
@@ -158,7 +162,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'prefixvalue'
+        cidr = prefixvalue
         args = ['--tenant_id', 'tenantid',
                 '--host-route', 'destination=172.16.1.0/24,nexthop=1.1.1.20',
                 netid, cidr]
@@ -181,7 +185,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'prefixvalue'
+        cidr = prefixvalue
         args = ['--tenant_id', 'tenantid',
                 '--host-route', 'destination=172.16.1.0/24,nexthop=1.1.1.20',
                 '--host-route', 'destination=172.17.7.0/24,nexthop=1.1.1.40',
@@ -205,7 +209,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'prefixvalue'
+        cidr = prefixvalue
         args = ['--tenant_id', 'tenantid',
                 '--dns-nameserver', '1.1.1.20',
                 '--dns-nameserver', '1.1.1.40',
@@ -225,7 +229,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'prefixvalue'
+        cidr = prefixvalue
         args = ['--tenant_id', 'tenantid',
                 '--disable-dhcp',
                 netid, cidr]
@@ -242,7 +246,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'prefixvalue'
+        cidr = prefixvalue
         args = ['--tenant_id', 'tenantid',
                 '--allocation-pool', 'start=1.1.1.10,end=1.1.1.20',
                 netid, cidr,
@@ -263,7 +267,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'prefixvalue'
+        cidr = prefixvalue
         args = ['--tenant_id', 'tenantid',
                 netid, cidr,
                 '--allocation-pools', 'list=true', 'type=dict',
@@ -282,7 +286,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'prefixvalue'
+        cidr = prefixvalue
         args = ['--tenant_id', 'tenantid',
                 '--allocation-pool', 'start=1.1.1.10,end=1.1.1.20',
                 netid, cidr,
@@ -355,8 +359,11 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         cmd = subnet.UpdateSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'myname',
+                                    '--cidr', prefixvalue,
                                     '--tags', 'a', 'b'],
-                                   {'name': 'myname', 'tags': ['a', 'b'], }
+                                   {'name': 'myname',
+                                    'cidr': prefixvalue,
+                                    'tags': ['a', 'b'], }
                                    )
 
     def test_update_subnet_known_option_before_id(self):
@@ -366,8 +373,9 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         cmd = subnet.UpdateSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['--request-format', 'json',
-                                    'myid', '--name', 'myname'],
-                                   {'name': 'myname', }
+                                    'myid', '--name', 'myname',
+                                    '--cidr', prefixvalue],
+                                   {'name': 'myname', 'cidr': prefixvalue, }
                                    )
 
     def test_update_subnet_known_option_after_id(self):
@@ -377,8 +385,9 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         cmd = subnet.UpdateSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'myname',
+                                    '--cidr', prefixvalue,
                                     '--request-format', 'json'],
-                                   {'name': 'myname', }
+                                   {'name': 'myname', 'cidr': prefixvalue, }
                                    )
 
     def test_show_subnet(self):
