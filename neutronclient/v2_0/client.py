@@ -20,6 +20,7 @@ import logging
 import time
 import urllib
 import urlparse
+import netaddr
 
 from neutronclient import client
 from neutronclient.common import _
@@ -367,11 +368,39 @@ class Client(object):
     @APIParamsCall
     def create_subnet(self, body=None):
         """Creates a new subnet."""
+        try:
+            ip = netaddr.IPNetwork(body['subnet']['cidr'])
+            if ip.size < 8:
+                msg = "Error: %s has size %d" % (body['subnet']['cidr'], ip.size)
+                raise exceptions.Error(msg)
+            if 'gateway_ip' in body['subnet'] and body['subnet']['gateway_ip'] is not None:
+                gw = netaddr.IPAddress(body['subnet']['gateway_ip'])
+                if gw not in ip:
+                    msg = "Error: %s is not in network %s" % (body['subnet']['gateway_ip'], body['subnet']['cidr'])
+                    raise exceptions.Error(msg)
+        except:
+            raise
         return self.post(self.subnets_path, body=body)
 
     @APIParamsCall
     def update_subnet(self, subnet, body=None):
         """Updates a subnet."""
+        try:
+            if 'cidr' in body['subnet']:
+                ip = netaddr.IPNetwork(body['subnet']['cidr'])
+            else:
+                entry = self.get(self.subnet_path % (subnet))
+                ip = netaddr.IPNetwork(entry['subnet']['cidr'])
+            if ip.size < 8:
+                msg = "Error: %s has size %d" % (body['subnet']['cidr'], ip.size)
+                raise exceptions.Error(msg)
+            if 'gateway_ip' in body['subnet'] and body['subnet']['gateway_ip'] is not None:
+                gw = netaddr.IPAddress(body['subnet']['gateway_ip'])
+                if gw not in ip:
+                    msg = "Error: %s is not in network %s" % (body['subnet']['gateway_ip'], ip)
+                    raise exceptions.Error(msg)
+        except:
+            raise
         return self.put(self.subnet_path % (subnet), body=body)
 
     @APIParamsCall
