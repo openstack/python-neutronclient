@@ -15,6 +15,7 @@
 #
 
 import contextlib
+import itertools
 import sys
 import urllib
 
@@ -174,11 +175,12 @@ class CLITestV20Base(base.BaseTestCase):
                 'xmlns': constants.XML_NS_V20,
                 constants.EXT_NS: {'prefix': 'http://xxxx.yy.com'}}
 
-    def setUp(self, plurals={}):
+    def setUp(self, plurals=None):
         """Prepare the test environment."""
         super(CLITestV20Base, self).setUp()
         client.Client.EXTED_PLURALS.update(constants.PLURALS)
-        client.Client.EXTED_PLURALS.update(plurals)
+        if plurals is not None:
+            client.Client.EXTED_PLURALS.update(plurals)
         self.metadata = {'plurals': client.Client.EXTED_PLURALS,
                          'xmlns': constants.XML_NS_V20,
                          constants.EXT_NS: {'prefix':
@@ -264,7 +266,7 @@ class CLITestV20Base(base.BaseTestCase):
             self.assertIn(name, _str)
 
     def _test_list_columns(self, cmd, resources,
-                           resources_out, args=['-f', 'json'],
+                           resources_out, args=('-f', 'json'),
                            cmd_resources=None, parent_id=None):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
@@ -283,16 +285,16 @@ class CLITestV20Base(base.BaseTestCase):
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
-        args.extend(['--request-format', self.format])
+        args = tuple(args) + ('--request-format', self.format)
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("list_" + cmd_resources)
         shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
 
-    def _test_list_resources(self, resources, cmd, detail=False, tags=[],
-                             fields_1=[], fields_2=[], page_size=None,
-                             sort_key=[], sort_dir=[], response_contents=None,
+    def _test_list_resources(self, resources, cmd, detail=False, tags=(),
+                             fields_1=(), fields_2=(), page_size=None,
+                             sort_key=(), sort_dir=(), response_contents=None,
                              base_args=None, path=None, cmd_resources=None,
                              parent_id=None):
         self.mox.StubOutWithMock(cmd, "get_client")
@@ -338,8 +340,7 @@ class CLITestV20Base(base.BaseTestCase):
                 args.append(field)
         if detail:
             query = query and query + '&verbose=True' or 'verbose=True'
-        fields_1.extend(fields_2)
-        for field in fields_1:
+        for field in itertools.chain(fields_1, fields_2):
             if query:
                 query += "&fields=" + field
             else:
@@ -361,7 +362,7 @@ class CLITestV20Base(base.BaseTestCase):
         if sort_dir:
             len_diff = len(sort_key) - len(sort_dir)
             if len_diff > 0:
-                sort_dir += ['asc'] * len_diff
+                sort_dir = tuple(sort_dir) + ('asc',) * len_diff
             elif len_diff < 0:
                 sort_dir = sort_dir[:len(sort_key)]
             for dir in sort_dir:
@@ -467,7 +468,7 @@ class CLITestV20Base(base.BaseTestCase):
         _str = self.fake_stdout.make_string()
         self.assertIn(myid, _str)
 
-    def _test_show_resource(self, resource, cmd, myid, args, fields=[],
+    def _test_show_resource(self, resource, cmd, myid, args, fields=(),
                             cmd_resource=None, parent_id=None):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
