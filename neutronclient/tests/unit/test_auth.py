@@ -17,6 +17,7 @@
 import json
 import uuid
 
+import fixtures
 import httpretty
 from mox3 import mox
 import requests
@@ -215,6 +216,9 @@ class CLITestAuthKeystone(testtools.TestCase):
         """Prepare the test environment."""
         super(CLITestAuthKeystone, self).setUp()
         self.mox = mox.Mox()
+
+        for var in ('http_proxy', 'HTTP_PROXY'):
+            self.useFixture(fixtures.EnvironmentVariableFixture(var))
 
         self.client = client.construct_http_client(
             username=USERNAME,
