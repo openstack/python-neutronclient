@@ -133,7 +133,7 @@ class DisassociateFloatingIP(neutronV20.NeutronCommand):
         parser = super(DisassociateFloatingIP, self).get_parser(prog_name)
         parser.add_argument(
             'floatingip_id', metavar='FLOATINGIP_ID',
-            help=_('ID of the floating IP to associate.'))
+            help=_('ID of the floating IP to disassociate.'))
         return parser
 
     def run(self, parsed_args):
