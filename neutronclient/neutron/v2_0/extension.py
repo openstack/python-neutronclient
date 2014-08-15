@@ -15,7 +15,6 @@
 #
 
 from neutronclient.neutron import v2_0 as cmd_base
-from neutronclient.openstack.common.gettextutils import _
 
 
 class ListExt(cmd_base.ListCommand):
@@ -30,11 +29,3 @@ class ShowExt(cmd_base.ShowCommand):
 
     resource = "extension"
     allow_names = False
-
-    def get_parser(self, prog_name):
-        parser = super(cmd_base.ShowCommand, self).get_parser(prog_name)
-        cmd_base.add_show_list_common_argument(parser)
-        parser.add_argument(
-            'id', metavar='EXT-ALIAS',
-            help=_('The extension alias.'))
-        return parser
