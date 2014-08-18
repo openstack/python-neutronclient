@@ -85,6 +85,22 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.addCleanup(self.mox.VerifyAll)
         self.addCleanup(self.mox.UnsetStubs)
 
+    def test_reused_token_get_auth_info(self):
+        """Test that Client.get_auth_info() works even if client was
+           instantiated with predefined token.
+        """
+        client_ = client.HTTPClient(username=USERNAME,
+                                    tenant_name=TENANT_NAME,
+                                    token=TOKEN,
+                                    password=PASSWORD,
+                                    auth_url=AUTH_URL,
+                                    region_name=REGION)
+        expected = {'auth_token': TOKEN,
+                    'auth_tenant_id': None,
+                    'auth_user_id': None,
+                    'endpoint_url': self.client.endpoint_url}
+        self.assertEqual(client_.get_auth_info(), expected)
+
     def test_get_token(self):
         self.mox.StubOutWithMock(self.client, "request")
 

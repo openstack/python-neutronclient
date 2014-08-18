@@ -111,6 +111,8 @@ class HTTPClient(httplib2.Http):
         self.endpoint_type = endpoint_type
         self.region_name = region_name
         self.auth_token = token
+        self.auth_tenant_id = None
+        self.auth_user_id = None
         self.content_type = 'application/json'
         self.endpoint_url = endpoint_url
         self.auth_strategy = auth_strategy
