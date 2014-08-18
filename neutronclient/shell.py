@@ -594,7 +594,7 @@ class NeutronShell(app.App):
             help=argparse.SUPPRESS)
 
         parser.add_argument(
-            '--timeout', metavar='<seconds>',
+            '--http-timeout', metavar='<seconds>',
             default=env('OS_NETWORK_TIMEOUT', default=None), type=float,
             help=_('Timeout in seconds to wait for an HTTP response. Defaults '
                    'to env[OS_NETWORK_TIMEOUT] or None if not specified.'))
@@ -801,7 +801,7 @@ class NeutronShell(app.App):
             endpoint_type=self.options.os_endpoint_type or self.endpoint_type,
             insecure=self.options.insecure,
             ca_cert=self.options.os_cacert,
-            timeout=self.options.timeout,
+            timeout=self.options.http_timeout,
             retries=self.options.retries,
             raise_errors=False,
             session=auth_session,

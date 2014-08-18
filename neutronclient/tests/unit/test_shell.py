@@ -466,11 +466,11 @@ class ShellTest(testtools.TestCase):
 
         # Neither $OS_ENDPOINT_TYPE nor --endpoint-type
         namespace = parser.parse_args([])
-        self.assertIsNone(namespace.timeout)
+        self.assertIsNone(namespace.http_timeout)
 
         # --endpoint-type but not $OS_ENDPOINT_TYPE
-        namespace = parser.parse_args(['--timeout=50'])
-        self.assertEqual(50, namespace.timeout)
+        namespace = parser.parse_args(['--http-timeout=50'])
+        self.assertEqual(50, namespace.http_timeout)
 
     def test_timeout_environment_variable(self):
         fixture = fixtures.EnvironmentVariable("OS_NETWORK_TIMEOUT",
@@ -481,4 +481,4 @@ class ShellTest(testtools.TestCase):
         parser = shell.build_option_parser('descr', '2.0')
 
         namespace = parser.parse_args([])
-        self.assertEqual(50, namespace.timeout)
+        self.assertEqual(50, namespace.http_timeout)
