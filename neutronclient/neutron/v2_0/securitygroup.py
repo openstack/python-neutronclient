@@ -16,6 +16,7 @@
 
 import argparse
 
+from neutronclient.common import exceptions
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
 
@@ -134,9 +135,31 @@ class ListSecurityGroupRule(neutronV20.ListCommand):
         for rule in data:
             for key in self.replace_rules:
                 sec_group_ids.add(rule[key])
-        search_opts.update({"id": sec_group_ids})
-        secgroups = neutron_client.list_security_groups(**search_opts)
-        secgroups = secgroups.get('security_groups', [])
+        sec_group_ids = list(sec_group_ids)
+
+        def _get_sec_group_list(sec_group_ids):
+            search_opts['id'] = sec_group_ids
+            return neutron_client.list_security_groups(
+                **search_opts).get('security_groups', [])
+
+        try:
+            secgroups = _get_sec_group_list(sec_group_ids)
+        except exceptions.RequestURITooLong as uri_len_exc:
+            # Length of a query filter on security group rule id
+            # id=<uuid>& (with len(uuid)=36)
+            sec_group_id_filter_len = 40
+            # The URI is too long because of too many sec_group_id filters
+            # Use the excess attribute of the exception to know how many
+            # sec_group_id filters can be inserted into a single request
+            sec_group_count = len(sec_group_ids)
+            max_size = ((sec_group_id_filter_len * sec_group_count) -
+                        uri_len_exc.excess)
+            chunk_size = max_size / sec_group_id_filter_len
+            secgroups = []
+            for i in range(0, sec_group_count, chunk_size):
+                secgroups.extend(
+                    _get_sec_group_list(sec_group_ids[i: i + chunk_size]))
+
         sg_dict = dict([(sg['id'], sg['name'])
                         for sg in secgroups if sg['name']])
         for rule in data:
