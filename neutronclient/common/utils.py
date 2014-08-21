@@ -138,22 +138,17 @@ def get_item_properties(item, fields, mixed_case_fields=[], formatters={}):
 def str2bool(strbool):
     if strbool is None:
         return None
-    else:
-        return strbool.lower() == 'true'
+    return strbool.lower() == 'true'
 
 
 def str2dict(strdict):
-        '''Convert key1=value1,key2=value2,... string into dictionary.
+    """Convert key1=value1,key2=value2,... string into dictionary.
 
-        :param strdict: key1=value1,key2=value2
-        '''
-        _info = {}
-        if not strdict:
-            return _info
-        for kv_str in strdict.split(","):
-            k, v = kv_str.split("=", 1)
-            _info.update({k: v})
-        return _info
+    :param strdict: key1=value1,key2=value2
+    """
+    if not strdict:
+        return {}
+    return dict([kv.split('=', 1) for kv in strdict.split(',')])
 
 
 def http_log_req(_logger, args, kwargs):
