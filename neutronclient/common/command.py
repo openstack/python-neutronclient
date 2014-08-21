@@ -14,16 +14,11 @@
 #    under the License.
 #
 
-"""
-OpenStack base command
-"""
-
 from cliff import command
 
 
 class OpenStackCommand(command.Command):
-    """Base class for OpenStack commands
-    """
+    """Base class for OpenStack commands."""
 
     api = None
 

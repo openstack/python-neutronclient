@@ -26,8 +26,7 @@ API_VERSIONS = {
 
 
 def make_client(instance):
-    """Returns an neutron client.
-    """
+    """Returns an neutron client."""
     neutron_client = utils.get_client_class(
         API_NAME,
         instance._api_version[API_NAME],
@@ -60,6 +59,7 @@ def make_client(instance):
 
 def Client(api_version, *args, **kwargs):
     """Return an neutron client.
+
     @param api_version: only 2.0 is supported now
     """
     neutron_client = utils.get_client_class(

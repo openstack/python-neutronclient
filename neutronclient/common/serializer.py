@@ -393,7 +393,6 @@ class Serializer(object):
         """Deserialize a string to a dictionary.
 
         The string must be in the format of a supported MIME type.
-
         """
         return self.get_deserialize_handler(content_type).deserialize(
             datastring)
