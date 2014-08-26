@@ -112,8 +112,6 @@ class HTTPClient(AbstractHTTPClient):
 
         if 'body' in kwargs:
             kargs['body'] = kwargs['body']
-        args = utils.safe_encode_list(args)
-        kargs = utils.safe_encode_dict(kargs)
 
         if self.log_credentials:
             log_kargs = kargs
@@ -310,7 +308,6 @@ class SessionClient(AbstractHTTPClient):
         endpoint_filter.setdefault('service_type', self.service_type)
         endpoint_filter.setdefault('region_name', self.region_name)
 
-        kwargs = utils.safe_encode_dict(kwargs)
         resp = self.session.request(url, method, data=body, headers=headers,
                                     **kwargs)
         return resp, resp.text
