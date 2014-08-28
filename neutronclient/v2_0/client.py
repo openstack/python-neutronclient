@@ -1240,7 +1240,7 @@ class Client(object):
             body = self.serialize(body)
         self.httpclient.content_type = self.content_type()
         resp, replybody = self.httpclient.do_request(action, method, body=body)
-        status_code = self.get_status_code(resp)
+        status_code = resp.status_code
         if status_code in (requests.codes.ok,
                            requests.codes.created,
                            requests.codes.accepted,
@@ -1253,17 +1253,6 @@ class Client(object):
 
     def get_auth_info(self):
         return self.httpclient.get_auth_info()
-
-    def get_status_code(self, response):
-        """Returns the integer status code from the response.
-
-        Either a Webob.Response (used in testing) or requests.Response
-        is returned.
-        """
-        if hasattr(response, 'status_int'):
-            return response.status_int
-        else:
-            return response.status_code
 
     def serialize(self, data):
         """Serializes a dictionary into either XML or JSON.
