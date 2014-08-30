@@ -46,17 +46,6 @@ class NeutronClientMixin(object):
 
     USER_AGENT = 'python-neutronclient'
 
-    def get_status_code(self, response):
-        """Returns the integer status code from the response.
-
-        Either a Webob.Response (used in testing) or requests.Response
-        is returned.
-        """
-        if hasattr(response, 'status_int'):
-            return response.status_int
-        else:
-            return response.status_code
-
 
 class HTTPClient(NeutronClientMixin):
     """Handles the REST calls and responses, include authn."""
@@ -127,8 +116,7 @@ class HTTPClient(NeutronClientMixin):
             _logger.debug("throwing ConnectionFailed : %s", e)
             raise exceptions.ConnectionFailed(reason=e)
         utils.http_log_resp(_logger, resp, body)
-        status_code = self.get_status_code(resp)
-        if status_code == 401:
+        if resp.status_code == 401:
             raise exceptions.Unauthorized(message=body)
         return resp, body
 
@@ -222,8 +210,7 @@ class HTTPClient(NeutronClientMixin):
                                            body=json.dumps(body),
                                            content_type="application/json",
                                            allow_redirects=True)
-        status_code = self.get_status_code(resp)
-        if status_code != 200:
+        if resp.status_code != 200:
             raise exceptions.Unauthorized(message=resp_body)
         if resp_body:
             try:
