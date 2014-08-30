@@ -324,7 +324,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                                  args, ['id'])
 
     def _test_list_security_group_rules_extend(self, data=None, expected=None,
-                                               args=[], conv=True,
+                                               args=(), conv=True,
                                                query_field=False):
         def setup_list_stub(resources, data, query):
             reses = {resources: data}

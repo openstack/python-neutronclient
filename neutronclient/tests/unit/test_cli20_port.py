@@ -14,6 +14,7 @@
 #    under the License.
 #
 
+import itertools
 import sys
 
 from mox3 import mox
@@ -227,8 +228,8 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                   fields_1=['a', 'b'], fields_2=['c', 'd'])
 
     def _test_list_router_port(self, resources, cmd,
-                               myid, detail=False, tags=[],
-                               fields_1=[], fields_2=[]):
+                               myid, detail=False, tags=(),
+                               fields_1=(), fields_2=()):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
@@ -257,8 +258,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
             args.append("--fields")
             for field in fields_2:
                 args.append(field)
-        fields_1.extend(fields_2)
-        for field in fields_1:
+        for field in itertools.chain(fields_1, fields_2):
             if query:
                 query += "&fields=" + field
             else:
