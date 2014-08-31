@@ -14,7 +14,6 @@
 #    under the License.
 #
 
-import abc
 try:
     import json
 except ImportError:
@@ -23,9 +22,8 @@ import logging
 import os
 
 from keystoneclient import access
-from keystoneclient.auth.identity.base import BaseIdentityPlugin
+from keystoneclient import adapter
 import requests
-import six
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
@@ -44,35 +42,14 @@ else:
 logging.getLogger("requests").setLevel(_requests_log_level)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class AbstractHTTPClient(object):
+class HTTPClient(object):
+    """Handles the REST calls and responses, include authn."""
 
     USER_AGENT = 'python-neutronclient'
     CONTENT_TYPE = 'application/json'
 
-    def request(self, url, method, body=None, content_type=None, headers=None,
-                **kwargs):
-        """Request without authentication."""
-
-        headers = headers or {}
-        content_type = content_type or self.CONTENT_TYPE
-        headers.setdefault('Accept', content_type)
-        if body:
-            headers.setdefault('Content-Type', content_type)
-
-        return self._request(url, method, body=body, headers=headers, **kwargs)
-
-    @abc.abstractmethod
-    def do_request(self, url, method, **kwargs):
-        """Request with authentication."""
-
-    @abc.abstractmethod
-    def _request(self, url, method, body=None, headers=None, **kwargs):
-        """Request without authentication nor headers population."""
-
-
-class HTTPClient(AbstractHTTPClient):
-    """Handles the REST calls and responses, include authentication."""
+    # 8192 Is the default max URI len for eventlet.wsgi.server
+    MAX_URI_LEN = 8192
 
     def __init__(self, username=None, user_id=None,
                  tenant_name=None, tenant_id=None,
@@ -149,8 +126,16 @@ class HTTPClient(AbstractHTTPClient):
         elif not self.endpoint_url:
             self.endpoint_url = self._get_endpoint_url()
 
-    def _request(self, url, method, body=None, headers=None, **kwargs):
+    def request(self, url, method, body=None, headers=None, **kwargs):
+        """Request without authentication."""
+
+        content_type = kwargs.pop('content_type', None) or 'application/json'
         headers = headers or {}
+        headers.setdefault('Accept', content_type)
+
+        if body:
+            headers.setdefault('Content-Type', content_type)
+
         headers['User-Agent'] = self.USER_AGENT
 
         resp = requests.request(
@@ -164,8 +149,17 @@ class HTTPClient(AbstractHTTPClient):
 
         return resp, resp.text
 
+    def _check_uri_length(self, action):
+        uri_len = len(self.endpoint_url) + len(action)
+        if uri_len > self.MAX_URI_LEN:
+            raise exceptions.RequestURITooLong(
+                excess=uri_len - self.MAX_URI_LEN)
+
     def do_request(self, url, method, **kwargs):
+        # Ensure client always has correct uri - do not guesstimate anything
         self.authenticate_and_fetch_endpoint_url()
+        self._check_uri_length(url)
+
         # Perform the request once. If we get a 401 back then it
         # might be because the auth token expired, so try to
         # re-authenticate and try again. If it still fails, bail.
@@ -280,71 +274,67 @@ class HTTPClient(AbstractHTTPClient):
                 'endpoint_url': self.endpoint_url}
 
 
-class SessionClient(AbstractHTTPClient):
+class SessionClient(adapter.Adapter):
 
-    def __init__(self,
-                 session,
-                 auth,
-                 interface=None,
-                 service_type=None,
-                 region_name=None):
-
-        self.session = session
-        self.auth = auth
-        self.interface = interface
-        self.service_type = service_type
-        self.region_name = region_name
-        self.auth_token = None
-        self.endpoint_url = None
-
-    def _request(self, url, method, body=None, headers=None, **kwargs):
-        kwargs.setdefault('user_agent', self.USER_AGENT)
-        kwargs.setdefault('auth', self.auth)
+    def request(self, *args, **kwargs):
         kwargs.setdefault('authenticated', False)
         kwargs.setdefault('raise_exc', False)
 
-        endpoint_filter = kwargs.setdefault('endpoint_filter', {})
-        endpoint_filter.setdefault('interface', self.interface)
-        endpoint_filter.setdefault('service_type', self.service_type)
-        endpoint_filter.setdefault('region_name', self.region_name)
+        content_type = kwargs.pop('content_type', None) or 'application/json'
 
-        resp = self.session.request(url, method, data=body, headers=headers,
-                                    **kwargs)
+        headers = kwargs.setdefault('headers', {})
+        headers.setdefault('Accept', content_type)
+
+        try:
+            kwargs.setdefault('data', kwargs.pop('body'))
+        except KeyError:
+            pass
+
+        if kwargs.get('data'):
+            headers.setdefault('Content-Type', content_type)
+
+        resp = super(SessionClient, self).request(*args, **kwargs)
         return resp, resp.text
 
     def do_request(self, url, method, **kwargs):
         kwargs.setdefault('authenticated', True)
         return self.request(url, method, **kwargs)
 
-    def authenticate(self):
-        # This method is provided for backward compatibility only.
-        # We only care about setting the service endpoint.
-        self.endpoint_url = self.session.get_endpoint(
-            self.auth,
-            service_type=self.service_type,
-            region_name=self.region_name,
-            interface=self.interface)
+    @property
+    def endpoint_url(self):
+        # NOTE(jamielennox): This is used purely by the CLI and should be
+        # removed when the CLI gets smarter.
+        return self.get_endpoint()
 
-    def authenticate_and_fetch_endpoint_url(self):
-        # This method is provided for backward compatibility only.
-        # We only care about setting the service endpoint.
-        self.authenticate()
+    @property
+    def auth_token(self):
+        # NOTE(jamielennox): This is used purely by the CLI and should be
+        # removed when the CLI gets smarter.
+        return self.get_token()
+
+    def authenticate(self):
+        # NOTE(jamielennox): This is used purely by the CLI and should be
+        # removed when the CLI gets smarter.
+        self.get_token()
 
     def get_auth_info(self):
-        # This method is provided for backward compatibility only.
-        if not isinstance(self.auth, BaseIdentityPlugin):
-            msg = ('Auth info not available. Auth plugin is not an identity '
-                   'auth plugin.')
-            raise exceptions.NeutronClientException(message=msg)
-        access_info = self.auth.get_access(self.session)
-        endpoint_url = self.auth.get_endpoint(self.session,
-                                              service_type=self.service_type,
-                                              region_name=self.region_name,
-                                              interface=self.interface)
-        return {'auth_token': access_info.auth_token,
-                'auth_tenant_id': access_info.tenant_id,
-                'auth_user_id': access_info.user_id,
-                'endpoint_url': endpoint_url}
+        auth_info = {'auth_token': self.auth_token,
+                     'endpoint_url': self.endpoint_url}
+
+        # NOTE(jamielennox): This is the best we can do here. It will work
+        # with identity plugins which is the primary case but we should
+        # deprecate it's usage as much as possible.
+        try:
+            get_access = (self.auth or self.session.auth).get_access
+        except AttributeError:
+            pass
+        else:
+            auth_ref = get_access(self.session)
+
+            auth_info['auth_tenant_id'] = auth_ref.project_id
+            auth_info['auth_user_id'] = auth_ref.user_id
+
+        return auth_info
 
 
 # FIXME(bklei): Should refactor this to use kwargs and only
@@ -366,14 +356,15 @@ def construct_http_client(username=None,
                           ca_cert=None,
                           service_type='network',
                           session=None,
-                          auth=None):
+                          **kwargs):
 
     if session:
+        kwargs.setdefault('user_agent', 'python-neutronclient')
+        kwargs.setdefault('interface', endpoint_type)
         return SessionClient(session=session,
-                             auth=auth,
-                             interface=endpoint_type,
                              service_type=service_type,
-                             region_name=region_name)
+                             region_name=region_name,
+                             **kwargs)
     else:
         # FIXME(bklei): username and password are now optional. Need
         # to test that they were provided in this mode.  Should also
