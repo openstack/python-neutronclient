@@ -17,13 +17,9 @@
 
 """Utilities and helper functions."""
 
-import datetime
-import json
 import logging
 import os
 import sys
-
-import six
 
 from neutronclient.common import _
 from neutronclient.common import exceptions
@@ -40,39 +36,6 @@ def env(*vars, **kwargs):
         if value:
             return value
     return kwargs.get('default', '')
-
-
-def to_primitive(value):
-    if isinstance(value, list) or isinstance(value, tuple):
-        o = []
-        for v in value:
-            o.append(to_primitive(v))
-        return o
-    elif isinstance(value, dict):
-        o = {}
-        for k, v in six.iteritems(value):
-            o[k] = to_primitive(v)
-        return o
-    elif isinstance(value, datetime.datetime):
-        return str(value)
-    elif hasattr(value, 'iteritems'):
-        return to_primitive(dict(value.iteritems()))
-    elif hasattr(value, '__iter__'):
-        return to_primitive(list(value))
-    else:
-        return value
-
-
-def dumps(value, indent=None):
-    try:
-        return json.dumps(value, indent=indent)
-    except TypeError:
-        pass
-    return json.dumps(to_primitive(value))
-
-
-def loads(s):
-    return json.loads(s)
 
 
 def import_class(import_str):

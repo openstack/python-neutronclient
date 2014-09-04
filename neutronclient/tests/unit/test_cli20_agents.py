@@ -16,8 +16,8 @@
 
 import sys
 
-from neutronclient.common import utils
 from neutronclient.neutron.v2_0 import agent
+from neutronclient.openstack.common import jsonutils
 from neutronclient.tests.unit import test_cli20
 
 
@@ -32,7 +32,7 @@ class CLITestV20Agent(test_cli20.CLITestV20Base):
         self._test_list_columns(cmd, resources, contents, args)
         _str = self.fake_stdout.make_string()
 
-        returned_agents = utils.loads(_str)
+        returned_agents = jsonutils.loads(_str)
         self.assertEqual(1, len(returned_agents))
         ag = returned_agents[0]
         self.assertEqual(3, len(ag))
@@ -48,7 +48,7 @@ class CLITestV20Agent(test_cli20.CLITestV20Base):
         self._test_list_columns(cmd, resources, contents, args)
         _str = self.fake_stdout.make_string()
 
-        returned_agents = utils.loads(_str)
+        returned_agents = jsonutils.loads(_str)
         self.assertEqual(1, len(returned_agents))
         ag = returned_agents[0]
         self.assertEqual(1, len(ag))

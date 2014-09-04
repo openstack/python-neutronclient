@@ -13,10 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import datetime
 import sys
 
-import six
 import testtools
 
 from neutronclient.common import exceptions
@@ -105,81 +103,6 @@ class TestUtils(testtools.TestCase):
         item = Fake()
         act = utils.get_item_properties(item, fields, formatters=formatters)
         self.assertEqual(('test_name', 'test_id', 'test', 'pass'), act)
-
-
-class JSONUtilsTestCase(testtools.TestCase):
-    def test_dumps(self):
-        self.assertEqual(utils.dumps({'a': 'b'}), '{"a": "b"}')
-
-    def test_dumps_dict_with_date_value(self):
-        x = datetime.datetime(1920, 2, 3, 4, 5, 6, 7)
-        res = utils.dumps({1: 'a', 2: x})
-        expected = '{"1": "a", "2": "1920-02-03 04:05:06.000007"}'
-        self.assertEqual(expected, res)
-
-    def test_dumps_dict_with_spaces(self):
-        x = datetime.datetime(1920, 2, 3, 4, 5, 6, 7)
-        res = utils.dumps({1: 'a ', 2: x})
-        expected = '{"1": "a ", "2": "1920-02-03 04:05:06.000007"}'
-        self.assertEqual(expected, res)
-
-    def test_loads(self):
-        self.assertEqual(utils.loads('{"a": "b"}'), {'a': 'b'})
-
-
-class ToPrimitiveTestCase(testtools.TestCase):
-    def test_list(self):
-        self.assertEqual(utils.to_primitive([1, 2, 3]), [1, 2, 3])
-
-    def test_empty_list(self):
-        self.assertEqual(utils.to_primitive([]), [])
-
-    def test_tuple(self):
-        self.assertEqual(utils.to_primitive((1, 2, 3)), [1, 2, 3])
-
-    def test_empty_tuple(self):
-        self.assertEqual(utils.to_primitive(()), [])
-
-    def test_dict(self):
-        self.assertEqual(
-            utils.to_primitive(dict(a=1, b=2, c=3)),
-            dict(a=1, b=2, c=3))
-
-    def test_empty_dict(self):
-        self.assertEqual(utils.to_primitive({}), {})
-
-    def test_datetime(self):
-        x = datetime.datetime(1920, 2, 3, 4, 5, 6, 7)
-        self.assertEqual(
-            utils.to_primitive(x),
-            '1920-02-03 04:05:06.000007')
-
-    def test_iter(self):
-        x = range(1, 6)
-        self.assertEqual(utils.to_primitive(x), [1, 2, 3, 4, 5])
-
-    def test_iteritems(self):
-        d = {'a': 1, 'b': 2, 'c': 3}
-
-        class IterItemsClass(object):
-            def iteritems(self):
-                return six.iteritems(d)
-
-        x = IterItemsClass()
-        p = utils.to_primitive(x)
-        self.assertEqual(p, {'a': 1, 'b': 2, 'c': 3})
-
-    def test_nasties(self):
-        def foo():
-            pass
-        x = [datetime, foo, dir]
-        ret = utils.to_primitive(x)
-        self.assertEqual(len(ret), 3)
-
-    def test_to_primitive_dict_with_date_value(self):
-        x = datetime.datetime(1920, 2, 3, 4, 5, 6, 7)
-        res = utils.to_primitive({'a': x})
-        self.assertEqual({'a': '1920-02-03 04:05:06.000007'}, res)
 
 
 class ImportClassTestCase(testtools.TestCase):

@@ -20,11 +20,12 @@ from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
+from neutronclient.openstack.common import jsonutils
 
 
 def _format_fixed_ips(port):
     try:
-        return '\n'.join([utils.dumps(ip) for ip in port['fixed_ips']])
+        return '\n'.join([jsonutils.dumps(ip) for ip in port['fixed_ips']])
     except Exception:
         return ''
 
