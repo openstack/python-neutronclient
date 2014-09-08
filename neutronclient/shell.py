@@ -549,7 +549,7 @@ class NeutronShell(app.App):
             help=_("Path of certificate file to use in SSL "
                    "connection. This file can optionally be "
                    "prepended with the private key. Defaults "
-                   "to env[OS_CERT]"))
+                   "to env[OS_CERT]."))
 
         parser.add_argument(
             '--os-cacert',
@@ -557,7 +557,7 @@ class NeutronShell(app.App):
             default=env('OS_CACERT', default=None),
             help=_("Specify a CA bundle file to use in "
                    "verifying a TLS (https) server certificate. "
-                   "Defaults to env[OS_CACERT]"))
+                   "Defaults to env[OS_CACERT]."))
 
         parser.add_argument(
             '--os-key',
@@ -566,7 +566,7 @@ class NeutronShell(app.App):
             help=_("Path of client key to use in SSL "
                    "connection. This option is not necessary "
                    "if your key is prepended to your certificate "
-                   "file. Defaults to env[OS_KEY]"))
+                   "file. Defaults to env[OS_KEY]."))
 
         parser.add_argument(
             '--os-password', metavar='<auth-password>',
