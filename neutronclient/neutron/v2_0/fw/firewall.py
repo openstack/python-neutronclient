@@ -46,7 +46,7 @@ class CreateFirewall(neutronv20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'firewall_policy_id', metavar='POLICY',
-            help=_('Firewall policy ID.'))
+            help=_('Firewall policy name or ID.'))
         parser.add_argument(
             '--name',
             help=_('Name for the firewall.'))
@@ -82,6 +82,20 @@ class UpdateFirewall(neutronv20.UpdateCommand):
     """Update a given firewall."""
 
     resource = 'firewall'
+
+    def add_known_arguments(self, parser):
+        parser.add_argument(
+            '--policy', metavar='POLICY',
+            help=_('Firewall policy name or ID.'))
+
+    def args2body(self, parsed_args):
+        data = {}
+        if parsed_args.policy:
+            _policy_id = neutronv20.find_resourceid_by_name_or_id(
+                self.get_client(), 'firewall_policy',
+                parsed_args.policy)
+            data['firewall_policy_id'] = _policy_id
+        return {self.resource: data}
 
 
 class DeleteFirewall(neutronv20.DeleteCommand):
