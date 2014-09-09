@@ -20,11 +20,12 @@ from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
+from neutronclient.openstack.common import jsonutils
 
 
 def _format_allocation_pools(subnet):
     try:
-        return '\n'.join([utils.dumps(pool) for pool in
+        return '\n'.join([jsonutils.dumps(pool) for pool in
                           subnet['allocation_pools']])
     except Exception:
         return ''
@@ -32,7 +33,7 @@ def _format_allocation_pools(subnet):
 
 def _format_dns_nameservers(subnet):
     try:
-        return '\n'.join([utils.dumps(server) for server in
+        return '\n'.join([jsonutils.dumps(server) for server in
                           subnet['dns_nameservers']])
     except Exception:
         return ''
@@ -40,7 +41,7 @@ def _format_dns_nameservers(subnet):
 
 def _format_host_routes(subnet):
     try:
-        return '\n'.join([utils.dumps(route) for route in
+        return '\n'.join([jsonutils.dumps(route) for route in
                           subnet['host_routes']])
     except Exception:
         return ''

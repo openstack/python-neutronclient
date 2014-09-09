@@ -19,8 +19,8 @@ import sys
 from mox3 import mox
 
 from neutronclient.common import exceptions
-from neutronclient.common import utils
 from neutronclient.neutron.v2_0 import network
+from neutronclient.openstack.common import jsonutils
 from neutronclient import shell
 from neutronclient.tests.unit import test_cli20
 
@@ -282,7 +282,7 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         self._test_list_nets_columns(cmd, returned_body,
                                      args=['-f', 'json', '-c', 'id'])
         _str = self.fake_stdout.make_string()
-        returned_networks = utils.loads(_str)
+        returned_networks = jsonutils.loads(_str)
         self.assertEqual(1, len(returned_networks))
         net = returned_networks[0]
         self.assertEqual(1, len(net))
@@ -296,7 +296,7 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                                        "subnets": []}]}
         self._test_list_nets_columns(cmd, returned_body)
         _str = self.fake_stdout.make_string()
-        returned_networks = utils.loads(_str)
+        returned_networks = jsonutils.loads(_str)
         self.assertEqual(1, len(returned_networks))
         net = returned_networks[0]
         self.assertEqual(3, len(net))

@@ -26,6 +26,7 @@ from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
+from neutronclient.openstack.common import jsonutils
 
 
 def get_tenant_id(tenant_id, client):
@@ -128,7 +129,7 @@ class ShowQuota(neutronV20.NeutronCommand, show.ShowOne):
                         if value:
                             value += "\n"
                         if isinstance(_item, dict):
-                            value += utils.dumps(_item)
+                            value += jsonutils.dumps(_item)
                         else:
                             value += str(_item)
                     data[self.resource][k] = value
@@ -233,7 +234,7 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
                         if value:
                             value += "\n"
                         if isinstance(_item, dict):
-                            value += utils.dumps(_item)
+                            value += jsonutils.dumps(_item)
                         else:
                             value += str(_item)
                     data[self.resource][k] = value

@@ -30,6 +30,7 @@ from neutronclient.common import command
 from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.openstack.common.gettextutils import _
+from neutronclient.openstack.common import jsonutils
 
 HEX_ELEM = '[0-9A-Fa-f]'
 UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
@@ -416,12 +417,12 @@ class NeutronCommand(command.OpenStackCommand):
         if self.resource in data:
             for k, v in six.iteritems(data[self.resource]):
                 if isinstance(v, list):
-                    value = '\n'.join(utils.dumps(
+                    value = '\n'.join(jsonutils.dumps(
                         i, indent=self.json_indent) if isinstance(i, dict)
                         else str(i) for i in v)
                     data[self.resource][k] = value
                 elif isinstance(v, dict):
-                    value = utils.dumps(v, indent=self.json_indent)
+                    value = jsonutils.dumps(v, indent=self.json_indent)
                     data[self.resource][k] = value
                 elif v is None:
                     data[self.resource][k] = ''
