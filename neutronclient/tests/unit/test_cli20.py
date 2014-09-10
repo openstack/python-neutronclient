@@ -1,4 +1,4 @@
-# Copyright 2012 OpenStack LLC.
+# Copyright 2012 OpenStack Foundation.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import urllib
 
@@ -22,6 +21,7 @@ import mox
 import testtools
 
 from neutronclient.common import constants
+from neutronclient.common import exceptions
 from neutronclient.neutron import v2_0 as neutronV2_0
 from neutronclient import shell
 from neutronclient.v2_0 import client
@@ -173,6 +173,9 @@ class CLITestV20Base(testtools.TestCase):
             'neutronclient.neutron.v2_0.find_resourceid_by_name_or_id',
             self._find_resourceid))
         self.useFixture(fixtures.MonkeyPatch(
+            'neutronclient.neutron.v2_0.find_resourceid_by_id',
+            self._find_resourceid))
+        self.useFixture(fixtures.MonkeyPatch(
             'neutronclient.v2_0.client.Client.get_attr_metadata',
             self._get_attr_metadata))
         self.client = client.Client(token=TOKEN, endpoint_url=self.endurl)
@@ -180,8 +183,8 @@ class CLITestV20Base(testtools.TestCase):
     def _test_create_resource(self, resource, cmd,
                               name, myid, args,
                               position_names, position_values, tenant_id=None,
-                              tags=None, admin_state_up=True, shared=False,
-                              extra_body=None, **kwargs):
+                              tags=None, admin_state_up=True, extra_body=None,
+                              **kwargs):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
@@ -199,13 +202,11 @@ class CLITestV20Base(testtools.TestCase):
             body[resource].update({'tenant_id': tenant_id})
         if tags:
             body[resource].update({'tags': tags})
-        if shared:
-            body[resource].update({'shared': shared})
         if extra_body:
             body[resource].update(extra_body)
         body[resource].update(kwargs)
 
-        for i in xrange(len(position_names)):
+        for i in range(len(position_names)):
             body[resource].update({position_names[i]: position_values[i]})
         ress = {resource:
                 {self.id_field: myid}, }
@@ -522,3 +523,17 @@ class ClientV2UnicodeTestJson(CLITestV20Base):
 
 class ClientV2UnicodeTestXML(ClientV2UnicodeTestJson):
     format = 'xml'
+
+
+class CLITestV20ExceptionHandler(CLITestV20Base):
+
+    def test_exception_handler_v20_ip_address_in_use(self):
+        # Tests that an IpAddressInUse exception from the server is
+        # translated to an IpAddressInUseClient exception in the client.
+        err_msg = ('Unable to complete operation for network '
+                   'fake-network-uuid. The IP address fake-ip is in use.')
+        err_data = {'type': 'IpAddressInUse', 'message': err_msg, 'detail': ''}
+        error_content = {'NeutronError': err_data}
+        self.assertRaises(exceptions.IpAddressInUseClient,
+                          client.exception_handler_v20,
+                          409, error_content)

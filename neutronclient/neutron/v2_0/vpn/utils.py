@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-#
 #    (c) Copyright 2013 Hewlett-Packard Development Company, L.P.
 #    All Rights Reserved.
 #
@@ -100,17 +98,17 @@ def validate_lifetime_dict(lifetime_dict):
 
 
 def lifetime_help(policy):
-    lifetime = ("%s Lifetime Attributes."
-                "'units'-seconds,default:seconds. "
-                "'value'-non negative integer, default:3600." % policy)
+    lifetime = _("%s Lifetime Attributes."
+                 "'units'-seconds,default:seconds. "
+                 "'value'-non negative integer, default:3600.") % policy
     return lifetime
 
 
 def dpd_help(policy):
-    dpd = (" %s Dead Peer Detection Attributes. "
-           " 'action'-hold,clear,disabled,restart,restart-by-peer."
-           " 'interval' and 'timeout' are non negative integers. "
-           " 'interval' should be less than 'timeout' value. "
-           " 'action', default:hold 'interval', default:30, "
-           " 'timeout', default:120." % policy)
+    dpd = _(" %s Dead Peer Detection Attributes. "
+            " 'action'-hold,clear,disabled,restart,restart-by-peer."
+            " 'interval' and 'timeout' are non negative integers. "
+            " 'interval' should be less than 'timeout' value. "
+            " 'action', default:hold 'interval', default:30, "
+            " 'timeout', default:120.") % policy.capitalize()
     return dpd

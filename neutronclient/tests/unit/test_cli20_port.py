@@ -1,4 +1,4 @@
-# Copyright 2012 OpenStack LLC.
+# Copyright 2012 OpenStack Foundation.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import sys
 
@@ -60,7 +59,6 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
             args += ['--extra-dhcp-opt',
                      ('opt_name=%(opt_name)s,opt_value=%(opt_value)s' %
                       dhcp_opt)]
-        print args
         position_names = ['network_id', 'extra_dhcp_opts']
         position_values = [netid, extra_dhcp_opts]
         position_values.extend([netid])
@@ -162,7 +160,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         netid = 'netid'
         args = ['--no-security-group', netid]
         position_names = ['network_id', 'security_groups']
-        position_values = [netid, None]
+        position_values = [netid, []]
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
@@ -373,7 +371,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['--no-security-groups', 'myid'],
-                                   {'security_groups': None})
+                                   {'security_groups': []})
 
     def test_show_port(self):
         """Show port: --fields id --fields name myid."""

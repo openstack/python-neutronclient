@@ -1,4 +1,4 @@
-# Copyright 2012 Nicira, Inc
+# Copyright 2012 VMware, Inc
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,11 +13,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import sys
 
-from neutronclient.neutron.v2_0 import nvpnetworkgateway as nwgw
+from neutronclient.neutron.v2_0.nsx import networkgateway as nwgw
 from neutronclient.tests.unit import test_cli20
 
 

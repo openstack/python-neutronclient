@@ -1,4 +1,4 @@
-# Copyright 2012 OpenStack LLC.
+# Copyright 2012 OpenStack Foundation.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import argparse
 import logging
@@ -60,17 +59,17 @@ class CreateRouter(neutronV20.CreateCommand):
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help='Set Admin State Up to false')
+            help=_('Set Admin State Up to false'))
         parser.add_argument(
             '--admin_state_down',
             dest='admin_state', action='store_false',
             help=argparse.SUPPRESS)
         parser.add_argument(
             'name', metavar='NAME',
-            help='Name of router to create')
+            help=_('Name of router to create'))
         parser.add_argument(
             'distributed', action='store_true',
-            help='Create a distributed router (Nicira plugin only)')
+            help=_('Create a distributed router (VMware NSX plugin only)'))
 
     def args2body(self, parsed_args):
         body = {'router': {
@@ -111,13 +110,13 @@ class RouterInterfaceCommand(neutronV20.NeutronCommand):
         parser = super(RouterInterfaceCommand, self).get_parser(prog_name)
         parser.add_argument(
             'router_id', metavar='router-id',
-            help='ID of the router')
+            help=_('ID of the router'))
         parser.add_argument(
             'interface', metavar='INTERFACE',
-            help='The format is "SUBNET|subnet=SUBNET|port=PORT". '
+            help=_('The format is "SUBNET|subnet=SUBNET|port=PORT". '
             'Either a subnet or port must be specified. '
             'Both ID and name are accepted as SUBNET or PORT. '
-            'Note that "subnet=" can be omitted when specifying subnet.')
+            'Note that "subnet=" can be omitted when specifying subnet.'))
         return parser
 
     def run(self, parsed_args):
@@ -128,8 +127,8 @@ class RouterInterfaceCommand(neutronV20.NeutronCommand):
         if '=' in parsed_args.interface:
             resource, value = parsed_args.interface.split('=', 1)
             if resource not in ['subnet', 'port']:
-                exceptions.CommandError('You must specify either subnet or '
-                                        'port for INTERFACE parameter.')
+                exceptions.CommandError(_('You must specify either subnet or '
+                                        'port for INTERFACE parameter.'))
         else:
             resource = 'subnet'
             value = parsed_args.interface
@@ -183,13 +182,13 @@ class SetGatewayRouter(neutronV20.NeutronCommand):
         parser = super(SetGatewayRouter, self).get_parser(prog_name)
         parser.add_argument(
             'router_id', metavar='router-id',
-            help='ID of the router')
+            help=_('ID of the router'))
         parser.add_argument(
             'external_network_id', metavar='external-network-id',
-            help='ID of the external network for the gateway')
+            help=_('ID of the external network for the gateway'))
         parser.add_argument(
             '--disable-snat', action='store_true',
-            help='Disable Source NAT on the router gateway')
+            help=_('Disable Source NAT on the router gateway'))
         return parser
 
     def run(self, parsed_args):
@@ -219,7 +218,7 @@ class RemoveGatewayRouter(neutronV20.NeutronCommand):
         parser = super(RemoveGatewayRouter, self).get_parser(prog_name)
         parser.add_argument(
             'router_id', metavar='router-id',
-            help='ID of the router')
+            help=_('ID of the router'))
         return parser
 
     def run(self, parsed_args):

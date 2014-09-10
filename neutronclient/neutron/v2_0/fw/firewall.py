@@ -15,11 +15,12 @@
 #
 # @author: KC Wang, Big Switch Networks
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+import argparse
 import logging
 
 from neutronclient.neutron import v2_0 as neutronv20
+from neutronclient.openstack.common.gettextutils import _
 
 
 class ListFirewall(neutronv20.ListCommand):
@@ -49,22 +50,23 @@ class CreateFirewall(neutronv20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'firewall_policy_id', metavar='POLICY',
-            help='firewall policy id')
+            help=_('Firewall policy id'))
         parser.add_argument(
             '--name',
-            help='name for the firewall')
+            help=_('Name for the firewall'))
         parser.add_argument(
             '--description',
-            help='description for the firewall rule')
+            help=_('Description for the firewall rule'))
         parser.add_argument(
             '--shared',
             action='store_true',
-            help='set shared to True (default False)')
+            help=_('Set shared to True (default False)'),
+            default=argparse.SUPPRESS)
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state',
             action='store_false',
-            help='set admin state up to false')
+            help=_('Set admin state up to false'))
 
     def args2body(self, parsed_args):
         _policy_id = neutronv20.find_resourceid_by_name_or_id(

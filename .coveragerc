@@ -1,7 +1,7 @@
 [run]
 branch = True
-source = quantumclient
-omit = quantumclient/openstack/*
+source = neutronclient
+omit = neutronclient/openstack/*,neutronclient/tests/*
 
 [report]
 ignore-errors = True

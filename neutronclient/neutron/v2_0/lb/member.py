@@ -15,11 +15,11 @@
 #
 # @author: Ilya Shakhat, Mirantis Inc.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import logging
 
 from neutronclient.neutron import v2_0 as neutronV20
+from neutronclient.openstack.common.gettextutils import _
 
 
 class ListMember(neutronV20.ListCommand):
@@ -50,23 +50,23 @@ class CreateMember(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'pool_id', metavar='POOL',
-            help='Pool id or name this vip belongs to')
+            help=_('Pool id or name this vip belongs to'))
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help='set admin state up to false')
+            help=_('Set admin state up to false'))
         parser.add_argument(
             '--weight',
-            help='weight of pool member in the pool (default:1, [0..256])')
+            help=_('Weight of pool member in the pool (default:1, [0..256])'))
         parser.add_argument(
             '--address',
             required=True,
-            help='IP address of the pool member on the pool network. ')
+            help=_('IP address of the pool member on the pool network. '))
         parser.add_argument(
             '--protocol-port',
             required=True,
-            help='port on which the pool member listens for requests or '
-                 'connections. ')
+            help=_('Port on which the pool member listens for requests or '
+                   'connections. '))
 
     def args2body(self, parsed_args):
         _pool_id = neutronV20.find_resourceid_by_name_or_id(

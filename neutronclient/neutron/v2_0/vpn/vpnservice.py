@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-#
 #    (c) Copyright 2013 Hewlett-Packard Development Company, L.P.
 #    All Rights Reserved.
 #
@@ -21,6 +19,7 @@
 import logging
 
 from neutronclient.neutron import v2_0 as neutronv20
+from neutronclient.openstack.common.gettextutils import _
 
 
 class ListVPNService(neutronv20.ListCommand):
@@ -52,19 +51,19 @@ class CreateVPNService(neutronv20.CreateCommand):
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help='set admin state up to false')
+            help=_('Set admin state up to false'))
         parser.add_argument(
             '--name',
-            help='Set a name for the vpnservice')
+            help=_('Set a name for the vpnservice'))
         parser.add_argument(
             '--description',
-            help='Set a description for the vpnservice')
+            help=_('Set a description for the vpnservice'))
         parser.add_argument(
             'router', metavar='ROUTER',
-            help='Router unique identifier for the vpnservice')
+            help=_('Router unique identifier for the vpnservice'))
         parser.add_argument(
             'subnet', metavar='SUBNET',
-            help='Subnet unique identifier for the vpnservice deployment')
+            help=_('Subnet unique identifier for the vpnservice deployment'))
 
     def args2body(self, parsed_args):
         _subnet_id = neutronv20.find_resourceid_by_name_or_id(

@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-#
 #    (c) Copyright 2013 Hewlett-Packard Development Company, L.P.
 #    All Rights Reserved.
 #
@@ -64,22 +62,22 @@ class CreateIPsecSiteConnection(neutronv20.CreateCommand):
         parser.add_argument(
             '--admin-state-down',
             default=True, action='store_false',
-            help='Set admin state up to false')
+            help=_('Set admin state up to false'))
         parser.add_argument(
             '--name',
-            help='Set friendly name for the connection')
+            help=_('Set friendly name for the connection'))
         parser.add_argument(
             '--description',
-            help='Set a description for the connection')
+            help=_('Set a description for the connection'))
         parser.add_argument(
             '--mtu',
             default='1500',
-            help='MTU size for the connection, default:1500')
+            help=_('MTU size for the connection, default:1500'))
         parser.add_argument(
             '--initiator',
             default='bi-directional', choices=['bi-directional',
                                                'response-only'],
-            help='Initiator state in lowercase, default:bi-directional')
+            help=_('Initiator state in lowercase, default:bi-directional'))
         parser.add_argument(
             '--dpd',
             metavar="action=ACTION,interval=INTERVAL,timeout=TIMEOUT",
@@ -88,33 +86,33 @@ class CreateIPsecSiteConnection(neutronv20.CreateCommand):
         parser.add_argument(
             '--vpnservice-id', metavar='VPNSERVICE',
             required=True,
-            help='VPNService instance id associated with this connection')
+            help=_('VPNService instance id associated with this connection'))
         parser.add_argument(
             '--ikepolicy-id', metavar='IKEPOLICY',
             required=True,
-            help='IKEPolicy id associated with this connection')
+            help=_('IKEPolicy id associated with this connection'))
         parser.add_argument(
             '--ipsecpolicy-id', metavar='IPSECPOLICY',
             required=True,
-            help='IPsecPolicy id associated with this connection')
+            help=_('IPsecPolicy id associated with this connection'))
         parser.add_argument(
             '--peer-address',
             required=True,
-            help='Peer gateway public IPv4/IPv6 address or FQDN.')
+            help=_('Peer gateway public IPv4/IPv6 address or FQDN.'))
         parser.add_argument(
             '--peer-id',
             required=True,
-            help='Peer router identity for authentication. Can be '
-                 'IPv4/IPv6 address, e-mail address, key id, or FQDN.')
+            help=_('Peer router identity for authentication. Can be '
+                   'IPv4/IPv6 address, e-mail address, key id, or FQDN.'))
         parser.add_argument(
             '--peer-cidr',
             action='append', dest='peer_cidrs',
             required=True,
-            help='Remote subnet(s) in CIDR format')
+            help=_('Remote subnet(s) in CIDR format'))
         parser.add_argument(
             '--psk',
             required=True,
-            help='Pre-Shared Key string')
+            help=_('Pre-Shared Key string'))
 
     def args2body(self, parsed_args):
         _vpnservice_id = neutronv20.find_resourceid_by_name_or_id(

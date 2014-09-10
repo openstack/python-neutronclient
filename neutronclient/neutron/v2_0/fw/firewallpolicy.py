@@ -15,8 +15,8 @@
 #
 # @author: KC Wang, Big Switch Networks
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+import argparse
 import logging
 import string
 
@@ -62,23 +62,25 @@ class CreateFirewallPolicy(neutronv20.CreateCommand):
         parser.add_argument(
             'name',
             metavar='NAME',
-            help='name for the firewall policy')
+            help=_('Name for the firewall policy'))
         parser.add_argument(
             '--description',
-            help='description for the firewall policy')
+            help=_('Description for the firewall policy'))
         parser.add_argument(
             '--shared',
             dest='shared',
             action='store_true',
-            help='to create a shared policy')
+            help=_('To create a shared policy'),
+            default=argparse.SUPPRESS)
         parser.add_argument(
             '--firewall-rules', type=string.split,
-            help='ordered list of whitespace-delimited firewall rule '
-            'names or IDs; e.g., --firewall-rules \"rule1 rule2\"')
+            help=_('Ordered list of whitespace-delimited firewall rule '
+            'names or IDs; e.g., --firewall-rules \"rule1 rule2\"'))
         parser.add_argument(
             '--audited',
             action='store_true',
-            help='to set audited to True')
+            help=_('To set audited to True'),
+            default=argparse.SUPPRESS)
 
     def args2body(self, parsed_args):
         if parsed_args.firewall_rules:
@@ -152,15 +154,15 @@ class FirewallPolicyInsertRule(neutronv20.UpdateCommand):
         parser.add_argument(
             '--insert-before',
             metavar='FIREWALL_RULE',
-            help='insert before this rule')
+            help=_('Insert before this rule'))
         parser.add_argument(
             '--insert-after',
             metavar='FIREWALL_RULE',
-            help='insert after this rule')
+            help=_('Insert after this rule'))
         parser.add_argument(
             'firewall_rule_id',
             metavar='FIREWALL_RULE',
-            help='new rule to insert')
+            help=_('New rule to insert'))
         self.add_known_arguments(parser)
         return parser
 
@@ -202,7 +204,7 @@ class FirewallPolicyRemoveRule(neutronv20.UpdateCommand):
         parser.add_argument(
             'firewall_rule_id',
             metavar='FIREWALL_RULE',
-            help='firewall rule to remove from policy')
+            help=_('Firewall rule to remove from policy'))
         self.add_known_arguments(parser)
         return parser
 

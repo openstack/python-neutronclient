@@ -1,6 +1,4 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-
-# Copyright 2011 Nicira Networks, Inc
+# Copyright 2011 VMware, Inc
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -86,6 +84,10 @@ class PortInUseClient(NeutronClientException):
     pass
 
 
+class IpAddressInUseClient(NeutronClientException):
+    pass
+
+
 class AlreadyAttachedClient(NeutronClientException):
     pass
 
@@ -116,7 +118,7 @@ class EndpointTypeNotFound(NeutronClientException):
     """Could not find endpoint type in Service Catalog."""
 
     def __str__(self):
-        msg = "Could not find endpoint type %s in Service Catalog."
+        msg = _("Could not find endpoint type %s in Service Catalog.")
         return msg % repr(self.message)
 
 
@@ -124,7 +126,7 @@ class AmbiguousEndpoints(NeutronClientException):
     """Found more than one matching endpoint in Service Catalog."""
 
     def __str__(self):
-        return "AmbiguousEndpoints: %s" % repr(self.message)
+        return _("AmbiguousEndpoints: %s") % repr(self.message)
 
 
 class NeutronCLIError(NeutronClientException):

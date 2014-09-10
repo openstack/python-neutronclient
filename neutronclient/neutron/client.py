@@ -1,4 +1,4 @@
-# Copyright 2012 OpenStack LLC.
+# Copyright 2012 OpenStack Foundation.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,10 +13,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
+from neutronclient.openstack.common.gettextutils import _
 
 
 API_NAME = 'network'
@@ -49,7 +49,8 @@ def make_client(instance):
                                 ca_cert=instance._ca_cert)
         return client
     else:
-        raise exceptions.UnsupportedVersion("API version %s is not supported" %
+        raise exceptions.UnsupportedVersion(_("API version %s is not "
+                                              "supported") %
                                             instance._api_version[API_NAME])
 
 

@@ -1,4 +1,4 @@
-# Copyright 2012 OpenStack LLC.
+# Copyright 2012 OpenStack Foundation.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import argparse
 import logging
@@ -42,17 +41,22 @@ def _get_resource_plural(resource, client):
     return resource + 's'
 
 
-def find_resourceid_by_name_or_id(client, resource, name_or_id):
+def find_resourceid_by_id(client, resource, resource_id):
     resource_plural = _get_resource_plural(resource, client)
     obj_lister = getattr(client, "list_%s" % resource_plural)
     # perform search by id only if we are passing a valid UUID
-    match = re.match(UUID_PATTERN, name_or_id)
+    match = re.match(UUID_PATTERN, resource_id)
     collection = resource_plural
     if match:
-        data = obj_lister(id=name_or_id, fields='id')
+        data = obj_lister(id=resource_id, fields='id')
         if data and data[collection]:
             return data[collection][0]['id']
-    return _find_resourceid_by_name(client, resource, name_or_id)
+    not_found_message = (_("Unable to find %(resource)s with id "
+                           "'%(id)s'") %
+                         {'resource': resource, 'id': resource_id})
+    # 404 is used to simulate server side behavior
+    raise exceptions.NeutronClientException(
+        message=not_found_message, status_code=404)
 
 
 def _find_resourceid_by_name(client, resource, name):
@@ -75,10 +79,17 @@ def _find_resourceid_by_name(client, resource, name):
         return info[0]['id']
 
 
+def find_resourceid_by_name_or_id(client, resource, name_or_id):
+    try:
+        return find_resourceid_by_id(client, resource, name_or_id)
+    except exceptions.NeutronClientException:
+        return _find_resourceid_by_name(client, resource, name_or_id)
+
+
 def add_show_list_common_argument(parser):
     parser.add_argument(
         '-D', '--show-details',
-        help='show detailed info',
+        help=_('Show detailed info'),
         action='store_true',
         default=False, )
     parser.add_argument(
@@ -93,8 +104,8 @@ def add_show_list_common_argument(parser):
     parser.add_argument(
         '-F', '--field',
         dest='fields', metavar='FIELD',
-        help='specify the field(s) to be returned by server,'
-        ' can be repeated',
+        help=_('Specify the field(s) to be returned by server,'
+               ' can be repeated'),
         action='append',
         default=[])
 
@@ -103,8 +114,8 @@ def add_pagination_argument(parser):
     parser.add_argument(
         '-P', '--page-size',
         dest='page_size', metavar='SIZE', type=int,
-        help=("specify retrieve unit of each request, then split one request "
-              "to several requests"),
+        help=_("Specify retrieve unit of each request, then split one request "
+               "to several requests"),
         default=None)
 
 
@@ -113,16 +124,16 @@ def add_sorting_argument(parser):
         '--sort-key',
         dest='sort_key', metavar='FIELD',
         action='append',
-        help=("sort list by specified fields (This option can be repeated), "
-              "The number of sort_dir and sort_key should match each other, "
-              "more sort_dir specified will be omitted, less will be filled "
-              "with asc as default direction "),
+        help=_("Sort list by specified fields (This option can be repeated), "
+               "The number of sort_dir and sort_key should match each other, "
+               "more sort_dir specified will be omitted, less will be filled "
+               "with asc as default direction "),
         default=[])
     parser.add_argument(
         '--sort-dir',
         dest='sort_dir', metavar='{asc,desc}',
-        help=("sort list in specified directions "
-              "(This option can be repeated)"),
+        help=_("Sort list in specified directions "
+               "(This option can be repeated)"),
         action='append',
         default=[],
         choices=['asc', 'desc'])
@@ -147,7 +158,7 @@ def _process_previous_argument(current_arg, _value_number, current_type_str,
         if _value_number == 0 and (current_type_str or _list_flag):
                 # This kind of argument should have value
                 raise exceptions.CommandError(
-                    "invalid values_specs %s" % ' '.join(values_specs))
+                    _("Invalid values_specs %s") % ' '.join(values_specs))
         if _value_number > 1 or _list_flag or current_type_str == 'list':
             current_arg.update({'nargs': '+'})
         elif _value_number == 0:
@@ -218,7 +229,7 @@ def parse_args_to_dict(values_specs):
                 _value_number = 0
             if _item in _options:
                 raise exceptions.CommandError(
-                    "duplicated options %s" % ' '.join(values_specs))
+                    _("Duplicated options %s") % ' '.join(values_specs))
             else:
                 _options.update({_item: {}})
             current_arg = _options[_item]
@@ -226,7 +237,7 @@ def parse_args_to_dict(values_specs):
         elif _item.startswith('type='):
             if current_arg is None:
                 raise exceptions.CommandError(
-                    "invalid values_specs %s" % ' '.join(values_specs))
+                    _("Invalid values_specs %s") % ' '.join(values_specs))
             if 'type' not in current_arg:
                 current_type_str = _item.split('=', 2)[1]
                 current_arg.update({'type': eval(current_type_str)})
@@ -248,7 +259,7 @@ def parse_args_to_dict(values_specs):
             if (not current_item or '=' in current_item or
                 _item.startswith('-') and not is_number(_item)):
                 raise exceptions.CommandError(
-                    "Invalid values_specs %s" % ' '.join(values_specs))
+                    _("Invalid values_specs %s") % ' '.join(values_specs))
             _value_number += 1
 
         _values_specs.append(_item)
@@ -297,8 +308,14 @@ def _merge_args(qCmd, parsed_args, _extra_values, value_specs):
 
 
 def update_dict(obj, dict, attributes):
+    """Update dict with fields from obj.attributes
+
+    :param obj: the object updated into dict
+    :param dict: the result dictionary
+    :param attributes: a list of attributes belonging to obj
+    """
     for attribute in attributes:
-        if hasattr(obj, attribute) and getattr(obj, attribute):
+        if hasattr(obj, attribute) and getattr(obj, attribute) is not None:
             dict[attribute] = getattr(obj, attribute)
 
 
@@ -323,8 +340,11 @@ class NeutronCommand(command.OpenStackCommand):
 
     def __init__(self, app, app_args):
         super(NeutronCommand, self).__init__(app, app_args)
-        if hasattr(self, 'formatters'):
-            self.formatters['table'] = TableFormater()
+        # NOTE(markmcclain): This is no longer supported in cliff version 1.5.2
+        # see https://bugs.launchpad.net/python-neutronclient/+bug/1265926
+
+        #if hasattr(self, 'formatters'):
+            #self.formatters['table'] = TableFormater()
 
     def get_client(self):
         return self.app.client_manager.neutron
@@ -333,7 +353,7 @@ class NeutronCommand(command.OpenStackCommand):
         parser = super(NeutronCommand, self).get_parser(prog_name)
         parser.add_argument(
             '--request-format',
-            help=_('the xml or json request format'),
+            help=_('The xml or json request format'),
             default='json',
             choices=['json', 'xml', ], )
         parser.add_argument(
@@ -378,7 +398,7 @@ class CreateCommand(NeutronCommand, show.ShowOne):
         parser = super(CreateCommand, self).get_parser(prog_name)
         parser.add_argument(
             '--tenant-id', metavar='TENANT_ID',
-            help=_('the owner tenant ID'), )
+            help=_('The owner tenant ID'), )
         parser.add_argument(
             '--tenant_id',
             help=argparse.SUPPRESS)
@@ -414,17 +434,18 @@ class UpdateCommand(NeutronCommand):
     api = 'network'
     resource = None
     log = None
+    allow_names = True
 
     def get_parser(self, prog_name):
         parser = super(UpdateCommand, self).get_parser(prog_name)
         parser.add_argument(
             'id', metavar=self.resource.upper(),
-            help='ID or name of %s to update' % self.resource)
+            help=_('ID or name of %s to update') % self.resource)
         self.add_known_arguments(parser)
         return parser
 
     def run(self, parsed_args):
-        self.log.debug('run(%s)' % parsed_args)
+        self.log.debug('run(%s)', parsed_args)
         neutron_client = self.get_client()
         neutron_client.format = parsed_args.request_format
         _extra_values = parse_args_to_dict(self.values_specs)
@@ -437,10 +458,13 @@ class UpdateCommand(NeutronCommand):
             body[self.resource] = _extra_values
         if not body[self.resource]:
             raise exceptions.CommandError(
-                "Must specify new values to update %s" % self.resource)
-        _id = find_resourceid_by_name_or_id(neutron_client,
-                                            self.resource,
-                                            parsed_args.id)
+                _("Must specify new values to update %s") % self.resource)
+        if self.allow_names:
+            _id = find_resourceid_by_name_or_id(
+                neutron_client, self.resource, parsed_args.id)
+        else:
+            _id = find_resourceid_by_id(
+                neutron_client, self.resource, parsed_args.id)
         obj_updator = getattr(neutron_client,
                               "update_%s" % self.resource)
         obj_updator(_id, body)
@@ -463,16 +487,16 @@ class DeleteCommand(NeutronCommand):
     def get_parser(self, prog_name):
         parser = super(DeleteCommand, self).get_parser(prog_name)
         if self.allow_names:
-            help_str = 'ID or name of %s to delete'
+            help_str = _('ID or name of %s to delete')
         else:
-            help_str = 'ID of %s to delete'
+            help_str = _('ID of %s to delete')
         parser.add_argument(
             'id', metavar=self.resource.upper(),
             help=help_str % self.resource)
         return parser
 
     def run(self, parsed_args):
-        self.log.debug('run(%s)' % parsed_args)
+        self.log.debug('run(%s)', parsed_args)
         neutron_client = self.get_client()
         neutron_client.format = parsed_args.request_format
         obj_deleter = getattr(neutron_client,
@@ -582,7 +606,7 @@ class ListCommand(NeutronCommand, lister.Lister):
             for s in info), )
 
     def get_data(self, parsed_args):
-        self.log.debug('get_data(%s)' % parsed_args)
+        self.log.debug('get_data(%s)', parsed_args)
         data = self.retrieve_list(parsed_args)
         self.extend_list(data, parsed_args)
         return self.setup_columns(data, parsed_args)
@@ -602,16 +626,16 @@ class ShowCommand(NeutronCommand, show.ShowOne):
         parser = super(ShowCommand, self).get_parser(prog_name)
         add_show_list_common_argument(parser)
         if self.allow_names:
-            help_str = 'ID or name of %s to look up'
+            help_str = _('ID or name of %s to look up')
         else:
-            help_str = 'ID of %s to look up'
+            help_str = _('ID of %s to look up')
         parser.add_argument(
             'id', metavar=self.resource.upper(),
             help=help_str % self.resource)
         return parser
 
     def get_data(self, parsed_args):
-        self.log.debug('get_data(%s)' % parsed_args)
+        self.log.debug('get_data(%s)', parsed_args)
         neutron_client = self.get_client()
         neutron_client.format = parsed_args.request_format
 

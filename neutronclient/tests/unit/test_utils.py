@@ -12,7 +12,6 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import datetime
 import sys
@@ -147,7 +146,7 @@ class ToPrimitiveTestCase(testtools.TestCase):
             '1920-02-03 04:05:06.000007')
 
     def test_iter(self):
-        x = xrange(1, 6)
+        x = range(1, 6)
         self.assertEqual(utils.to_primitive(x), [1, 2, 3, 4, 5])
 
     def test_iteritems(self):

@@ -1,4 +1,4 @@
-# Copyright 2012 OpenStack LLC.
+# Copyright 2012 OpenStack Foundation.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import argparse
 import logging
@@ -43,7 +42,7 @@ class DeleteQuota(neutronV20.NeutronCommand):
         parser = super(DeleteQuota, self).get_parser(prog_name)
         parser.add_argument(
             '--tenant-id', metavar='tenant-id',
-            help='the owner tenant ID')
+            help=_('The owner tenant ID'))
         parser.add_argument(
             '--tenant_id',
             help=argparse.SUPPRESS)
@@ -65,7 +64,7 @@ class DeleteQuota(neutronV20.NeutronCommand):
 
 
 class ListQuota(neutronV20.NeutronCommand, lister.Lister):
-    """List defined quotas of all tenants."""
+    """List quotas of all tenants who have non-default quota values."""
 
     api = 'network'
     resource = 'quota'
@@ -76,7 +75,7 @@ class ListQuota(neutronV20.NeutronCommand, lister.Lister):
         return parser
 
     def get_data(self, parsed_args):
-        self.log.debug('get_data(%s)' % parsed_args)
+        self.log.debug('get_data(%s)', parsed_args)
         neutron_client = self.get_client()
         search_opts = {}
         self.log.debug('search options: %s', search_opts)
@@ -105,14 +104,14 @@ class ShowQuota(neutronV20.NeutronCommand, show.ShowOne):
         parser = super(ShowQuota, self).get_parser(prog_name)
         parser.add_argument(
             '--tenant-id', metavar='tenant-id',
-            help='the owner tenant ID')
+            help=_('The owner tenant ID'))
         parser.add_argument(
             '--tenant_id',
             help=argparse.SUPPRESS)
         return parser
 
     def get_data(self, parsed_args):
-        self.log.debug('get_data(%s)' % parsed_args)
+        self.log.debug('get_data(%s)', parsed_args)
         neutron_client = self.get_client()
         neutron_client.format = parsed_args.request_format
         tenant_id = get_tenant_id(parsed_args.tenant_id,
@@ -150,38 +149,38 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
         parser = super(UpdateQuota, self).get_parser(prog_name)
         parser.add_argument(
             '--tenant-id', metavar='tenant-id',
-            help='the owner tenant ID')
+            help=_('The owner tenant ID'))
         parser.add_argument(
             '--tenant_id',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--network', metavar='networks',
-            help='the limit of networks')
+            help=_('The limit of networks'))
         parser.add_argument(
             '--subnet', metavar='subnets',
-            help='the limit of subnets')
+            help=_('The limit of subnets'))
         parser.add_argument(
             '--port', metavar='ports',
-            help='the limit of ports')
+            help=_('The limit of ports'))
         parser.add_argument(
             '--router', metavar='routers',
-            help='the limit of routers')
+            help=_('The limit of routers'))
         parser.add_argument(
             '--floatingip', metavar='floatingips',
-            help='the limit of floating IPs')
+            help=_('The limit of floating IPs'))
         parser.add_argument(
             '--security-group', metavar='security_groups',
-            help='the limit of security groups')
+            help=_('The limit of security groups'))
         parser.add_argument(
             '--security-group-rule', metavar='security_group_rules',
-            help='the limit of security groups rules')
+            help=_('The limit of security groups rules'))
         return parser
 
     def _validate_int(self, name, value):
         try:
             return_value = int(value)
         except Exception:
-            message = (_('quota limit for %(name)s must be an integer') %
+            message = (_('Quota limit for %(name)s must be an integer') %
                        {'name': name})
             raise exceptions.NeutronClientException(message=message)
         return return_value
@@ -197,7 +196,7 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
         return {self.resource: quota}
 
     def get_data(self, parsed_args):
-        self.log.debug('run(%s)' % parsed_args)
+        self.log.debug('run(%s)', parsed_args)
         neutron_client = self.get_client()
         neutron_client.format = parsed_args.request_format
         _extra_values = neutronV20.parse_args_to_dict(self.values_specs)

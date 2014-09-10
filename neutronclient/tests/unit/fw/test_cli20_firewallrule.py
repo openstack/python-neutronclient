@@ -15,7 +15,6 @@
 #
 # @author: KC Wang, Big Switch Networks Inc.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import sys
 
@@ -25,7 +24,7 @@ from neutronclient.tests.unit import test_cli20
 
 class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
 
-    def test_create_firewall_rule_with_mandatory_params(self):
+    def _test_create_firewall_rule_with_mandatory_params(self, enabled):
         """firewall-rule-create with mandatory (none) params only."""
         resource = 'firewall_rule'
         cmd = firewallrule.CreateFirewallRule(test_cli20.MyApp(sys.stdout),
@@ -35,17 +34,24 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
         my_id = 'myid'
         protocol = 'tcp'
         action = 'allow'
+        enabled_flag = '--enabled' if enabled else '--disabled'
         args = ['--tenant-id', tenant_id,
                 '--admin-state-up',
                 '--protocol', protocol,
                 '--action', action,
-                '--enabled']
+                enabled_flag]
         position_names = []
         position_values = []
         self._test_create_resource(resource, cmd, name, my_id, args,
                                    position_names, position_values,
                                    protocol=protocol, action=action,
-                                   enabled=True, tenant_id=tenant_id)
+                                   enabled=enabled, tenant_id=tenant_id)
+
+    def test_create_enabled_firewall_rule_with_mandatory_params(self):
+        self._test_create_firewall_rule_with_mandatory_params(enabled=True)
+
+    def test_create_disabled_firewall_rule_with_mandatory_params(self):
+        self._test_create_firewall_rule_with_mandatory_params(enabled=False)
 
     def _setup_create_firewall_rule_with_all_params(self, protocol='tcp'):
         """firewall-rule-create with all params set."""

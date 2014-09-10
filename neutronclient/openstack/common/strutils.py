@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-
 # Copyright 2011 OpenStack Foundation.
 # All Rights Reserved.
 #
@@ -147,7 +145,7 @@ def safe_encode(text, incoming=None,
     :raises TypeError: If text is not an isntance of str
     """
     if not isinstance(text, six.string_types):
-        raise TypeError("%s can't be encoded" % type(text))
+        raise TypeError(_("%s can't be encoded") % type(text).capitalize())
 
     if not incoming:
         incoming = (sys.stdin.encoding or

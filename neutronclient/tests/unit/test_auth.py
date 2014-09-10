@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import copy
 import httplib2
@@ -90,6 +89,7 @@ class CLITestAuthKeystone(testtools.TestCase):
            instantiated with predefined token.
         """
         client_ = client.HTTPClient(username=USERNAME,
+                                    tenant_id=TENANT_ID,
                                     tenant_name=TENANT_NAME,
                                     token=TOKEN,
                                     password=PASSWORD,

@@ -1,9 +1,9 @@
 pbr>=0.5.21,<1.0
 argparse
 cliff>=1.4.3
-httplib2
+httplib2>=0.7.5
 iso8601>=0.1.4
 netaddr
 simplejson>=2.0.9
-six
-Babel>=0.9.6
+six>=1.4.1
+Babel>=1.3

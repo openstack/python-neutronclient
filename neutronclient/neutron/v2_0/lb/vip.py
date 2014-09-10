@@ -15,11 +15,11 @@
 #
 # @author: Ilya Shakhat, Mirantis Inc.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import logging
 
 from neutronclient.neutron import v2_0 as neutronV20
+from neutronclient.openstack.common.gettextutils import _
 
 
 class ListVip(neutronV20.ListCommand):
@@ -49,38 +49,38 @@ class CreateVip(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'pool_id', metavar='POOL',
-            help='Pool id or name this vip belongs to')
+            help=_('Pool id or name this vip belongs to'))
         parser.add_argument(
             '--address',
-            help='IP address of the vip')
+            help=_('IP address of the vip'))
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help='set admin state up to false')
+            help=_('Set admin state up to false'))
         parser.add_argument(
             '--connection-limit',
-            help='the maximum number of connections per second allowed for '
-                 'the vip. Positive integer or -1 for unlimited (default)')
+            help=_('The maximum number of connections per second allowed for '
+                   'the vip. Positive integer or -1 for unlimited (default)'))
         parser.add_argument(
             '--description',
-            help='description of the vip')
+            help=_('Description of the vip'))
         parser.add_argument(
             '--name',
             required=True,
-            help='name of the vip')
+            help=_('Name of the vip'))
         parser.add_argument(
             '--protocol-port',
             required=True,
-            help='TCP port on which to listen for client traffic that is '
-                 'associated with the vip address')
+            help=_('TCP port on which to listen for client traffic that is '
+                   'associated with the vip address'))
         parser.add_argument(
             '--protocol',
             required=True, choices=['TCP', 'HTTP', 'HTTPS'],
-            help='protocol for balancing')
+            help=_('Protocol for balancing'))
         parser.add_argument(
             '--subnet-id', metavar='SUBNET',
             required=True,
-            help='the subnet on which to allocate the vip address')
+            help=_('The subnet on which to allocate the vip address'))
 
     def args2body(self, parsed_args):
         _pool_id = neutronV20.find_resourceid_by_name_or_id(

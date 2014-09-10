@@ -1,4 +1,4 @@
-# Copyright 2012 OpenStack LLC.
+# Copyright 2012 OpenStack Foundation.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import httplib
 import logging
@@ -50,6 +49,7 @@ def exception_handler_v20(status_code, error_content):
         'PortNotFound': exceptions.PortNotFoundClient,
         'RequestedStateInvalid': exceptions.StateInvalidClient,
         'PortInUse': exceptions.PortInUseClient,
+        'IpAddressInUse': exceptions.IpAddressInUseClient,
         'AlreadyAttached': exceptions.AlreadyAttachedClient,
         'IpAddressGenerationFailure':
         exceptions.IpAddressGenerationFailureClient,
@@ -74,9 +74,8 @@ def exception_handler_v20(status_code, error_content):
             ex = None
             try:
                 # raise the appropriate error!
-                ex = neutron_errors[error_type](message=error_message)
-                ex.args = ([dict(status_code=status_code,
-                                 message=error_message)], )
+                ex = neutron_errors[error_type](message=error_message,
+                                                status_code=status_code)
             except Exception:
                 pass
             if ex:
@@ -1152,7 +1151,7 @@ class Client(object):
 
     def _handle_fault_response(self, status_code, response_body):
         # Create exception with HTTP status code and message
-        _logger.debug("Error message: %s", response_body)
+        _logger.debug(_("Error message: %s"), response_body)
         # Add deserialized error message to exception arguments
         try:
             des_error_body = self.deserialize(response_body, status_code)
@@ -1219,7 +1218,7 @@ class Client(object):
             return serializer.Serializer(
                 self.get_attr_metadata()).serialize(data, self.content_type())
         else:
-            raise Exception("unable to serialize object of type = '%s'" %
+            raise Exception(_("Unable to serialize object of type = '%s'") %
                             type(data))
 
     def deserialize(self, data, status_code):
@@ -1245,7 +1244,7 @@ class Client(object):
         :raises: ConnectionFailed if the maximum # of retries is exceeded
         """
         max_attempts = self.retries + 1
-        for i in xrange(max_attempts):
+        for i in range(max_attempts):
             try:
                 return self.do_request(method, action, body=body,
                                        headers=headers, params=params)

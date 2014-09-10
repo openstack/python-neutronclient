@@ -1,4 +1,4 @@
-# Copyright 2012 OpenStack LLC.
+# Copyright 2012 OpenStack Foundation.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,13 +13,13 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import argparse
 import logging
 
 from neutronclient.common import exceptions
 from neutronclient.neutron import v2_0 as neutronV20
+from neutronclient.openstack.common.gettextutils import _
 
 
 def _format_subnets(network):
@@ -72,7 +72,7 @@ class ListNetwork(neutronV20.ListCommand):
                         uri_len_exc.excess)
             chunk_size = max_size / self.subnet_id_filter_len
             subnets = []
-            for i in xrange(0, subnet_count, chunk_size):
+            for i in range(0, subnet_count, chunk_size):
                 subnets.extend(
                     _get_subnet_list(subnet_ids[i: i + chunk_size]))
 
@@ -114,7 +114,7 @@ class CreateNetwork(neutronV20.CreateCommand):
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help='Set Admin State Up to false')
+            help=_('Set Admin State Up to false'))
         parser.add_argument(
             '--admin_state_down',
             dest='admin_state', action='store_false',
@@ -122,19 +122,18 @@ class CreateNetwork(neutronV20.CreateCommand):
         parser.add_argument(
             '--shared',
             action='store_true',
-            help='Set the network as shared')
+            help=_('Set the network as shared'),
+            default=argparse.SUPPRESS)
         parser.add_argument(
             'name', metavar='NAME',
-            help='Name of network to create')
+            help=_('Name of network to create'))
 
     def args2body(self, parsed_args):
         body = {'network': {
             'name': parsed_args.name,
             'admin_state_up': parsed_args.admin_state}, }
-        if parsed_args.tenant_id:
-            body['network'].update({'tenant_id': parsed_args.tenant_id})
-        if parsed_args.shared:
-            body['network'].update({'shared': parsed_args.shared})
+        neutronV20.update_dict(parsed_args, body['network'],
+                               ['shared', 'tenant_id'])
         return body
 
 

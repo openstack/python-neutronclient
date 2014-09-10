@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-#
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
@@ -57,9 +55,9 @@ class UpdatePolicyProfileV2(neutronV20.UpdateCommand):
     def get_parser(self, prog_name):
         parser = super(UpdatePolicyProfileV2, self).get_parser(prog_name)
         parser.add_argument("--add-tenant",
-                            help="Add tenant to the policy profile")
+                            help=_("Add tenant to the policy profile"))
         parser.add_argument("--remove-tenant",
-                            help="Remove tenant from the policy profile")
+                            help=_("Remove tenant from the policy profile"))
         return parser
 
     def run(self, parsed_args):

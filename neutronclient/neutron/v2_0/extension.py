@@ -1,4 +1,4 @@
-# Copyright 2012 OpenStack LLC.
+# Copyright 2012 OpenStack Foundation.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,11 +13,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import logging
 
 from neutronclient.neutron import v2_0 as cmd_base
+from neutronclient.openstack.common.gettextutils import _
 
 
 class ListExt(cmd_base.ListCommand):
@@ -40,5 +40,5 @@ class ShowExt(cmd_base.ShowCommand):
         cmd_base.add_show_list_common_argument(parser)
         parser.add_argument(
             'id', metavar='EXT-ALIAS',
-            help='the extension alias')
+            help=_('The extension alias'))
         return parser

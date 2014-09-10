@@ -1,6 +1,4 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-
-# Copyright 2013 Nicira Inc.
+# Copyright 2013 VMware Inc.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -18,6 +16,7 @@
 import logging
 
 from neutronclient.neutron import v2_0 as neutronV20
+from neutronclient.openstack.common.gettextutils import _
 
 
 class ListQoSQueue(neutronV20.ListCommand):
@@ -46,24 +45,24 @@ class CreateQoSQueue(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'name', metavar='NAME',
-            help='Name of queue')
+            help=_('Name of queue'))
         parser.add_argument(
             '--min',
-            help='min-rate'),
+            help=_('min-rate')),
         parser.add_argument(
             '--max',
-            help='max-rate'),
+            help=_('max-rate')),
         parser.add_argument(
             '--qos-marking',
-            help='qos marking untrusted/trusted'),
+            help=_('QOS marking untrusted/trusted')),
         parser.add_argument(
             '--default',
             default=False,
-            help=('If true all ports created with be the size of this queue'
-                  ' if queue is not specified')),
+            help=_('If true all ports created with be the size of this queue'
+                   ' if queue is not specified')),
         parser.add_argument(
             '--dscp',
-            help='Differentiated Services Code Point'),
+            help=_('Differentiated Services Code Point')),
 
     def args2body(self, parsed_args):
         params = {'name': parsed_args.name,

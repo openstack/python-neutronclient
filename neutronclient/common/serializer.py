@@ -1,4 +1,4 @@
-# Copyright 2013 OpenStack LLC.
+# Copyright 2013 OpenStack Foundation.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,8 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-
 ###
 ### Codes from neutron wsgi
 ###
@@ -306,6 +304,7 @@ class XMLDeserializer(TextDeserializer):
     def _from_xml_node(self, node, listnames):
         """Convert a minidom node to a simple Python type.
 
+        :param node: minidom node name
         :param listnames: list of XML node names whose subnodes should
                           be considered list items.
 

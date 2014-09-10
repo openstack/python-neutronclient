@@ -17,6 +17,7 @@
 import logging
 
 from neutronclient.neutron import v2_0 as neutronv20
+from neutronclient.openstack.common.gettextutils import _
 
 
 class ListMeteringLabel(neutronv20.ListCommand):
@@ -46,10 +47,10 @@ class CreateMeteringLabel(neutronv20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'name', metavar='NAME',
-            help='Name of metering label to create')
+            help=_('Name of metering label to create'))
         parser.add_argument(
             '--description',
-            help='description of metering label to create')
+            help=_('Description of metering label to create'))
 
     def args2body(self, parsed_args):
         body = {'metering_label': {
@@ -97,18 +98,18 @@ class CreateMeteringLabelRule(neutronv20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'label_id', metavar='LABEL',
-            help='Id or Name of the label')
+            help=_('Id or Name of the label'))
         parser.add_argument(
             'remote_ip_prefix', metavar='REMOTE_IP_PREFIX',
-            help='cidr to match on')
+            help=_('CIDR to match on'))
         parser.add_argument(
             '--direction',
             default='ingress', choices=['ingress', 'egress'],
-            help='direction of traffic, default:ingress')
+            help=_('Direction of traffic, default:ingress'))
         parser.add_argument(
             '--excluded',
             action='store_true',
-            help='exclude this cidr from the label, default:not excluded')
+            help=_('Exclude this cidr from the label, default:not excluded'))
 
     def args2body(self, parsed_args):
         neutron_client = self.get_client()

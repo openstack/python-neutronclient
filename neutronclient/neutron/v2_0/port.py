@@ -1,4 +1,4 @@
-# Copyright 2012 OpenStack LLC.
+# Copyright 2012 OpenStack Foundation.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 import argparse
 import logging
@@ -21,6 +20,7 @@ import logging
 from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
+from neutronclient.openstack.common.gettextutils import _
 
 
 def _format_fixed_ips(port):
@@ -55,7 +55,7 @@ class ListRouterPort(neutronV20.ListCommand):
         parser = super(ListRouterPort, self).get_parser(prog_name)
         parser.add_argument(
             'id', metavar='router',
-            help='ID or name of router to look up')
+            help=_('ID or name of router to look up'))
         return parser
 
     def get_data(self, parsed_args):
@@ -80,12 +80,12 @@ class UpdatePortSecGroupMixin(object):
         group_sg.add_argument(
             '--security-group', metavar='SECURITY_GROUP',
             default=[], action='append', dest='security_groups',
-            help='security group associated with the port '
-            '(This option can be repeated)')
+            help=_('Security group associated with the port '
+            '(This option can be repeated)'))
         group_sg.add_argument(
             '--no-security-groups',
             action='store_true',
-            help='associate no security groups with the port')
+            help=_('Associate no security groups with the port'))
 
     def _resolv_sgid(self, secgroup):
         return neutronV20.find_resourceid_by_name_or_id(
@@ -96,7 +96,7 @@ class UpdatePortSecGroupMixin(object):
             port['security_groups'] = [self._resolv_sgid(sg) for sg
                                        in parsed_args.security_groups]
         elif parsed_args.no_security_groups:
-            port['security_groups'] = None
+            port['security_groups'] = []
 
 
 class UpdateExtraDhcpOptMixin(object):
@@ -107,9 +107,9 @@ class UpdateExtraDhcpOptMixin(object):
             default=[],
             action='append',
             dest='extra_dhcp_opts',
-            help='extra dhcp options to be assigned to this port: '
-            'opt_name=<dhcp_option_name>,opt_value=<value>, '
-            '(This option can be repeated.)')
+            help=_('Extra dhcp options to be assigned to this port: '
+                   'opt_name=<dhcp_option_name>,opt_value=<value>, '
+                   '(This option can be repeated.)'))
 
     def args2body_extradhcpopt(self, parsed_args, port):
         ops = []
@@ -118,9 +118,9 @@ class UpdateExtraDhcpOptMixin(object):
             # must come in pairs, if there is a parm error
             # both must be thrown out.
             opt_ele = {}
-            edo_err_msg = ("invalid --extra-dhcp-opt option, can only be: "
-                           "opt_name=<dhcp_option_name>,opt_value=<value>, "
-                           "(This option can be repeated.")
+            edo_err_msg = _("Invalid --extra-dhcp-opt option, can only be: "
+                            "opt_name=<dhcp_option_name>,opt_value=<value>, "
+                            "(This option can be repeated.")
             for opt in parsed_args.extra_dhcp_opts:
                 if opt.split('=')[0] in ['opt_value', 'opt_name']:
                     opt_ele.update(utils.str2dict(opt))
@@ -147,33 +147,33 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--name',
-            help='name of this port')
+            help=_('Name of this port'))
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help='set admin state up to false')
+            help=_('Set admin state up to false'))
         parser.add_argument(
             '--admin_state_down',
             dest='admin_state', action='store_false',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--mac-address',
-            help='mac address of this port')
+            help=_('MAC address of this port'))
         parser.add_argument(
             '--mac_address',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--device-id',
-            help='device id of this port')
+            help=_('Device id of this port'))
         parser.add_argument(
             '--device_id',
             help=argparse.SUPPRESS)
         parser.add_argument(
-            '--fixed-ip', metavar='ip_address=IP_ADDR',
+            '--fixed-ip', metavar='subnet_id=SUBNET,ip_address=IP_ADDR',
             action='append',
-            help='desired IP for this port: '
-            'subnet_id=<name_or_id>,ip_address=<ip>, '
-            '(This option can be repeated.)')
+            help=_('Desired IP and/or subnet for this port: '
+                   'subnet_id=<name_or_id>,ip_address=<ip>, '
+                   '(This option can be repeated.)'))
         parser.add_argument(
             '--fixed_ip',
             action='append',
@@ -184,7 +184,7 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
 
         parser.add_argument(
             'network_id', metavar='NETWORK',
-            help='Network id or name this port belongs to')
+            help=_('Network id or name this port belongs to'))
 
     def args2body(self, parsed_args):
         _network_id = neutronV20.find_resourceid_by_name_or_id(

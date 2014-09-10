@@ -1,4 +1,4 @@
-# Copyright 2012 OpenStack LLC.
+# Copyright 2012 OpenStack Foundation.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 try:
     import json
@@ -21,19 +20,19 @@ except ImportError:
     import simplejson as json
 import logging
 import os
-import urlparse
-# Python 2.5 compat fix
-if not hasattr(urlparse, 'parse_qsl'):
-    import cgi
-    urlparse.parse_qsl = cgi.parse_qsl
 
 import httplib2
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
+from neutronclient.openstack.common.gettextutils import _
 
 _logger = logging.getLogger(__name__)
 
+# httplib2 retries requests on socket.timeout which
+# is not idempotent and can lead to orhan objects.
+# See: https://code.google.com/p/httplib2/issues/detail?id=124
+httplib2.RETRIES = 1
 
 if os.environ.get('NEUTRONCLIENT_DEBUG'):
     ch = logging.StreamHandler()
@@ -151,6 +150,7 @@ class HTTPClient(httplib2.Http):
             # Wrap the low-level connection error (socket timeout, redirect
             # limit, decompression error, etc) into our custom high-level
             # connection exception (it is excepted in the upper layers of code)
+            _logger.debug("throwing ConnectionFailed : %s", e)
             raise exceptions.ConnectionFailed(reason=e)
         finally:
             # Temporary Fix for gate failures. RPC calls and HTTP requests
@@ -216,7 +216,7 @@ class HTTPClient(httplib2.Http):
 
     def authenticate(self):
         if self.auth_strategy != 'keystone':
-            raise exceptions.Unauthorized(message='unknown auth strategy')
+            raise exceptions.Unauthorized(message=_('Unknown auth strategy'))
         if self.tenant_id:
             body = {'auth': {'passwordCredentials':
                              {'username': self.username,
@@ -234,22 +234,22 @@ class HTTPClient(httplib2.Http):
         tmp_follow_all_redirects = self.follow_all_redirects
         self.follow_all_redirects = True
         try:
-            resp, body = self._cs_request(token_url, "POST",
-                                          body=json.dumps(body),
-                                          content_type="application/json")
+            resp, resp_body = self._cs_request(token_url, "POST",
+                                               body=json.dumps(body),
+                                               content_type="application/json")
         finally:
             self.follow_all_redirects = tmp_follow_all_redirects
         status_code = self.get_status_code(resp)
         if status_code != 200:
-            raise exceptions.Unauthorized(message=body)
-        if body:
+            raise exceptions.Unauthorized(message=resp_body)
+        if resp_body:
             try:
-                body = json.loads(body)
+                resp_body = json.loads(resp_body)
             except ValueError:
                 pass
         else:
-            body = None
-        self._extract_service_catalog(body)
+            resp_body = None
+        self._extract_service_catalog(resp_body)
 
     def _get_endpoint_url(self):
         url = self.auth_url + '/tokens/%s/endpoints' % self.auth_token
