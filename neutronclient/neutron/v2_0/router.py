@@ -68,8 +68,8 @@ class CreateRouter(neutronV20.CreateCommand):
             help=_('Name of router to create.'))
         parser.add_argument(
             '--distributed',
-            dest='distributed',
-            choices=['True', 'False'],
+            dest='distributed', metavar='{True,False}',
+            choices=['True', 'true', 'False', 'false'],
             default=argparse.SUPPRESS,
             help=_('Create a distributed router.'))
         parser.add_argument(
