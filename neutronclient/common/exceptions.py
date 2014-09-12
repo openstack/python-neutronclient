@@ -30,12 +30,11 @@ Exceptions are classified into three categories:
 
 
 class NeutronException(Exception):
-    """Base Neutron Exception
+    """Base Neutron Exception.
 
     To correctly use this class, inherit from it and define
     a 'message' property. That message will get printf'd
     with the keyword arguments provided to the constructor.
-
     """
     message = _("An unknown exception occurred.")
 
@@ -218,8 +217,8 @@ class CommandError(NeutronCLIError):
 
 
 class UnsupportedVersion(NeutronCLIError):
-    """Indicates that the user is trying to use an unsupported
-       version of the API
+    """Indicates that the user is trying to use an unsupported version of
+    the API.
     """
     pass
 

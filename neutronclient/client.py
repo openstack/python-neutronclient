@@ -48,7 +48,7 @@ class NeutronClientMixin(object):
 
 
 class HTTPClient(NeutronClientMixin):
-    """Handles the REST calls and responses, include authn."""
+    """Handles the REST calls and responses, include authentication."""
 
     def __init__(self, username=None, user_id=None,
                  tenant_name=None, tenant_id=None,

@@ -29,7 +29,7 @@ from neutronclient.openstack.common import strutils
 def env(*vars, **kwargs):
     """Returns the first environment variable set.
 
-    if none are non-empty, defaults to '' or keyword arg default.
+    If none are non-empty, defaults to '' or keyword arg default.
     """
     for v in vars:
         value = os.environ.get(v)
@@ -50,7 +50,7 @@ def import_class(import_str):
 
 
 def get_client_class(api_name, version, version_map):
-    """Returns the client class for the requested API version
+    """Returns the client class for the requested API version.
 
     :param api_name: the name of the API, e.g. 'compute', 'image', etc
     :param version: the requested API version

@@ -27,8 +27,7 @@ LOG = logging.getLogger(__name__)
 
 
 class ClientCache(object):
-    """Descriptor class for caching created client handles.
-    """
+    """Descriptor class for caching created client handles."""
 
     def __init__(self, factory):
         self.factory = factory
@@ -42,8 +41,7 @@ class ClientCache(object):
 
 
 class ClientManager(object):
-    """Manages access to API clients, including authentication.
-    """
+    """Manages access to API clients, including authentication."""
     neutron = ClientCache(neutron_client.make_client)
     # Provide support for old quantum commands (for example
     # in stable versions)

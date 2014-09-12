@@ -199,7 +199,7 @@ def _process_previous_argument(current_arg, _value_number, current_type_str,
 
 
 def parse_args_to_dict(values_specs):
-    '''It is used to analyze the extra command options to command.
+    """It is used to analyze the extra command options to command.
 
     Besides known options and arguments, our commands also support user to
     put more options to the end of command line. For example,
@@ -211,8 +211,7 @@ def parse_args_to_dict(values_specs):
     value spec is: --key type=int|bool|... value. Type is one of Python
     built-in types. By default, type is string. The key without value is
     a bool option. Key with two values will be a list option.
-
-    '''
+    """
 
     # values_specs for example: '-- --tag x y --key1 type=int value1'
     # -- is a pseudo argument
@@ -296,7 +295,7 @@ def parse_args_to_dict(values_specs):
         current_arg, _value_number, current_type_str,
         _list_flag, _values_specs, _clear_flag, values_specs)
 
-    # populate the parser with arguments
+    # Populate the parser with arguments
     _parser = argparse.ArgumentParser(add_help=False)
     for opt, optspec in six.iteritems(_options):
         _parser.add_argument(opt, **optspec)
@@ -335,7 +334,7 @@ def _merge_args(qCmd, parsed_args, _extra_values, value_specs):
 
 
 def update_dict(obj, dict, attributes):
-    """Update dict with fields from obj.attributes
+    """Update dict with fields from obj.attributes.
 
     :param obj: the object updated into dict
     :param dict: the result dictionary
@@ -435,9 +434,7 @@ class NeutronCommand(command.OpenStackCommand):
 
 
 class CreateCommand(NeutronCommand, show.ShowOne):
-    """Create a resource for a given tenant
-
-    """
+    """Create a resource for a given tenant."""
 
     api = 'network'
     log = None
@@ -479,8 +476,7 @@ class CreateCommand(NeutronCommand, show.ShowOne):
 
 
 class UpdateCommand(NeutronCommand):
-    """Update resource's information
-    """
+    """Update resource's information."""
 
     api = 'network'
     log = None
@@ -531,9 +527,7 @@ class UpdateCommand(NeutronCommand):
 
 
 class DeleteCommand(NeutronCommand):
-    """Delete a given resource
-
-    """
+    """Delete a given resource."""
 
     api = 'network'
     log = None
@@ -578,9 +572,7 @@ class DeleteCommand(NeutronCommand):
 
 
 class ListCommand(NeutronCommand, lister.Lister):
-    """List resources that belong to a given tenant
-
-    """
+    """List resources that belong to a given tenant."""
 
     api = 'network'
     log = None
@@ -619,7 +611,7 @@ class ListCommand(NeutronCommand, lister.Lister):
         return data
 
     def retrieve_list(self, parsed_args):
-        """Retrieve a list of resources from Neutron server"""
+        """Retrieve a list of resources from Neutron server."""
         neutron_client = self.get_client()
         neutron_client.format = parsed_args.request_format
         _extra_values = parse_args_to_dict(self.values_specs)
@@ -680,9 +672,7 @@ class ListCommand(NeutronCommand, lister.Lister):
 
 
 class ShowCommand(NeutronCommand, show.ShowOne):
-    """Show information of a given resource
-
-    """
+    """Show information of a given resource."""
 
     api = 'network'
     log = None

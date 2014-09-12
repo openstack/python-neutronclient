@@ -33,14 +33,13 @@ _logger = logging.getLogger(__name__)
 
 
 def exception_handler_v20(status_code, error_content):
-    """Exception handler for API v2.0 client
+    """Exception handler for API v2.0 client.
 
-        This routine generates the appropriate
-        Neutron exception according to the contents of the
-        response body
+    This routine generates the appropriate Neutron exception according to
+    the contents of the response body.
 
-        :param status_code: HTTP error status code
-        :param error_content: deserialized body of error response
+    :param status_code: HTTP error status code
+    :param error_content: deserialized body of error response
     """
     error_dict = None
     if isinstance(error_content, dict):
@@ -87,8 +86,7 @@ def exception_handler_v20(status_code, error_content):
 
 
 class APIParamsCall(object):
-    """A Decorator to add support for format and tenant overriding
-       and filters
+    """A Decorator to add support for format and tenant overriding and filters.
     """
     def __init__(self, function):
         self.function = function
@@ -273,8 +271,7 @@ class Client(object):
 
     @APIParamsCall
     def get_quotas_tenant(self, **_params):
-        """Fetch tenant info in server's context for
-        following quota operation.
+        """Fetch tenant info in server's context for following quota operation.
         """
         return self.get(self.quota_path % 'tenant', params=_params)
 
@@ -1257,8 +1254,8 @@ class Client(object):
     def serialize(self, data):
         """Serializes a dictionary into either XML or JSON.
 
-        A dictionary with a single key can be passed and
-        it can contain any structure.
+        A dictionary with a single key can be passed and it can contain any
+        structure.
         """
         if data is None:
             return None
