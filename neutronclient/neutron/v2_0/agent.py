@@ -20,7 +20,7 @@ from neutronclient.neutron import v2_0 as neutronV20
 def _format_timestamp(component):
     try:
         return component['heartbeat_timestamp'].split(".", 2)[0]
-    except Exception:
+    except (TypeError, KeyError):
         return ''
 
 

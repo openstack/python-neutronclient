@@ -27,7 +27,7 @@ from neutronclient.openstack.common import jsonutils
 def _format_external_gateway_info(router):
     try:
         return jsonutils.dumps(router['external_gateway_info'])
-    except Exception:
+    except (TypeError, KeyError):
         return ''
 
 
