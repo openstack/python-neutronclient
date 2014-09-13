@@ -36,7 +36,7 @@ class ListRouter(neutronV20.ListCommand):
 
     resource = 'router'
     _formatters = {'external_gateway_info': _format_external_gateway_info, }
-    list_columns = ['id', 'name', 'external_gateway_info', 'distributed']
+    list_columns = ['id', 'name', 'external_gateway_info', 'distributed', 'ha']
     pagination_support = True
     sorting_support = True
 
@@ -71,11 +71,17 @@ class CreateRouter(neutronV20.CreateCommand):
             choices=['True', 'False'],
             default=argparse.SUPPRESS,
             help=_('Create a distributed router.'))
+        parser.add_argument(
+            '--ha',
+            dest='ha',
+            choices=['True', 'False'],
+            default=argparse.SUPPRESS,
+            help=_('Create a highly available router.'))
 
     def args2body(self, parsed_args):
         body = {self.resource: {'admin_state_up': parsed_args.admin_state}}
         neutronV20.update_dict(parsed_args, body[self.resource],
-                               ['name', 'tenant_id', 'distributed'])
+                               ['name', 'tenant_id', 'distributed', 'ha'])
         return body
 
 
