@@ -847,7 +847,13 @@ class NeutronShell(app.App):
                          self.INFO_LEVEL: logging.INFO,
                          self.DEBUG_LEVEL: logging.DEBUG,
                          }.get(self.options.verbose_level, logging.DEBUG)
-        console.setLevel(console_level)
+        # The default log level is INFO, in this situation, set the
+        # log level of the console to WARNING, to avoid displaying
+        # useless messages. This equals using "--quiet"
+        if console_level == logging.INFO:
+            console.setLevel(logging.WARNING)
+        else:
+            console.setLevel(console_level)
         if logging.DEBUG == console_level:
             formatter = logging.Formatter(self.DEBUG_MESSAGE_FORMAT)
         else:
