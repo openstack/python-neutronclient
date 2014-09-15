@@ -21,11 +21,12 @@ from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronv20
 from neutronclient.neutron.v2_0.vpn import utils as vpn_utils
 from neutronclient.openstack.common.gettextutils import _
+from neutronclient.openstack.common import jsonutils
 
 
 def _format_peer_cidrs(ipsec_site_connection):
     try:
-        return '\n'.join([utils.dumps(cidrs) for cidrs in
+        return '\n'.join([jsonutils.dumps(cidrs) for cidrs in
                           ipsec_site_connection['peer_cidrs']])
     except Exception:
         return ''

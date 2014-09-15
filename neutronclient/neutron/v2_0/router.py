@@ -19,14 +19,14 @@ from __future__ import print_function
 import argparse
 
 from neutronclient.common import exceptions
-from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.openstack.common.gettextutils import _
+from neutronclient.openstack.common import jsonutils
 
 
 def _format_external_gateway_info(router):
     try:
-        return utils.dumps(router['external_gateway_info'])
+        return jsonutils.dumps(router['external_gateway_info'])
     except Exception:
         return ''
 
