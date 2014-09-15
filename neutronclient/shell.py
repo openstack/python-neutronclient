@@ -671,21 +671,16 @@ class NeutronShell(app.App):
             else:
                 self.log.error(unicode(err))
             return 1
-        result = 1
         if self.interactive_mode:
             _argv = [sys.argv[0]]
             sys.argv = _argv
-            result = self.interact()
-        else:
-            result = self.run_subcommand(remainder)
-        return result
+            return self.interact()
+        return self.run_subcommand(remainder)
 
     def run_subcommand(self, argv):
         subcommand = self.command_manager.find_command(argv)
         cmd_factory, cmd_name, sub_argv = subcommand
         cmd = cmd_factory(self, self.options)
-        err = None
-        result = 1
         try:
             self.prepare_to_run_command(cmd)
             full_name = (cmd_name
@@ -694,29 +689,12 @@ class NeutronShell(app.App):
                          )
             cmd_parser = cmd.get_parser(full_name)
             return run_command(cmd, cmd_parser, sub_argv)
-        except Exception as err:
+        except Exception as e:
             if self.options.verbose_level >= self.DEBUG_LEVEL:
-                self.log.exception(unicode(err))
-            else:
-                self.log.error(unicode(err))
-            try:
-                self.clean_up(cmd, result, err)
-            except Exception as err2:
-                if self.options.verbose_level >= self.DEBUG_LEVEL:
-                    self.log.exception(unicode(err2))
-                else:
-                    self.log.error(_('Could not clean up: %s'), unicode(err2))
-            if self.options.verbose_level >= self.DEBUG_LEVEL:
+                self.log.exception("%s", e)
                 raise
-        else:
-            try:
-                self.clean_up(cmd, result, None)
-            except Exception as err3:
-                if self.options.verbose_level >= self.DEBUG_LEVEL:
-                    self.log.exception(unicode(err3))
-                else:
-                    self.log.error(_('Could not clean up: %s'), unicode(err3))
-        return result
+            self.log.error("%s", e)
+        return 1
 
     def authenticate_user(self):
         """Make sure the user has provided all of the authentication
@@ -828,11 +806,6 @@ class NeutronShell(app.App):
             cmd_factory, cmd_name, sub_argv = cmd_info
         if self.interactive_mode or cmd_name != 'help':
             self.authenticate_user()
-
-    def clean_up(self, cmd, result, err):
-        self.log.debug('clean_up %s', cmd.__class__.__name__)
-        if err:
-            self.log.debug('Got an error: %s', unicode(err))
 
     def configure_logging(self):
         """Create logging handlers for any log output."""
