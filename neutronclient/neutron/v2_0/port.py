@@ -26,7 +26,7 @@ from neutronclient.openstack.common import jsonutils
 def _format_fixed_ips(port):
     try:
         return '\n'.join([jsonutils.dumps(ip) for ip in port['fixed_ips']])
-    except Exception:
+    except (TypeError, KeyError):
         return ''
 
 

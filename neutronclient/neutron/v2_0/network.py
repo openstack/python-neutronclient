@@ -25,7 +25,7 @@ def _format_subnets(network):
     try:
         return '\n'.join([' '.join([s['id'], s.get('cidr', '')])
                           for s in network['subnets']])
-    except Exception:
+    except (TypeError, KeyError):
         return ''
 
 

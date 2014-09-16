@@ -27,7 +27,7 @@ def _format_allocation_pools(subnet):
     try:
         return '\n'.join([jsonutils.dumps(pool) for pool in
                           subnet['allocation_pools']])
-    except Exception:
+    except (TypeError, KeyError):
         return ''
 
 
@@ -35,7 +35,7 @@ def _format_dns_nameservers(subnet):
     try:
         return '\n'.join([jsonutils.dumps(server) for server in
                           subnet['dns_nameservers']])
-    except Exception:
+    except (TypeError, KeyError):
         return ''
 
 
@@ -43,7 +43,7 @@ def _format_host_routes(subnet):
     try:
         return '\n'.join([jsonutils.dumps(route) for route in
                           subnet['host_routes']])
-    except Exception:
+    except (TypeError, KeyError):
         return ''
 
 

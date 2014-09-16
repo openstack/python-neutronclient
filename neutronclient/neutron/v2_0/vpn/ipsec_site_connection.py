@@ -28,7 +28,7 @@ def _format_peer_cidrs(ipsec_site_connection):
     try:
         return '\n'.join([jsonutils.dumps(cidrs) for cidrs in
                           ipsec_site_connection['peer_cidrs']])
-    except Exception:
+    except (TypeError, KeyError):
         return ''
 
 
