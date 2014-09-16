@@ -98,7 +98,7 @@ class CreateFirewallRule(neutronv20.CreateCommand):
         parser.add_argument(
             '--enabled',
             dest='enabled', choices=['True', 'False'],
-            help=_('To enable or disable this rule'),
+            help=_('Whether to enable or disable this rule.'),
             default=argparse.SUPPRESS)
         parser.add_argument(
             '--protocol', choices=['tcp', 'udp', 'icmp', 'any'],

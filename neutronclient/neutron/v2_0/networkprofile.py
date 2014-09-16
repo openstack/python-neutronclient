@@ -65,8 +65,8 @@ class CreateNetworkProfile(neutronV20.CreateCommand):
                             help=_('Multicast IPv4 range.'))
         parser.add_argument("--add-tenant",
                             action='append', dest='add_tenants',
-                            help=_("Add tenant to the network profile "
-                                   "(This option can be repeated)."))
+                            help=_("Add tenant to the network profile. "
+                                   "You can repeat this option."))
 
     def args2body(self, parsed_args):
         body = {'network_profile': {'name': parsed_args.name}}
@@ -106,12 +106,12 @@ class UpdateNetworkProfile(neutronV20.UpdateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument("--remove-tenant",
                             action='append', dest='remove_tenants',
-                            help=_("Remove tenant from the network profile "
-                                   "(This option can be repeated)"))
+                            help=_("Remove tenant from the network profile. "
+                                   "You can repeat this option."))
         parser.add_argument("--add-tenant",
                             action='append', dest='add_tenants',
-                            help=_("Add tenant to the network profile "
-                                   "(This option can be repeated)"))
+                            help=_("Add tenant to the network profile. "
+                                   "You can repeat this option."))
 
     def args2body(self, parsed_args):
         body = {'network_profile': {}}
