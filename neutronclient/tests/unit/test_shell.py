@@ -51,7 +51,11 @@ class ShellTest(testtools.TestCase):
         'OS_PASSWORD': DEFAULT_PASSWORD,
         'OS_TENANT_ID': DEFAULT_TENANT_ID,
         'OS_TENANT_NAME': DEFAULT_TENANT_NAME,
-        'OS_AUTH_URL': DEFAULT_AUTH_URL}
+        'OS_AUTH_URL': DEFAULT_AUTH_URL,
+        'OS_REGION_NAME': None,
+        'HTTP_PROXY': None,
+        'http_proxy': None,
+    }
 
     # Patch os.environ to avoid required auth info.
     def setUp(self):
