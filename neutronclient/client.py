@@ -14,6 +14,7 @@
 #    under the License.
 #
 
+import abc
 try:
     import json
 except ImportError:
@@ -24,6 +25,7 @@ import os
 from keystoneclient import access
 from keystoneclient.auth.identity.base import BaseIdentityPlugin
 import requests
+import six
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
@@ -42,12 +44,34 @@ else:
 logging.getLogger("requests").setLevel(_requests_log_level)
 
 
-class NeutronClientMixin(object):
+@six.add_metaclass(abc.ABCMeta)
+class AbstractHTTPClient(object):
 
     USER_AGENT = 'python-neutronclient'
+    CONTENT_TYPE = 'application/json'
+
+    def request(self, url, method, body=None, content_type=None, headers=None,
+                **kwargs):
+        """Request without authentication."""
+
+        headers = headers or {}
+        content_type = content_type or self.CONTENT_TYPE
+        headers.setdefault('Accept', content_type)
+        if body:
+            headers.setdefault('Content-Type', content_type)
+
+        return self._request(url, method, body=body, headers=headers, **kwargs)
+
+    @abc.abstractmethod
+    def do_request(self, url, method, **kwargs):
+        """Request with authentication."""
+
+    @abc.abstractmethod
+    def _request(self, url, method, body=None, headers=None, **kwargs):
+        """Request without authentication nor headers population."""
 
 
-class HTTPClient(NeutronClientMixin):
+class HTTPClient(AbstractHTTPClient):
     """Handles the REST calls and responses, include authentication."""
 
     def __init__(self, username=None, user_id=None,
@@ -73,7 +97,6 @@ class HTTPClient(NeutronClientMixin):
         self.auth_token = token
         self.auth_tenant_id = None
         self.auth_user_id = None
-        self.content_type = 'application/json'
         self.endpoint_url = endpoint_url
         self.auth_strategy = auth_strategy
         self.log_credentials = log_credentials
@@ -86,13 +109,6 @@ class HTTPClient(NeutronClientMixin):
         kargs = {}
         kargs.setdefault('headers', kwargs.get('headers', {}))
         kargs['headers']['User-Agent'] = self.USER_AGENT
-
-        if 'content_type' in kwargs:
-            kargs['headers']['Content-Type'] = kwargs['content_type']
-            kargs['headers']['Accept'] = kwargs['content_type']
-        else:
-            kargs['headers']['Content-Type'] = self.content_type
-            kargs['headers']['Accept'] = self.content_type
 
         if 'body' in kwargs:
             kargs['body'] = kwargs['body']
@@ -135,17 +151,15 @@ class HTTPClient(NeutronClientMixin):
         elif not self.endpoint_url:
             self.endpoint_url = self._get_endpoint_url()
 
-    def request(self, url, method, **kwargs):
-        kwargs.setdefault('headers', kwargs.get('headers', {}))
-        kwargs['headers']['User-Agent'] = self.USER_AGENT
-        kwargs['headers']['Accept'] = 'application/json'
-        if 'body' in kwargs:
-            kwargs['headers']['Content-Type'] = 'application/json'
-            kwargs['data'] = kwargs['body']
-            del kwargs['body']
+    def _request(self, url, method, body=None, headers=None, **kwargs):
+        headers = headers or {}
+        headers['User-Agent'] = self.USER_AGENT
+
         resp = requests.request(
             method,
             url,
+            data=body,
+            headers=headers,
             verify=self.verify_cert,
             timeout=self.timeout,
             **kwargs)
@@ -268,7 +282,7 @@ class HTTPClient(NeutronClientMixin):
                 'endpoint_url': self.endpoint_url}
 
 
-class SessionClient(NeutronClientMixin):
+class SessionClient(AbstractHTTPClient):
 
     def __init__(self,
                  session,
@@ -285,15 +299,10 @@ class SessionClient(NeutronClientMixin):
         self.auth_token = None
         self.endpoint_url = None
 
-    def request(self, url, method, **kwargs):
+    def _request(self, url, method, body=None, headers=None, **kwargs):
         kwargs.setdefault('user_agent', self.USER_AGENT)
         kwargs.setdefault('auth', self.auth)
         kwargs.setdefault('authenticated', False)
-
-        try:
-            kwargs['data'] = kwargs.pop('body')
-        except KeyError:
-            pass
 
         endpoint_filter = kwargs.setdefault('endpoint_filter', {})
         endpoint_filter.setdefault('interface', self.interface)
@@ -301,7 +310,8 @@ class SessionClient(NeutronClientMixin):
         endpoint_filter.setdefault('region_name', self.region_name)
 
         kwargs = utils.safe_encode_dict(kwargs)
-        resp = self.session.request(url, method, **kwargs)
+        resp = self.session.request(url, method, data=body, headers=headers,
+                                    **kwargs)
         return resp, resp.text
 
     def do_request(self, url, method, **kwargs):

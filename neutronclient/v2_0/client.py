@@ -1235,8 +1235,11 @@ class Client(object):
 
         if body:
             body = self.serialize(body)
-        self.httpclient.content_type = self.content_type()
-        resp, replybody = self.httpclient.do_request(action, method, body=body)
+
+        resp, replybody = self.httpclient.do_request(
+            action, method, body=body,
+            content_type=self.content_type())
+
         status_code = resp.status_code
         if status_code in (requests.codes.ok,
                            requests.codes.created,
