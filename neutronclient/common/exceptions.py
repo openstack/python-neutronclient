@@ -140,6 +140,10 @@ class IpAddressInUseClient(Conflict):
     pass
 
 
+class InvalidIpForNetworkClient(BadRequest):
+    pass
+
+
 class OverQuotaClient(Conflict):
     pass
 
