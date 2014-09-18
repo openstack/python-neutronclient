@@ -286,7 +286,7 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         self.assertEqual(1, len(returned_networks))
         net = returned_networks[0]
         self.assertEqual(1, len(net))
-        self.assertEqual("id", net.keys()[0])
+        self.assertIn("id", net.keys())
 
     def test_list_nets_with_default_column(self):
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)

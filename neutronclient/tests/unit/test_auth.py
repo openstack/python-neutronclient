@@ -21,6 +21,7 @@ import fixtures
 import httpretty
 from mox3 import mox
 import requests
+import six
 import testtools
 
 from keystoneclient.auth.identity import v2 as ks_v2_auth
@@ -468,12 +469,14 @@ class CLITestAuthKeystone(testtools.TestCase):
         utils.http_log_req(mox.IgnoreArg(), mox.IgnoreArg(), mox.Func(
             verify_no_credentials))
         self.client.request(
-            mox.IsA(str), mox.IsA(str), body=mox.Func(verify_credentials),
+            mox.IsA(six.string_types), mox.IsA(six.string_types),
+            body=mox.Func(verify_credentials),
             headers=mox.IgnoreArg()
         ).AndReturn((res200, json.dumps(KS_TOKEN_RESULT)))
         utils.http_log_req(mox.IgnoreArg(), mox.IgnoreArg(), mox.IgnoreArg())
         self.client.request(
-            mox.IsA(str), mox.IsA(str), headers=mox.IsA(dict)
+            mox.IsA(six.string_types), mox.IsA(six.string_types),
+            headers=mox.IsA(dict)
         ).AndReturn((res200, ''))
         self.mox.ReplayAll()
 

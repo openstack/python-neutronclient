@@ -19,7 +19,6 @@
 from __future__ import print_function
 
 import argparse
-import string
 
 from neutronclient.neutron import v2_0 as neutronv20
 from neutronclient.openstack.common.gettextutils import _
@@ -71,7 +70,7 @@ class CreateFirewallPolicy(neutronv20.CreateCommand):
             help=_('Create a shared policy.'),
             default=argparse.SUPPRESS)
         parser.add_argument(
-            '--firewall-rules', type=string.split,
+            '--firewall-rules', type=str.split,
             help=_('Ordered list of whitespace-delimited firewall rule '
                    'names or IDs; e.g., --firewall-rules \"rule1 rule2\"'))
         parser.add_argument(

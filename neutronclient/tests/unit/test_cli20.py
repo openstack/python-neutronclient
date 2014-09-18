@@ -599,7 +599,7 @@ class ClientV2TestJson(CLITestV20Base):
         self.client.format = self.format
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         params = {'test': 'value'}
-        expect_query = urllib.urlencode(params)
+        expect_query = six.moves.urllib.parse.urlencode(params)
         self.client.httpclient.auth_token = 'token'
 
         self.client.httpclient.request(
