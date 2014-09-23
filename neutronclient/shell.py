@@ -925,6 +925,9 @@ def main(argv=sys.argv[1:]):
     try:
         return NeutronShell(NEUTRON_API_VERSION).run(
             list(map(strutils.safe_decode, argv)))
+    except KeyboardInterrupt:
+        print("... terminating neutron client", file=sys.stderr)
+        return 130
     except exc.NeutronClientException:
         return 1
     except Exception as e:
