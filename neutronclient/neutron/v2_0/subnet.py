@@ -84,17 +84,9 @@ def add_updatable_arguments(parser):
         '--enable-dhcp',
         action='store_true',
         help=_('Enable DHCP for this subnet.'))
-    parser.add_argument(
-        '--ipv6-ra-mode',
-        choices=['dhcpv6-stateful', 'dhcpv6-stateless', 'slaac'],
-        help=_('IPv6 RA (Router Advertisement) mode.'))
-    parser.add_argument(
-        '--ipv6-address-mode',
-        choices=['dhcpv6-stateful', 'dhcpv6-stateless', 'slaac'],
-        help=_('IPv6 address mode.'))
 
 
-def updatable_args2body(parsed_args, body):
+def updatable_args2body(parsed_args, body, for_create=True):
     if parsed_args.gateway and parsed_args.no_gateway:
         raise exceptions.CommandError(_("--gateway option and "
                                       "--no-gateway option can "
@@ -119,12 +111,12 @@ def updatable_args2body(parsed_args, body):
         body['subnet']['host_routes'] = parsed_args.host_routes
     if parsed_args.dns_nameservers:
         body['subnet']['dns_nameservers'] = parsed_args.dns_nameservers
-    if parsed_args.ipv6_ra_mode:
+    if for_create and parsed_args.ipv6_ra_mode:
         if parsed_args.ip_version == 4:
             raise exceptions.CommandError(_("--ipv6-ra-mode is invalid "
                                             "when --ip-version is 4"))
         body['subnet']['ipv6_ra_mode'] = parsed_args.ipv6_ra_mode
-    if parsed_args.ipv6_address_mode:
+    if for_create and parsed_args.ipv6_address_mode:
         if parsed_args.ip_version == 4:
             raise exceptions.CommandError(_("--ipv6-address-mode is "
                                             "invalid when --ip-version "
@@ -173,6 +165,14 @@ class CreateSubnet(neutronV20.CreateCommand):
         parser.add_argument(
             'cidr', metavar='CIDR',
             help=_('CIDR of subnet to create.'))
+        parser.add_argument(
+            '--ipv6-ra-mode',
+            choices=['dhcpv6-stateful', 'dhcpv6-stateless', 'slaac'],
+            help=_('IPv6 RA (Router Advertisement) mode.'))
+        parser.add_argument(
+            '--ipv6-address-mode',
+            choices=['dhcpv6-stateful', 'dhcpv6-stateless', 'slaac'],
+            help=_('IPv6 address mode.'))
 
     def args2body(self, parsed_args):
         if parsed_args.ip_version == 4 and parsed_args.cidr.endswith('/32'):
@@ -209,5 +209,5 @@ class UpdateSubnet(neutronV20.UpdateCommand):
 
     def args2body(self, parsed_args):
         body = {'subnet': {}}
-        updatable_args2body(parsed_args, body)
+        updatable_args2body(parsed_args, body, for_create=False)
         return body
