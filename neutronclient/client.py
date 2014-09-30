@@ -303,6 +303,7 @@ class SessionClient(AbstractHTTPClient):
         kwargs.setdefault('user_agent', self.USER_AGENT)
         kwargs.setdefault('auth', self.auth)
         kwargs.setdefault('authenticated', False)
+        kwargs.setdefault('raise_exc', False)
 
         endpoint_filter = kwargs.setdefault('endpoint_filter', {})
         endpoint_filter.setdefault('interface', self.interface)
