@@ -212,6 +212,10 @@ class ListL3AgentsHostingRouter(neutronV20.ListCommand):
         return parser
 
     def extend_list(self, data, parsed_args):
+        # Show the ha_state column only if the server responds with it,
+        # as some plugins do not support HA routers.
+        if any('ha_state' in agent for agent in data):
+            self.list_columns.append('ha_state')
         for agent in data:
             agent['alive'] = ":-)" if agent['alive'] else 'xxx'
 
