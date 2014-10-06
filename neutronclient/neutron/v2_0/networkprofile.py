@@ -54,9 +54,10 @@ class CreateNetworkProfile(neutronV20.CreateCommand):
                             help='Segment type.')
         # TODO(Abhishek): Check on sub-type choices depending on segment_type
         parser.add_argument('--sub_type',
-                            help=_('Sub-type for the segment. Available sub-'
-                            'types for overlay segments: native, enhanced; '
-                            'For trunk segments: vlan, overlay.'))
+                            help=_('Sub-type for the segment. Available '
+                                   'sub-types for overlay segments: '
+                                   'native, enhanced; For trunk segments: '
+                                   'vlan, overlay.'))
         parser.add_argument('--segment_range',
                             help=_('Range for the segment.'))
         parser.add_argument('--physical_network',
