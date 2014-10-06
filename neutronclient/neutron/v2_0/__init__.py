@@ -385,8 +385,8 @@ class NeutronCommand(command.OpenStackCommand):
         # NOTE(markmcclain): This is no longer supported in cliff version 1.5.2
         # see https://bugs.launchpad.net/python-neutronclient/+bug/1265926
 
-        #if hasattr(self, 'formatters'):
-            #self.formatters['table'] = TableFormater()
+        # if hasattr(self, 'formatters'):
+        #     self.formatters['table'] = TableFormater()
 
     @property
     def cmd_resource(self):
