@@ -724,7 +724,7 @@ class NeutronShell(app.App):
                                 self.options.os_project_id)
 
                 if (not self.options.os_username
-                    and not self.options.os_user_id):
+                        and not self.options.os_user_id):
                     raise exc.CommandError(
                         _("You must provide a username or user ID via"
                           "  --os-username, env[OS_USERNAME] or"

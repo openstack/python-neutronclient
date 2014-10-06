@@ -29,7 +29,7 @@ def validate_int_range(parsed_args, attr_name, min_value=None, max_value=None):
         else:
             int_val = val
         if ((min_value is None or min_value <= int_val) and
-            (max_value is None or int_val <= max_value)):
+                (max_value is None or int_val <= max_value)):
             return
     except (ValueError, TypeError):
         pass

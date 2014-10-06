@@ -291,7 +291,7 @@ class XMLDeserializer(TextDeserializer):
             parseError = False
             # Python2.7
             if (hasattr(etree, 'ParseError') and
-                isinstance(e, getattr(etree, 'ParseError'))):
+                    isinstance(e, getattr(etree, 'ParseError'))):
                 parseError = True
             # Python2.6
             elif isinstance(e, expat.ExpatError):
@@ -341,9 +341,9 @@ class XMLDeserializer(TextDeserializer):
             result = dict()
             for attr in node.keys():
                 if (attr == 'xmlns' or
-                    attr.startswith('xmlns:') or
-                    attr == constants.XSI_ATTR or
-                    attr == constants.TYPE_ATTR):
+                        attr.startswith('xmlns:') or
+                        attr == constants.XSI_ATTR or
+                        attr == constants.TYPE_ATTR):
                     continue
                 result[self._get_key(attr)] = node.get(attr)
             children = list(node)

@@ -224,7 +224,7 @@ class UpdatePacketFilter(PacketFilterOptionMixin,
 
         for attr in ['action', 'priority', 'name']:
             if (hasattr(parsed_args, attr) and
-                getattr(parsed_args, attr) is not None):
+                    getattr(parsed_args, attr) is not None):
                 body[attr] = getattr(parsed_args, attr)
 
         return {self.resource: body}

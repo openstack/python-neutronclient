@@ -283,7 +283,7 @@ def parse_args_to_dict(values_specs):
             # All others are value items
             # Make sure '--' occurs first and allow minus value
             if (not current_item or '=' in current_item or
-                _item.startswith('-') and not is_number(_item)):
+                    _item.startswith('-') and not is_number(_item)):
                 raise exceptions.CommandError(
                     _("Invalid values_specs %s") % ' '.join(values_specs))
             _value_number += 1
@@ -328,7 +328,7 @@ def _merge_args(qCmd, parsed_args, _extra_values, value_specs):
                 if isinstance(arg_value, list):
                     if value and isinstance(value, list):
                         if (not arg_value or
-                            type(arg_value[0]) == type(value[0])):
+                                type(arg_value[0]) == type(value[0])):
                             arg_value.extend(value)
                             _extra_values.pop(key)
 
