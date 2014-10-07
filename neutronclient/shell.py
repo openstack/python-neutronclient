@@ -752,13 +752,15 @@ class NeutronShell(app.App):
                     raise exc.CommandError(
                         _("You must provide an auth url via"
                           " either --os-auth-url or via env[OS_AUTH_URL]"))
+            auth_session = self._get_keystone_session()
+            auth = auth_session.auth
         else:   # not keystone
             if not self.options.os_url:
                 raise exc.CommandError(
                     _("You must provide a service URL via"
                       " either --os-url or env[OS_URL]"))
-
-        auth_session = self._get_keystone_session()
+            auth_session = None
+            auth = None
 
         self.client_manager = clientmanager.ClientManager(
             token=self.options.os_token,
@@ -783,7 +785,7 @@ class NeutronShell(app.App):
             retries=self.options.retries,
             raise_errors=False,
             session=auth_session,
-            auth=auth_session.auth,
+            auth=auth,
             log_credentials=True)
         return
 
