@@ -110,6 +110,8 @@ class Client(object):
     :param string token: Token for authentication. (optional)
     :param string tenant_name: Tenant name. (optional)
     :param string tenant_id: Tenant id. (optional)
+    :param string auth_strategy: 'keystone' by default, 'noauth' for no
+                                 authentication against keystone. (optional)
     :param string auth_url: Keystone service endpoint for authorization.
     :param string service_type: Network service type to pull from the
                                 keystone catalog (e.g. 'network') (optional)
@@ -125,6 +127,8 @@ class Client(object):
     :param integer timeout: Allows customization of the timeout for client
                             http requests. (optional)
     :param bool insecure: SSL certificate validation. (optional)
+    :param bool log_credentials: Allow for logging of passwords or not.
+                                 Defaults to False. (optional)
     :param string ca_cert: SSL CA bundle file to use. (optional)
     :param integer retries: How many times idempotent (GET, PUT, DELETE)
                             requests to Neutron server should be retried if
