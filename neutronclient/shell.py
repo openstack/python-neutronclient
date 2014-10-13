@@ -21,6 +21,7 @@ Command-line interface to the Neutron APIs
 from __future__ import print_function
 
 import argparse
+import getpass
 import logging
 import os
 import sys
@@ -730,9 +731,20 @@ class NeutronShell(app.App):
                           "  --os-user_id, env[OS_USER_ID]"))
 
                 if not self.options.os_password:
-                    raise exc.CommandError(
-                        _("You must provide a password via"
-                          " either --os-password or env[OS_PASSWORD]"))
+                    # No password, If we've got a tty, try prompting for it
+                    if hasattr(sys.stdin, 'isatty') and sys.stdin.isatty():
+                        # Check for Ctl-D
+                        try:
+                            self.options.os_password = getpass.getpass(
+                                'OS Password: ')
+                        except EOFError:
+                            pass
+                    # No password because we didn't have a tty or the
+                    # user Ctl-D when prompted.
+                    if not self.options.os_password:
+                        raise exc.CommandError(
+                            _("You must provide a password via"
+                              " either --os-password or env[OS_PASSWORD]"))
 
                 if (not project_info):
                     # tenent is deprecated in Keystone v3. Use the latest
