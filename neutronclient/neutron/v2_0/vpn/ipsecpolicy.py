@@ -22,7 +22,7 @@ from neutronclient.openstack.common.gettextutils import _
 
 
 class ListIPsecPolicy(neutronv20.ListCommand):
-    """List ipsecpolicies that belongs to a given tenant connection."""
+    """List IPsec policies that belong to a given tenant connection."""
 
     resource = 'ipsecpolicy'
     list_columns = ['id', 'name', 'auth_algorithm',
