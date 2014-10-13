@@ -18,9 +18,9 @@ import json
 import uuid
 
 import fixtures
-import httpretty
 from mox3 import mox
 import requests
+import requests_mock
 import six
 import testtools
 
@@ -138,24 +138,24 @@ def get_response(status_code, headers=None):
     return response
 
 
-def setup_keystone_v2():
+def setup_keystone_v2(mrequests):
     v2_token = ks_v2_fixture.Token(token_id=TOKENID)
     service = v2_token.add_service('network')
     service.add_endpoint(PUBLIC_ENDPOINT_URL, region=REGION)
 
-    httpretty.register_uri(httpretty.POST,
+    mrequests.register_uri('POST',
                            '%s/tokens' % (V2_URL),
-                           body=json.dumps(v2_token))
+                           text=json.dumps(v2_token))
 
     auth_session = session.Session()
     auth_plugin = ks_v2_auth.Password(V2_URL, 'xx', 'xx')
     return auth_session, auth_plugin
 
 
-def setup_keystone_v3():
-    httpretty.register_uri(httpretty.GET,
+def setup_keystone_v3(mrequests):
+    mrequests.register_uri('GET',
                            V3_URL,
-                           body=V3_VERSION_ENTRY)
+                           text=V3_VERSION_ENTRY)
 
     v3_token = ks_v3_fixture.Token()
     service = v3_token.add_service('network')
@@ -164,10 +164,10 @@ def setup_keystone_v3():
                                    internal=INTERNAL_ENDPOINT_URL,
                                    region=REGION)
 
-    httpretty.register_uri(httpretty.POST,
+    mrequests.register_uri('POST',
                            '%s/auth/tokens' % (V3_URL),
-                           body=json.dumps(v3_token),
-                           adding_headers={'X-Subject-Token': TOKENID})
+                           text=json.dumps(v3_token),
+                           headers={'X-Subject-Token': TOKENID})
 
     auth_session = session.Session()
     auth_plugin = ks_v3_auth.Password(V3_URL,
@@ -247,9 +247,9 @@ class CLITestAuthKeystone(testtools.TestCase):
                     'endpoint_url': self.client.endpoint_url}
         self.assertEqual(client_.get_auth_info(), expected)
 
-    @httpretty.activate
-    def test_get_token(self):
-        auth_session, auth_plugin = setup_keystone_v2()
+    @requests_mock.Mocker()
+    def test_get_token(self, mrequests):
+        auth_session, auth_plugin = setup_keystone_v2(mrequests)
 
         self.client = client.construct_http_client(
             username=USERNAME,
@@ -403,9 +403,9 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
 
-    @httpretty.activate
-    def test_endpoint_type(self):
-        auth_session, auth_plugin = setup_keystone_v3()
+    @requests_mock.Mocker()
+    def test_endpoint_type(self, mrequests):
+        auth_session, auth_plugin = setup_keystone_v3(mrequests)
 
         # Test default behavior is to choose public.
         self.client = client.construct_http_client(
@@ -518,9 +518,9 @@ class TestKeystoneClientVersions(testtools.TestCase):
         self.addCleanup(self.mox.VerifyAll)
         self.addCleanup(self.mox.UnsetStubs)
 
-    @httpretty.activate
-    def test_v2_auth(self):
-        auth_session, auth_plugin = setup_keystone_v2()
+    @requests_mock.Mocker()
+    def test_v2_auth(self, mrequests):
+        auth_session, auth_plugin = setup_keystone_v2(mrequests)
         res200 = get_response(200)
 
         self.client = client.construct_http_client(
@@ -542,9 +542,9 @@ class TestKeystoneClientVersions(testtools.TestCase):
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
 
-    @httpretty.activate
-    def test_v3_auth(self):
-        auth_session, auth_plugin = setup_keystone_v3()
+    @requests_mock.Mocker()
+    def test_v3_auth(self, mrequests):
+        auth_session, auth_plugin = setup_keystone_v3(mrequests)
         res200 = get_response(200)
 
         self.client = client.construct_http_client(

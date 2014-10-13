@@ -16,6 +16,7 @@
 import abc
 
 from mox3 import mox
+import requests_mock
 import six
 import testtools
 
@@ -81,8 +82,9 @@ class TestHTTPClientMixin(object):
 
 class TestSessionClient(TestHTTPClientMixin, testtools.TestCase):
 
-    def initialize(self):
-        session, auth = test_auth.setup_keystone_v2()
+    @requests_mock.Mocker()
+    def initialize(self, mrequests):
+        session, auth = test_auth.setup_keystone_v2(mrequests)
         return [client.SessionClient,
                 client.SessionClient(session=session, auth=auth)]
 
