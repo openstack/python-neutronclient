@@ -71,8 +71,8 @@ class ShellTest(testtools.TestCase):
         clean_env = {}
         _old_env, os.environ = os.environ, clean_env.copy()
         try:
-            sys.stdout = six.StringIO()
-            sys.stderr = six.StringIO()
+            sys.stdout = six.moves.cStringIO()
+            sys.stderr = six.moves.cStringIO()
             _shell = openstack_shell.NeutronShell('2.0')
             _shell.run(argstr.split())
         except SystemExit:
