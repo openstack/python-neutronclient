@@ -23,7 +23,7 @@ from neutronclient.openstack.common.gettextutils import _
 
 
 class ListHealthMonitor(neutronV20.ListCommand):
-    """List healthmonitors that belong to a given tenant."""
+    """List health monitors that belong to a given tenant."""
 
     resource = 'health_monitor'
     list_columns = ['id', 'type', 'admin_state_up']
@@ -32,13 +32,13 @@ class ListHealthMonitor(neutronV20.ListCommand):
 
 
 class ShowHealthMonitor(neutronV20.ShowCommand):
-    """Show information of a given healthmonitor."""
+    """Show information of a given health monitor."""
 
     resource = 'health_monitor'
 
 
 class CreateHealthMonitor(neutronV20.CreateCommand):
-    """Create a healthmonitor."""
+    """Create a health monitor."""
 
     resource = 'health_monitor'
 
@@ -101,14 +101,14 @@ class CreateHealthMonitor(neutronV20.CreateCommand):
 
 
 class UpdateHealthMonitor(neutronV20.UpdateCommand):
-    """Update a given healthmonitor."""
+    """Update a given health monitor."""
 
     resource = 'health_monitor'
     allow_names = False
 
 
 class DeleteHealthMonitor(neutronV20.DeleteCommand):
-    """Delete a given healthmonitor."""
+    """Delete a given health monitor."""
 
     resource = 'health_monitor'
 
