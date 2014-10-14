@@ -13,8 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import sys
-
 import testtools
 
 from neutronclient.common import exceptions
@@ -106,15 +104,6 @@ class TestUtils(testtools.TestCase):
 
 
 class ImportClassTestCase(testtools.TestCase):
-    def test_import_class(self):
-        dt = utils.import_class('datetime.datetime')
-        self.assertTrue(sys.modules['datetime'].datetime is dt)
-
-    def test_import_bad_class(self):
-        self.assertRaises(
-            ImportError, utils.import_class,
-            'lol.u_mad.brah')
-
     def test_get_client_class_invalid_version(self):
         self.assertRaises(
             exceptions.UnsupportedVersion,

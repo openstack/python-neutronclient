@@ -19,12 +19,12 @@
 
 import logging
 import os
-import sys
 
 import six
 
 from neutronclient.common import _
 from neutronclient.common import exceptions
+from neutronclient.openstack.common import importutils
 from neutronclient.openstack.common import strutils
 
 
@@ -38,17 +38,6 @@ def env(*vars, **kwargs):
         if value:
             return value
     return kwargs.get('default', '')
-
-
-def import_class(import_str):
-    """Returns a class from a string including module and class.
-
-    :param import_str: a string representation of the class name
-    :rtype: the requested class
-    """
-    mod_str, _sep, class_str = import_str.rpartition('.')
-    __import__(mod_str)
-    return getattr(sys.modules[mod_str], class_str)
 
 
 def get_client_class(api_name, version, version_map):
@@ -68,7 +57,7 @@ def get_client_class(api_name, version, version_map):
                      'map_keys': ', '.join(version_map.keys())}
         raise exceptions.UnsupportedVersion(msg)
 
-    return import_class(client_path)
+    return importutils.import_class(client_path)
 
 
 def get_item_properties(item, fields, mixed_case_fields=(), formatters=None):
