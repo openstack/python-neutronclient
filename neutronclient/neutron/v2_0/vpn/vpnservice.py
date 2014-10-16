@@ -16,8 +16,8 @@
 # @author: Swaminathan Vasudevan, Hewlett-Packard.
 #
 
+from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronv20
-from neutronclient.openstack.common.gettextutils import _
 
 
 class ListVPNService(neutronv20.ListCommand):

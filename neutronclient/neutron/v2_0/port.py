@@ -16,11 +16,12 @@
 
 import argparse
 
+from oslo.serialization import jsonutils
+
 from neutronclient.common import exceptions
 from neutronclient.common import utils
+from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
-from neutronclient.openstack.common.gettextutils import _
-from neutronclient.openstack.common import jsonutils
 
 
 def _format_fixed_ips(port):

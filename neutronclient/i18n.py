@@ -1,4 +1,3 @@
-#
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
@@ -11,7 +10,19 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import six
+from oslo import i18n
 
+_translators = i18n.TranslatorFactory(domain='neutronclient')
 
-six.add_move(six.MovedModule('mox', 'mox', 'mox3.mox'))
+# The primary translation function using the well-known name "_"
+_ = _translators.primary
+
+# Translators for log levels.
+#
+# The abbreviated names are meant to reflect the usual use of a short
+# name like '_'. The "L" is for "log" and the other letter comes from
+# the level.
+_LI = _translators.log_info
+_LW = _translators.log_warning
+_LE = _translators.log_error
+_LC = _translators.log_critical

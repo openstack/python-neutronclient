@@ -20,13 +20,13 @@ import argparse
 
 from cliff import lister
 from cliff import show
+from oslo.serialization import jsonutils
 import six
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
+from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
-from neutronclient.openstack.common.gettextutils import _
-from neutronclient.openstack.common import jsonutils
 
 
 def get_tenant_id(tenant_id, client):

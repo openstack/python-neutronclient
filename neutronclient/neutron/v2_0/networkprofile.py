@@ -16,9 +16,9 @@
 
 from __future__ import print_function
 
+from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.neutron.v2_0 import parse_args_to_dict
-from neutronclient.openstack.common.gettextutils import _
 
 RESOURCE = 'network_profile'
 SEGMENT_TYPE_CHOICES = ['vlan', 'overlay', 'multi-segment', 'trunk']
