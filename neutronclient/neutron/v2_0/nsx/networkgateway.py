@@ -169,7 +169,7 @@ class CreateNetworkGateway(neutronV20.CreateCommand):
             '--device', metavar='id=ID,interface_name=NAME_OR_ID',
             action='append',
             help=_('Device info for this gateway. You can repeat this '
-            'option for multiple devices for HA gateways.'))
+                   'option for multiple devices for HA gateways.'))
 
     def args2body(self, parsed_args):
         body = {self.resource: {

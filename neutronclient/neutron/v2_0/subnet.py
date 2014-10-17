@@ -62,7 +62,7 @@ def add_updatable_arguments(parser):
         '--allocation-pool', metavar='start=IP_ADDR,end=IP_ADDR',
         action='append', dest='allocation_pools', type=utils.str2dict,
         help=_('Allocation pool IP addresses for this subnet '
-        '(This option can be repeated).'))
+               '(This option can be repeated).'))
     parser.add_argument(
         '--allocation_pool',
         action='append', dest='allocation_pools', type=utils.str2dict,
@@ -75,7 +75,7 @@ def add_updatable_arguments(parser):
         '--dns-nameserver', metavar='DNS_NAMESERVER',
         action='append', dest='dns_nameservers',
         help=_('DNS name server for this subnet '
-        '(This option can be repeated).'))
+               '(This option can be repeated).'))
     parser.add_argument(
         '--disable-dhcp',
         action='store_true',
@@ -97,8 +97,8 @@ def add_updatable_arguments(parser):
 def updatable_args2body(parsed_args, body):
     if parsed_args.gateway and parsed_args.no_gateway:
         raise exceptions.CommandError(_("--gateway option and "
-                                      "--no-gateway option can "
-                                      "not be used same time"))
+                                        "--no-gateway option can "
+                                        "not be used same time"))
     if parsed_args.disable_dhcp and parsed_args.enable_dhcp:
         raise exceptions.CommandError(_("--enable-dhcp and --disable-dhcp can "
                                       "not be used in the same command."))

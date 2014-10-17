@@ -117,9 +117,10 @@ class RouterInterfaceCommand(neutronV20.NeutronCommand):
         parser.add_argument(
             'interface', metavar='INTERFACE',
             help=_('The format is "SUBNET|subnet=SUBNET|port=PORT". '
-            'Either a subnet or port must be specified. '
-            'Both ID and name are accepted as SUBNET or PORT. '
-            'Note that "subnet=" can be omitted when specifying a subnet.'))
+                   'Either a subnet or port must be specified. '
+                   'Both ID and name are accepted as SUBNET or PORT. '
+                   'Note that "subnet=" can be omitted when specifying a '
+                   'subnet.'))
         return parser
 
     def run(self, parsed_args):
