@@ -19,6 +19,7 @@ import uuid
 
 import fixtures
 from mox3 import mox
+from oslo.serialization import jsonutils
 import requests
 import requests_mock
 import six
@@ -34,7 +35,6 @@ from keystoneclient import session
 from neutronclient import client
 from neutronclient.common import exceptions
 from neutronclient.common import utils
-from neutronclient.openstack.common import jsonutils
 
 
 USERNAME = 'testuser'

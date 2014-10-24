@@ -21,7 +21,7 @@
 
 
 from neutronclient.common import exceptions
-from neutronclient.openstack.common.gettextutils import _
+from neutronclient.i18n import _
 
 dpd_supported_actions = ['hold', 'clear', 'restart',
                          'restart-by-peer', 'disabled']

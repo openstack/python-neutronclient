@@ -17,8 +17,8 @@
 from __future__ import print_function
 
 from neutronclient.common import utils
+from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
-from neutronclient.openstack.common.gettextutils import _
 
 GW_RESOURCE = 'network_gateway'
 DEV_RESOURCE = 'gateway_device'

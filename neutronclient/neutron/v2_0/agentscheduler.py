@@ -16,10 +16,10 @@
 
 from __future__ import print_function
 
+from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.neutron.v2_0 import network
 from neutronclient.neutron.v2_0 import router
-from neutronclient.openstack.common.gettextutils import _
 
 
 PERFECT_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"

@@ -14,8 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronv20
-from neutronclient.openstack.common.gettextutils import _
 
 
 class ListMeteringLabel(neutronv20.ListCommand):

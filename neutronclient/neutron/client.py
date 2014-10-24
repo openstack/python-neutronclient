@@ -16,7 +16,7 @@
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
-from neutronclient.openstack.common.gettextutils import _
+from neutronclient.i18n import _
 
 
 API_NAME = 'network'

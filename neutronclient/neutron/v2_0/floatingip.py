@@ -18,8 +18,8 @@ from __future__ import print_function
 
 import argparse
 
+from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
-from neutronclient.openstack.common.gettextutils import _
 
 
 class ListFloatingIP(neutronV20.ListCommand):

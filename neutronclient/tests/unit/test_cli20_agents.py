@@ -14,8 +14,9 @@
 
 import sys
 
+from oslo.serialization import jsonutils
+
 from neutronclient.neutron.v2_0 import agent
-from neutronclient.openstack.common import jsonutils
 from neutronclient.tests.unit import test_cli20
 
 

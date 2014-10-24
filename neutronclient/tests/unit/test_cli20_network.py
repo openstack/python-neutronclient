@@ -17,10 +17,10 @@ import itertools
 import sys
 
 from mox3 import mox
+from oslo.serialization import jsonutils
 
 from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0 import network
-from neutronclient.openstack.common import jsonutils
 from neutronclient import shell
 from neutronclient.tests.unit import test_cli20
 

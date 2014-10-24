@@ -21,12 +21,12 @@ import logging
 from xml.etree import ElementTree as etree
 from xml.parsers import expat
 
+from oslo.serialization import jsonutils
 import six
 
 from neutronclient.common import constants
 from neutronclient.common import exceptions as exception
-from neutronclient.openstack.common.gettextutils import _
-from neutronclient.openstack.common import jsonutils
+from neutronclient.i18n import _
 
 LOG = logging.getLogger(__name__)
 

@@ -31,6 +31,7 @@ from keystoneclient.auth.identity import v3 as v3_auth
 from keystoneclient import discover
 from keystoneclient.openstack.common.apiclient import exceptions as ks_exc
 from keystoneclient import session
+from oslo.utils import encodeutils
 import six.moves.urllib.parse as urlparse
 
 from cliff import app
@@ -39,6 +40,7 @@ from cliff import commandmanager
 from neutronclient.common import clientmanager
 from neutronclient.common import exceptions as exc
 from neutronclient.common import utils
+from neutronclient.i18n import _
 from neutronclient.neutron.v2_0 import agent
 from neutronclient.neutron.v2_0 import agentscheduler
 from neutronclient.neutron.v2_0 import credential
@@ -69,8 +71,6 @@ from neutronclient.neutron.v2_0.vpn import ikepolicy
 from neutronclient.neutron.v2_0.vpn import ipsec_site_connection
 from neutronclient.neutron.v2_0.vpn import ipsecpolicy
 from neutronclient.neutron.v2_0.vpn import vpnservice
-from neutronclient.openstack.common.gettextutils import _
-from neutronclient.openstack.common import strutils
 from neutronclient.version import __version__
 
 
@@ -938,7 +938,7 @@ class NeutronShell(app.App):
 def main(argv=sys.argv[1:]):
     try:
         return NeutronShell(NEUTRON_API_VERSION).run(
-            list(map(strutils.safe_decode, argv)))
+            list(map(encodeutils.safe_decode, argv)))
     except KeyboardInterrupt:
         print("... terminating neutron client", file=sys.stderr)
         return 130

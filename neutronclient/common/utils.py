@@ -20,12 +20,12 @@
 import logging
 import os
 
+from oslo.utils import encodeutils
+from oslo.utils import importutils
 import six
 
 from neutronclient.common import _
 from neutronclient.common import exceptions
-from neutronclient.openstack.common import importutils
-from neutronclient.openstack.common import strutils
 
 
 def env(*vars, **kwargs):
@@ -125,7 +125,7 @@ def http_log_req(_logger, args, kwargs):
 
     if 'body' in kwargs and kwargs['body']:
         string_parts.append(" -d '%s'" % (kwargs['body']))
-    req = strutils.safe_encode("".join(string_parts))
+    req = encodeutils.safe_encode("".join(string_parts))
     _logger.debug("\nREQ: %s\n", req)
 
 
@@ -140,7 +140,7 @@ def http_log_resp(_logger, resp, body):
 
 def _safe_encode_without_obj(data):
     if isinstance(data, six.string_types):
-        return strutils.safe_encode(data)
+        return encodeutils.safe_encode(data)
     return data
 
 

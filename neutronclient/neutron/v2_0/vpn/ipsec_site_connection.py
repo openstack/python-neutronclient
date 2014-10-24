@@ -16,12 +16,13 @@
 # @author: Swaminathan Vasudevan, Hewlett-Packard.
 #
 
+from oslo.serialization import jsonutils
+
 from neutronclient.common import exceptions
 from neutronclient.common import utils
+from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronv20
 from neutronclient.neutron.v2_0.vpn import utils as vpn_utils
-from neutronclient.openstack.common.gettextutils import _
-from neutronclient.openstack.common import jsonutils
 
 
 def _format_peer_cidrs(ipsec_site_connection):

@@ -24,13 +24,13 @@ import re
 from cliff.formatters import table
 from cliff import lister
 from cliff import show
+from oslo.serialization import jsonutils
 import six
 
 from neutronclient.common import command
 from neutronclient.common import exceptions
 from neutronclient.common import utils
-from neutronclient.openstack.common.gettextutils import _
-from neutronclient.openstack.common import jsonutils
+from neutronclient.i18n import _
 
 HEX_ELEM = '[0-9A-Fa-f]'
 UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
