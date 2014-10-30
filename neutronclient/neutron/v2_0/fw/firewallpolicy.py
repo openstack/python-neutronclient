@@ -70,7 +70,7 @@ class CreateFirewallPolicy(neutronv20.CreateCommand):
             help=_('Create a shared policy.'),
             default=argparse.SUPPRESS)
         parser.add_argument(
-            '--firewall-rules', type=str.split,
+            '--firewall-rules', type=lambda x: x.split(),
             help=_('Ordered list of whitespace-delimited firewall rule '
                    'names or IDs; e.g., --firewall-rules \"rule1 rule2\"'))
         parser.add_argument(
