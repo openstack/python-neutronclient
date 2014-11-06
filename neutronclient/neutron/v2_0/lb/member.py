@@ -35,6 +35,7 @@ class ShowMember(neutronV20.ShowCommand):
     """Show information of a given member."""
 
     resource = 'member'
+    allow_names = False
 
 
 class CreateMember(neutronV20.CreateCommand):
