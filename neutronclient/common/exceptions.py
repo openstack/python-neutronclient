@@ -13,7 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from neutronclient.common import _
+from neutronclient.i18n import _
 
 """
 Neutron base exception handling.
