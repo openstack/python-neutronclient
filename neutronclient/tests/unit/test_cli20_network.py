@@ -72,6 +72,24 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values,
                                    tenant_id='tenantid')
 
+    def test_create_network_provider_args(self):
+        """Create net: with --provider arguments."""
+        resource = 'network'
+        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+
+        # Test --provider attributes before network name
+        args = ['--provider:network_type', 'vlan',
+                '--provider:physical_network', 'physnet1',
+                '--provider:segmentation_id', '400', name]
+        position_names = ['provider:network_type',
+                          'provider:physical_network',
+                          'provider:segmentation_id', 'name']
+        position_values = ['vlan', 'physnet1', '400', name]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_create_network_tags(self):
         """Create net: myname --tags a b."""
         resource = 'network'
