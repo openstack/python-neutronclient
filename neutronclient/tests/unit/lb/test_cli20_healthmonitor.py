@@ -125,15 +125,6 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
         args = ['--fields', 'id', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
-    def test_show_healthmonitor_id_name(self):
-        """lb-healthmonitor-show."""
-        resource = 'health_monitor'
-        cmd = healthmonitor.ShowHealthMonitor(test_cli20.MyApp(sys.stdout),
-                                              None)
-        args = ['--fields', 'id', '--fields', 'name', self.test_id]
-        self._test_show_resource(resource, cmd, self.test_id,
-                                 args, ['id', 'name'])
-
     def test_update_health_monitor(self):
         """lb-healthmonitor-update  myid --name myname --tags a b."""
         resource = 'health_monitor'
