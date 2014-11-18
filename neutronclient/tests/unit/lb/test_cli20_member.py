@@ -103,14 +103,6 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
         args = ['--fields', 'id', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
-    def test_show_member_id_name(self):
-        """lb-member-show."""
-        resource = 'member'
-        cmd = member.ShowMember(test_cli20.MyApp(sys.stdout), None)
-        args = ['--fields', 'id', '--fields', 'name', self.test_id]
-        self._test_show_resource(resource, cmd, self.test_id,
-                                 args, ['id', 'name'])
-
     def test_update_member(self):
         """lb-member-update  myid --name myname --tags a b."""
         resource = 'member'
