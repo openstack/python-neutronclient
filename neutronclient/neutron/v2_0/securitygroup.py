@@ -134,7 +134,8 @@ class ListSecurityGroupRule(neutronV20.ListCommand):
         sec_group_ids = set()
         for rule in data:
             for key in self.replace_rules:
-                sec_group_ids.add(rule[key])
+                if key in rule:
+                    sec_group_ids.add(rule[key])
         sec_group_ids = list(sec_group_ids)
 
         def _get_sec_group_list(sec_group_ids):
@@ -164,7 +165,8 @@ class ListSecurityGroupRule(neutronV20.ListCommand):
                         for sg in secgroups if sg['name']])
         for rule in data:
             for key in self.replace_rules:
-                rule[key] = sg_dict.get(rule[key], rule[key])
+                if key in rule:
+                    rule[key] = sg_dict.get(rule[key], rule[key])
 
     def setup_columns(self, info, parsed_args):
         parsed_args.columns = self.replace_columns(parsed_args.columns,
