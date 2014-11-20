@@ -35,6 +35,7 @@ class ShowHealthMonitor(neutronV20.ShowCommand):
     """Show information of a given health monitor."""
 
     resource = 'health_monitor'
+    allow_names = False
 
 
 class CreateHealthMonitor(neutronV20.CreateCommand):
@@ -111,6 +112,7 @@ class DeleteHealthMonitor(neutronV20.DeleteCommand):
     """Delete a given health monitor."""
 
     resource = 'health_monitor'
+    allow_names = False
 
 
 class AssociateHealthMonitor(neutronV20.NeutronCommand):
