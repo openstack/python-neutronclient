@@ -53,3 +53,13 @@ class CLITestV20Agent(test_cli20.CLITestV20Base):
         self.assertEqual(1, len(ag))
         self.assertIn("alive", ag.keys())
         self.assertIn(smile, ag.values())
+
+    def test_update_agent(self):
+        """agent-update myid --admin-state-down --description mydescr."""
+        resource = 'agent'
+        cmd = agent.UpdateAgent(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(
+            resource, cmd, 'myid',
+            ['myid', '--admin-state-down', '--description', 'mydescr'],
+            {'description': 'mydescr', 'admin_state_up': False}
+        )
