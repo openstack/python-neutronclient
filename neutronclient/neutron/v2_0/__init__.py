@@ -663,6 +663,14 @@ class ListCommand(NeutronCommand, lister.Lister):
         return (_columns, (utils.get_item_properties(
             s, _columns, formatters=self._formatters, )
             for s in info), )
+        if parsed_args.formatter == 'csv':
+            return (_columns, (utils.get_item_properties(
+                s, _columns, formatters=self._formatters_csv)
+                for s in info),)
+        else:
+            return (_columns, (utils.get_item_properties(
+                s, _columns, formatters=self._formatters)
+                for s in info),)
 
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)', parsed_args)

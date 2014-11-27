@@ -31,11 +31,19 @@ def _format_fixed_ips(port):
         return ''
 
 
+def _format_fixed_ips_csv(port):
+    try:
+        return [utils.dumps(ip) for ip in port['fixed_ips']]
+    except Exception:
+        return ''
+
+
 class ListPort(neutronV20.ListCommand):
     """List ports that belong to a given tenant."""
 
     resource = 'port'
     _formatters = {'fixed_ips': _format_fixed_ips, }
+    _formatters_csv = {'fixed_ips': _format_fixed_ips_csv, }
     list_columns = ['id', 'name', 'mac_address', 'fixed_ips']
     pagination_support = True
     sorting_support = True
