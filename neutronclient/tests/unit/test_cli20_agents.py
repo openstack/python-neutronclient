@@ -63,3 +63,19 @@ class CLITestV20Agent(test_cli20.CLITestV20Base):
             ['myid', '--admin-state-down', '--description', 'mydescr'],
             {'description': 'mydescr', 'admin_state_up': False}
         )
+
+    def test_show_agent(self):
+        """Show agent: --field id --field binary myid."""
+        resource = 'agent'
+        cmd = agent.ShowAgent(test_cli20.MyApp(sys.stdout), None)
+        args = ['--field', 'id', '--field', 'binary', self.test_id]
+        self._test_show_resource(resource, cmd, self.test_id,
+                                 args, ['id', 'binary'])
+
+    def test_delete_agent(self):
+        """Delete agent: myid."""
+        resource = 'agent'
+        cmd = agent.DeleteAgent(test_cli20.MyApp(sys.stdout), None)
+        myid = 'myid'
+        args = [myid]
+        self._test_delete_resource(resource, cmd, myid, args)
