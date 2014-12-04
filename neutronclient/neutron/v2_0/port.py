@@ -38,6 +38,55 @@ def _format_fixed_ips_csv(port):
         return ''
 
 
+def _add_updatable_args(parser):
+    parser.add_argument(
+        '--name',
+        help=_('Name of this port.'))
+    parser.add_argument(
+        '--fixed-ip', metavar='subnet_id=SUBNET,ip_address=IP_ADDR',
+        action='append',
+        help=_('Desired IP and/or subnet for this port: '
+               'subnet_id=<name_or_id>,ip_address=<ip>. '
+               'You can repeat this option.'))
+    parser.add_argument(
+        '--fixed_ip',
+        action='append',
+        help=argparse.SUPPRESS)
+    parser.add_argument(
+        '--device-id',
+        help=_('Device ID of this port.'))
+    parser.add_argument(
+        '--device_id',
+        help=argparse.SUPPRESS)
+    parser.add_argument(
+        '--device-owner',
+        help=_('Device owner of this port.'))
+    parser.add_argument(
+        '--device_owner',
+        help=argparse.SUPPRESS)
+
+
+def _updatable_args2body(parsed_args, body, client):
+    if parsed_args.device_id:
+        body['port'].update({'device_id': parsed_args.device_id})
+    if parsed_args.device_owner:
+        body['port'].update({'device_owner': parsed_args.device_owner})
+    if parsed_args.name:
+        body['port'].update({'name': parsed_args.name})
+    ips = []
+    if parsed_args.fixed_ip:
+        for ip_spec in parsed_args.fixed_ip:
+            ip_dict = utils.str2dict(ip_spec)
+            if 'subnet_id' in ip_dict:
+                subnet_name_id = ip_dict['subnet_id']
+                _subnet_id = neutronV20.find_resourceid_by_name_or_id(
+                    client, 'subnet', subnet_name_id)
+                ip_dict['subnet_id'] = _subnet_id
+            ips.append(ip_dict)
+    if ips:
+        body['port'].update({'fixed_ips': ips})
+
+
 class ListPort(neutronV20.ListCommand):
     """List ports that belong to a given tenant."""
 
@@ -152,9 +201,7 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
     resource = 'port'
 
     def add_known_arguments(self, parser):
-        parser.add_argument(
-            '--name',
-            help=_('Name of this port.'))
+        _add_updatable_args(parser)
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
@@ -169,23 +216,6 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
         parser.add_argument(
             '--mac_address',
             help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--device-id',
-            help=_('Device ID of this port.'))
-        parser.add_argument(
-            '--device_id',
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--fixed-ip', metavar='subnet_id=SUBNET,ip_address=IP_ADDR',
-            action='append',
-            help=_('Desired IP and/or subnet for this port: '
-                   'subnet_id=<name_or_id>,ip_address=<ip>.'
-                   'You can repeat this option.'))
-        parser.add_argument(
-            '--fixed_ip',
-            action='append',
-            help=argparse.SUPPRESS)
-
         self.add_arguments_secgroup(parser)
         self.add_arguments_extradhcpopt(parser)
 
@@ -194,30 +224,16 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
             help=_('Network ID or name this port belongs to.'))
 
     def args2body(self, parsed_args):
+        client = self.get_client()
         _network_id = neutronV20.find_resourceid_by_name_or_id(
-            self.get_client(), 'network', parsed_args.network_id)
+            client, 'network', parsed_args.network_id)
         body = {'port': {'admin_state_up': parsed_args.admin_state,
                          'network_id': _network_id, }, }
+        _updatable_args2body(parsed_args, body, client)
         if parsed_args.mac_address:
             body['port'].update({'mac_address': parsed_args.mac_address})
-        if parsed_args.device_id:
-            body['port'].update({'device_id': parsed_args.device_id})
         if parsed_args.tenant_id:
             body['port'].update({'tenant_id': parsed_args.tenant_id})
-        if parsed_args.name:
-            body['port'].update({'name': parsed_args.name})
-        ips = []
-        if parsed_args.fixed_ip:
-            for ip_spec in parsed_args.fixed_ip:
-                ip_dict = utils.str2dict(ip_spec)
-                if 'subnet_id' in ip_dict:
-                    subnet_name_id = ip_dict['subnet_id']
-                    _subnet_id = neutronV20.find_resourceid_by_name_or_id(
-                        self.get_client(), 'subnet', subnet_name_id)
-                    ip_dict['subnet_id'] = _subnet_id
-                ips.append(ip_dict)
-        if ips:
-            body['port'].update({'fixed_ips': ips})
 
         self.args2body_secgroup(parsed_args, body['port'])
         self.args2body_extradhcpopt(parsed_args, body['port'])
@@ -238,11 +254,25 @@ class UpdatePort(neutronV20.UpdateCommand, UpdatePortSecGroupMixin,
     resource = 'port'
 
     def add_known_arguments(self, parser):
+        _add_updatable_args(parser)
+        parser.add_argument(
+            '--admin-state-up',
+            choices=['True', 'False'],
+            help=_('Set admin state up for the port.'))
+        parser.add_argument(
+            '--admin_state_up',
+            choices=['True', 'False'],
+            help=argparse.SUPPRESS)
         self.add_arguments_secgroup(parser)
         self.add_arguments_extradhcpopt(parser)
 
     def args2body(self, parsed_args):
         body = {'port': {}}
+        client = self.get_client()
+        _updatable_args2body(parsed_args, body, client)
+        if parsed_args.admin_state_up:
+            body['port'].update({'admin_state_up':
+                                parsed_args.admin_state_up})
         self.args2body_secgroup(parsed_args, body['port'])
         self.args2body_extradhcpopt(parsed_args, body['port'])
         return body
