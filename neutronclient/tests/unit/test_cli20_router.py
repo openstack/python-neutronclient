@@ -87,8 +87,17 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
         """Create router: --distributed=True."""
         self._create_router_distributed_or_ha(distributed='True')
 
-    def test_create_router_ha(self):
-        self._create_router_distributed_or_ha(ha=True)
+    def test_create_router_ha_with_True(self):
+        self._create_router_distributed_or_ha(ha='True')
+
+    def test_create_router_ha_with_true(self):
+        self._create_router_distributed_or_ha(ha='true')
+
+    def test_create_router_ha_with_False(self):
+        self._create_router_distributed_or_ha(ha='False')
+
+    def test_create_router_ha_with_false(self):
+        self._create_router_distributed_or_ha(ha='false')
 
     def test_create_router_distributed_False(self):
         """Create router: --distributed=False."""
