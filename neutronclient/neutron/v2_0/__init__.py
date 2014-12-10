@@ -660,9 +660,6 @@ class ListCommand(NeutronCommand, lister.Lister):
             # both list_columns and returned resource.
             # Also Keep their order the same as in list_columns
             _columns = [x for x in self.list_columns if x in _columns]
-        return (_columns, (utils.get_item_properties(
-            s, _columns, formatters=self._formatters, )
-            for s in info), )
         if parsed_args.formatter == 'csv':
             return (_columns, (utils.get_item_properties(
                 s, _columns, formatters=self._formatters_csv)
