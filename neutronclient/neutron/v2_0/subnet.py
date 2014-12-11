@@ -85,6 +85,20 @@ def add_updatable_arguments(parser):
         '--enable-dhcp',
         action='store_true',
         help=_('Enable DHCP for this subnet.'))
+    # NOTE(ihrachys): yes, that's awful, but should be left as-is for
+    # backwards compatibility for versions <=2.3.4 that passed the
+    # boolean values through to the server without any argument
+    # validation.
+    parser.add_argument(
+        '--enable-dhcp=True',
+        action='store_true',
+        dest='enable_dhcp',
+        help=argparse.SUPPRESS)
+    parser.add_argument(
+        '--enable-dhcp=False',
+        action='store_true',
+        dest='disable_dhcp',
+        help=argparse.SUPPRESS)
 
 
 def updatable_args2body(parsed_args, body, for_create=True):
@@ -93,8 +107,8 @@ def updatable_args2body(parsed_args, body, for_create=True):
                                         "--no-gateway option can "
                                         "not be used same time"))
     if parsed_args.disable_dhcp and parsed_args.enable_dhcp:
-        raise exceptions.CommandError(_("--enable-dhcp and --disable-dhcp can "
-                                      "not be used in the same command."))
+        raise exceptions.CommandError(_(
+            "You cannot enable and disable DHCP at the same time."))
 
     if parsed_args.no_gateway:
         body['subnet'].update({'gateway_ip': None})
