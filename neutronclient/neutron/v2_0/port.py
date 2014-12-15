@@ -163,8 +163,8 @@ class UpdateExtraDhcpOptMixin(object):
             action='append',
             dest='extra_dhcp_opts',
             help=_('Extra dhcp options to be assigned to this port: '
-                   'opt_name=<dhcp_option_name>,opt_value=<value>. You can '
-                   'repeat this option.'))
+                   'opt_name=<dhcp_option_name>,opt_value=<value>,'
+                   'ip_version={4,6}. You can repeat this option.'))
 
     def args2body_extradhcpopt(self, parsed_args, port):
         ops = []
@@ -174,19 +174,17 @@ class UpdateExtraDhcpOptMixin(object):
             # both must be thrown out.
             opt_ele = {}
             edo_err_msg = _("Invalid --extra-dhcp-opt option, can only be: "
-                            "opt_name=<dhcp_option_name>,opt_value=<value>. "
+                            "opt_name=<dhcp_option_name>,opt_value=<value>,"
+                            "ip_version={4,6}. "
                             "You can repeat this option.")
             for opt in parsed_args.extra_dhcp_opts:
-                if opt.split('=')[0] in ['opt_value', 'opt_name']:
-                    opt_ele.update(utils.str2dict(opt))
-                    if (('opt_name' in opt_ele) and
-                            ('opt_value' in opt_ele)):
-                        if opt_ele['opt_value'] == 'null':
-                            opt_ele['opt_value'] = None
-                        ops.append(opt_ele)
-                        opt_ele = {}
-                    else:
-                        raise exceptions.CommandError(edo_err_msg)
+                opt_ele.update(utils.str2dict(opt))
+                if ('opt_name' in opt_ele and
+                        ('opt_value' in opt_ele or 'ip_version' in opt_ele)):
+                    if opt_ele.get('opt_value') == 'null':
+                        opt_ele['opt_value'] = None
+                    ops.append(opt_ele)
+                    opt_ele = {}
                 else:
                     raise exceptions.CommandError(edo_err_msg)
 
