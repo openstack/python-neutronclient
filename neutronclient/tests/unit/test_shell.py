@@ -139,7 +139,7 @@ class ShellTest(testtools.TestCase):
         # emulate Keystone version discovery
         mrequests.register_uri('GET',
                                auth.V3_URL,
-                               text=auth.V3_VERSION_ENTRY)
+                               json=auth.V3_VERSION_ENTRY)
 
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)
@@ -174,7 +174,7 @@ class ShellTest(testtools.TestCase):
         # emulate Keystone version discovery
         mrequests.register_uri('GET',
                                auth.V3_URL,
-                               text=auth.V3_VERSION_ENTRY)
+                               json=auth.V3_VERSION_ENTRY)
 
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)
@@ -210,7 +210,7 @@ class ShellTest(testtools.TestCase):
         # emulate Keystone version discovery
         mrequests.register_uri('GET',
                                auth.V2_URL,
-                               text=auth.V2_VERSION_ENTRY)
+                               json=auth.V2_VERSION_ENTRY)
 
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)
@@ -387,7 +387,7 @@ class ShellTest(testtools.TestCase):
         # emulate Keystone version discovery
         mrequests.register_uri('GET',
                                auth.V2_URL,
-                               text=auth.V2_VERSION_ENTRY)
+                               json=auth.V2_VERSION_ENTRY)
 
         neutron_shell = openstack_shell.NeutronShell('2.0')
         self.addCleanup(self.mox.UnsetStubs)

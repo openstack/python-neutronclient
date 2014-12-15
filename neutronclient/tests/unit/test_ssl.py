@@ -48,7 +48,7 @@ class TestSSL(testtools.TestCase):
         # emulate Keystone version discovery
         mrequests.register_uri('GET',
                                auth.V3_URL,
-                               text=auth.V3_VERSION_ENTRY)
+                               json=auth.V3_VERSION_ENTRY)
 
         self.mox.StubOutWithMock(ClientManager, '__init__')
         self.mox.StubOutWithMock(openstack_shell.NeutronShell, 'interact')
@@ -93,7 +93,7 @@ class TestSSL(testtools.TestCase):
         # emulate Keystone version discovery
         mrequests.register_uri('GET',
                                auth.V3_URL,
-                               text=auth.V3_VERSION_ENTRY)
+                               json=auth.V3_VERSION_ENTRY)
 
         self.useFixture(fixtures.EnvironmentVariable('OS_CACERT', CA_CERT))
 

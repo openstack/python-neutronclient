@@ -66,54 +66,18 @@ ENDPOINTS_RESULT = {
     }]
 }
 
-BASE_HOST = 'http://keystone.example.com'
-BASE_URL = "%s:5000/" % BASE_HOST
-UPDATED = '2013-03-06T00:00:00Z'
+BASE_URL = "http://keystone.example.com:5000/"
 
-# FIXME (bklei): A future release of keystoneclient will support
-# a discovery fixture which can replace these constants and clean
-# this up.
 V2_URL = "%sv2.0" % BASE_URL
-V2_DESCRIBED_BY_HTML = {'href': 'http://docs.openstack.org/api/'
-                                'openstack-identity-service/2.0/content/',
-                        'rel': 'describedby',
-                        'type': 'text/html'}
-
-V2_DESCRIBED_BY_PDF = {'href': 'http://docs.openstack.org/api/openstack-ident'
-                               'ity-service/2.0/identity-dev-guide-2.0.pdf',
-                       'rel': 'describedby',
-                       'type': 'application/pdf'}
-
-V2_VERSION = {'id': 'v2.0',
-              'links': [{'href': V2_URL, 'rel': 'self'},
-                        V2_DESCRIBED_BY_HTML, V2_DESCRIBED_BY_PDF],
-              'status': 'stable',
-              'updated': UPDATED}
-
 V3_URL = "%sv3" % BASE_URL
-V3_MEDIA_TYPES = [{'base': 'application/json',
-                   'type': 'application/vnd.openstack.identity-v3+json'},
-                  {'base': 'application/xml',
-                   'type': 'application/vnd.openstack.identity-v3+xml'}]
 
-V3_VERSION = {'id': 'v3.0',
-              'links': [{'href': V3_URL, 'rel': 'self'}],
-              'media-types': V3_MEDIA_TYPES,
-              'status': 'stable',
-              'updated': UPDATED}
+_v2 = fixture.V2Discovery(V2_URL)
+_v3 = fixture.V3Discovery(V3_URL)
 
+V3_VERSION_LIST = jsonutils.dumps({'versions': {'values': [_v2, _v3]}})
 
-def _create_version_entry(version):
-    return jsonutils.dumps({'version': version})
-
-
-def _create_version_list(versions):
-    return jsonutils.dumps({'versions': {'values': versions}})
-
-
-V3_VERSION_LIST = _create_version_list([V3_VERSION, V2_VERSION])
-V3_VERSION_ENTRY = _create_version_entry(V3_VERSION)
-V2_VERSION_ENTRY = _create_version_entry(V2_VERSION)
+V2_VERSION_ENTRY = {'version': _v2}
+V3_VERSION_ENTRY = {'version': _v3}
 
 
 def get_response(status_code, headers=None):
@@ -130,7 +94,7 @@ def setup_keystone_v2(mrequests):
 
     mrequests.register_uri('POST',
                            '%s/tokens' % (V2_URL),
-                           text=json.dumps(v2_token))
+                           json=v2_token)
 
     auth_session = session.Session()
     auth_plugin = ks_v2_auth.Password(V2_URL, 'xx', 'xx')
@@ -140,7 +104,7 @@ def setup_keystone_v2(mrequests):
 def setup_keystone_v3(mrequests):
     mrequests.register_uri('GET',
                            V3_URL,
-                           text=V3_VERSION_ENTRY)
+                           json=V3_VERSION_ENTRY)
 
     v3_token = fixture.V3Token()
     service = v3_token.add_service('network')
