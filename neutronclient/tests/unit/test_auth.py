@@ -28,8 +28,7 @@ import testtools
 from keystoneclient.auth.identity import v2 as ks_v2_auth
 from keystoneclient.auth.identity import v3 as ks_v3_auth
 from keystoneclient import exceptions as ks_exceptions
-from keystoneclient.fixture import v2 as ks_v2_fixture
-from keystoneclient.fixture import v3 as ks_v3_fixture
+from keystoneclient import fixture
 from keystoneclient import session
 
 from neutronclient import client
@@ -47,28 +46,14 @@ PUBLIC_ENDPOINT_URL = 'public_%s' % ENDPOINT_URL
 ADMIN_ENDPOINT_URL = 'admin_%s' % ENDPOINT_URL
 INTERNAL_ENDPOINT_URL = 'internal_%s' % ENDPOINT_URL
 ENDPOINT_OVERRIDE = 'otherurl'
-TOKEN = 'tokentoken'
 TOKENID = uuid.uuid4().hex
 REGION = 'RegionOne'
 NOAUTH = 'noauth'
 
-KS_TOKEN_RESULT = {
-    'access': {
-        'token': {'id': TOKEN,
-                  'expires': '2012-08-11T07:49:01Z',
-                  'tenant': {'id': str(uuid.uuid1())}},
-        'user': {'id': str(uuid.uuid1())},
-        'serviceCatalog': [
-            {'endpoints_links': [],
-             'endpoints': [{'adminURL': ENDPOINT_URL,
-                            'internalURL': ENDPOINT_URL,
-                            'publicURL': ENDPOINT_URL,
-                            'region': REGION}],
-             'type': 'network',
-             'name': 'Neutron Service'}
-        ]
-    }
-}
+KS_TOKEN_RESULT = fixture.V2Token()
+KS_TOKEN_RESULT.set_scope()
+_s = KS_TOKEN_RESULT.add_service('network', 'Neutron Service')
+_s.add_endpoint(ENDPOINT_URL, region=REGION)
 
 ENDPOINTS_RESULT = {
     'endpoints': [{
@@ -139,7 +124,7 @@ def get_response(status_code, headers=None):
 
 
 def setup_keystone_v2(mrequests):
-    v2_token = ks_v2_fixture.Token(token_id=TOKENID)
+    v2_token = fixture.V2Token(token_id=TOKENID)
     service = v2_token.add_service('network')
     service.add_endpoint(PUBLIC_ENDPOINT_URL, region=REGION)
 
@@ -157,7 +142,7 @@ def setup_keystone_v3(mrequests):
                            V3_URL,
                            text=V3_VERSION_ENTRY)
 
-    v3_token = ks_v3_fixture.Token()
+    v3_token = fixture.V3Token()
     service = v3_token.add_service('network')
     service.add_standard_endpoints(public=PUBLIC_ENDPOINT_URL,
                                    admin=ADMIN_ENDPOINT_URL,
@@ -235,13 +220,14 @@ class CLITestAuthKeystone(testtools.TestCase):
         """Test that Client.get_auth_info() works even if client was
            instantiated with predefined token.
         """
+        token_id = uuid.uuid4().hex
         client_ = client.HTTPClient(username=USERNAME,
                                     tenant_name=TENANT_NAME,
-                                    token=TOKEN,
+                                    token=token_id,
                                     password=PASSWORD,
                                     auth_url=AUTH_URL,
                                     region_name=REGION)
-        expected = {'auth_token': TOKEN,
+        expected = {'auth_token': token_id,
                     'auth_tenant_id': None,
                     'auth_user_id': None,
                     'endpoint_url': self.client.endpoint_url}
@@ -275,7 +261,8 @@ class CLITestAuthKeystone(testtools.TestCase):
     def test_refresh_token(self):
         self.mox.StubOutWithMock(self.client, "request")
 
-        self.client.auth_token = TOKEN
+        token_id = uuid.uuid4().hex
+        self.client.auth_token = token_id
         self.client.endpoint_url = ENDPOINT_URL
 
         res200 = get_response(200)
@@ -284,7 +271,7 @@ class CLITestAuthKeystone(testtools.TestCase):
         # If a token is expired, neutron server retruns 401
         self.client.request(
             mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
-            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+            headers=mox.ContainsKeyValue('X-Auth-Token', token_id)
         ).AndReturn((res401, ''))
         self.client.request(
             AUTH_URL + '/tokens', 'POST',
@@ -292,7 +279,8 @@ class CLITestAuthKeystone(testtools.TestCase):
         ).AndReturn((res200, json.dumps(KS_TOKEN_RESULT)))
         self.client.request(
             mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
-            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+            headers=mox.ContainsKeyValue('X-Auth-Token',
+                                         KS_TOKEN_RESULT.token_id)
         ).AndReturn((res200, ''))
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
@@ -301,7 +289,8 @@ class CLITestAuthKeystone(testtools.TestCase):
         self.mox.StubOutWithMock(self.client, "request")
         self.client.auth_url = None
 
-        self.client.auth_token = TOKEN
+        token_id = uuid.uuid4().hex
+        self.client.auth_token = token_id
         self.client.endpoint_url = ENDPOINT_URL
 
         res401 = get_response(401)
@@ -309,7 +298,7 @@ class CLITestAuthKeystone(testtools.TestCase):
         # If a token is expired, neutron server returns 401
         self.client.request(
             mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
-            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+            headers=mox.ContainsKeyValue('X-Auth-Token', token_id)
         ).AndReturn((res401, ''))
         self.mox.ReplayAll()
         self.assertRaises(exceptions.NoAuthURLProvided,
@@ -326,17 +315,18 @@ class CLITestAuthKeystone(testtools.TestCase):
     def test_get_endpoint_url(self):
         self.mox.StubOutWithMock(self.client, "request")
 
-        self.client.auth_token = TOKEN
+        token_id = uuid.uuid4().hex
+        self.client.auth_token = token_id
 
         res200 = get_response(200)
 
         self.client.request(
-            mox.StrContains(AUTH_URL + '/tokens/%s/endpoints' % TOKEN), 'GET',
-            headers=mox.IsA(dict)
+            mox.StrContains(AUTH_URL + '/tokens/%s/endpoints' % token_id),
+            'GET', headers=mox.IsA(dict)
         ).AndReturn((res200, json.dumps(ENDPOINTS_RESULT)))
         self.client.request(
             mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
-            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+            headers=mox.ContainsKeyValue('X-Auth-Token', token_id)
         ).AndReturn((res200, ''))
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
@@ -350,12 +340,14 @@ class CLITestAuthKeystone(testtools.TestCase):
 
         self.mox.StubOutWithMock(self.client, "request")
 
-        self.client.auth_token = TOKEN
+        token_id = uuid.uuid4().hex
+
+        self.client.auth_token = token_id
         res200 = get_response(200)
 
         self.client.request(
             mox.StrContains(ENDPOINT_OVERRIDE + '/resource'), 'GET',
-            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+            headers=mox.ContainsKeyValue('X-Auth-Token', token_id)
         ).AndReturn((res200, ''))
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
@@ -367,12 +359,13 @@ class CLITestAuthKeystone(testtools.TestCase):
             auth_url=AUTH_URL, region_name=REGION, endpoint_type='otherURL')
         self.mox.StubOutWithMock(self.client, "request")
 
-        self.client.auth_token = TOKEN
+        token_id = uuid.uuid4().hex
+        self.client.auth_token = token_id
         res200 = get_response(200)
 
         self.client.request(
-            mox.StrContains(AUTH_URL + '/tokens/%s/endpoints' % TOKEN), 'GET',
-            headers=mox.IsA(dict)
+            mox.StrContains(AUTH_URL + '/tokens/%s/endpoints' % token_id),
+            'GET', headers=mox.IsA(dict)
         ).AndReturn((res200, json.dumps(ENDPOINTS_RESULT)))
         self.mox.ReplayAll()
         self.assertRaises(exceptions.EndpointTypeNotFound,
@@ -383,14 +376,15 @@ class CLITestAuthKeystone(testtools.TestCase):
     def test_get_endpoint_url_failed(self):
         self.mox.StubOutWithMock(self.client, "request")
 
-        self.client.auth_token = TOKEN
+        token_id = uuid.uuid4().hex
+        self.client.auth_token = token_id
 
         res200 = get_response(200)
         res401 = get_response(401)
 
         self.client.request(
-            mox.StrContains(AUTH_URL + '/tokens/%s/endpoints' % TOKEN), 'GET',
-            headers=mox.IsA(dict)
+            mox.StrContains(AUTH_URL + '/tokens/%s/endpoints' % token_id),
+            'GET', headers=mox.IsA(dict)
         ).AndReturn((res401, ''))
         self.client.request(
             AUTH_URL + '/tokens', 'POST',
@@ -398,7 +392,8 @@ class CLITestAuthKeystone(testtools.TestCase):
         ).AndReturn((res200, json.dumps(KS_TOKEN_RESULT)))
         self.client.request(
             mox.StrContains(ENDPOINT_URL + '/resource'), 'GET',
-            headers=mox.ContainsKeyValue('X-Auth-Token', TOKEN)
+            headers=mox.ContainsKeyValue('X-Auth-Token',
+                                         KS_TOKEN_RESULT.token_id)
         ).AndReturn((res200, ''))
         self.mox.ReplayAll()
         self.client.do_request('/resource', 'GET')
