@@ -75,23 +75,71 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
             return
         self.fail('No exception for bad gateway option')
 
+    def _test_create_resource_and_catch_command_error(self, tested_args,
+                                                      should_fail,
+                                                      *args):
+        _j = lambda args: ' '.join(args)
+        try:
+            self._test_create_resource(*args)
+        except exceptions.CommandError:
+            if not should_fail:
+                self.fail(
+                    'Unexpected exception raised for %s options' %
+                    _j(tested_args))
+            self.mox.UnsetStubs()
+        else:
+            if should_fail:
+                self.fail(
+                    'No exception for %s options' % _j(tested_args))
+
     def test_create_subnet_with_enable_and_disable_dhcp(self):
-        """Create sbunet: --enable-dhcp and --disable-dhcp."""
+        """Create subnet: --enable-dhcp and --disable-dhcp."""
         resource = 'subnet'
         cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
         cidr = 'cidrvalue'
-        args = ['--enable-dhcp', '--disable-dhcp', netid, cidr]
-        position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
-        position_values = [4, netid, cidr, None]
-        try:
-            self._test_create_resource(resource, cmd, name, myid, args,
-                                       position_names, position_values)
-        except exceptions.CommandError:
-            return
-        self.fail('No exception for --enable-dhcp --disable-dhcp option')
+        position_names = ['ip_version', 'network_id', 'cidr', 'enable_dhcp']
+        # enable_dhcp value is appended later inside the loop
+        position_values = [4, netid, cidr]
+        for enable_dhcp_arg, should_fail in (
+                ('--enable-dhcp=False', False),
+                ('--enable-dhcp=True', True),
+                ('--enable-dhcp', True)
+        ):
+            tested_args = [enable_dhcp_arg, '--disable-dhcp']
+            args = tested_args + [netid, cidr]
+            pos_values = position_values + [should_fail]
+            self._test_create_resource_and_catch_command_error(
+                tested_args, should_fail,
+                resource, cmd, name, myid, args, position_names, pos_values)
+
+    def test_create_subnet_with_multiple_enable_dhcp(self):
+        """Create subnet with multiple --enable-dhcp arguments passed."""
+        resource = 'subnet'
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'cidrvalue'
+        position_names = ['ip_version', 'network_id', 'cidr', 'enable_dhcp']
+        # enable_dhcp value is appended later inside the loop
+        position_values = [4, netid, cidr]
+
+        _ = 'UNUSED_MARKER'
+        for tested_args, should_fail, pos_value in (
+                (['--enable-dhcp', '--enable-dhcp=True'], False, True),
+                (['--enable-dhcp', '--enable-dhcp=False'], True, _),
+                (['--enable-dhcp=False', '--enable-dhcp'], True, _),
+                (['--enable-dhcp=True', '--enable-dhcp=False'], True, _),
+                (['--enable-dhcp=False', '--enable-dhcp=True'], True, _)
+        ):
+            args = tested_args + [netid, cidr]
+            pos_values = position_values + [pos_value]
+            self._test_create_resource_and_catch_command_error(
+                tested_args, should_fail,
+                resource, cmd, name, myid, args, position_names, pos_values)
 
     def test_create_subnet_tenant(self):
         """Create subnet: --tenant_id tenantid netid cidr."""
