@@ -8,7 +8,7 @@ iso8601>=0.1.9
 netaddr>=0.7.12
 oslo.i18n>=1.0.0  # Apache-2.0
 oslo.serialization>=1.0.0               # Apache-2.0
-oslo.utils>=1.0.0                       # Apache-2.0
+oslo.utils>=1.1.0                       # Apache-2.0
 requests>=2.2.0,!=2.4.0
 python-keystoneclient>=0.11.1
 simplejson>=2.2.0
