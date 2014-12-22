@@ -427,7 +427,7 @@ class ShellTest(testtools.TestCase):
         self.mox.StubOutClassWithMocks(openstack_shell, 'NeutronShell')
         qshell_mock = openstack_shell.NeutronShell('2.0')
         unicode_text = u'\u7f51\u7edc'
-        argv = ['net-list', unicode_text, unicode_text.encode('utf-8')]
+        argv = ['net-list', unicode_text, unicode_text]
         qshell_mock.run([u'net-list', unicode_text,
                          unicode_text]).AndReturn(0)
         self.mox.ReplayAll()

@@ -17,10 +17,10 @@
 import contextlib
 import itertools
 import sys
-import urllib
 
 import fixtures
 from mox3 import mox
+from oslo.utils import encodeutils
 from oslotest import base
 import requests
 import six
@@ -28,6 +28,7 @@ import six.moves.urllib.parse as urlparse
 
 from neutronclient.common import constants
 from neutronclient.common import exceptions
+from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV2_0
 from neutronclient import shell
 from neutronclient.v2_0 import client
@@ -333,12 +334,12 @@ class CLITestV20Base(base.BaseTestCase):
             args.append("--tag")
         for tag in tags:
             args.append(tag)
-            if isinstance(tag, unicode):
-                tag = urllib.quote(tag.encode('utf-8'))
+            tag_query = urlparse.urlencode(
+                {'tag': encodeutils.safe_encode(tag)})
             if query:
-                query += "&tag=" + tag
+                query += "&" + tag_query
             else:
-                query = "tag=" + tag
+                query = tag_query
         if (not tags) and fields_2:
             args.append('--')
         if fields_2:
@@ -567,17 +568,16 @@ class ClientV2TestJson(CLITestV20Base):
         unicode_text = u'\u7f51\u7edc'
         # url with unicode
         action = u'/test'
-        expected_action = action.encode('utf-8')
+        expected_action = action
         # query string with unicode
         params = {'test': unicode_text}
-        expect_query = urllib.urlencode({'test':
-                                         unicode_text.encode('utf-8')})
+        expect_query = urlparse.urlencode(utils.safe_encode_dict(params))
         # request body with unicode
         body = params
         expect_body = self.client.serialize(body)
-        # headers with unicode
-        self.client.httpclient.auth_token = unicode_text
-        expected_auth_token = unicode_text.encode('utf-8')
+        self.client.httpclient.auth_token = encodeutils.safe_encode(
+            unicode_text)
+        expected_auth_token = encodeutils.safe_encode(unicode_text)
 
         self.client.httpclient.request(
             end_url(expected_action, query=expect_query, format=self.format),
