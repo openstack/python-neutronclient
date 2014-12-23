@@ -719,8 +719,8 @@ class NeutronShell(app.App):
                 project_info = (self.options.os_tenant_name or
                                 self.options.os_tenant_id or
                                 (self.options.os_project_name and
-                                    (self.options.project_domain_name or
-                                     self.options.project_domain_id)) or
+                                    (self.options.os_project_domain_name or
+                                     self.options.os_project_domain_id)) or
                                 self.options.os_project_id)
 
                 if (not self.options.os_username
