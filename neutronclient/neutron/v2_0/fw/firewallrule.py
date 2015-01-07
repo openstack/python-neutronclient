@@ -97,7 +97,8 @@ class CreateFirewallRule(neutronv20.CreateCommand):
                    'a:b).'))
         parser.add_argument(
             '--enabled',
-            dest='enabled', choices=['True', 'False'],
+            dest='enabled', metavar='{True,False}',
+            choices=['True', 'true', 'False', 'false'],
             help=_('Whether to enable or disable this rule.'),
             default=argparse.SUPPRESS)
         parser.add_argument(

@@ -74,8 +74,8 @@ class CreateRouter(neutronV20.CreateCommand):
             help=_('Create a distributed router.'))
         parser.add_argument(
             '--ha',
-            dest='ha',
-            choices=['True', 'False'],
+            dest='ha', metavar='{True,False}',
+            choices=['True', 'true', 'false', 'False'],
             default=argparse.SUPPRESS,
             help=_('Create a highly available router.'))
 

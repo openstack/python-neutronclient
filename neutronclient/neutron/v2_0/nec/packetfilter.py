@@ -71,7 +71,8 @@ class PacketFilterOptionMixin(object):
                 help=_('Set Admin State Up to false'))
         else:
             parser.add_argument(
-                '--admin-state', choices=['True', 'False'],
+                '--admin-state', metavar='{True,False}',
+                choices=['True', 'true', 'False', 'false'],
                 help=_('Set a value of Admin State Up'))
 
         parser.add_argument(

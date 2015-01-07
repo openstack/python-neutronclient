@@ -46,6 +46,12 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
                                    protocol=protocol, action=action,
                                    enabled=enabled, tenant_id=tenant_id)
 
+    def test_create_enabled_firewall_rule_with_mandatory_params_lcase(self):
+        self._test_create_firewall_rule_with_mandatory_params(enabled='true')
+
+    def test_create_disabled_firewall_rule_with_mandatory_params_lcase(self):
+        self._test_create_firewall_rule_with_mandatory_params(enabled='false')
+
     def test_create_enabled_firewall_rule_with_mandatory_params(self):
         self._test_create_firewall_rule_with_mandatory_params(enabled='True')
 
