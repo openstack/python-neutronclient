@@ -127,6 +127,29 @@ class ShellTest(testtools.TestCase):
             matchers.MatchesRegex(required))
         self.assertFalse(stderr)
 
+    def test_bash_completion_in_outputs_of_help_command(self):
+        help_text, stderr = self.shell('help')
+        self.assertFalse(stderr)
+        completion_cmd = "bash-completion"
+        completion_help_str = ("Prints all of the commands and options "
+                               "for bash-completion.")
+        self.assertIn(completion_cmd, help_text)
+        self.assertIn(completion_help_str, help_text)
+
+    def test_bash_completion_command(self):
+        # just check we have some output
+        required = [
+            '.*--tenant_id',
+            '.*--client-certificate',
+            '.*help',
+            '.*gateway-device-create',
+            '.*--dns-nameserver']
+        help_text, stderr = self.shell('neutron bash-completion')
+        self.assertFalse(stderr)
+        for r in required:
+            self.assertThat(help_text,
+                            matchers.MatchesRegex(r, re.DOTALL | re.MULTILINE))
+
     def test_unknown_auth_strategy(self):
         self.useFixture(fixtures.FakeLogger(level=logging.DEBUG))
         stdout, stderr = self.shell('--os-auth-strategy fake quota-list')
