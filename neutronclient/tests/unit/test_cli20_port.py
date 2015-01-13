@@ -227,6 +227,19 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_list_resources(resources, cmd,
                                   fields_1=['a', 'b'], fields_2=['c', 'd'])
 
+    def test_list_ports_with_fixed_ips_in_csv(self):
+        """List ports: -f csv."""
+        resources = "ports"
+        cmd = port.ListPort(test_cli20.MyApp(sys.stdout), None)
+        fixed_ips = [{"subnet_id": "30422057-d6df-4c90-8314-aefb5e326666",
+                      "ip_address": "10.0.0.12"},
+                     {"subnet_id": "30422057-d6df-4c90-8314-aefb5e326666",
+                      "ip_address": "10.0.0.4"}]
+        contents = [{'name': 'name1', 'fixed_ips': fixed_ips}]
+        self._test_list_resources(resources, cmd, True,
+                                  response_contents=contents,
+                                  output_format='csv')
+
     def _test_list_router_port(self, resources, cmd,
                                myid, detail=False, tags=(),
                                fields_1=(), fields_2=()):
