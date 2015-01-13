@@ -15,15 +15,13 @@
 
 import abc
 
-from mox3 import mox
-import requests_mock
+from requests_mock.contrib import fixture as mock_fixture
 import six
 import testtools
 
 from neutronclient import client
 from neutronclient.common import exceptions
 from neutronclient.tests.unit import test_auth
-from neutronclient.tests.unit.test_cli20 import MyResp
 
 
 AUTH_TOKEN = 'test_token'
@@ -39,10 +37,8 @@ class TestHTTPClientMixin(object):
     def setUp(self):
         super(TestHTTPClientMixin, self).setUp()
 
+        self.requests = self.useFixture(mock_fixture.Fixture())
         self.clazz, self.http = self.initialize()
-        self.mox = mox.Mox()
-        self.addCleanup(self.mox.UnsetStubs)
-        self.mox.StubOutWithMock(self.clazz, '_request')
 
     @abc.abstractmethod
     def initialize(self):
@@ -50,12 +46,10 @@ class TestHTTPClientMixin(object):
 
     def _test_headers(self, expected_headers, **kwargs):
         """Test headers."""
-        self.clazz._request(URL, METHOD,
-                            body=kwargs.get('body'),
-                            headers=expected_headers)
-        self.mox.ReplayAll()
+        self.requests.register_uri(METHOD, URL,
+                                   request_headers=expected_headers)
         self.http.request(URL, METHOD, **kwargs)
-        self.mox.VerifyAll()
+        self.assertEqual(kwargs.get('body'), self.requests.last_request.body)
 
     def test_headers_without_body(self):
         self._test_headers({'Accept': 'application/json'})
@@ -82,9 +76,8 @@ class TestHTTPClientMixin(object):
 
 class TestSessionClient(TestHTTPClientMixin, testtools.TestCase):
 
-    @requests_mock.Mocker()
-    def initialize(self, mrequests):
-        session, auth = test_auth.setup_keystone_v2(mrequests)
+    def initialize(self):
+        session, auth = test_auth.setup_keystone_v2(self.requests)
         return [client.SessionClient,
                 client.SessionClient(session=session, auth=auth)]
 
@@ -96,47 +89,35 @@ class TestHTTPClient(TestHTTPClientMixin, testtools.TestCase):
                 client.HTTPClient(token=AUTH_TOKEN, endpoint_url=END_URL)]
 
     def test_request_error(self):
-        self.clazz._request(
-            URL, METHOD, body=None, headers=mox.IgnoreArg()
-        ).AndRaise(Exception('error msg'))
-        self.mox.ReplayAll()
+        def cb(*args, **kwargs):
+            raise Exception('error msg')
 
+        self.requests.get(URL, body=cb)
         self.assertRaises(
             exceptions.ConnectionFailed,
             self.http._cs_request,
             URL, METHOD
         )
-        self.mox.VerifyAll()
 
     def test_request_success(self):
-        rv_should_be = MyResp(200), 'test content'
+        text = 'test content'
+        self.requests.register_uri(METHOD, URL, text=text)
 
-        self.clazz._request(
-            URL, METHOD, body=None, headers=mox.IgnoreArg()
-        ).AndReturn(rv_should_be)
-        self.mox.ReplayAll()
-
-        self.assertEqual(rv_should_be, self.http._cs_request(URL, METHOD))
-        self.mox.VerifyAll()
+        resp, resp_text = self.http._cs_request(URL, METHOD)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(text, resp_text)
 
     def test_request_unauthorized(self):
-        rv_should_be = MyResp(401), 'unauthorized message'
-        self.clazz._request(
-            URL, METHOD, body=None, headers=mox.IgnoreArg()
-        ).AndReturn(rv_should_be)
-        self.mox.ReplayAll()
-
+        text = 'unauthorized message'
+        self.requests.register_uri(METHOD, URL, status_code=401, text=text)
         e = self.assertRaises(exceptions.Unauthorized,
                               self.http._cs_request, URL, METHOD)
-        self.assertEqual('unauthorized message', e.message)
-        self.mox.VerifyAll()
+        self.assertEqual(text, e.message)
 
     def test_request_forbidden_is_returned_to_caller(self):
-        rv_should_be = MyResp(403), 'forbidden message'
-        self.clazz._request(
-            URL, METHOD, body=None, headers=mox.IgnoreArg()
-        ).AndReturn(rv_should_be)
-        self.mox.ReplayAll()
+        text = 'forbidden message'
+        self.requests.register_uri(METHOD, URL, status_code=403, text=text)
 
-        self.assertEqual(rv_should_be, self.http._cs_request(URL, METHOD))
-        self.mox.VerifyAll()
+        resp, resp_text = self.http._cs_request(URL, METHOD)
+        self.assertEqual(403, resp.status_code)
+        self.assertEqual(text, resp_text)
