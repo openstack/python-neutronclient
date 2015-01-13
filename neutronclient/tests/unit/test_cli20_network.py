@@ -85,6 +85,20 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values,
                                    tags=['a', 'b'])
 
+    def test_create_network_external(self):
+        """Create net: --router:external myname."""
+        resource = 'network'
+        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        args = [name, '--router:external']
+        position_names = ['name', ]
+        position_values = [name, ]
+        external = {'router:external': True}
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   **external)
+
     def test_create_network_state(self):
         """Create net: --admin_state_down myname."""
         resource = 'network'

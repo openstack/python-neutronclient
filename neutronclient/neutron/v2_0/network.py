@@ -120,6 +120,11 @@ class CreateNetwork(neutronV20.CreateCommand):
             help=_('Set the network as shared.'),
             default=argparse.SUPPRESS)
         parser.add_argument(
+            '--router:external',
+            action='store_true',
+            help=_('Set network as external, it is only available for admin'),
+            default=argparse.SUPPRESS)
+        parser.add_argument(
             'name', metavar='NAME',
             help=_('Name of network to create.'))
 
@@ -128,7 +133,8 @@ class CreateNetwork(neutronV20.CreateCommand):
             'name': parsed_args.name,
             'admin_state_up': parsed_args.admin_state}, }
         neutronV20.update_dict(parsed_args, body['network'],
-                               ['shared', 'tenant_id'])
+                               ['shared', 'tenant_id', 'router:external'])
+
         return body
 
 
