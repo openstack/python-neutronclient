@@ -316,7 +316,6 @@ class CLITestAuthKeystone(testtools.TestCase):
             auth_url=AUTH_URL, region_name=REGION,
             session=auth_session, auth=auth_plugin)
 
-        self.client.authenticate()
         self.assertEqual(self.client.endpoint_url, PUBLIC_ENDPOINT_URL)
 
         # Test admin url
@@ -325,7 +324,6 @@ class CLITestAuthKeystone(testtools.TestCase):
             auth_url=AUTH_URL, region_name=REGION, endpoint_type='adminURL',
             session=auth_session, auth=auth_plugin)
 
-        self.client.authenticate()
         self.assertEqual(self.client.endpoint_url, ADMIN_ENDPOINT_URL)
 
         # Test public url
@@ -334,7 +332,6 @@ class CLITestAuthKeystone(testtools.TestCase):
             auth_url=AUTH_URL, region_name=REGION, endpoint_type='publicURL',
             session=auth_session, auth=auth_plugin)
 
-        self.client.authenticate()
         self.assertEqual(self.client.endpoint_url, PUBLIC_ENDPOINT_URL)
 
         # Test internal url
@@ -343,7 +340,6 @@ class CLITestAuthKeystone(testtools.TestCase):
             auth_url=AUTH_URL, region_name=REGION, endpoint_type='internalURL',
             session=auth_session, auth=auth_plugin)
 
-        self.client.authenticate()
         self.assertEqual(self.client.endpoint_url, INTERNAL_ENDPOINT_URL)
 
         # Test url that isn't found in the service catalog
@@ -354,7 +350,7 @@ class CLITestAuthKeystone(testtools.TestCase):
 
         self.assertRaises(
             ks_exceptions.EndpointNotFound,
-            self.client.authenticate)
+            getattr, self.client, 'endpoint_url')
 
     def test_strip_credentials_from_log(self):
         m = self.requests.post(AUTH_URL + '/tokens', json=KS_TOKEN_RESULT)

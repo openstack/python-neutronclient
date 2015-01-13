@@ -256,8 +256,6 @@ class Client(object):
                      'net_partitions': 'net_partition',
                      'packet_filters': 'packet_filter',
                      }
-    # 8192 Is the default max URI len for eventlet.wsgi.server
-    MAX_URI_LEN = 8192
 
     def get_attr_metadata(self):
         if self.format == 'json':
@@ -1219,12 +1217,6 @@ class Client(object):
         # Raise the appropriate exception
         exception_handler_v20(status_code, des_error_body)
 
-    def _check_uri_length(self, action):
-        uri_len = len(self.httpclient.endpoint_url) + len(action)
-        if uri_len > self.MAX_URI_LEN:
-            raise exceptions.RequestURITooLong(
-                excess=uri_len - self.MAX_URI_LEN)
-
     def do_request(self, method, action, body=None, headers=None, params=None):
         # Add format and tenant_id
         action += ".%s" % self.format
@@ -1232,9 +1224,6 @@ class Client(object):
         if type(params) is dict and params:
             params = utils.safe_encode_dict(params)
             action += '?' + urlparse.urlencode(params, doseq=1)
-        # Ensure client always has correct uri - do not guesstimate anything
-        self.httpclient.authenticate_and_fetch_endpoint_url()
-        self._check_uri_length(action)
 
         if body:
             body = self.serialize(body)
