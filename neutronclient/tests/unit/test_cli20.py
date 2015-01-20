@@ -177,11 +177,6 @@ class CLITestV20Base(base.BaseTestCase):
 
     def _get_attr_metadata(self):
         return self.metadata
-        client.Client.EXTED_PLURALS.update(constants.PLURALS)
-        client.Client.EXTED_PLURALS.update({'tags': 'tag'})
-        return {'plurals': client.Client.EXTED_PLURALS,
-                'xmlns': constants.XML_NS_V20,
-                constants.EXT_NS: {'prefix': 'http://xxxx.yy.com'}}
 
     def setUp(self, plurals=None):
         """Prepare the test environment."""
