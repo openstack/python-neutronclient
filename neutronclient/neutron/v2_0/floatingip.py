@@ -61,6 +61,9 @@ class CreateFloatingIP(neutronV20.CreateCommand):
         parser.add_argument(
             '--fixed_ip_address',
             help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--floating-ip-address',
+            help=_('IP address of the floating IP'))
 
     def args2body(self, parsed_args):
         _network_id = neutronV20.find_resourceid_by_name_or_id(
@@ -73,6 +76,9 @@ class CreateFloatingIP(neutronV20.CreateCommand):
         if parsed_args.fixed_ip_address:
             body[self.resource].update({'fixed_ip_address':
                                         parsed_args.fixed_ip_address})
+        if parsed_args.floating_ip_address:
+            body[self.resource].update({'floating_ip_address':
+                                        parsed_args.floating_ip_address})
         return body
 
 
