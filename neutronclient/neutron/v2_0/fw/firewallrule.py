@@ -104,7 +104,7 @@ class CreateFirewallRule(neutronv20.CreateCommand):
         parser.add_argument(
             '--action',
             required=True,
-            choices=['allow', 'deny'],
+            choices=['allow', 'deny', 'reject'],
             help=_('Action for the firewall rule.'))
 
     def args2body(self, parsed_args):
