@@ -320,14 +320,18 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                     fields_2=['c', 'd'])
 
     def test_update_port(self):
-        """Update port: myid --name myname --tags a b."""
+        """Update port: myid --name myname --admin-state-up False
+        --tags a b.
+         """
         resource = 'port'
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'myname',
+                                    '--admin-state-up', 'False',
                                     '--tags', 'a', 'b'],
-                                   {'name': 'myname', 'tags': ['a', 'b'], }
-                                   )
+                                   {'name': 'myname',
+                                    'admin_state_up': 'False',
+                                    'tags': ['a', 'b'], })
 
     def test_update_port_secgroup(self):
         resource = 'port'
@@ -367,6 +371,29 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                               'opt_value': '123.123.123.45'}]}
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, myid, args, updatedfields)
+
+    def test_update_port_fixed_ip(self):
+        resource = 'port'
+        cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
+        myid = 'myid'
+        net_id = 'net_id'
+        ip_addr = '123.123.123.123'
+        args = [myid,
+                '--fixed-ip', "network_id=%(net_id)s,ip_address=%(ip_addr)s" %
+                {'net_id': net_id,
+                 'ip_addr': ip_addr}]
+        updated_fields = {"fixed_ips": [{'network_id': net_id,
+                                         'ip_address': ip_addr}]}
+        self._test_update_resource(resource, cmd, myid, args, updated_fields)
+
+    def test_update_port_device_id_device_owner(self):
+        resource = 'port'
+        cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
+        myid = 'myid'
+        args = ['--device-id', 'dev_id', '--device-owner', 'fake', myid]
+        updatefields = {'device_id': 'dev_id',
+                        'device_owner': 'fake'}
+        self._test_update_resource(resource, cmd, myid, args, updatefields)
 
     def test_delete_extra_dhcp_opts_from_port(self):
         resource = 'port'
