@@ -18,6 +18,7 @@
 
 import argparse
 
+from neutronclient.common import utils
 from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronv20
 
@@ -95,12 +96,9 @@ class CreateFirewallRule(neutronv20.CreateCommand):
             '--destination-port',
             help=_('Destination port (integer in [1, 65535] or range in '
                    'a:b).'))
-        parser.add_argument(
-            '--enabled',
-            dest='enabled', metavar='{True,False}',
-            choices=['True', 'true', 'False', 'false'],
-            help=_('Whether to enable or disable this rule.'),
-            default=argparse.SUPPRESS)
+        utils.add_boolean_argument(
+            parser, '--enabled', dest='enabled',
+            help=_('Whether to enable or disable this rule.'))
         parser.add_argument(
             '--protocol', choices=['tcp', 'udp', 'icmp', 'any'],
             required=True,

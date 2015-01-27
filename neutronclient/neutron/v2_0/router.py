@@ -21,6 +21,7 @@ import argparse
 from oslo.serialization import jsonutils
 
 from neutronclient.common import exceptions
+from neutronclient.common import utils
 from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
 
@@ -66,17 +67,11 @@ class CreateRouter(neutronV20.CreateCommand):
         parser.add_argument(
             'name', metavar='NAME',
             help=_('Name of router to create.'))
-        parser.add_argument(
-            '--distributed',
-            dest='distributed', metavar='{True,False}',
-            choices=['True', 'true', 'False', 'false'],
-            default=argparse.SUPPRESS,
+        utils.add_boolean_argument(
+            parser, '--distributed', dest='distributed',
             help=_('Create a distributed router.'))
-        parser.add_argument(
-            '--ha',
-            dest='ha', metavar='{True,False}',
-            choices=['True', 'true', 'false', 'False'],
-            default=argparse.SUPPRESS,
+        utils.add_boolean_argument(
+            parser, '--ha', dest='ha',
             help=_('Create a highly available router.'))
 
     def args2body(self, parsed_args):

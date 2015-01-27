@@ -17,6 +17,7 @@
 
 """Utilities and helper functions."""
 
+import argparse
 import logging
 import os
 
@@ -158,3 +159,15 @@ def safe_encode_dict(data):
         return (k, _safe_encode_without_obj(v))
 
     return dict(list(map(_encode_item, data.items())))
+
+
+def add_boolean_argument(parser, name, **kwargs):
+    for keyword in ('metavar', 'choices'):
+        kwargs.pop(keyword, None)
+    default = kwargs.pop('default', argparse.SUPPRESS)
+    parser.add_argument(
+        name,
+        metavar='{True,False}',
+        choices=['True', 'true', 'False', 'false'],
+        default=default,
+        **kwargs)
