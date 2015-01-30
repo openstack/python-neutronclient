@@ -167,6 +167,14 @@ class ExternalIpAddressExhaustedClient(BadRequest):
 
 
 # Exceptions from client library
+class AuthSystemNotFound(Exception):
+    """When the user specifies an AuthSystem but one is not installed."""
+    def __init__(self, auth_system):
+        self.auth_system = auth_system
+
+    def __str__(self):
+        return "AuthSystemNotFound: %s" % repr(self.auth_system)
+
 
 class NoAuthURLProvided(Unauthorized):
     message = _("auth_url was not provided to the Neutron client")

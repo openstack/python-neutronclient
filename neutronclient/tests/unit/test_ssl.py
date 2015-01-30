@@ -59,6 +59,7 @@ class TestSSL(testtools.TestCase):
             api_version=mox.IgnoreArg(),
             auth_strategy=mox.IgnoreArg(),
             auth_url=mox.IgnoreArg(),
+            auth_plugin=mox.IgnoreArg(),
             service_type=mox.IgnoreArg(),
             endpoint_type=mox.IgnoreArg(),
             insecure=mox.IgnoreArg(),
@@ -108,6 +109,7 @@ class TestSSL(testtools.TestCase):
             auth_url=mox.IgnoreArg(),
             service_type=mox.IgnoreArg(),
             endpoint_type=mox.IgnoreArg(),
+            auth_plugin=mox.IgnoreArg(),
             insecure=mox.IgnoreArg(),
             password=mox.IgnoreArg(),
             region_name=mox.IgnoreArg(),
@@ -139,6 +141,7 @@ class TestSSL(testtools.TestCase):
             # we are not really interested in other args
             auth_strategy=mox.IgnoreArg(),
             auth_url=mox.IgnoreArg(),
+            auth_plugin=mox.IgnoreArg(),
             endpoint_url=mox.IgnoreArg(),
             insecure=mox.IgnoreArg(),
             password=mox.IgnoreArg(),

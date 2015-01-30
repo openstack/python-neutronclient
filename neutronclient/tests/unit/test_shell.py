@@ -154,8 +154,7 @@ class ShellTest(testtools.TestCase):
         self.useFixture(fixtures.FakeLogger(level=logging.DEBUG))
         stdout, stderr = self.shell('--os-auth-strategy fake quota-list')
         self.assertFalse(stdout)
-        self.assertEqual('You must provide a service URL via '
-                         'either --os-url or env[OS_URL]', stderr.strip())
+        self.assertEqual("AuthSystemNotFound: 'fake'", stderr.strip())
 
     @requests_mock.Mocker()
     def test_auth(self, mrequests):
@@ -174,6 +173,7 @@ class ShellTest(testtools.TestCase):
             username='test', user_id='',
             password='test', region_name='', api_version={'network': '2.0'},
             auth_strategy='keystone', service_type='network',
+            auth_plugin=None,
             endpoint_type='publicURL', insecure=False, ca_cert=None,
             timeout=None,
             raise_errors=False,
@@ -209,6 +209,7 @@ class ShellTest(testtools.TestCase):
             username='test', user_id='',
             password='test', region_name='', api_version={'network': '2.0'},
             auth_strategy='keystone', service_type='network',
+            auth_plugin=None,
             raise_errors=False,
             endpoint_type='publicURL', insecure=False, ca_cert=None, retries=0,
             timeout=None,
@@ -245,6 +246,7 @@ class ShellTest(testtools.TestCase):
             username='test', user_id='',
             password='test', region_name='', api_version={'network': '2.0'},
             auth_strategy='keystone', service_type='network',
+            auth_plugin=None,
             endpoint_type='publicURL', insecure=False, ca_cert=None,
             timeout=None,
             raise_errors=False,
@@ -280,6 +282,7 @@ class ShellTest(testtools.TestCase):
             username='test', user_id='',
             password='test', region_name='', api_version={'network': '2.0'},
             auth_strategy='keystone', service_type='network',
+            auth_plugin=None,
             endpoint_type='publicURL', insecure=False, ca_cert=None,
             timeout=None,
             raise_errors=False,
@@ -316,6 +319,7 @@ class ShellTest(testtools.TestCase):
             username='test', user_id='',
             password='test', region_name='', api_version={'network': '2.0'},
             auth_strategy='keystone', service_type='network',
+            auth_plugin=None,
             endpoint_type='publicURL', insecure=False, ca_cert=None,
             timeout=None,
             raise_errors=False,
@@ -351,6 +355,7 @@ class ShellTest(testtools.TestCase):
             username='test', user_id='',
             password='test', region_name='', api_version={'network': '2.0'},
             auth_strategy='keystone', service_type='network',
+            auth_plugin=None,
             endpoint_type='publicURL', insecure=False, ca_cert=None,
             timeout=None,
             raise_errors=False,
@@ -387,6 +392,7 @@ class ShellTest(testtools.TestCase):
             username='test', user_id='',
             password='test', region_name='', api_version={'network': '2.0'},
             auth_strategy='keystone', service_type='network',
+            auth_plugin=None,
             endpoint_type='publicURL', insecure=False, ca_cert=None,
             timeout=None,
             raise_errors=False,
@@ -422,6 +428,7 @@ class ShellTest(testtools.TestCase):
             username='test', user_id='',
             password='test', region_name='', api_version={'network': '2.0'},
             auth_strategy='keystone', service_type='network',
+            auth_plugin=None,
             endpoint_type='publicURL', insecure=True, ca_cert=None,
             timeout=None,
             raise_errors=False,

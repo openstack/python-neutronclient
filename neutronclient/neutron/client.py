@@ -41,6 +41,7 @@ def make_client(instance):
                                 password=instance._password,
                                 region_name=instance._region_name,
                                 auth_url=instance._auth_url,
+                                auth_plugin=instance._auth_plugin,
                                 endpoint_url=url,
                                 endpoint_type=instance._endpoint_type,
                                 token=instance._token,

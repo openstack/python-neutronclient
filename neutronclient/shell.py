@@ -22,6 +22,8 @@ from __future__ import print_function
 
 import argparse
 import getpass
+import inspect
+import itertools
 import logging
 import os
 import sys
@@ -37,9 +39,11 @@ import six.moves.urllib.parse as urlparse
 from cliff import app
 from cliff import commandmanager
 
+from neutronclient.common import auth_plugin
 from neutronclient.common import clientmanager
 from neutronclient.common import command as openstack_command
 from neutronclient.common import exceptions as exc
+from neutronclient.common import extension as client_extension
 from neutronclient.common import utils
 from neutronclient.i18n import _
 from neutronclient.neutron.v2_0 import agent
@@ -381,6 +385,8 @@ class NeutronShell(app.App):
         for k, v in self.commands[apiversion].items():
             self.command_manager.add_command(k, v)
 
+        self._register_extensions(VERSION)
+
         # Pop the 'complete' to correct the outputs of 'neutron help'.
         self.command_manager.commands.pop('complete')
 
@@ -671,6 +677,25 @@ class NeutronShell(app.App):
                 options.add(option)
         print(' '.join(commands | options))
 
+    def _register_extensions(self, version):
+        for name, module in itertools.chain(
+                client_extension._discover_via_entry_points()):
+            self._extend_shell_commands(module, version)
+
+    def _extend_shell_commands(self, module, version):
+        classes = inspect.getmembers(module, inspect.isclass)
+        for cls_name, cls in classes:
+            if (issubclass(cls, client_extension.NeutronClientExtension) and
+                    hasattr(cls, 'shell_command')):
+                cmd = cls.shell_command
+                if hasattr(cls, 'versions'):
+                    if version not in cls.versions:
+                        continue
+                try:
+                    self.command_manager.add_command(cmd, cls)
+                except TypeError:
+                    pass
+
     def run(self, argv):
         """Equivalent to the main program for the application.
 
@@ -740,7 +765,9 @@ class NeutronShell(app.App):
         """Make sure the user has provided all of the authentication
         info we need.
         """
-        if self.options.os_auth_strategy == 'keystone':
+        _os_auth_str = self.options.os_auth_strategy
+        _auth_plugin = None
+        if _os_auth_str == 'keystone':
             if self.options.os_token or self.options.os_url:
                 # Token flow auth takes priority
                 if not self.options.os_token:
@@ -806,7 +833,12 @@ class NeutronShell(app.App):
             auth_session = self._get_keystone_session()
             auth = auth_session.auth
         else:   # not keystone
-            if not self.options.os_url:
+            if _os_auth_str:
+                try:
+                    _auth_plugin = auth_plugin.load_plugin(_os_auth_str)
+                except exc.AuthSystemNotFound:
+                    raise
+            elif not self.options.os_url:
                 raise exc.CommandError(
                     _("You must provide a service URL via"
                       " either --os-url or env[OS_URL]"))
@@ -825,6 +857,7 @@ class NeutronShell(app.App):
             region_name=self.options.os_region_name,
             api_version=self.api_version,
             auth_strategy=self.options.os_auth_strategy,
+            auth_plugin=_auth_plugin,
             # FIXME (bklei) honor deprecated service_type and
             # endpoint type until they are removed
             service_type=self.options.os_service_type or

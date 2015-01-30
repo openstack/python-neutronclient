@@ -56,7 +56,7 @@ class HTTPClient(object):
                  password=None, auth_url=None,
                  token=None, region_name=None, timeout=None,
                  endpoint_url=None, insecure=False,
-                 endpoint_type='publicURL',
+                 endpoint_type='publicURL', auth_plugin=None,
                  auth_strategy='keystone', ca_cert=None, log_credentials=False,
                  service_type='network',
                  **kwargs):
@@ -74,6 +74,7 @@ class HTTPClient(object):
         self.auth_token = token
         self.auth_tenant_id = None
         self.auth_user_id = None
+        self.auth_plugin = auth_plugin
         self.endpoint_url = endpoint_url
         self.auth_strategy = auth_strategy
         self.log_credentials = log_credentials
@@ -123,7 +124,7 @@ class HTTPClient(object):
     def authenticate_and_fetch_endpoint_url(self):
         if not self.auth_token:
             self.authenticate()
-        elif not self.endpoint_url:
+        if not self.endpoint_url:
             self.endpoint_url = self._get_endpoint_url()
 
     def request(self, url, method, body=None, headers=None, **kwargs):
@@ -168,15 +169,29 @@ class HTTPClient(object):
             if self.auth_token is None:
                 self.auth_token = ""
             kwargs['headers']['X-Auth-Token'] = self.auth_token
+            if self.auth_plugin:
+                aph = self.auth_plugin.pre_hook
+                self.endpoint_url, url, method, kwargs = aph(self.endpoint_url,
+                                                             url, method,
+                                                             **kwargs)
             resp, body = self._cs_request(self.endpoint_url + url, method,
                                           **kwargs)
+            if self.auth_plugin:
+                resp, body = self.auth_plugin.post_hook(resp, body)
             return resp, body
         except exceptions.Unauthorized:
             self.authenticate()
             kwargs.setdefault('headers', {})
             kwargs['headers']['X-Auth-Token'] = self.auth_token
+            if self.auth_plugin:
+                aph = self.auth_plugin.pre_hook
+                self.endpoint_url, url, method, kwargs = aph(self.endpoint_url,
+                                                             url, method,
+                                                             **kwargs)
             resp, body = self._cs_request(
                 self.endpoint_url + url, method, **kwargs)
+            if self.auth_plugin:
+                resp, body = self.auth_plugin.post_hook(resp, body)
             return resp, body
 
     def _extract_service_catalog(self, body):
@@ -192,6 +207,9 @@ class HTTPClient(object):
                 attr='region', filter_value=self.region_name,
                 service_type=self.service_type,
                 endpoint_type=self.endpoint_type)
+
+    def _plugin_auth(self, auth_url):
+        return self.auth_plugin.authenticate(self, auth_url)
 
     def _authenticate_keystone(self):
         if self.user_id:
@@ -235,7 +253,9 @@ class HTTPClient(object):
             raise exceptions.Unauthorized(message=message)
 
     def authenticate(self):
-        if self.auth_strategy == 'keystone':
+        if self.auth_plugin:
+            self._plugin_auth(self.auth_url)
+        elif self.auth_strategy == 'keystone':
             self._authenticate_keystone()
         elif self.auth_strategy == 'noauth':
             self._authenticate_noauth()
@@ -345,6 +365,7 @@ def construct_http_client(username=None,
                           tenant_id=None,
                           password=None,
                           auth_url=None,
+                          auth_plugin=None,
                           token=None,
                           region_name=None,
                           timeout=None,
@@ -377,6 +398,7 @@ def construct_http_client(username=None,
                           auth_url=auth_url,
                           token=token,
                           endpoint_url=endpoint_url,
+                          auth_plugin=auth_plugin,
                           insecure=insecure,
                           timeout=timeout,
                           region_name=region_name,
