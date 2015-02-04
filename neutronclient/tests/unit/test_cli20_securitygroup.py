@@ -259,6 +259,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         data = [{'name': 'default',
                  'remote_group_id': 'remgroupid%02d' % i}
                 for i in range(10)]
+        data.append({'name': 'default', 'remote_group_id': None})
         self._test_extend_list(mox_calls, data)
 
     def test_extend_list_exceed_max_uri_len(self):
@@ -285,6 +286,9 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                  'security_group_id': 'secgroupid%02d' % i,
                  'remote_group_id': 'remgroupid%02d' % i}
                 for i in range(10)]
+        data.append({'name': 'default',
+                     'security_group_id': 'secgroupid10',
+                     'remote_group_id': None})
         self._test_extend_list(mox_calls, data)
 
     def test_list_security_group_rules_pagination(self):

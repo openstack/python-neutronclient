@@ -134,7 +134,7 @@ class ListSecurityGroupRule(neutronV20.ListCommand):
         sec_group_ids = set()
         for rule in data:
             for key in self.replace_rules:
-                if key in rule:
+                if rule.get(key):
                     sec_group_ids.add(rule[key])
         sec_group_ids = list(sec_group_ids)
 
