@@ -53,6 +53,11 @@ from neutronclient.neutron.v2_0.fw import firewallrule
 from neutronclient.neutron.v2_0.lb import healthmonitor as lb_healthmonitor
 from neutronclient.neutron.v2_0.lb import member as lb_member
 from neutronclient.neutron.v2_0.lb import pool as lb_pool
+from neutronclient.neutron.v2_0.lb.v2 import healthmonitor as lbaas_healthmon
+from neutronclient.neutron.v2_0.lb.v2 import listener as lbaas_listener
+from neutronclient.neutron.v2_0.lb.v2 import loadbalancer as lbaas_loadbalancer
+from neutronclient.neutron.v2_0.lb.v2 import member as lbaas_member
+from neutronclient.neutron.v2_0.lb.v2 import pool as lbaas_pool
 from neutronclient.neutron.v2_0.lb import vip as lb_vip
 from neutronclient.neutron.v2_0 import metering
 from neutronclient.neutron.v2_0.nec import packetfilter
@@ -170,6 +175,31 @@ COMMAND_V2 = {
     'security-group-rule-show': securitygroup.ShowSecurityGroupRule,
     'security-group-rule-create': securitygroup.CreateSecurityGroupRule,
     'security-group-rule-delete': securitygroup.DeleteSecurityGroupRule,
+    'lbaas-loadbalancer-list': lbaas_loadbalancer.ListLoadBalancer,
+    'lbaas-loadbalancer-show': lbaas_loadbalancer.ShowLoadBalancer,
+    'lbaas-loadbalancer-create': lbaas_loadbalancer.CreateLoadBalancer,
+    'lbaas-loadbalancer-update': lbaas_loadbalancer.UpdateLoadBalancer,
+    'lbaas-loadbalancer-delete': lbaas_loadbalancer.DeleteLoadBalancer,
+    'lbaas-listener-list': lbaas_listener.ListListener,
+    'lbaas-listener-show': lbaas_listener.ShowListener,
+    'lbaas-listener-create': lbaas_listener.CreateListener,
+    'lbaas-listener-update': lbaas_listener.UpdateListener,
+    'lbaas-listener-delete': lbaas_listener.DeleteListener,
+    'lbaas-pool-list': lbaas_pool.ListPool,
+    'lbaas-pool-show': lbaas_pool.ShowPool,
+    'lbaas-pool-create': lbaas_pool.CreatePool,
+    'lbaas-pool-update': lbaas_pool.UpdatePool,
+    'lbaas-pool-delete': lbaas_pool.DeletePool,
+    'lbaas-healthmonitor-list': lbaas_healthmon.ListHealthMonitor,
+    'lbaas-healthmonitor-show': lbaas_healthmon.ShowHealthMonitor,
+    'lbaas-healthmonitor-create': lbaas_healthmon.CreateHealthMonitor,
+    'lbaas-healthmonitor-update': lbaas_healthmon.UpdateHealthMonitor,
+    'lbaas-healthmonitor-delete': lbaas_healthmon.DeleteHealthMonitor,
+    'lbaas-member-list': lbaas_member.ListMember,
+    'lbaas-member-show': lbaas_member.ShowMember,
+    'lbaas-member-create': lbaas_member.CreateMember,
+    'lbaas-member-update': lbaas_member.UpdateMember,
+    'lbaas-member-delete': lbaas_member.DeleteMember,
     'lb-vip-list': lb_vip.ListVip,
     'lb-vip-show': lb_vip.ShowVip,
     'lb-vip-create': lb_vip.CreateVip,

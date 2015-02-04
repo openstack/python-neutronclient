@@ -1,4 +1,5 @@
 # Copyright 2012 OpenStack Foundation.
+# Copyright 2015 Hewlett-Packard Development Company, L.P.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -178,6 +179,18 @@ class Client(object):
     ikepolicy_path = "/vpn/ikepolicies/%s"
     ipsec_site_connections_path = "/vpn/ipsec-site-connections"
     ipsec_site_connection_path = "/vpn/ipsec-site-connections/%s"
+
+    lbaas_loadbalancers_path = "/lbaas/loadbalancers"
+    lbaas_loadbalancer_path = "/lbaas/loadbalancers/%s"
+    lbaas_listeners_path = "/lbaas/listeners"
+    lbaas_listener_path = "/lbaas/listeners/%s"
+    lbaas_pools_path = "/lbaas/pools"
+    lbaas_pool_path = "/lbaas/pools/%s"
+    lbaas_healthmonitors_path = "/lbaas/healthmonitors"
+    lbaas_healthmonitor_path = "/lbaas/healthmonitors/%s"
+    lbaas_members_path = lbaas_pool_path + "/members"
+    lbaas_member_path = lbaas_pool_path + "/members/%s"
+
     vips_path = "/lb/vips"
     vip_path = "/lb/vips/%s"
     pools_path = "/lb/pools"
@@ -255,6 +268,12 @@ class Client(object):
                      'metering_label_rules': 'metering_label_rule',
                      'net_partitions': 'net_partition',
                      'packet_filters': 'packet_filter',
+                     'loadbalancers': 'loadbalancer',
+                     'listeners': 'listener',
+                     'lbaas_pools': 'lbaas_pool',
+                     'lbaas_healthmonitors': 'lbaas_healthmonitor',
+                     'lbaas_members': 'lbaas_member',
+                     'healthmonitors': 'healthmonitor',
                      }
 
     def get_attr_metadata(self):
@@ -627,6 +646,154 @@ class Client(object):
     def delete_ipsecpolicy(self, ipsecpolicy):
         """Deletes the specified IPsecPolicy."""
         return self.delete(self.ipsecpolicy_path % (ipsecpolicy))
+
+    @APIParamsCall
+    def list_loadbalancers(self, retrieve_all=True, **_params):
+        """Fetches a list of all loadbalancers for a tenant."""
+        return self.list('loadbalancers', self.lbaas_loadbalancers_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_loadbalancer(self, lbaas_loadbalancer, **_params):
+        """Fetches information for a load balancer."""
+        return self.get(self.lbaas_loadbalancer_path % (lbaas_loadbalancer),
+                        params=_params)
+
+    @APIParamsCall
+    def create_loadbalancer(self, body=None):
+        """Creates a new load balancer."""
+        return self.post(self.lbaas_loadbalancers_path, body=body)
+
+    @APIParamsCall
+    def update_loadbalancer(self, lbaas_loadbalancer, body=None):
+        """Updates a load balancer."""
+        return self.put(self.lbaas_loadbalancer_path % (lbaas_loadbalancer),
+                        body=body)
+
+    @APIParamsCall
+    def delete_loadbalancer(self, lbaas_loadbalancer):
+        """Deletes the specified load balancer."""
+        return self.delete(self.lbaas_loadbalancer_path %
+                           (lbaas_loadbalancer))
+
+    @APIParamsCall
+    def list_listeners(self, retrieve_all=True, **_params):
+        """Fetches a list of all lbaas_listeners for a tenant."""
+        return self.list('listeners', self.lbaas_listeners_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_listener(self, lbaas_listener, **_params):
+        """Fetches information for a lbaas_listener."""
+        return self.get(self.lbaas_listener_path % (lbaas_listener),
+                        params=_params)
+
+    @APIParamsCall
+    def create_listener(self, body=None):
+        """Creates a new lbaas_listener."""
+        return self.post(self.lbaas_listeners_path, body=body)
+
+    @APIParamsCall
+    def update_listener(self, lbaas_listener, body=None):
+        """Updates a lbaas_listener."""
+        return self.put(self.lbaas_listener_path % (lbaas_listener),
+                        body=body)
+
+    @APIParamsCall
+    def delete_listener(self, lbaas_listener):
+        """Deletes the specified lbaas_listener."""
+        return self.delete(self.lbaas_listener_path % (lbaas_listener))
+
+    @APIParamsCall
+    def list_lbaas_pools(self, retrieve_all=True, **_params):
+        """Fetches a list of all lbaas_pools for a tenant."""
+        return self.list('pools', self.lbaas_pools_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_lbaas_pool(self, lbaas_pool, **_params):
+        """Fetches information for a lbaas_pool."""
+        return self.get(self.lbaas_pool_path % (lbaas_pool),
+                        params=_params)
+
+    @APIParamsCall
+    def create_lbaas_pool(self, body=None):
+        """Creates a new lbaas_pool."""
+        return self.post(self.lbaas_pools_path, body=body)
+
+    @APIParamsCall
+    def update_lbaas_pool(self, lbaas_pool, body=None):
+        """Updates a lbaas_pool."""
+        return self.put(self.lbaas_pool_path % (lbaas_pool),
+                        body=body)
+
+    @APIParamsCall
+    def delete_lbaas_pool(self, lbaas_pool):
+        """Deletes the specified lbaas_pool."""
+        return self.delete(self.lbaas_pool_path % (lbaas_pool))
+
+    @APIParamsCall
+    def list_lbaas_healthmonitors(self, retrieve_all=True, **_params):
+        """Fetches a list of all lbaas_healthmonitors for a tenant."""
+        return self.list('healthmonitors', self.lbaas_healthmonitors_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_lbaas_healthmonitor(self, lbaas_healthmonitor, **_params):
+        """Fetches information for a lbaas_healthmonitor."""
+        return self.get(self.lbaas_healthmonitor_path % (lbaas_healthmonitor),
+                        params=_params)
+
+    @APIParamsCall
+    def create_lbaas_healthmonitor(self, body=None):
+        """Creates a new lbaas_healthmonitor."""
+        return self.post(self.lbaas_healthmonitors_path, body=body)
+
+    @APIParamsCall
+    def update_lbaas_healthmonitor(self, lbaas_healthmonitor, body=None):
+        """Updates a lbaas_healthmonitor."""
+        return self.put(self.lbaas_healthmonitor_path % (lbaas_healthmonitor),
+                        body=body)
+
+    @APIParamsCall
+    def delete_lbaas_healthmonitor(self, lbaas_healthmonitor):
+        """Deletes the specified lbaas_healthmonitor."""
+        return self.delete(self.lbaas_healthmonitor_path %
+                           (lbaas_healthmonitor))
+
+    @APIParamsCall
+    def list_lbaas_loadbalancers(self, retrieve_all=True, **_params):
+        """Fetches a list of all lbaas_loadbalancers for a tenant."""
+        return self.list('loadbalancers', self.lbaas_loadbalancers_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def list_lbaas_members(self, lbaas_pool, retrieve_all=True, **_params):
+        """Fetches a list of all lbaas_members for a tenant."""
+        return self.list('members', self.lbaas_members_path % lbaas_pool,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_lbaas_member(self, lbaas_member, lbaas_pool, **_params):
+        """Fetches information of a certain lbaas_member."""
+        return self.get(self.lbaas_member_path % (lbaas_pool, lbaas_member),
+                        params=_params)
+
+    @APIParamsCall
+    def create_lbaas_member(self, lbaas_pool, body=None):
+        """Creates an lbaas_member."""
+        return self.post(self.lbaas_members_path % lbaas_pool, body=body)
+
+    @APIParamsCall
+    def update_lbaas_member(self, lbaas_member, lbaas_pool, body=None):
+        """Updates a lbaas_healthmonitor."""
+        return self.put(self.lbaas_member_path % (lbaas_pool, lbaas_member),
+                        body=body)
+
+    @APIParamsCall
+    def delete_lbaas_member(self, lbaas_member, lbaas_pool):
+        """Deletes the specified lbaas_member."""
+        return self.delete(self.lbaas_member_path % (lbaas_pool, lbaas_member))
 
     @APIParamsCall
     def list_vips(self, retrieve_all=True, **_params):
