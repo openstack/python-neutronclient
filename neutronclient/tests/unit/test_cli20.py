@@ -299,7 +299,7 @@ class CLITestV20Base(base.BaseTestCase):
                              fields_1=(), fields_2=(), page_size=None,
                              sort_key=(), sort_dir=(), response_contents=None,
                              base_args=None, path=None, cmd_resources=None,
-                             parent_id=None):
+                             parent_id=None, output_format=None):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
@@ -378,6 +378,9 @@ class CLITestV20Base(base.BaseTestCase):
             path = getattr(self.client, cmd_resources + "_path")
             if parent_id:
                 path = path % parent_id
+        if output_format:
+            args.append('-f')
+            args.append(output_format)
         self.client.httpclient.request(
             MyUrlComparator(end_url(path, query, format=self.format),
                             self.client),

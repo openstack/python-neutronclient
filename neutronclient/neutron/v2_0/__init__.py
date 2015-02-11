@@ -672,14 +672,14 @@ class ListCommand(NeutronCommand, lister.Lister):
             # both list_columns and returned resource.
             # Also Keep their order the same as in list_columns
             _columns = [x for x in self.list_columns if x in _columns]
-        if parsed_args.formatter == 'csv':
-            return (_columns, (utils.get_item_properties(
-                s, _columns, formatters=self._formatters_csv)
-                for s in info),)
-        else:
-            return (_columns, (utils.get_item_properties(
-                s, _columns, formatters=self._formatters)
-                for s in info),)
+
+        formatters = self._formatters
+        if hasattr(self, '_formatters_csv') and parsed_args.formatter == 'csv':
+            formatters = self._formatters_csv
+
+        return (_columns, (utils.get_item_properties(
+            s, _columns, formatters=formatters, )
+            for s in info), )
 
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)', parsed_args)

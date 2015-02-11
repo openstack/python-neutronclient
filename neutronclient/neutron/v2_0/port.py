@@ -33,8 +33,8 @@ def _format_fixed_ips(port):
 
 def _format_fixed_ips_csv(port):
     try:
-        return [utils.dumps(ip) for ip in port['fixed_ips']]
-    except Exception:
+        return jsonutils.dumps(port['fixed_ips'])
+    except (TypeError, KeyError):
         return ''
 
 
