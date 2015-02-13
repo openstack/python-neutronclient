@@ -92,6 +92,31 @@ class UpdateRouter(neutronV20.UpdateCommand):
 
     resource = 'router'
 
+    def add_known_arguments(self, parser):
+        parser.add_argument(
+            '--name',
+            help=_('Name of this router.'))
+        utils.add_boolean_argument(
+            parser, '--admin-state-up', dest='admin_state',
+            help=_('Specify the administrative state of the router'
+                   ' (True meaning "Up")'))
+        utils.add_boolean_argument(
+            parser, '--admin_state_up', dest='admin_state',
+            help=argparse.SUPPRESS)
+        utils.add_boolean_argument(
+            parser, '--distributed', dest='distributed',
+            help=_('True means this router should operate in'
+                   ' distributed mode.'))
+
+    def args2body(self, parsed_args):
+        body = {self.resource: {}}
+        if hasattr(parsed_args, 'admin_state'):
+            body[self.resource].update(
+                {'admin_state_up': parsed_args.admin_state})
+        neutronV20.update_dict(parsed_args, body[self.resource],
+                               ['name', 'distributed'])
+        return body
+
 
 class RouterInterfaceCommand(neutronV20.NeutronCommand):
     """Based class to Add/Remove router interface."""
