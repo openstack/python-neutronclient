@@ -767,7 +767,7 @@ class NeutronShell(app.App):
                     raise exc.CommandError(
                         _("You must provide a username or user ID via"
                           "  --os-username, env[OS_USERNAME] or"
-                          "  --os-user_id, env[OS_USER_ID]"))
+                          "  --os-user-id, env[OS_USER_ID]"))
 
                 if not self.options.os_password:
                     # No password, If we've got a tty, try prompting for it
