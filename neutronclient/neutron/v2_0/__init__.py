@@ -492,9 +492,13 @@ class UpdateCommand(NeutronCommand):
 
     def get_parser(self, prog_name):
         parser = super(UpdateCommand, self).get_parser(prog_name)
+        if self.allow_names:
+            help_str = _('ID or name of %s to update.')
+        else:
+            help_str = _('ID of %s to update.')
         parser.add_argument(
             'id', metavar=self.resource.upper(),
-            help=_('ID or name of %s to update.') % self.resource)
+            help=help_str % self.resource)
         self.add_known_arguments(parser)
         return parser
 
