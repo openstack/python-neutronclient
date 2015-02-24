@@ -746,12 +746,14 @@ class NeutronShell(app.App):
                 if not self.options.os_token:
                     raise exc.CommandError(
                         _("You must provide a token via"
-                          " either --os-token or env[OS_TOKEN]"))
+                          " either --os-token or env[OS_TOKEN]"
+                          " when providing a service URL"))
 
                 if not self.options.os_url:
                     raise exc.CommandError(
                         _("You must provide a service URL via"
-                          " either --os-url or env[OS_URL]"))
+                          " either --os-url or env[OS_URL]"
+                          " when providing a token"))
 
             else:
                 # Validate password flow auth
