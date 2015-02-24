@@ -58,6 +58,7 @@ class ClientManager(object):
                  region_name=None,
                  api_version=None,
                  auth_strategy=None,
+                 auth_plugin=None,
                  insecure=False,
                  ca_cert=None,
                  log_credentials=False,
@@ -82,6 +83,7 @@ class ClientManager(object):
         self._api_version = api_version
         self._service_catalog = None
         self._auth_strategy = auth_strategy
+        self._auth_plugin = auth_plugin
         self._insecure = insecure
         self._ca_cert = ca_cert
         self._log_credentials = log_credentials
@@ -102,6 +104,8 @@ class ClientManager(object):
                 password=self._password,
                 region_name=self._region_name,
                 auth_url=self._auth_url,
+                auth_plugin=self._auth_plugin,
+                auth_strategy=self._auth_strategy,
                 service_type=self._service_type,
                 endpoint_type=self._endpoint_type,
                 insecure=self._insecure,
