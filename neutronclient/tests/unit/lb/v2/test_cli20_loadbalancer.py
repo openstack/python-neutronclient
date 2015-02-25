@@ -32,9 +32,9 @@ class CLITestV20LbLoadBalancerJSON(test_cli20.CLITestV20Base):
         name = 'lbaas-loadbalancer-name'
         vip_subnet_id = 'vip-subnet'
         my_id = 'my-id'
-        args = ['--name', name, vip_subnet_id]
-        position_names = ['name', 'vip_subnet_id']
-        position_values = [name, vip_subnet_id]
+        args = [vip_subnet_id]
+        position_names = ['vip_subnet_id']
+        position_values = [vip_subnet_id]
         self._test_create_resource(resource, cmd, name, my_id, args,
                                    position_names, position_values,
                                    cmd_resource=cmd_resource)

@@ -69,13 +69,13 @@ class CreateLoadBalancer(neutronV20.CreateCommand):
             self.get_client(), 'subnet', parsed_args.vip_subnet)
         body = {
             self.resource: {
-                'name': parsed_args.name,
                 'vip_subnet_id': _subnet_id,
                 'admin_state_up': parsed_args.admin_state,
             },
         }
         neutronV20.update_dict(parsed_args, body[self.resource],
-                               ['description', 'provider', 'vip_address'])
+                               ['description', 'provider', 'vip_address',
+                                'name'])
         return body
 
 
