@@ -186,5 +186,29 @@ class CLITestV20LBaaSAgentScheduler(test_cli20.CLITestV20Base):
                                   path=path, response_contents=contents)
 
 
+class CLITestV20LBaaSV2AgentScheduler(test_cli20.CLITestV20Base):
+
+    def test_list_loadbalancers_on_agent(self):
+        resources = 'loadbalancers'
+        cmd = agentscheduler.ListLoadBalancersOnLbaasAgent(
+            test_cli20.MyApp(sys.stdout), None)
+        agent_id = 'agent_id1'
+        path = ((self.client.agent_path + self.client.AGENT_LOADBALANCERS) %
+                agent_id)
+        self._test_list_resources(resources, cmd, base_args=[agent_id],
+                                  path=path)
+
+    def test_get_lbaas_agent_hosting_pool(self):
+        resources = 'agent'
+        cmd = agentscheduler.GetLbaasAgentHostingLoadBalancer(
+            test_cli20.MyApp(sys.stdout), None)
+        lb_id = 'lb_id1'
+        path = ((self.client.lbaas_loadbalancer_path +
+                 self.client.LOADBALANCER_HOSTING_AGENT) % lb_id)
+        contents = {self.id_field: 'myid1', 'alive': True}
+        self._test_list_resources(resources, cmd, base_args=[lb_id],
+                                  path=path, response_contents=contents)
+
+
 class CLITestV20LBaaSAgentSchedulerXML(CLITestV20LBaaSAgentScheduler):
     format = 'xml'
