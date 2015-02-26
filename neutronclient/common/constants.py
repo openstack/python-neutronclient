@@ -36,6 +36,7 @@ TYPE_DICT = "dict"
 PLURALS = {'networks': 'network',
            'ports': 'port',
            'subnets': 'subnet',
+           'subnetpools': 'subnetpool',
            'dns_nameservers': 'dns_nameserver',
            'host_routes': 'host_route',
            'allocation_pools': 'allocation_pool',

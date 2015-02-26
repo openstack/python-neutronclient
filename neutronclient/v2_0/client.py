@@ -339,6 +339,8 @@ class Client(ClientBase):
     port_path = "/ports/%s"
     subnets_path = "/subnets"
     subnet_path = "/subnets/%s"
+    subnetpools_path = "/subnetpools"
+    subnetpool_path = "/subnetpools/%s"
     quotas_path = "/quotas"
     quota_path = "/quotas/%s"
     extensions_path = "/extensions"
@@ -603,6 +605,32 @@ class Client(ClientBase):
     def delete_subnet(self, subnet):
         """Deletes the specified subnet."""
         return self.delete(self.subnet_path % (subnet))
+
+    @APIParamsCall
+    def list_subnetpools(self, retrieve_all=True, **_params):
+        """Fetches a list of all subnetpools for a tenant."""
+        return self.list('subnetpools', self.subnetpools_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_subnetpool(self, subnetpool, **_params):
+        """Fetches information of a certain subnetpool."""
+        return self.get(self.subnetpool_path % (subnetpool), params=_params)
+
+    @APIParamsCall
+    def create_subnetpool(self, body=None):
+        """Creates a new subnetpool."""
+        return self.post(self.subnetpools_path, body=body)
+
+    @APIParamsCall
+    def update_subnetpool(self, subnetpool, body=None):
+        """Updates a subnetpool."""
+        return self.put(self.subnetpool_path % (subnetpool), body=body)
+
+    @APIParamsCall
+    def delete_subnetpool(self, subnetpool):
+        """Deletes the specified subnetpool."""
+        return self.delete(self.subnetpool_path % (subnetpool))
 
     @APIParamsCall
     def list_routers(self, retrieve_all=True, **_params):

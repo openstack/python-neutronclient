@@ -76,6 +76,7 @@ from neutronclient.neutron.v2_0 import router
 from neutronclient.neutron.v2_0 import securitygroup
 from neutronclient.neutron.v2_0 import servicetype
 from neutronclient.neutron.v2_0 import subnet
+from neutronclient.neutron.v2_0 import subnetpool
 from neutronclient.neutron.v2_0.vpn import ikepolicy
 from neutronclient.neutron.v2_0.vpn import ipsec_site_connection
 from neutronclient.neutron.v2_0.vpn import ipsecpolicy
@@ -142,6 +143,11 @@ COMMAND_V2 = {
     'subnet-create': subnet.CreateSubnet,
     'subnet-delete': subnet.DeleteSubnet,
     'subnet-update': subnet.UpdateSubnet,
+    'subnetpool-list': subnetpool.ListSubnetPool,
+    'subnetpool-show': subnetpool.ShowSubnetPool,
+    'subnetpool-create': subnetpool.CreateSubnetPool,
+    'subnetpool-delete': subnetpool.DeleteSubnetPool,
+    'subnetpool-update': subnetpool.UpdateSubnetPool,
     'port-list': port.ListPort,
     'port-show': port.ShowPort,
     'port-create': port.CreatePort,
