@@ -35,10 +35,11 @@ class CLITestV20LbHealthMonitorJSON(test_cli20.CLITestV20Base):
         max_retries = '3'
         delay = '10'
         timeout = '60'
+        pool = 'pool1'
         args = ['--type', type, '--max-retries', max_retries,
-                '--delay', delay, '--timeout', timeout]
-        position_names = ['type', 'max_retries', 'delay', 'timeout']
-        position_values = [type, max_retries, delay, timeout]
+                '--delay', delay, '--timeout', timeout, '--pool', pool]
+        position_names = ['type', 'max_retries', 'delay', 'timeout', 'pool_id']
+        position_values = [type, max_retries, delay, timeout, pool]
         self._test_create_resource(resource, cmd, '', my_id, args,
                                    position_names, position_values,
                                    cmd_resource=cmd_resource)
@@ -57,15 +58,16 @@ class CLITestV20LbHealthMonitorJSON(test_cli20.CLITestV20Base):
         http_method = 'GET'
         expected_codes = '201'
         url_path = '/somepath'
+        pool = 'pool1'
         args = ['--admin-state-down', '--http-method', http_method,
                 '--expected-codes', expected_codes, '--url-path', url_path,
                 '--type', type, '--max-retries', max_retries,
-                '--delay', delay, '--timeout', timeout]
+                '--delay', delay, '--timeout', timeout, '--pool', pool]
         position_names = ['admin_state_up', 'http_method', 'expected_codes',
                           'url_path', 'type', 'max_retries', 'delay',
-                          'timeout']
+                          'timeout', 'pool_id']
         position_values = [False, http_method, expected_codes, url_path,
-                           type, max_retries, delay, timeout]
+                           type, max_retries, delay, timeout, pool]
         self._test_create_resource(resource, cmd, '', my_id, args,
                                    position_names, position_values,
                                    cmd_resource=cmd_resource)
