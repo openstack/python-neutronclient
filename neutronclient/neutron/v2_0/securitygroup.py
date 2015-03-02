@@ -21,11 +21,72 @@ from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
 
 
+def _get_protocol_port(rule):
+    proto = rule['protocol']
+    port_min = rule['port_range_min']
+    port_max = rule['port_range_max']
+    if proto in ('tcp', 'udp'):
+        if (port_min and port_min == port_max):
+            protocol_port = '%s/%s' % (port_min, proto)
+        elif port_min:
+            protocol_port = '%s-%s/%s' % (port_min, port_max, proto)
+        else:
+            protocol_port = proto
+    elif proto == 'icmp':
+        icmp_opts = []
+        if port_min is not None:
+            icmp_opts.append('type:%s' % port_min)
+        if port_max is not None:
+            icmp_opts.append('code:%s' % port_max)
+
+        if icmp_opts:
+            protocol_port = 'icmp (%s)' % ', '.join(icmp_opts)
+        else:
+            protocol_port = 'icmp'
+    elif proto is not None:
+        # port_range_min/max are not recognized for protocol
+        # other than TCP, UDP and ICMP.
+        protocol_port = proto
+    else:
+        protocol_port = None
+
+    return protocol_port
+
+
+def _format_sg_rule(rule):
+    formatted = []
+    for field in ['direction',
+                  'ethertype',
+                  ('protocol_port', _get_protocol_port),
+                  'remote_ip_prefix',
+                  'remote_group_id']:
+        if isinstance(field, tuple):
+            field, get_method = field
+            data = get_method(rule)
+        else:
+            data = rule[field]
+        if not data:
+            continue
+        if field in ('remote_ip_prefix', 'remote_group_id'):
+            data = '%s: %s' % (field, data)
+        formatted.append(data)
+    return ', '.join(formatted)
+
+
+def _format_sg_rules(secgroup):
+    try:
+        return '\n'.join(sorted([_format_sg_rule(rule) for rule
+                                 in secgroup['security_group_rules']]))
+    except Exception:
+        return ''
+
+
 class ListSecurityGroup(neutronV20.ListCommand):
     """List security groups that belong to a given tenant."""
 
     resource = 'security_group'
-    list_columns = ['id', 'name', 'description']
+    list_columns = ['id', 'name', 'security_group_rules']
+    _formatters = {'security_group_rules': _format_sg_rules}
     pagination_support = True
     sorting_support = True
 
