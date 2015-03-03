@@ -618,6 +618,17 @@ class ClientV2TestJson(CLITestV20Base):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
 
+    def test_do_request_with_long_uri_exception(self):
+        long_string = 'x' * 8200                  # 8200 > MAX_URI_LEN:8192
+        params = {'id': long_string}
+
+        try:
+            self.client.do_request('GET', '/test', body='', params=params)
+        except exceptions.RequestURITooLong as cm:
+            self.assertNotEqual(cm.excess, 0)
+        else:
+            self.fail('Expected exception NOT raised')
+
 
 class ClientV2UnicodeTestXML(ClientV2TestJson):
     format = 'xml'

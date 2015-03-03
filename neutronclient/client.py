@@ -48,9 +48,6 @@ class HTTPClient(object):
     USER_AGENT = 'python-neutronclient'
     CONTENT_TYPE = 'application/json'
 
-    # 8192 Is the default max URI len for eventlet.wsgi.server
-    MAX_URI_LEN = 8192
-
     def __init__(self, username=None, user_id=None,
                  tenant_name=None, tenant_id=None,
                  password=None, auth_url=None,
@@ -149,16 +146,9 @@ class HTTPClient(object):
 
         return resp, resp.text
 
-    def _check_uri_length(self, action):
-        uri_len = len(self.endpoint_url) + len(action)
-        if uri_len > self.MAX_URI_LEN:
-            raise exceptions.RequestURITooLong(
-                excess=uri_len - self.MAX_URI_LEN)
-
     def do_request(self, url, method, **kwargs):
         # Ensure client always has correct uri - do not guesstimate anything
         self.authenticate_and_fetch_endpoint_url()
-        self._check_uri_length(url)
 
         # Perform the request once. If we get a 401 back then it
         # might be because the auth token expired, so try to
