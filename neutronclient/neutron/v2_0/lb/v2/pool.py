@@ -76,11 +76,10 @@ class CreatePool(neutronV20.CreateCommand):
             '--description',
             help=_('Description of the pool.'))
         parser.add_argument(
-            '--healthmonitor-id',
-            help=_('ID of the health monitor to use.'))
-        parser.add_argument(
             '--session-persistence', metavar='TYPE:VALUE',
             help=_('The type of session persistence to use.'))
+        parser.add_argument(
+            '--name', help=_('The name of the pool.'))
         parser.add_argument(
             '--lb-algorithm',
             required=True,
@@ -96,9 +95,6 @@ class CreatePool(neutronV20.CreateCommand):
             required=True,
             choices=['HTTP', 'HTTPS', 'TCP'],
             help=_('Protocol for balancing.'))
-        parser.add_argument(
-            'name', metavar='NAME',
-            help=_('The name of the pool.'))
 
     def args2body(self, parsed_args):
         if parsed_args.session_persistence:
@@ -107,7 +103,6 @@ class CreatePool(neutronV20.CreateCommand):
             self.get_client(), 'listener', parsed_args.listener)
         body = {
             self.resource: {
-                'name': parsed_args.name,
                 'admin_state_up': parsed_args.admin_state,
                 'protocol': parsed_args.protocol,
                 'lb_algorithm': parsed_args.lb_algorithm,
@@ -115,7 +110,7 @@ class CreatePool(neutronV20.CreateCommand):
             },
         }
         neutronV20.update_dict(parsed_args, body[self.resource],
-                               ['description', 'healthmonitor_id',
+                               ['description', 'name',
                                 'session_persistence'])
         return body
 

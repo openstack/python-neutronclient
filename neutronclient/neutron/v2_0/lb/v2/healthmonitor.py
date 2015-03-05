@@ -86,8 +86,15 @@ class CreateHealthMonitor(neutronV20.CreateCommand):
             '--type',
             required=True, choices=['PING', 'TCP', 'HTTP', 'HTTPS'],
             help=_('One of the predefined health monitor types.'))
+        parser.add_argument(
+            '--pool', required=True,
+            help=_('ID or name of the pool that this healthmonitor will '
+                   'monitor.'))
 
     def args2body(self, parsed_args):
+        pool_id = neutronV20.find_resourceid_by_name_or_id(
+            self.get_client(), 'pool', parsed_args.pool,
+            cmd_resource='lbaas_pool')
         body = {
             self.resource: {
                 'admin_state_up': parsed_args.admin_state,
@@ -95,6 +102,7 @@ class CreateHealthMonitor(neutronV20.CreateCommand):
                 'max_retries': parsed_args.max_retries,
                 'timeout': parsed_args.timeout,
                 'type': parsed_args.type,
+                'pool_id': pool_id
             },
         }
         neutronV20.update_dict(parsed_args, body[self.resource],
