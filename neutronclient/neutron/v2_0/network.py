@@ -17,6 +17,7 @@
 import argparse
 
 from neutronclient.common import exceptions
+from neutronclient.common import utils
 from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
 
@@ -139,6 +140,11 @@ class CreateNetwork(neutronV20.CreateCommand):
             metavar='<segmentation_id>',
             help=_('VLAN ID for VLAN networks or tunnel-id for GRE/VXLAN'
                    ' networks.'))
+        utils.add_boolean_argument(
+            parser,
+            '--vlan-transparent',
+            default=argparse.SUPPRESS,
+            help=_('Create a vlan transparent network.'))
         parser.add_argument(
             'name', metavar='NAME',
             help=_('Name of network to create.'))
@@ -149,6 +155,7 @@ class CreateNetwork(neutronV20.CreateCommand):
             'admin_state_up': parsed_args.admin_state}, }
         neutronV20.update_dict(parsed_args, body['network'],
                                ['shared', 'tenant_id', 'router:external',
+                                'vlan_transparent',
                                 'provider:network_type',
                                 'provider:physical_network',
                                 'provider:segmentation_id'])

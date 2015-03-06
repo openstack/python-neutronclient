@@ -136,6 +136,20 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values,
                                    admin_state_up=False)
 
+    def test_create_network_vlan_transparent(self):
+        """Create net: myname --vlan-transparent True."""
+        resource = 'network'
+        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        args = ['--vlan-transparent', 'True', name]
+        vlantrans = {'vlan_transparent': 'True'}
+        position_names = ['name', ]
+        position_values = [name, ]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   **vlantrans)
+
     def test_list_nets_empty_with_column(self):
         resources = "networks"
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
