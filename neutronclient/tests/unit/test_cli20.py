@@ -91,10 +91,14 @@ class MyUrlComparator(mox.Comparator):
         lhsp = urlparse.urlparse(self.lhs)
         rhsp = urlparse.urlparse(rhs)
 
+        lhs_qs = urlparse.parse_qsl(lhsp.query)
+        rhs_qs = urlparse.parse_qsl(rhsp.query)
+
         return (lhsp.scheme == rhsp.scheme and
                 lhsp.netloc == rhsp.netloc and
                 lhsp.path == rhsp.path and
-                urlparse.parse_qs(lhsp.query) == urlparse.parse_qs(rhsp.query))
+                len(lhs_qs) == len(rhs_qs) and
+                set(lhs_qs) == set(rhs_qs))
 
     def __str__(self):
         if self.client and self.client.format != FORMAT:
