@@ -52,8 +52,8 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
         listener = 'listener'
         protocol = 'TCP'
         description = 'description'
-        session_persistence_str = 'HTTP_COOKIE:1234'
-        session_persistence = {'type': 'HTTP_COOKIE',
+        session_persistence_str = 'type=APP_COOKIE,cookie_name=1234'
+        session_persistence = {'type': 'APP_COOKIE',
                                'cookie_name': '1234'}
         name = 'my-pool'
         args = ['--lb-algorithm', lb_algorithm, '--protocol', protocol,
