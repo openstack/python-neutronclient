@@ -32,7 +32,7 @@ class ShowCredential(neutronV20.ShowCommand):
 
 
 class CreateCredential(neutronV20.CreateCommand):
-    """Creates a credential."""
+    """Create a credential."""
 
     resource = 'credential'
 
@@ -67,7 +67,7 @@ class CreateCredential(neutronV20.CreateCommand):
 
 
 class DeleteCredential(neutronV20.DeleteCommand):
-    """Delete a  given credential."""
+    """Delete a given credential."""
 
     resource = 'credential'
     allow_names = False

@@ -42,7 +42,7 @@ class ShowNetworkProfile(neutronV20.ShowCommand):
 
 
 class CreateNetworkProfile(neutronV20.CreateCommand):
-    """Creates a network profile."""
+    """Create a network profile."""
 
     resource = RESOURCE
 
