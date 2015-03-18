@@ -19,20 +19,9 @@
 #    under the License.
 #
 
-from neutronclient.common import exceptions
+from neutronclient.common import utils
 from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
-
-
-def _parse_persistence(parsed_args):
-    persistence = None
-    if parsed_args.session_persistence:
-        parts = parsed_args.session_persistence.split(':')
-        if not len(parts) == 2:
-            raise exceptions.CommandError('Incorrect --session-persistence'
-                                          ' format. Format is <TYPE>:<VALUE>')
-        persistence = {'type': parts[0], 'cookie_name': parts[1]}
-    return persistence
 
 
 class ListPool(neutronV20.ListCommand):
@@ -76,8 +65,10 @@ class CreatePool(neutronV20.CreateCommand):
             '--description',
             help=_('Description of the pool.'))
         parser.add_argument(
-            '--session-persistence', metavar='TYPE:VALUE',
-            help=_('The type of session persistence to use.'))
+            '--session-persistence',
+            metavar='type=TYPE[,cookie_name=COOKIE_NAME]',
+            help=_('The type of session persistence to use and associated '
+                   'cookie name'))
         parser.add_argument(
             '--name', help=_('The name of the pool.'))
         parser.add_argument(
@@ -98,7 +89,8 @@ class CreatePool(neutronV20.CreateCommand):
 
     def args2body(self, parsed_args):
         if parsed_args.session_persistence:
-            parsed_args.session_persistence = _parse_persistence(parsed_args)
+            parsed_args.session_persistence = utils.str2dict(
+                parsed_args.session_persistence)
         _listener_id = neutronV20.find_resourceid_by_name_or_id(
             self.get_client(), 'listener', parsed_args.listener)
         body = {
