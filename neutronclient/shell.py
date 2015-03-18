@@ -258,6 +258,10 @@ COMMAND_V2 = {
     'l3-agent-list-hosting-router': agentscheduler.ListL3AgentsHostingRouter,
     'lb-pool-list-on-agent': agentscheduler.ListPoolsOnLbaasAgent,
     'lb-agent-hosting-pool': agentscheduler.GetLbaasAgentHostingPool,
+    'lbaas-loadbalancer-list-on-agent':
+        agentscheduler.ListLoadBalancersOnLbaasAgent,
+    'lbaas-agent-hosting-loadbalancer':
+        agentscheduler.GetLbaasAgentHostingLoadBalancer,
     'service-provider-list': servicetype.ListServiceProvider,
     'firewall-rule-list': firewallrule.ListFirewallRule,
     'firewall-rule-show': firewallrule.ShowFirewallRule,

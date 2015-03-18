@@ -421,6 +421,8 @@ class Client(ClientBase):
     L3_AGENTS = '/l3-agents'
     LOADBALANCER_POOLS = '/loadbalancer-pools'
     LOADBALANCER_AGENT = '/loadbalancer-agent'
+    AGENT_LOADBALANCERS = '/agent-loadbalancers'
+    LOADBALANCER_HOSTING_AGENT = '/loadbalancer-hosting-agent'
     firewall_rules_path = "/fw/firewall_rules"
     firewall_rule_path = "/fw/firewall_rules/%s"
     firewall_policies_path = "/fw/firewall_policies"
@@ -1393,6 +1395,19 @@ class Client(ClientBase):
     def list_pools_on_lbaas_agent(self, lbaas_agent, **_params):
         """Fetches a list of pools hosted by the loadbalancer agent."""
         return self.get((self.agent_path + self.LOADBALANCER_POOLS) %
+                        lbaas_agent, params=_params)
+
+    @APIParamsCall
+    def get_lbaas_agent_hosting_loadbalancer(self, loadbalancer, **_params):
+        """Fetches a loadbalancer agent hosting a loadbalancer."""
+        return self.get((self.lbaas_loadbalancer_path +
+                         self.LOADBALANCER_HOSTING_AGENT) % loadbalancer,
+                        params=_params)
+
+    @APIParamsCall
+    def list_loadbalancers_on_lbaas_agent(self, lbaas_agent, **_params):
+        """Fetches a list of loadbalancers hosted by the loadbalancer agent."""
+        return self.get((self.agent_path + self.AGENT_LOADBALANCERS) %
                         lbaas_agent, params=_params)
 
     @APIParamsCall
