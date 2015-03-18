@@ -51,12 +51,17 @@ class CLITestV20LbListenerJSON(test_cli20.CLITestV20Base):
         loadbalancer = 'loadbalancer'
         protocol = 'TCP'
         protocol_port = '80'
+        def_tls_cont_id = '11111'
         args = ['--admin-state-down',
                 '--protocol', protocol, '--protocol-port', protocol_port,
-                '--loadbalancer', loadbalancer]
+                '--loadbalancer', loadbalancer,
+                '--default-tls-container-id', def_tls_cont_id,
+                '--sni-container-ids', '1111', '2222', '3333']
         position_names = ['admin_state_up',
-                          'protocol', 'protocol_port', 'loadbalancer_id']
-        position_values = [False, protocol, protocol_port, loadbalancer]
+                          'protocol', 'protocol_port', 'loadbalancer_id',
+                          'default_tls_container_id', 'sni_container_ids']
+        position_values = [False, protocol, protocol_port, loadbalancer,
+                           def_tls_cont_id, ['1111', '2222', '3333']]
         self._test_create_resource(resource, cmd, '', my_id, args,
                                    position_names, position_values,
                                    cmd_resource=cmd_resource)
