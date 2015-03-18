@@ -19,6 +19,7 @@ import sys
 import mock
 
 from neutronclient.neutron.v2_0.contrib import _fox_sockets as fox_sockets
+from neutronclient import shell
 from neutronclient.tests.unit import test_cli20
 
 
@@ -37,9 +38,17 @@ class CLITestV20ExtensionJSON(test_cli20.CLITestV20Base):
     def _mock_extension_loading(self):
         ext_pkg = 'neutronclient.common.extension'
         contrib = self._create_patch(ext_pkg + '._discover_via_entry_points')
-        iterator = iter([("_fox_sockets", fox_sockets)])
-        contrib.return_value.__iter__.return_value = iterator
+        contrib.return_value = [("_fox_sockets", fox_sockets)]
         return contrib
+
+    def test_ext_cmd_loaded(self):
+        shell.NeutronShell('2.0')
+        ext_cmd = {'fox-sockets-list': fox_sockets.FoxInSocketsList,
+                   'fox-sockets-create': fox_sockets.FoxInSocketsCreate,
+                   'fox-sockets-update': fox_sockets.FoxInSocketsUpdate,
+                   'fox-sockets-delete': fox_sockets.FoxInSocketsDelete,
+                   'fox-sockets-show': fox_sockets.FoxInSocketsShow}
+        self.assertDictContainsSubset(ext_cmd, shell.COMMANDS['2.0'])
 
     def test_delete_fox_socket(self):
         """Delete fox socket: myid."""

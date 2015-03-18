@@ -696,6 +696,7 @@ class NeutronShell(app.App):
                         continue
                 try:
                     self.command_manager.add_command(cmd, cls)
+                    self.commands[version][cmd] = cls
                 except TypeError:
                     pass
 
