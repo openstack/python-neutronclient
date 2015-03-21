@@ -184,12 +184,6 @@ class ClientBase(object):
         # Raise the appropriate exception
         exception_handler_v20(status_code, des_error_body)
 
-    def _check_uri_length(self, action):
-        uri_len = len(self.httpclient.endpoint_url) + len(action)
-        if uri_len > self.MAX_URI_LEN:
-            raise exceptions.RequestURITooLong(
-                excess=uri_len - self.MAX_URI_LEN)
-
     def do_request(self, method, action, body=None, headers=None, params=None):
         # Add format and tenant_id
         action += ".%s" % self.format
@@ -197,8 +191,6 @@ class ClientBase(object):
         if type(params) is dict and params:
             params = utils.safe_encode_dict(params)
             action += '?' + urlparse.urlencode(params, doseq=1)
-
-        self._check_uri_length(action)
 
         if body:
             body = self.serialize(body)
@@ -465,9 +457,6 @@ class Client(ClientBase):
                      'lbaas_members': 'lbaas_member',
                      'healthmonitors': 'healthmonitor',
                      }
-
-    # 8192 Is the default max URI len for eventlet.wsgi.server
-    MAX_URI_LEN = 8192
 
     @APIParamsCall
     def list_ext(self, path, **_params):
