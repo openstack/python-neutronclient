@@ -332,9 +332,9 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         self._test_show_resource(resource, cmd, self.test_id,
                                  args, ['id'])
 
-    def _test_list_security_group_rules_extend(self, data=None, expected=None,
+    def _test_list_security_group_rules_extend(self, api_data, expected,
                                                args=(), conv=True,
-                                               query_field=False):
+                                               query_fields=None):
         def setup_list_stub(resources, data, query):
             reses = {resources: data}
             resstr = self.client.serialize(reses)
@@ -349,38 +349,22 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                 headers=mox.ContainsKeyValue(
                     'X-Auth-Token', test_cli20.TOKEN)).AndReturn(resp)
 
-        # Setup the default data
-        _data = {'cols': ['id', 'security_group_id', 'remote_group_id'],
-                 'data': [('ruleid1', 'myid1', 'myid1'),
-                          ('ruleid2', 'myid2', 'myid3'),
-                          ('ruleid3', 'myid2', 'myid2')]}
-        _expected = {'cols': ['id', 'security_group', 'remote_group'],
-                     'data': [('ruleid1', 'group1', 'group1'),
-                              ('ruleid2', 'group2', 'group3'),
-                              ('ruleid3', 'group2', 'group2')]}
-        if data is None:
-            data = _data
-        list_data = [dict(zip(data['cols'], d)) for d in data['data']]
-        if expected is None:
-            expected = {}
-        expected['cols'] = expected.get('cols', _expected['cols'])
-        expected['data'] = expected.get('data', _expected['data'])
-
         cmd = securitygroup.ListSecurityGroupRule(
             test_cli20.MyApp(sys.stdout), None)
         self.mox.StubOutWithMock(cmd, 'get_client')
         self.mox.StubOutWithMock(self.client.httpclient, 'request')
         cmd.get_client().AndReturn(self.client)
         query = ''
-        if query_field:
-            query = '&'.join(['fields=' + f for f in data['cols']])
-        setup_list_stub('security_group_rules', list_data, query)
+        if query_fields:
+            query = '&'.join(['fields=' + f for f in query_fields])
+        setup_list_stub('security_group_rules', api_data, query)
         if conv:
             cmd.get_client().AndReturn(self.client)
             sec_ids = set()
-            for n in data['data']:
-                sec_ids.add(n[1])
-                sec_ids.add(n[2])
+            for n in api_data:
+                sec_ids.add(n['security_group_id'])
+                if n.get('remote_group_id'):
+                    sec_ids.add(n['remote_group_id'])
             filters = ''
             for id in sec_ids:
                 filters = filters + "&id=%s" % id
@@ -397,50 +381,131 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         # Check columns
-        self.assertEqual(result[0], expected['cols'])
+        self.assertEqual(expected['cols'], result[0])
         # Check data
         _result = [x for x in result[1]]
         self.assertEqual(len(_result), len(expected['data']))
         for res, exp in zip(_result, expected['data']):
-            self.assertEqual(len(res), len(exp))
-            self.assertEqual(res, exp)
+            self.assertEqual(len(exp), len(res))
+            self.assertEqual(exp, res)
 
-    def test_list_security_group_rules_extend_source_id(self):
-        self._test_list_security_group_rules_extend()
+    def _test_list_security_group_rules_extend_sg_name(
+            self, expected_mode=None, args=(), conv=True, query_field=False):
+        if query_field:
+            field_filters = ['id', 'security_group_id',
+                             'remote_ip_prefix', 'remote_group_id']
+        else:
+            field_filters = None
 
-    def test_list_security_group_rules_extend_no_nameconv(self):
-        expected = {'cols': ['id', 'security_group_id', 'remote_group_id'],
-                    'data': [('ruleid1', 'myid1', 'myid1'),
-                             ('ruleid2', 'myid2', 'myid3'),
-                             ('ruleid3', 'myid2', 'myid2')]}
-        args = ['--no-nameconv']
-        self._test_list_security_group_rules_extend(expected=expected,
-                                                    args=args, conv=False)
+        data = [self._prepare_rule(rule_id='ruleid1', sg_id='myid1',
+                                   remote_group_id='myid1',
+                                   filters=field_filters),
+                self._prepare_rule(rule_id='ruleid2', sg_id='myid2',
+                                   remote_group_id='myid3',
+                                   filters=field_filters),
+                self._prepare_rule(rule_id='ruleid3', sg_id='myid2',
+                                   remote_group_id='myid2',
+                                   filters=field_filters),
+                ]
 
-    def test_list_security_group_rules_extend_with_columns(self):
+        if expected_mode == 'noconv':
+            expected = {'cols': ['id', 'security_group_id', 'remote_group_id'],
+                        'data': [('ruleid1', 'myid1', 'myid1'),
+                                 ('ruleid2', 'myid2', 'myid3'),
+                                 ('ruleid3', 'myid2', 'myid2')]}
+        elif expected_mode == 'remote_group_id':
+            expected = {'cols': ['id', 'security_group', 'remote_group'],
+                        'data': [('ruleid1', 'group1', 'group1'),
+                                 ('ruleid2', 'group2', 'group3'),
+                                 ('ruleid3', 'group2', 'group2')]}
+        else:
+            expected = {'cols': ['id', 'security_group', 'remote'],
+                        'data': [('ruleid1', 'group1', 'group1 (group)'),
+                                 ('ruleid2', 'group2', 'group3 (group)'),
+                                 ('ruleid3', 'group2', 'group2 (group)')]}
+
+        self._test_list_security_group_rules_extend(
+            data, expected, args=args, conv=conv, query_fields=field_filters)
+
+    def test_list_security_group_rules_extend_remote_sg_name(self):
+        args = '-c id -c security_group -c remote'.split()
+        self._test_list_security_group_rules_extend_sg_name(args=args)
+
+    def test_list_security_group_rules_extend_sg_name_noconv(self):
+        args = '--no-nameconv -c id -c security_group_id -c remote_group_id'
+        args = args.split()
+        self._test_list_security_group_rules_extend_sg_name(
+            expected_mode='noconv', args=args, conv=False)
+
+    def test_list_security_group_rules_extend_sg_name_with_columns(self):
         args = '-c id -c security_group_id -c remote_group_id'.split()
-        self._test_list_security_group_rules_extend(args=args)
+        self._test_list_security_group_rules_extend_sg_name(
+            expected_mode='remote_group_id', args=args)
 
-    def test_list_security_group_rules_extend_with_columns_no_id(self):
+    def test_list_security_group_rules_extend_sg_name_with_columns_no_id(self):
         args = '-c id -c security_group -c remote_group'.split()
-        self._test_list_security_group_rules_extend(args=args)
+        self._test_list_security_group_rules_extend_sg_name(
+            expected_mode='remote_group_id', args=args)
 
-    def test_list_security_group_rules_extend_with_fields(self):
-        args = '-F id -F security_group_id -F remote_group_id'.split()
-        self._test_list_security_group_rules_extend(args=args,
-                                                    query_field=True)
+    def test_list_security_group_rules_extend_sg_name_with_fields(self):
+        # NOTE: remote_ip_prefix is required to show "remote" column
+        args = ('-F id -F security_group_id '
+                '-F remote_ip_prefix -F remote_group_id').split()
+        self._test_list_security_group_rules_extend_sg_name(
+            args=args, query_field=True)
 
-    def test_list_security_group_rules_extend_with_fields_no_id(self):
-        args = '-F id -F security_group -F remote_group'.split()
-        self._test_list_security_group_rules_extend(args=args,
-                                                    query_field=True)
+    def test_list_security_group_rules_extend_sg_name_with_fields_no_id(self):
+        # NOTE: remote_ip_prefix is required to show "remote" column
+        args = ('-F id -F security_group '
+                '-F remote_ip_prefix -F remote_group').split()
+        self._test_list_security_group_rules_extend_sg_name(args=args,
+                                                            query_field=True)
 
-    def _prepare_rule(self, direction=None, ethertype=None,
+    def test_list_security_group_rules_extend_remote(self):
+        args = '-c id -c security_group -c remote'.split()
+
+        data = [self._prepare_rule(rule_id='ruleid1', sg_id='myid1',
+                                   remote_ip_prefix='172.16.18.0/24'),
+                self._prepare_rule(rule_id='ruleid2', sg_id='myid2',
+                                   remote_ip_prefix='172.16.20.0/24'),
+                self._prepare_rule(rule_id='ruleid3', sg_id='myid2',
+                                   remote_group_id='myid3')]
+        expected = {'cols': ['id', 'security_group', 'remote'],
+                    'data': [('ruleid1', 'group1', '172.16.18.0/24 (CIDR)'),
+                             ('ruleid2', 'group2', '172.16.20.0/24 (CIDR)'),
+                             ('ruleid3', 'group2', 'group3 (group)')]}
+        self._test_list_security_group_rules_extend(data, expected, args)
+
+    def test_list_security_group_rules_extend_proto_port(self):
+        data = [self._prepare_rule(rule_id='ruleid1', sg_id='myid1',
+                                   protocol='tcp',
+                                   port_range_min=22, port_range_max=22),
+                self._prepare_rule(rule_id='ruleid2', sg_id='myid2',
+                                   direction='egress', ethertype='IPv6',
+                                   protocol='udp',
+                                   port_range_min=80, port_range_max=81),
+                self._prepare_rule(rule_id='ruleid3', sg_id='myid2',
+                                   protocol='icmp',
+                                   remote_ip_prefix='10.2.0.0/16')]
+        expected = {
+            'cols': ['id', 'security_group', 'direction', 'ethertype',
+                     'protocol/port', 'remote'],
+            'data': [
+                ('ruleid1', 'group1', 'ingress', 'IPv4', '22/tcp', 'any'),
+                ('ruleid2', 'group2', 'egress', 'IPv6', '80-81/udp', 'any'),
+                ('ruleid3', 'group2', 'ingress', 'IPv4', 'icmp',
+                 '10.2.0.0/16 (CIDR)')
+            ]}
+        self._test_list_security_group_rules_extend(data, expected)
+
+    def _prepare_rule(self, rule_id=None, sg_id=None, tenant_id=None,
+                      direction=None, ethertype=None,
                       protocol=None, port_range_min=None, port_range_max=None,
-                      remote_ip_prefix=None, remote_group_id=None):
-        return {'id': str(uuid.uuid4()),
-                'tenant_id': str(uuid.uuid4()),
-                'security_group_id': str(uuid.uuid4()),
+                      remote_ip_prefix=None, remote_group_id=None,
+                      filters=None):
+        rule = {'id': rule_id or str(uuid.uuid4()),
+                'tenant_id': tenant_id or str(uuid.uuid4()),
+                'security_group_id': sg_id or str(uuid.uuid4()),
                 'direction': direction or 'ingress',
                 'ethertype': ethertype or 'IPv4',
                 'protocol': protocol,
@@ -448,6 +513,24 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                 'port_range_max': port_range_max,
                 'remote_ip_prefix': remote_ip_prefix,
                 'remote_group_id': remote_group_id}
+        if filters:
+            return dict([(k, v) for k, v in rule.items() if k in filters])
+        else:
+            return rule
+
+    def test__get_remote_both_unspecified(self):
+        sg_rule = self._prepare_rule(remote_ip_prefix=None,
+                                     remote_group_id=None)
+        self.assertIsNone(securitygroup._get_remote(sg_rule))
+
+    def test__get_remote_remote_ip_prefix_specified(self):
+        sg_rule = self._prepare_rule(remote_ip_prefix='172.16.18.0/24')
+        self.assertEqual('172.16.18.0/24 (CIDR)',
+                         securitygroup._get_remote(sg_rule))
+
+    def test__get_remote_remote_group_specified(self):
+        sg_rule = self._prepare_rule(remote_group_id='sg_id1')
+        self.assertEqual('sg_id1 (group)', securitygroup._get_remote(sg_rule))
 
     def test__get_protocol_port_all_none(self):
         sg_rule = self._prepare_rule()

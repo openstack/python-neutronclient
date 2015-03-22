@@ -21,6 +21,16 @@ from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
 
 
+def _get_remote(rule):
+    if rule['remote_ip_prefix']:
+        remote = '%s (CIDR)' % rule['remote_ip_prefix']
+    elif rule['remote_group_id']:
+        remote = '%s (group)' % rule['remote_group_id']
+    else:
+        remote = None
+    return remote
+
+
 def _get_protocol_port(rule):
     proto = rule['protocol']
     port_min = rule['port_range_min']
@@ -157,10 +167,19 @@ class ListSecurityGroupRule(neutronV20.ListCommand):
     """List security group rules that belong to a given tenant."""
 
     resource = 'security_group_rule'
-    list_columns = ['id', 'security_group_id', 'direction', 'protocol',
-                    'remote_ip_prefix', 'remote_group_id']
+    list_columns = ['id', 'security_group_id', 'direction',
+                    'ethertype', 'protocol/port', 'remote']
+    # replace_rules: key is an attribute name in Neutron API and
+    # corresponding value is a display name shown by CLI.
     replace_rules = {'security_group_id': 'security_group',
                      'remote_group_id': 'remote_group'}
+    digest_fields = {
+        'remote': {
+            'method': _get_remote,
+            'depends_on': ['remote_ip_prefix', 'remote_group_id']},
+        'protocol/port': {
+            'method': _get_protocol_port,
+            'depends_on': ['protocol', 'port_range_min', 'port_range_max']}}
     pagination_support = True
     sorting_support = True
 
@@ -177,19 +196,28 @@ class ListSecurityGroupRule(neutronV20.ListCommand):
             rules = dict((rules[k], k) for k in rules.keys())
         return [rules.get(col, col) for col in cols]
 
+    def get_required_fields(self, fields):
+        fields = self.replace_columns(fields, self.replace_rules, reverse=True)
+        for field, digest_fields in self.digest_fields.items():
+            if field in fields:
+                fields += digest_fields['depends_on']
+                fields.remove(field)
+        return fields
+
     def retrieve_list(self, parsed_args):
-        parsed_args.fields = self.replace_columns(parsed_args.fields,
-                                                  self.replace_rules,
-                                                  reverse=True)
+        parsed_args.fields = self.get_required_fields(parsed_args.fields)
         return super(ListSecurityGroupRule, self).retrieve_list(parsed_args)
 
-    def extend_list(self, data, parsed_args):
-        if parsed_args.no_nameconv:
-            return
+    def _get_sg_name_dict(self, data, page_size, no_nameconv):
+        """Get names of security groups referred in the retrieved rules.
+
+        :return: a dict from secgroup ID to secgroup name
+        """
+        if no_nameconv:
+            return {}
         neutron_client = self.get_client()
         search_opts = {'fields': ['id', 'name']}
         if self.pagination_support:
-            page_size = parsed_args.page_size
             if page_size:
                 search_opts.update({'limit': page_size})
         sec_group_ids = set()
@@ -222,14 +250,28 @@ class ListSecurityGroupRule(neutronV20.ListCommand):
                 secgroups.extend(
                     _get_sec_group_list(sec_group_ids[i: i + chunk_size]))
 
-        sg_dict = dict([(sg['id'], sg['name'])
-                        for sg in secgroups if sg['name']])
+        return dict([(sg['id'], sg['name'])
+                     for sg in secgroups if sg['name']])
+
+    @staticmethod
+    def _has_fileds(rule, required_fileds):
+        return all([key in rule for key in required_fileds])
+
+    def extend_list(self, data, parsed_args):
+        sg_dict = self._get_sg_name_dict(data, parsed_args.page_size,
+                                         parsed_args.no_nameconv)
         for rule in data:
+            # Replace security group UUID with its name.
             for key in self.replace_rules:
                 if key in rule:
                     rule[key] = sg_dict.get(rule[key], rule[key])
+            for field, digest_rule in self.digest_fields.items():
+                if self._has_fileds(rule, digest_rule['depends_on']):
+                    rule[field] = digest_rule['method'](rule) or 'any'
 
     def setup_columns(self, info, parsed_args):
+        # Translate the specified columns from the command line
+        # into field names used in "info".
         parsed_args.columns = self.replace_columns(parsed_args.columns,
                                                    self.replace_rules,
                                                    reverse=True)
@@ -240,6 +282,7 @@ class ListSecurityGroupRule(neutronV20.ListCommand):
                                                                 parsed_args)
         cols = info[0]
         if not parsed_args.no_nameconv:
+            # Replace column names in the header line (in info[0])
             cols = self.replace_columns(info[0], self.replace_rules)
             parsed_args.columns = cols
         return (cols, info[1])
