@@ -15,6 +15,7 @@
 #    under the License.
 
 import sys
+import uuid
 
 from mox3 import mox
 import six
@@ -433,6 +434,87 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         args = '-F id -F security_group -F remote_group'.split()
         self._test_list_security_group_rules_extend(args=args,
                                                     query_field=True)
+
+    def _prepare_rule(self, direction=None, ethertype=None,
+                      protocol=None, port_range_min=None, port_range_max=None,
+                      remote_ip_prefix=None, remote_group_id=None):
+        return {'id': str(uuid.uuid4()),
+                'tenant_id': str(uuid.uuid4()),
+                'security_group_id': str(uuid.uuid4()),
+                'direction': direction or 'ingress',
+                'ethertype': ethertype or 'IPv4',
+                'protocol': protocol,
+                'port_range_min': port_range_min,
+                'port_range_max': port_range_max,
+                'remote_ip_prefix': remote_ip_prefix,
+                'remote_group_id': remote_group_id}
+
+    def test__get_protocol_port_all_none(self):
+        sg_rule = self._prepare_rule()
+        self.assertIsNone(securitygroup._get_protocol_port(sg_rule))
+
+    def test__get_protocol_port_tcp_all_port(self):
+        sg_rule = self._prepare_rule(protocol='tcp')
+        self.assertEqual('tcp', securitygroup._get_protocol_port(sg_rule))
+
+    def test__get_protocol_port_tcp_one_port(self):
+        sg_rule = self._prepare_rule(protocol='tcp',
+                                     port_range_min=22, port_range_max=22)
+        self.assertEqual('22/tcp', securitygroup._get_protocol_port(sg_rule))
+
+    def test__get_protocol_port_tcp_port_range(self):
+        sg_rule = self._prepare_rule(protocol='tcp',
+                                     port_range_min=5000, port_range_max=5010)
+        self.assertEqual('5000-5010/tcp',
+                         securitygroup._get_protocol_port(sg_rule))
+
+    def test__get_protocol_port_udp_all_port(self):
+        sg_rule = self._prepare_rule(protocol='udp')
+        self.assertEqual('udp', securitygroup._get_protocol_port(sg_rule))
+
+    def test__get_protocol_port_udp_one_port(self):
+        sg_rule = self._prepare_rule(protocol='udp',
+                                     port_range_min=22, port_range_max=22)
+        self.assertEqual('22/udp', securitygroup._get_protocol_port(sg_rule))
+
+    def test__get_protocol_port_udp_port_range(self):
+        sg_rule = self._prepare_rule(protocol='udp',
+                                     port_range_min=5000, port_range_max=5010)
+        self.assertEqual('5000-5010/udp',
+                         securitygroup._get_protocol_port(sg_rule))
+
+    def test__get_protocol_port_icmp_all(self):
+        sg_rule = self._prepare_rule(protocol='icmp')
+        self.assertEqual('icmp', securitygroup._get_protocol_port(sg_rule))
+
+    def test__get_protocol_port_udp_code_type(self):
+        sg_rule = self._prepare_rule(protocol='icmp',
+                                     port_range_min=1, port_range_max=8)
+        self.assertEqual('icmp (type:1, code:8)',
+                         securitygroup._get_protocol_port(sg_rule))
+
+    def test__format_sg_rules(self):
+        rules = [self._prepare_rule(),
+                 self._prepare_rule(protocol='tcp', port_range_min=80,
+                                    port_range_max=80),
+                 self._prepare_rule(remote_ip_prefix='192.168.1.0/24'),
+                 self._prepare_rule(remote_group_id='group1'),
+                 self._prepare_rule(protocol='tcp',
+                                    remote_ip_prefix='10.1.1.0/24'),
+                 self._prepare_rule(direction='egress'),
+                 self._prepare_rule(direction='egress', ethertype='IPv6'),
+                 ]
+        sg = {'security_group_rules': rules}
+        expected_data = ['ingress, IPv4',
+                         'ingress, IPv4, 80/tcp',
+                         'ingress, IPv4, remote_ip_prefix: 192.168.1.0/24',
+                         'ingress, IPv4, remote_group_id: group1',
+                         'ingress, IPv4, tcp, remote_ip_prefix: 10.1.1.0/24',
+                         'egress, IPv4',
+                         'egress, IPv6',
+                         ]
+        expected = '\n'.join(sorted(expected_data))
+        self.assertEqual(expected, securitygroup._format_sg_rules(sg))
 
 
 class CLITestV20SecurityGroupsXML(CLITestV20SecurityGroupsJSON):

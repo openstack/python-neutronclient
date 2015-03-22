@@ -108,7 +108,8 @@ class SimpleReadOnlyNeutronClientTest(base.ClientTestBase):
 
     def test_neutron_security_group_list(self):
         security_grp = self.parser.listing(self.neutron('security-group-list'))
-        self.assertTableStruct(security_grp, ['id', 'name', 'description'])
+        self.assertTableStruct(security_grp, ['id', 'name',
+                                              'security_group_rules'])
 
     def test_neutron_security_group_rule_list(self):
         security_grp = self.parser.listing(self.neutron
