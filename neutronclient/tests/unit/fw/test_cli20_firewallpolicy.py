@@ -57,7 +57,7 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
         position_names = ['name', ]
         position_values = [name, ]
 
-        #check for both str and unicode format firewall_rules_arg
+        # check for both str and unicode format firewall_rules_arg
         for firewall_rules_arg in ['rule_id1 rule_id2', u'rule_id1 rule_id2']:
             args = ['--description', description,
                     '--shared',

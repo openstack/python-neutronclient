@@ -12,10 +12,6 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-#
-###
-### Codes from neutron wsgi
-###
 
 import logging
 from xml.etree import ElementTree as etree
@@ -126,7 +122,7 @@ class XMLDictSerializer(DictSerializer):
         self._add_xmlns(node, used_prefixes, has_atom)
         return etree.tostring(node, encoding='UTF-8')
 
-    #NOTE (ameade): the has_atom should be removed after all of the
+    # NOTE(ameade): the has_atom should be removed after all of the
     # XML serializers and view builders have been updated to the current
     # spec that required all responses include the xmlns:atom, the has_atom
     # flag is to prevent current tests from breaking
@@ -146,7 +142,7 @@ class XMLDictSerializer(DictSerializer):
         result = etree.SubElement(parent, nodename)
         if ":" in nodename:
             used_prefixes.append(nodename.split(":", 1)[0])
-        #TODO(bcwaldon): accomplish this without a type-check
+        # TODO(bcwaldon): accomplish this without a type-check
         if isinstance(data, list):
             if not data:
                 result.set(
@@ -162,7 +158,7 @@ class XMLDictSerializer(DictSerializer):
             for item in data:
                 self._to_xml_node(result, metadata, singular, item,
                                   used_prefixes)
-        #TODO(bcwaldon): accomplish this without a type-check
+        # TODO(bcwaldon): accomplish this without a type-check
         elif isinstance(data, dict):
             if not data:
                 result.set(
