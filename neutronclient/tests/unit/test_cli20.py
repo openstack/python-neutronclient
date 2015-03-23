@@ -641,9 +641,9 @@ class ClientV2UnicodeTestXML(ClientV2TestJson):
 class CLITestV20ExceptionHandler(CLITestV20Base):
 
     def _test_exception_handler_v20(
-        self, expected_exception, status_code, expected_msg,
-        error_type=None, error_msg=None, error_detail=None,
-        error_content=None):
+            self, expected_exception, status_code, expected_msg,
+            error_type=None, error_msg=None, error_detail=None,
+            error_content=None):
         if error_content is None:
             error_content = {'NeutronError': {'type': error_type,
                                               'message': error_msg,
