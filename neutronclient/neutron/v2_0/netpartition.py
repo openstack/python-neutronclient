@@ -12,7 +12,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# @author: Ronak Shah, Nuage Networks, Alcatel-Lucent USA Inc.
 
 from neutronclient.neutron.v2_0 import CreateCommand
 from neutronclient.neutron.v2_0 import DeleteCommand

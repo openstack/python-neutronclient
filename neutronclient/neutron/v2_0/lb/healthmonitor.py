@@ -13,8 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# @author: Ilya Shakhat, Mirantis Inc.
-#
 
 from __future__ import print_function
 

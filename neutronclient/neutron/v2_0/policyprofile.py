@@ -10,8 +10,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-#@author Abhishek Raut, Cisco Systems
-#@author Sergey Sudakovich, Cisco Systems
 
 from __future__ import print_function
 

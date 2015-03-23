@@ -13,8 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# @author: Swaminathan Vasudevan, Hewlett-Packard.
-#
 
 from neutronclient.common import utils
 from neutronclient.i18n import _
