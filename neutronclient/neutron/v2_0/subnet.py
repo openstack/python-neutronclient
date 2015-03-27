@@ -218,8 +218,11 @@ class CreateSubnet(neutronV20.CreateCommand):
         if parsed_args.prefixlen:
             body['subnet'].update({'prefixlen': parsed_args.prefixlen})
         if parsed_args.subnetpool:
-            _subnetpool_id = neutronV20.find_resourceid_by_name_or_id(
-                self.get_client(), 'subnetpool', parsed_args.subnetpool)
+            if parsed_args.subnetpool == 'None':
+                _subnetpool_id = None
+            else:
+                _subnetpool_id = neutronV20.find_resourceid_by_name_or_id(
+                    self.get_client(), 'subnetpool', parsed_args.subnetpool)
             body['subnet'].update({'subnetpool_id': _subnetpool_id})
 
         updatable_args2body(parsed_args, body)
