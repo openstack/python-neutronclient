@@ -68,12 +68,9 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         args = ['--gateway', gateway, '--no-gateway', netid, cidr]
         position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
         position_values = [4, netid, cidr, None]
-        try:
-            self._test_create_resource(resource, cmd, name, myid, args,
-                                       position_names, position_values)
-        except Exception:
-            return
-        self.fail('No exception for bad gateway option')
+        self.assertRaises(
+            SystemExit, self._test_create_resource,
+            resource, cmd, name, myid, args, position_names, position_values)
 
     def _test_create_resource_and_catch_command_error(self, tested_args,
                                                       should_fail,

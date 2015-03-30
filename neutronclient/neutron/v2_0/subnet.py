@@ -52,10 +52,11 @@ def add_updatable_arguments(parser):
     parser.add_argument(
         '--name',
         help=_('Name of this subnet.'))
-    parser.add_argument(
+    gateway_sg = parser.add_mutually_exclusive_group()
+    gateway_sg.add_argument(
         '--gateway', metavar='GATEWAY_IP',
         help=_('Gateway IP of this subnet.'))
-    parser.add_argument(
+    gateway_sg.add_argument(
         '--no-gateway',
         action='store_true',
         help=_('No distribution of gateway.'))
@@ -102,17 +103,13 @@ def add_updatable_arguments(parser):
 
 
 def updatable_args2body(parsed_args, body, for_create=True):
-    if parsed_args.gateway and parsed_args.no_gateway:
-        raise exceptions.CommandError(_("--gateway option and "
-                                        "--no-gateway option can "
-                                        "not be used same time"))
     if parsed_args.disable_dhcp and parsed_args.enable_dhcp:
         raise exceptions.CommandError(_(
             "You cannot enable and disable DHCP at the same time."))
 
     if parsed_args.no_gateway:
         body['subnet'].update({'gateway_ip': None})
-    if parsed_args.gateway:
+    elif parsed_args.gateway:
         body['subnet'].update({'gateway_ip': parsed_args.gateway})
     if parsed_args.name:
         body['subnet'].update({'name': parsed_args.name})
