@@ -214,6 +214,14 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
         parser.add_argument(
             '--mac_address',
             help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--vnic-type', metavar='<direct | macvtap | normal>',
+            choices=['direct', 'macvtap', 'normal'],
+            help=_('VNIC type for this port.'))
+        parser.add_argument(
+            '--vnic_type',
+            choices=['direct', 'macvtap', 'normal'],
+            help=argparse.SUPPRESS)
         self.add_arguments_secgroup(parser)
         self.add_arguments_extradhcpopt(parser)
 
@@ -232,6 +240,8 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
             body['port'].update({'mac_address': parsed_args.mac_address})
         if parsed_args.tenant_id:
             body['port'].update({'tenant_id': parsed_args.tenant_id})
+        if parsed_args.vnic_type:
+            body['port'].update({'binding:vnic_type': parsed_args.vnic_type})
 
         self.args2body_secgroup(parsed_args, body['port'])
         self.args2body_extradhcpopt(parsed_args, body['port'])
