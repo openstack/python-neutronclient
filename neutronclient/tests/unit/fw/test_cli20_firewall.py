@@ -61,6 +61,19 @@ class CLITestV20FirewallJSON(test_cli20.CLITestV20Base):
                                    shared=True, admin_state_up=False,
                                    tenant_id=tenant_id)
 
+    def test_create_firewall_with_routers(self):
+        resource = 'firewall'
+        cmd = firewall.CreateFirewall(test_cli20.MyApp(sys.stdout), None)
+        name = 'my-name'
+        policy_id = 'my-policy-id'
+        my_id = 'my-id'
+        args = ['--router', 'fake-id', '--router', 'fake-name', policy_id]
+        router_ids = ['fake-id', 'fake-name']
+        position_names = ['firewall_policy_id', 'router_ids']
+        position_values = [policy_id, router_ids]
+        self._test_create_resource(resource, cmd, name, my_id, args,
+                                   position_names, position_values)
+
     def test_list_firewalls(self):
         """firewall-list."""
         resources = "firewalls"
@@ -119,6 +132,30 @@ class CLITestV20FirewallJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--policy', 'newpolicy'],
                                    {'firewall_policy_id': 'newpolicy'})
+
+    def test_update_firewall_with_routers(self):
+        resource = 'firewall'
+        cmd = firewall.UpdateFirewall(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(
+            resource, cmd, 'myid',
+            ['myid', '--router', 'fake-id', '--router', 'fake-name'],
+            {'router_ids': ['fake-id', 'fake-name']})
+
+    def test_update_firewall_with_no_routers(self):
+        resource = 'firewall'
+        cmd = firewall.UpdateFirewall(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(
+            resource, cmd, 'myid',
+            ['myid', '--no-routers'], {'router_ids': []})
+
+    def test_update_firewall_with_bad_router_options(self):
+        resource = 'firewall'
+        cmd = firewall.UpdateFirewall(test_cli20.MyApp(sys.stdout), None)
+        self.assertRaises(
+            SystemExit,
+            self._test_update_resource,
+            resource, cmd, 'myid',
+            ['myid', '--no-routers', '--router', 'fake-id'], {})
 
     def test_delete_firewall(self):
         """firewall-delete my-id."""
