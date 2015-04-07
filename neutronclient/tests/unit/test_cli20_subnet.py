@@ -474,6 +474,44 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
                           resource, cmd, name, myid, args, position_names,
                           position_values, tenant_id='tenantid')
 
+    def test_create_subnet_with_subnetpool_ipv4_with_cidr_wildcard(self):
+        resource = 'subnet'
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'cidrwildcard'
+        args = ['--tenant_id', 'tenantid',
+                '--ip-version', '4',
+                '--ipv6-address-mode', 'slaac',
+                '--subnetpool', 'subnetpool_id',
+                netid, cidr]
+        position_names = ['ip_version', 'ipv6_address_mode',
+                          'network_id', 'subnetpool_id', 'cidr']
+        position_values = [4, None, netid, 'subnetpool_id', cidr]
+        self.assertRaises(exceptions.CommandError, self._test_create_resource,
+                          resource, cmd, name, myid, args, position_names,
+                          position_values, tenant_id='tenantid')
+
+    def test_create_subnet_with_subnetpool_ipv4_with_prefixlen(self):
+        resource = 'subnet'
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        args = ['--tenant_id', 'tenantid',
+                '--ip-version', '4',
+                '--ipv6-address-mode', 'slaac',
+                '--subnetpool', 'subnetpool_id',
+                '--prefixlen', '31',
+                netid]
+        position_names = ['ip_version', 'ipv6_address_mode',
+                          'network_id', 'subnetpool_id']
+        position_values = [4, None, netid, 'subnetpool_id']
+        self.assertRaises(exceptions.CommandError, self._test_create_resource,
+                          resource, cmd, name, myid, args, position_names,
+                          position_values, tenant_id='tenantid')
+
     def test_list_subnets_detail(self):
         """List subnets: -D."""
         resources = "subnets"
