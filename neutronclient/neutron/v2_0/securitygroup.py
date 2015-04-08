@@ -106,6 +106,7 @@ class ShowSecurityGroup(neutronV20.ShowCommand):
 
     resource = 'security_group'
     allow_names = True
+    json_indent = 5
 
 
 class CreateSecurityGroup(neutronV20.CreateCommand):
