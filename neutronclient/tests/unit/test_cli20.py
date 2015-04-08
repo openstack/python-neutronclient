@@ -50,7 +50,7 @@ def capture_std_streams():
         sys.stdout, sys.stderr = stdout, stderr
 
 
-class FakeStdout:
+class FakeStdout(object):
 
     def __init__(self):
         self.content = []
