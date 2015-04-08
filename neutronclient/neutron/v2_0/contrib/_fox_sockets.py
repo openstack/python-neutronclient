@@ -65,7 +65,7 @@ class FoxInSocketsUpdate(extension.ClientExtensionUpdate, FoxInSocket):
     list_columns = ['id', 'name']
 
     def add_known_arguments(self, parser):
-        #_add_updatable_args(parser)
+        # _add_updatable_args(parser)
         parser.add_argument(
             '--name',
             help=_('Name of this fox socket.'))
