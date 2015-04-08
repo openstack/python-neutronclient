@@ -13,8 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# @author: Kyle Mestery, Cisco Systems, Inc.
-#
 
 import sys
 

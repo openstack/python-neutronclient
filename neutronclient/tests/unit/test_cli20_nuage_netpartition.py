@@ -12,7 +12,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# @author: Ronak Shah, Nuage Networks, Alcatel-Lucent USA Inc.
 
 import sys
 

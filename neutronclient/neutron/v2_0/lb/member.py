@@ -13,8 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# @author: Ilya Shakhat, Mirantis Inc.
-#
 
 from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20

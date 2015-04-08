@@ -2,9 +2,6 @@
 # Copyright 2014 Blue Box Group, Inc.
 # All Rights Reserved
 #
-# Author: Ilya Shakhat, Mirantis Inc.
-# Author: Craig Tracey <craigtracey@gmail.com>
-#
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
