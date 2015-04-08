@@ -63,15 +63,27 @@ class CreateFirewall(neutronv20.CreateCommand):
             dest='admin_state',
             action='store_false',
             help=_('Set admin state up to false.'))
+        parser.add_argument(
+            '--router',
+            dest='routers',
+            metavar='ROUTER',
+            action='append',
+            help=_('Firewall associated router names or IDs (requires FWaaS '
+                   'router insertion extension, this option can be repeated)'))
 
     def args2body(self, parsed_args):
+        client = self.get_client()
         _policy_id = neutronv20.find_resourceid_by_name_or_id(
-            self.get_client(), 'firewall_policy',
+            client, 'firewall_policy',
             parsed_args.firewall_policy_id)
         body = {
             self.resource: {
                 'firewall_policy_id': _policy_id,
                 'admin_state_up': parsed_args.admin_state, }, }
+        if parsed_args.routers:
+            body[self.resource]['router_ids'] = [
+                neutronv20.find_resourceid_by_name_or_id(client, 'router', r)
+                for r in parsed_args.routers]
         neutronv20.update_dict(parsed_args, body[self.resource],
                                ['name', 'description', 'shared',
                                 'tenant_id'])
@@ -87,14 +99,34 @@ class UpdateFirewall(neutronv20.UpdateCommand):
         parser.add_argument(
             '--policy', metavar='POLICY',
             help=_('Firewall policy name or ID.'))
+        router_sg = parser.add_mutually_exclusive_group()
+        router_sg.add_argument(
+            '--router',
+            dest='routers',
+            metavar='ROUTER',
+            action='append',
+            help=_('Firewall associated router names or IDs (requires FWaaS '
+                   'router insertion extension, this option can be repeated)'))
+        router_sg.add_argument(
+            '--no-routers',
+            action='store_true',
+            help=_('Associate no routers with the firewall (requires FWaaS '
+                   'router insertion extension)'))
 
     def args2body(self, parsed_args):
         data = {}
+        client = self.get_client()
         if parsed_args.policy:
             _policy_id = neutronv20.find_resourceid_by_name_or_id(
-                self.get_client(), 'firewall_policy',
+                client, 'firewall_policy',
                 parsed_args.policy)
             data['firewall_policy_id'] = _policy_id
+        if parsed_args.routers:
+            data['router_ids'] = [
+                neutronv20.find_resourceid_by_name_or_id(client, 'router', r)
+                for r in parsed_args.routers]
+        elif parsed_args.no_routers:
+            data['router_ids'] = []
         return {self.resource: data}
 
 
