@@ -97,8 +97,23 @@ def run_command(cmd, cmd_parser, sub_argv):
         _argv = sub_argv[:index]
         values_specs = sub_argv[index:]
     known_args, _values_specs = cmd_parser.parse_known_args(_argv)
+    if(isinstance(cmd, subnet.CreateSubnet) and not known_args.cidr):
+        cidr = get_first_valid_cidr(_values_specs)
+        if cidr:
+            known_args.cidr = cidr
+            _values_specs.remove(cidr)
     cmd.values_specs = (index == -1 and _values_specs or values_specs)
     return cmd.run(known_args)
+
+
+def get_first_valid_cidr(value_specs):
+    # Bug 1442771, argparse does not allow optional positional parameter
+    # to be separated from previous positional parameter.
+    # When cidr was separated from network, the value will not be able
+    # to be parsed into known_args, but saved to _values_specs instead.
+    for value in value_specs:
+        if utils.is_valid_cidr(value):
+            return value
 
 
 def env(*_vars, **kwargs):
