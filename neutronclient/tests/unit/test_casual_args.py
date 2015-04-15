@@ -78,6 +78,11 @@ class CLITestArgs(testtools.TestCase):
         self.assertEqual('value1',
                          neutronV20.parse_args_to_dict(_specs)['arg1'])
 
+    def test_arg_invalid_syntax(self):
+        _specs = ['--tag=t', '---arg1', 'value1']
+        self.assertRaises(exceptions.CommandError,
+                          neutronV20.parse_args_to_dict, _specs)
+
     def test_dict_arg(self):
         _specs = ['--tag=t', '--arg1', 'type=dict', 'key1=value1,key2=value2']
         arg1 = neutronV20.parse_args_to_dict(_specs)['arg1']

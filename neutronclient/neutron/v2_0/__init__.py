@@ -288,6 +288,10 @@ def parse_args_to_dict(values_specs):
                     _("Invalid values_specs %s") % ' '.join(values_specs))
             _value_number += 1
 
+        if _item.startswith('---'):
+            raise exceptions.CommandError(
+                _("Invalid values_specs %s") % ' '.join(values_specs))
+
         _values_specs.append(_item)
 
     # Deal with last one argument
