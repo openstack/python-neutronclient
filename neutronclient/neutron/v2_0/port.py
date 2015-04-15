@@ -222,6 +222,12 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
             '--vnic_type',
             choices=['direct', 'macvtap', 'normal'],
             help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--binding-profile',
+            help=_('Custom data to be passed as binding:profile.'))
+        parser.add_argument(
+            '--binding_profile',
+            help=argparse.SUPPRESS)
         self.add_arguments_secgroup(parser)
         self.add_arguments_extradhcpopt(parser)
 
@@ -242,6 +248,9 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
             body['port'].update({'tenant_id': parsed_args.tenant_id})
         if parsed_args.vnic_type:
             body['port'].update({'binding:vnic_type': parsed_args.vnic_type})
+        if parsed_args.binding_profile:
+            body['port'].update({'binding:profile':
+                                 jsonutils.loads(parsed_args.binding_profile)})
 
         self.args2body_secgroup(parsed_args, body['port'])
         self.args2body_extradhcpopt(parsed_args, body['port'])
