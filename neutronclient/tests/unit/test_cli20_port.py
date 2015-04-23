@@ -173,6 +173,25 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_port_with_binding_profile(self):
+        resource = 'port'
+        cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        args = ['--binding_profile', '{"foo":"bar"}', netid]
+        position_names = ['binding:profile', 'network_id']
+        position_values = [{'foo': 'bar'}, netid]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
+        # Test dashed options
+        args = ['--binding-profile', '{"foo":"bar"}', netid]
+        position_names = ['binding:profile', 'network_id']
+        position_values = [{'foo': 'bar'}, netid]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_create_port_tenant(self):
         """Create port: --tenant_id tenantid netid."""
         resource = 'port'
