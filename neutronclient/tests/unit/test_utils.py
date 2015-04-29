@@ -102,6 +102,11 @@ class TestUtils(testtools.TestCase):
         act = utils.get_item_properties(item, fields, formatters=formatters)
         self.assertEqual(('test_name', 'test_id', 'test', 'pass'), act)
 
+    def test_is_cidr(self):
+        self.assertTrue(utils.is_valid_cidr('10.10.10.0/24'))
+        self.assertFalse(utils.is_valid_cidr('10.10.10..0/24'))
+        self.assertFalse(utils.is_valid_cidr('wrong_cidr_format'))
+
 
 class ImportClassTestCase(testtools.TestCase):
     def test_get_client_class_invalid_version(self):

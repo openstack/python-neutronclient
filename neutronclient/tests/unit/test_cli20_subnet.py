@@ -34,9 +34,25 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        cidr = 'cidrvalue'
+        cidr = '10.10.10.0/24'
         gateway = 'gatewayvalue'
         args = ['--gateway', gateway, netid, cidr]
+        position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
+        position_values = [4, netid, cidr, gateway]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
+    def test_create_subnet_network_cidr_seperated(self):
+        # For positional value, network_id and cidr can be separated.
+        """Create subnet: --gateway gateway netid cidr."""
+        resource = 'subnet'
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = '10.10.10.0/24'
+        gateway = 'gatewayvalue'
+        args = [netid, '--gateway', gateway, cidr]
         position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
         position_values = [4, netid, cidr, gateway]
         self._test_create_resource(resource, cmd, name, myid, args,
