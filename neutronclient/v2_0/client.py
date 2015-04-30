@@ -341,6 +341,7 @@ class Client(ClientBase):
 
     lbaas_loadbalancers_path = "/lbaas/loadbalancers"
     lbaas_loadbalancer_path = "/lbaas/loadbalancers/%s"
+    lbaas_loadbalancer_path_stats = "/lbaas/loadbalancers/%s/stats"
     lbaas_listeners_path = "/lbaas/listeners"
     lbaas_listener_path = "/lbaas/listeners/%s"
     lbaas_pools_path = "/lbaas/pools"
@@ -936,6 +937,12 @@ class Client(ClientBase):
         """Deletes the specified load balancer."""
         return self.delete(self.lbaas_loadbalancer_path %
                            (lbaas_loadbalancer))
+
+    @APIParamsCall
+    def retrieve_loadbalancer_stats(self, loadbalancer, **_params):
+        """Retrieves stats for a certain load balancer."""
+        return self.get(self.lbaas_loadbalancer_path_stats % (loadbalancer),
+                        params=_params)
 
     @APIParamsCall
     def list_listeners(self, retrieve_all=True, **_params):

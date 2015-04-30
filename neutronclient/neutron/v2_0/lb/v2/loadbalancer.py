@@ -93,3 +93,38 @@ class DeleteLoadBalancer(neutronV20.DeleteCommand):
 
     resource = 'loadbalancer'
     allow_names = True
+
+
+class RetrieveLoadBalancerStats(neutronV20.ShowCommand):
+    """Retrieve stats for a given loadbalancer."""
+
+    resource = 'loadbalancer'
+
+    def get_data(self, parsed_args):
+        self.log.debug('run(%s)' % parsed_args)
+        neutron_client = self.get_client()
+        neutron_client.format = parsed_args.request_format
+        loadbalancer_id = neutronV20.find_resourceid_by_name_or_id(
+            self.get_client(), 'loadbalancer', parsed_args.id)
+        params = {}
+        if parsed_args.fields:
+            params = {'fields': parsed_args.fields}
+
+        data = neutron_client.retrieve_loadbalancer_stats(loadbalancer_id,
+                                                          **params)
+        self.format_output_data(data)
+        stats = data['stats']
+        if 'stats' in data:
+            # To render the output table like:
+            # +--------------------+-------+
+            # | Field              | Value |
+            # +--------------------+-------+
+            # | field1             | value1|
+            # | field2             | value2|
+            # | field3             | value3|
+            # | ...                | ...   |
+            # +--------------------+-------+
+            # it has two columns and the Filed column is alphabetical,
+            # here covert the data dict to the 1-1 vector format below:
+            # [(field1, field2, field3, ...), (value1, value2, value3, ...)]
+            return list(zip(*sorted(stats.items())))
