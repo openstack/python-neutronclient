@@ -17,7 +17,7 @@ import logging
 from xml.etree import ElementTree as etree
 from xml.parsers import expat
 
-from oslo.serialization import jsonutils
+from oslo_serialization import jsonutils
 import six
 
 from neutronclient.common import constants

@@ -20,7 +20,7 @@ import sys
 
 import fixtures
 from mox3 import mox
-from oslo.utils import encodeutils
+from oslo_utils import encodeutils
 from oslotest import base
 import requests
 import six

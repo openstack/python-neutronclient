@@ -17,7 +17,7 @@ import itertools
 import sys
 
 from mox3 import mox
-from oslo.serialization import jsonutils
+from oslo_serialization import jsonutils
 
 from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0 import network

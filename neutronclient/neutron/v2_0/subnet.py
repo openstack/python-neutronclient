@@ -16,7 +16,7 @@
 
 import argparse
 
-from oslo.serialization import jsonutils
+from oslo_serialization import jsonutils
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils

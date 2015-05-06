@@ -19,7 +19,7 @@ import logging
 import uuid
 
 import fixtures
-from oslo.serialization import jsonutils
+from oslo_serialization import jsonutils
 from requests_mock.contrib import fixture as mock_fixture
 import testtools
 

@@ -33,7 +33,7 @@ from keystoneclient.auth.identity import v3 as v3_auth
 from keystoneclient import discover
 from keystoneclient.openstack.common.apiclient import exceptions as ks_exc
 from keystoneclient import session
-from oslo.utils import encodeutils
+from oslo_utils import encodeutils
 import six.moves.urllib.parse as urlparse
 
 from cliff import app

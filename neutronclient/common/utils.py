@@ -22,8 +22,8 @@ import logging
 import netaddr
 import os
 
-from oslo.utils import encodeutils
-from oslo.utils import importutils
+from oslo_utils import encodeutils
+from oslo_utils import importutils
 import six
 
 from neutronclient.common import exceptions
