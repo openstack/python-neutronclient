@@ -184,6 +184,11 @@ class SetGatewayRouter(neutronV20.NeutronCommand):
         parser.add_argument(
             '--disable-snat', action='store_true',
             help=_('Disable source NAT on the router gateway.'))
+        parser.add_argument(
+            '--fixed-ip', action='append',
+            help=_('Desired IP and/or subnet on external network: '
+                   'subnet_id=<name_or_id>,ip_address=<ip>. '
+                   'You can repeat this option.'))
         return parser
 
     def run(self, parsed_args):
@@ -197,6 +202,17 @@ class SetGatewayRouter(neutronV20.NeutronCommand):
         router_dict = {'network_id': _ext_net_id}
         if parsed_args.disable_snat:
             router_dict['enable_snat'] = False
+        if parsed_args.fixed_ip:
+            ips = []
+            for ip_spec in parsed_args.fixed_ip:
+                ip_dict = utils.str2dict(ip_spec)
+                subnet_name_id = ip_dict.get('subnet_id')
+                if subnet_name_id:
+                    subnet_id = neutronV20.find_resourceid_by_name_or_id(
+                        neutron_client, 'subnet', subnet_name_id)
+                    ip_dict['subnet_id'] = subnet_id
+                ips.append(ip_dict)
+            router_dict['external_fixed_ips'] = ips
         neutron_client.add_gateway_router(_router_id, router_dict)
         print(_('Set gateway for router %s') % parsed_args.router,
               file=self.app.stdout)
