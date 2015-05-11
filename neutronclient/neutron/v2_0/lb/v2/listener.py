@@ -106,7 +106,8 @@ class CreateListener(neutronV20.CreateCommand):
                                ['connection-limit', 'description',
                                 'loadbalancer_id', 'name',
                                 'default_tls_container_id',
-                                'sni_container_ids'])
+                                'sni_container_ids',
+                                'tenant_id'])
         return body
 
 
