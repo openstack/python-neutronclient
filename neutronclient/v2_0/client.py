@@ -1650,6 +1650,7 @@ class Client(ClientBase):
                 setattr(self, "%s_path" % cls.resource_plural,
                         cls.object_path)
                 setattr(self, "%s_path" % cls.resource, cls.resource_path)
+                self.EXTED_PLURALS.update({cls.resource_plural: cls.resource})
 
     def _register_extensions(self, version):
         for name, module in itertools.chain(
