@@ -10,7 +10,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import os
 import uuid
 
 from keystoneclient.auth.identity import v2 as v2_auth
@@ -20,6 +19,7 @@ from tempest_lib import base
 import testtools
 
 from neutronclient.common import exceptions
+from neutronclient.tests.functional import base as func_base
 from neutronclient.v2_0 import client as v2_client
 
 # This module tests client library functionalities with
@@ -38,26 +38,29 @@ class LibraryTestBase(base.BaseTestCase):
 class Libv2HTTPClientTestBase(LibraryTestBase):
 
     def _get_client(self):
-        return v2_client.Client(username=os.environ.get('OS_USERNAME'),
-                                password=os.environ.get('OS_PASSWORD'),
-                                tenant_name=os.environ.get('OS_TENANT_NAME'),
-                                auth_url=os.environ.get('OS_AUTH_URL'))
+        creds = func_base.credentials()
+        return v2_client.Client(username=creds['username'],
+                                password=creds['password'],
+                                tenant_name=creds['tenant_name'],
+                                auth_url=creds['auth_url'])
 
 
 class Libv2SessionClientTestBase(LibraryTestBase):
 
     def _get_client(self):
+        creds = func_base.credentials()
+
         session_params = {}
         ks_session = session.Session.construct(session_params)
         ks_discover = discover.Discover(session=ks_session,
-                                        auth_url=os.environ.get('OS_AUTH_URL'))
+                                        auth_url=creds['auth_url'])
         # At the moment, we use keystone v2 API
         v2_auth_url = ks_discover.url_for('2.0')
         ks_session.auth = v2_auth.Password(
             v2_auth_url,
-            username=os.environ.get('OS_USERNAME'),
-            password=os.environ.get('OS_PASSWORD'),
-            tenant_name=os.environ.get('OS_TENANT_NAME'))
+            username=creds['username'],
+            password=creds['password'],
+            tenant_name=creds['tenant_name'])
         return v2_client.Client(session=ks_session)
 
 
