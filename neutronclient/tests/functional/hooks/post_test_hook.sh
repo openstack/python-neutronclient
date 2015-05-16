@@ -28,14 +28,27 @@ function generate_testr_results {
 
 export NEUTRONCLIENT_DIR="$BASE/new/python-neutronclient"
 
+sudo chown -R jenkins:stack $NEUTRONCLIENT_DIR
+
 # Get admin credentials
 cd $BASE/new/devstack
 source openrc admin admin
 
+# Store these credentials into the config file
+CREDS_FILE=$NEUTRONCLIENT_DIR/functional_creds.conf
+cat <<EOF > $CREDS_FILE
+# Credentials for functional testing
+[auth]
+uri = $OS_AUTH_URL
+
+[admin]
+user = $OS_USERNAME
+tenant = $OS_TENANT_NAME
+pass = $OS_PASSWORD
+EOF
+
 # Go to the neutronclient dir
 cd $NEUTRONCLIENT_DIR
-
-sudo chown -R jenkins:stack $NEUTRONCLIENT_DIR
 
 # Run tests
 echo "Running neutronclient functional test suite"
