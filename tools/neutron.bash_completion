@@ -10,9 +10,9 @@ _neutron()
 
 	if [ "x$_neutron_opts" == "x" ] ; then
 		nbc="`neutron bash-completion`"
-		_neutron_opts="`echo "$nbc" | sed -e "s/--[a-z0-9_-]*//g" -e "s/\s\s*/ /g"`"
-		_neutron_flags="`echo " $nbc" | sed -e "s/ [^-][^-][a-z0-9_-]*//g" -e "s/\s\s*/ /g"`"
-		_neutron_opts_exp="`echo "$_neutron_opts" | sed -e "s/\s/|/g"`"
+		_neutron_opts="`echo "$nbc" | sed -e "s/--[a-z0-9_-]*//g" -e "s/[ ][ ]*/ /g"`"
+		_neutron_flags="`echo " $nbc" | sed -e "s/ [^-][^-][a-z0-9_-]*//g" -e "s/[ ][ ]*/ /g"`"
+		_neutron_opts_exp="`echo "$_neutron_opts" | sed -e "s/[ ]/|/g"`"
 	fi
 
 	if [[ " ${COMP_WORDS[@]} " =~ " "($_neutron_opts_exp)" " && "$prev" != "help" ]] ; then
