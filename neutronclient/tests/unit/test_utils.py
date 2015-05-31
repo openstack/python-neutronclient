@@ -13,6 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import argparse
+
 import testtools
 
 from neutronclient.common import exceptions
@@ -41,6 +43,11 @@ class TestUtils(testtools.TestCase):
         input_str = None
         expected = {}
         self.assertEqual(expected, utils.str2dict(input_str))
+
+    def test_invalid_string_to_dictionary(self):
+        input_str = 'invalid'
+        self.assertRaises(argparse.ArgumentTypeError,
+                          utils.str2dict, input_str)
 
     def test_get_dict_item_properties(self):
         item = {'name': 'test_name', 'id': 'test_id'}

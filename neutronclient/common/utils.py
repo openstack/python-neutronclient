@@ -105,9 +105,15 @@ def str2dict(strdict):
 
     :param strdict: key1=value1,key2=value2
     """
-    if not strdict:
-        return {}
-    return dict([kv.split('=', 1) for kv in strdict.split(',')])
+    result = {}
+    if strdict:
+        for kv in strdict.split(','):
+            key, sep, value = kv.partition('=')
+            if not sep:
+                msg = _("invalid key-value '%s', expected format: key=value")
+                raise argparse.ArgumentTypeError(msg % kv)
+            result[key] = value
+    return result
 
 
 def http_log_req(_logger, args, kwargs):
