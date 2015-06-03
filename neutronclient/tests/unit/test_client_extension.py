@@ -14,6 +14,7 @@
 #    under the License.
 #
 
+import inspect
 import sys
 
 import mock
@@ -138,3 +139,74 @@ class CLITestV20ExtensionJSONAlternatePlurals(test_cli20.CLITestV20Base):
         resources = 'ip_addresses'
         cmd = self.IPAddressesList(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
+
+
+class CLITestV20ExtensionJSONChildResource(test_cli20.CLITestV20Base):
+    class Child(extension.NeutronClientExtension):
+        parent_resource = 'parents'
+        child_resource = 'child'
+        resource = '%s_%s' % (parent_resource, child_resource)
+        resource_plural = '%sren' % resource
+        child_resource_plural = '%ren' % child_resource
+        object_path = '/%s/%%s/%s' % (parent_resource, child_resource_plural)
+        resource_path = '/%s/%%s/%s/%%s' % (parent_resource,
+                                            child_resource_plural)
+        versions = ['2.0']
+
+    class ChildrenList(extension.ClientExtensionList, Child):
+        shell_command = 'parent-child-list'
+
+    class ChildShow(extension.ClientExtensionShow, Child):
+        shell_command = 'parent-child-show'
+
+    class ChildUpdate(extension.ClientExtensionUpdate, Child):
+        shell_command = 'parent-child-update'
+
+    class ChildDelete(extension.ClientExtensionDelete, Child):
+        shell_command = 'parent-child-delete'
+
+    class ChildCreate(extension.ClientExtensionCreate, Child):
+        shell_command = 'parent-child-create'
+
+    def setUp(self):
+        # need to mock before super because extensions loaded on instantiation
+        self._mock_extension_loading()
+        super(CLITestV20ExtensionJSONChildResource, self).setUp()
+
+    def _create_patch(self, name, func=None):
+        patcher = mock.patch(name)
+        thing = patcher.start()
+        self.addCleanup(patcher.stop)
+        return thing
+
+    def _mock_extension_loading(self):
+        ext_pkg = 'neutronclient.common.extension'
+        contrib = self._create_patch(ext_pkg + '._discover_via_entry_points')
+        child = mock.MagicMock()
+        child.Child = self.Child
+        child.ChildrenList = self.ChildrenList
+        child.ChildShow = self.ChildShow
+        child.ChildUpdate = self.ChildUpdate
+        child.ChildDelete = self.ChildDelete
+        child.ChildCreate = self.ChildCreate
+        contrib.return_value = [("child", child)]
+        return contrib
+
+    def test_ext_cmd_loaded(self):
+        shell.NeutronShell('2.0')
+        ext_cmd = {'parent-child-list': self.ChildrenList,
+                   'parent-child-show': self.ChildShow,
+                   'parent-child-update': self.ChildUpdate,
+                   'parent-child-delete': self.ChildDelete,
+                   'parent-child-create': self.ChildCreate}
+        self.assertDictContainsSubset(ext_cmd, shell.COMMANDS['2.0'])
+
+    def test_client_methods_have_parent_id_arg(self):
+        methods = (self.client.list_parents_children,
+                   self.client.show_parents_child,
+                   self.client.update_parents_child,
+                   self.client.delete_parents_child,
+                   self.client.create_parents_child)
+        for method in methods:
+            argspec = inspect.getargspec(method)
+            self.assertIn("parent_id", argspec.args)
