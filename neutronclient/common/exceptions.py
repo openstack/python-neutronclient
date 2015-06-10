@@ -144,6 +144,10 @@ class InvalidIpForNetworkClient(BadRequest):
     pass
 
 
+class InvalidIpForSubnetClient(BadRequest):
+    pass
+
+
 class OverQuotaClient(Conflict):
     pass
 

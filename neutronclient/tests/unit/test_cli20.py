@@ -682,6 +682,7 @@ class CLITestV20ExceptionHandler(CLITestV20Base):
              exceptions.ExternalIpAddressExhaustedClient, 400),
             ('OverQuota', exceptions.OverQuotaClient, 409),
             ('InvalidIpForNetwork', exceptions.InvalidIpForNetworkClient, 400),
+            ('InvalidIpForSubnet', exceptions.InvalidIpForSubnetClient, 400),
         ]
 
         error_msg = 'dummy exception message'
