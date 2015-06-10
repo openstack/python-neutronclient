@@ -106,7 +106,7 @@ class CreateMember(neutronV20.CreateCommand):
             },
         }
         neutronV20.update_dict(parsed_args, body[self.resource],
-                               ['weight', 'subnet_id'])
+                               ['weight', 'subnet_id', 'tenant_id'])
         return body
 
 

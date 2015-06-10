@@ -73,7 +73,7 @@ class CreateLoadBalancer(neutronV20.CreateCommand):
         }
         neutronV20.update_dict(parsed_args, body[self.resource],
                                ['description', 'provider', 'vip_address',
-                                'name'])
+                                'tenant_id', 'name'])
         return body
 
 

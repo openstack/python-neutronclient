@@ -100,7 +100,7 @@ class CreatePool(neutronV20.CreateCommand):
         }
         neutronV20.update_dict(parsed_args, body[self.resource],
                                ['description', 'name',
-                                'session_persistence'])
+                                'session_persistence', 'tenant_id'])
         return body
 
 
