@@ -72,7 +72,8 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
         cmd = member.ListMember(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True, base_args=[pool_id],
                                   cmd_resources=cmd_resources,
-                                  parent_id=pool_id)
+                                  parent_id=pool_id,
+                                  query="pool_id=%s" % pool_id)
 
     def test_list_members_pagination(self):
         """lbaas-member-list with pagination."""
@@ -83,7 +84,8 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
         self._test_list_resources_with_pagination(resources, cmd,
                                                   base_args=[pool_id],
                                                   cmd_resources=cmd_resources,
-                                                  parent_id=pool_id)
+                                                  parent_id=pool_id,
+                                                  query="pool_id=%s" % pool_id)
 
     def test_list_members_sort(self):
         """lbaas-member-list --sort-key id --sort-key asc."""
@@ -93,7 +95,8 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
         cmd = member.ListMember(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True, base_args=[pool_id],
                                   cmd_resources=cmd_resources,
-                                  parent_id=pool_id)
+                                  parent_id=pool_id,
+                                  query="pool_id=%s" % pool_id)
 
     def test_list_members_limit(self):
         """lbaas-member-list -P."""
@@ -104,7 +107,8 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
         self._test_list_resources(resources, cmd, page_size=1000,
                                   base_args=[pool_id],
                                   cmd_resources=cmd_resources,
-                                  parent_id=pool_id)
+                                  parent_id=pool_id,
+                                  query="pool_id=%s" % pool_id)
 
     def test_show_member_id(self):
         """lbaas-member-show test_id."""

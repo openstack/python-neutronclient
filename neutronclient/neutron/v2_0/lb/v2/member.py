@@ -38,7 +38,7 @@ class LbaasMemberMixin(object):
 
 
 class ListMember(LbaasMemberMixin, neutronV20.ListCommand):
-    """LBaaS v2 List members that belong to a given tenant."""
+    """LBaaS v2 List members that belong to a given pool."""
 
     resource = 'member'
     shadow_resource = 'lbaas_member'
@@ -48,6 +48,11 @@ class ListMember(LbaasMemberMixin, neutronV20.ListCommand):
     ]
     pagination_support = True
     sorting_support = True
+
+    def get_data(self, parsed_args):
+        self.parent_id = _get_pool_id(self.get_client(), parsed_args.pool)
+        self.values_specs.append('--pool_id=%s' % self.parent_id)
+        return super(ListMember, self).get_data(parsed_args)
 
 
 class ShowMember(LbaasMemberMixin, neutronV20.ShowCommand):

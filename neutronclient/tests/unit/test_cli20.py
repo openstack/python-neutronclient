@@ -304,7 +304,7 @@ class CLITestV20Base(base.BaseTestCase):
                              fields_1=(), fields_2=(), page_size=None,
                              sort_key=(), sort_dir=(), response_contents=None,
                              base_args=None, path=None, cmd_resources=None,
-                             parent_id=None, output_format=None):
+                             parent_id=None, output_format=None, query=""):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
@@ -319,7 +319,6 @@ class CLITestV20Base(base.BaseTestCase):
         self.client.format = self.format
         resstr = self.client.serialize(reses)
         # url method body
-        query = ""
         args = base_args if base_args is not None else []
         if detail:
             args.append('-D')
@@ -406,7 +405,7 @@ class CLITestV20Base(base.BaseTestCase):
     def _test_list_resources_with_pagination(self, resources, cmd,
                                              base_args=None,
                                              cmd_resources=None,
-                                             parent_id=None):
+                                             parent_id=None, query=""):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
@@ -427,7 +426,7 @@ class CLITestV20Base(base.BaseTestCase):
         resstr1 = self.client.serialize(reses1)
         resstr2 = self.client.serialize(reses2)
         self.client.httpclient.request(
-            end_url(path, "", format=self.format), 'GET',
+            end_url(path, query, format=self.format), 'GET',
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr1))
