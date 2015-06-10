@@ -15,6 +15,18 @@ In order to use the python neutron client directly, you must first obtain an aut
     >>> network_id = networks['networks'][0]['id']
     >>> neutron.delete_network(network_id)
 
+Alternatively, if you have a username and password, authentication is done
+against the public endpoint. You must also specify a tenant that is associated
+with the user::
+
+    >>> from neutronclient.v2_0 import client
+    >>> username='adminUser'
+    >>> password='secretword'
+    >>> tenant_name='openstackDemo'
+    >>> auth_url='http://192.168.206.130:5000/v2.0'
+    >>> neutron = client.Client(username=username, password=password,
+    ...                         tenant_name=tenant_name, auth_url=auth_url)
+    >>>nets = neutron.list_networks()
 
 Command-line Tool
 =================
