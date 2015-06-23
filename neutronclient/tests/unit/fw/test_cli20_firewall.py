@@ -47,7 +47,6 @@ class CLITestV20FirewallJSON(test_cli20.CLITestV20Base):
         tenant_id = 'my-tenant'
         my_id = 'my-id'
         args = ['--description', description,
-                '--shared',
                 '--admin-state-down',
                 '--tenant-id', tenant_id,
                 policy_id]
@@ -56,7 +55,7 @@ class CLITestV20FirewallJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, my_id, args,
                                    position_names, position_values,
                                    description=description,
-                                   shared=True, admin_state_up=False,
+                                   admin_state_up=False,
                                    tenant_id=tenant_id)
 
     def test_create_firewall_with_routers(self):
