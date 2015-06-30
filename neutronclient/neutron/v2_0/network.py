@@ -121,11 +121,6 @@ class CreateNetwork(neutronV20.CreateCommand):
             help=_('Set the network as shared.'),
             default=argparse.SUPPRESS)
         parser.add_argument(
-            '--router:external',
-            action='store_true',
-            help=_('Set network as external, it is only available for admin'),
-            default=argparse.SUPPRESS)
-        parser.add_argument(
             '--provider:network_type',
             metavar='<network_type>',
             help=_('The physical mechanism by which the virtual network'
@@ -154,7 +149,7 @@ class CreateNetwork(neutronV20.CreateCommand):
             'name': parsed_args.name,
             'admin_state_up': parsed_args.admin_state}, }
         neutronV20.update_dict(parsed_args, body['network'],
-                               ['shared', 'tenant_id', 'router:external',
+                               ['shared', 'tenant_id',
                                 'vlan_transparent',
                                 'provider:network_type',
                                 'provider:physical_network',
