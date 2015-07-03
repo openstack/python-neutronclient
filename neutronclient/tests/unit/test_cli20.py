@@ -211,7 +211,9 @@ class CLITestV20Base(base.BaseTestCase):
                               position_names, position_values,
                               tenant_id=None, tags=None, admin_state_up=True,
                               extra_body=None, cmd_resource=None,
-                              parent_id=None, **kwargs):
+                              parent_id=None, no_api_call=False,
+                              expected_exception=None,
+                              **kwargs):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
@@ -257,21 +259,26 @@ class CLITestV20Base(base.BaseTestCase):
             mox_body = MyComparator(body, self.client)
         else:
             mox_body = self.client.serialize(body)
-        self.client.httpclient.request(
-            end_url(path, format=self.format), 'POST',
-            body=mox_body,
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
+        if not no_api_call:
+            self.client.httpclient.request(
+                end_url(path, format=self.format), 'POST',
+                body=mox_body,
+                headers=mox.ContainsKeyValue(
+                    'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
         args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser('create_' + resource)
-        shell.run_command(cmd, cmd_parser, args)
+        if expected_exception:
+            self.assertRaises(expected_exception,
+                              shell.run_command, cmd, cmd_parser, args)
+        else:
+            shell.run_command(cmd, cmd_parser, args)
+            _str = self.fake_stdout.make_string()
+            self.assertIn(myid, _str)
+            if name:
+                self.assertIn(name, _str)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
-        _str = self.fake_stdout.make_string()
-        self.assertIn(myid, _str)
-        if name:
-            self.assertIn(name, _str)
 
     def _test_list_columns(self, cmd, resources,
                            resources_out, args=('-f', 'json'),

@@ -88,22 +88,14 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
             SystemExit, self._test_create_resource,
             resource, cmd, name, myid, args, position_names, position_values)
 
-    def _test_create_resource_and_catch_command_error(self, tested_args,
-                                                      should_fail,
+    def _test_create_resource_and_catch_command_error(self, should_fail,
                                                       *args):
-        _j = lambda args: ' '.join(args)
-        try:
-            self._test_create_resource(*args)
-        except exceptions.CommandError:
-            if not should_fail:
-                self.fail(
-                    'Unexpected exception raised for %s options' %
-                    _j(tested_args))
-            self.mox.UnsetStubs()
+        if should_fail:
+            params = {'no_api_call': True,
+                      'expected_exception': exceptions.CommandError}
         else:
-            if should_fail:
-                self.fail(
-                    'No exception for %s options' % _j(tested_args))
+            params = {}
+        self._test_create_resource(*args, **params)
 
     def test_create_subnet_with_enable_and_disable_dhcp(self):
         """Create subnet: --enable-dhcp and --disable-dhcp."""
@@ -125,7 +117,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
             args = tested_args + [netid, cidr]
             pos_values = position_values + [should_fail]
             self._test_create_resource_and_catch_command_error(
-                tested_args, should_fail,
+                should_fail,
                 resource, cmd, name, myid, args, position_names, pos_values)
 
     def test_create_subnet_with_multiple_enable_dhcp(self):
@@ -151,7 +143,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
             args = tested_args + [netid, cidr]
             pos_values = position_values + [pos_value]
             self._test_create_resource_and_catch_command_error(
-                tested_args, should_fail,
+                should_fail,
                 resource, cmd, name, myid, args, position_names, pos_values)
 
     def test_create_subnet_tenant(self):
@@ -468,9 +460,10 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         position_names = ['ip_version', 'ipv6_ra_mode',
                           'network_id', 'cidr']
         position_values = [4, None, netid, cidr]
-        self.assertRaises(exceptions.CommandError, self._test_create_resource,
-                          resource, cmd, name, myid, args, position_names,
-                          position_values, tenant_id='tenantid')
+        self._test_create_resource(
+            resource, cmd, name, myid, args, position_names,
+            position_values, tenant_id='tenantid',
+            no_api_call=True, expected_exception=exceptions.CommandError)
 
     def test_create_subnet_with_ipv6_address_mode_ipv4(self):
         resource = 'subnet'
@@ -486,9 +479,10 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         position_names = ['ip_version', 'ipv6_address_mode',
                           'network_id', 'cidr']
         position_values = [4, None, netid, cidr]
-        self.assertRaises(exceptions.CommandError, self._test_create_resource,
-                          resource, cmd, name, myid, args, position_names,
-                          position_values, tenant_id='tenantid')
+        self._test_create_resource(
+            resource, cmd, name, myid, args, position_names,
+            position_values, tenant_id='tenantid',
+            no_api_call=True, expected_exception=exceptions.CommandError)
 
     def test_create_subnet_with_subnetpool_ipv4_with_cidr_wildcard(self):
         resource = 'subnet'
@@ -505,9 +499,10 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         position_names = ['ip_version', 'ipv6_address_mode',
                           'network_id', 'subnetpool_id', 'cidr']
         position_values = [4, None, netid, 'subnetpool_id', cidr]
-        self.assertRaises(exceptions.CommandError, self._test_create_resource,
-                          resource, cmd, name, myid, args, position_names,
-                          position_values, tenant_id='tenantid')
+        self._test_create_resource(
+            resource, cmd, name, myid, args, position_names,
+            position_values, tenant_id='tenantid',
+            no_api_call=True, expected_exception=exceptions.CommandError)
 
     def test_create_subnet_with_subnetpool_ipv4_with_prefixlen(self):
         resource = 'subnet'
@@ -524,9 +519,10 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         position_names = ['ip_version', 'ipv6_address_mode',
                           'network_id', 'subnetpool_id']
         position_values = [4, None, netid, 'subnetpool_id']
-        self.assertRaises(exceptions.CommandError, self._test_create_resource,
-                          resource, cmd, name, myid, args, position_names,
-                          position_values, tenant_id='tenantid')
+        self._test_create_resource(
+            resource, cmd, name, myid, args, position_names,
+            position_values, tenant_id='tenantid',
+            no_api_call=True, expected_exception=exceptions.CommandError)
 
     def test_list_subnets_detail(self):
         """List subnets: -D."""
