@@ -165,7 +165,10 @@ class CreateSubnet(neutronV20.CreateCommand):
             '--ip-version',
             type=int,
             default=4, choices=[4, 6],
-            help=_('IP version to use, default is 4.'))
+            help=_('IP version to use, default is 4. '
+                   'Note that when subnetpool is specified, '
+                   'IP version is determined from the subnetpool '
+                   'and this option is ignored.'))
         parser.add_argument(
             '--ip_version',
             type=int,
@@ -196,8 +199,25 @@ class CreateSubnet(neutronV20.CreateCommand):
     def args2body(self, parsed_args):
         _network_id = neutronV20.find_resourceid_by_name_or_id(
             self.get_client(), 'network', parsed_args.network_id)
-        body = {'subnet': {'network_id': _network_id,
-                           'ip_version': parsed_args.ip_version, }, }
+        body = {'subnet': {'network_id': _network_id}}
+
+        if parsed_args.prefixlen:
+            body['subnet'].update({'prefixlen': parsed_args.prefixlen})
+        if parsed_args.subnetpool:
+            if parsed_args.subnetpool == 'None':
+                _subnetpool_id = None
+            else:
+                _subnetpool = neutronV20.find_resource_by_name_or_id(
+                    self.get_client(), 'subnetpool', parsed_args.subnetpool)
+                _subnetpool_id = _subnetpool['id']
+                # Now that we have the pool_id - let's just have a check on the
+                # ip version used in the pool
+                parsed_args.ip_version = _subnetpool['ip_version']
+            body['subnet'].update({'subnetpool_id': _subnetpool_id})
+
+        # IP version needs to be set as IP version can be
+        # determined by subnetpool.
+        body['subnet']['ip_version'] = parsed_args.ip_version
 
         if parsed_args.cidr:
             # With subnetpool, cidr is now optional for creating subnet.
@@ -211,16 +231,6 @@ class CreateSubnet(neutronV20.CreateCommand):
                                    "any IP connectivity.")
                                  % {"ip": parsed_args.ip_version,
                                     "cidr": unusable_cidr})
-
-        if parsed_args.prefixlen:
-            body['subnet'].update({'prefixlen': parsed_args.prefixlen})
-        if parsed_args.subnetpool:
-            if parsed_args.subnetpool == 'None':
-                _subnetpool_id = None
-            else:
-                _subnetpool_id = neutronV20.find_resourceid_by_name_or_id(
-                    self.get_client(), 'subnetpool', parsed_args.subnetpool)
-            body['subnet'].update({'subnetpool_id': _subnetpool_id})
 
         updatable_args2body(parsed_args, body)
         if parsed_args.tenant_id:

@@ -46,8 +46,8 @@ def _get_resource_plural(resource, client):
     return resource + 's'
 
 
-def find_resourceid_by_id(client, resource, resource_id, cmd_resource=None,
-                          parent_id=None):
+def find_resource_by_id(client, resource, resource_id, cmd_resource=None,
+                        parent_id=None, fields=None):
     if not cmd_resource:
         cmd_resource = resource
     cmd_resource_plural = _get_resource_plural(cmd_resource, client)
@@ -57,12 +57,15 @@ def find_resourceid_by_id(client, resource, resource_id, cmd_resource=None,
     match = re.match(UUID_PATTERN, resource_id)
     collection = resource_plural
     if match:
+        params = {'id': resource_id}
+        if fields:
+            params['fields'] = fields
         if parent_id:
-            data = obj_lister(parent_id, id=resource_id, fields='id')
+            data = obj_lister(parent_id, **params)
         else:
-            data = obj_lister(id=resource_id, fields='id')
+            data = obj_lister(**params)
         if data and data[collection]:
-            return data[collection][0]['id']
+            return data[collection][0]
     not_found_message = (_("Unable to find %(resource)s with id "
                            "'%(id)s'") %
                          {'resource': resource, 'id': resource_id})
@@ -71,14 +74,23 @@ def find_resourceid_by_id(client, resource, resource_id, cmd_resource=None,
         message=not_found_message, status_code=404)
 
 
-def _find_resourceid_by_name(client, resource, name, project_id=None,
-                             cmd_resource=None, parent_id=None):
+def find_resourceid_by_id(client, resource, resource_id, cmd_resource=None,
+                          parent_id=None):
+    info = find_resource_by_id(client, resource, resource_id, cmd_resource,
+                               parent_id, fields='id')
+    return info['id']
+
+
+def _find_resource_by_name(client, resource, name, project_id=None,
+                           cmd_resource=None, parent_id=None, fields=None):
     if not cmd_resource:
         cmd_resource = resource
     cmd_resource_plural = _get_resource_plural(cmd_resource, client)
     resource_plural = _get_resource_plural(resource, client)
     obj_lister = getattr(client, "list_%s" % cmd_resource_plural)
-    params = {'name': name, 'fields': 'id'}
+    params = {'name': name}
+    if fields:
+        params['fields'] = fields
     if project_id:
         params['tenant_id'] = project_id
     if parent_id:
@@ -98,18 +110,27 @@ def _find_resourceid_by_name(client, resource, name, project_id=None,
         raise exceptions.NeutronClientException(
             message=not_found_message, status_code=404)
     else:
-        return info[0]['id']
+        return info[0]
+
+
+def find_resource_by_name_or_id(client, resource, name_or_id,
+                                project_id=None, cmd_resource=None,
+                                parent_id=None, fields=None):
+    try:
+        return find_resource_by_id(client, resource, name_or_id,
+                                   cmd_resource, parent_id, fields)
+    except exceptions.NeutronClientException:
+        return _find_resource_by_name(client, resource, name_or_id,
+                                      project_id, cmd_resource, parent_id,
+                                      fields)
 
 
 def find_resourceid_by_name_or_id(client, resource, name_or_id,
                                   project_id=None, cmd_resource=None,
                                   parent_id=None):
-    try:
-        return find_resourceid_by_id(client, resource, name_or_id,
-                                     cmd_resource, parent_id)
-    except exceptions.NeutronClientException:
-        return _find_resourceid_by_name(client, resource, name_or_id,
-                                        project_id, cmd_resource, parent_id)
+    return find_resource_by_name_or_id(client, resource, name_or_id,
+                                       project_id, cmd_resource,
+                                       parent_id, fields='id')['id']
 
 
 def add_show_list_common_argument(parser):
