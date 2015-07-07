@@ -288,6 +288,20 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_port_with_qos_policy(self):
+        """Create port: --qos-policy mypolicy."""
+        resource = 'port'
+        cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        qos_policy_name = 'mypolicy'
+        args = [netid, '--qos-policy', qos_policy_name]
+        position_names = ['network_id', 'qos_policy_id']
+        position_values = [netid, qos_policy_name]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_list_ports(self):
         """List ports: -D."""
         resources = "ports"
@@ -538,6 +552,22 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                               'ip_version': '4'}]}
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, myid, args, updatedfields)
+
+    def test_update_port_with_qos_policy(self):
+        """Update port: myid --qos-policy mypolicy."""
+        resource = 'port'
+        cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--qos-policy', 'mypolicy'],
+                                   {'qos_policy_id': 'mypolicy', })
+
+    def test_update_port_with_no_qos_policy(self):
+        """Update port: myid --no-qos-policy."""
+        resource = 'port'
+        cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--no-qos-policy'],
+                                   {'qos_policy_id': None, })
 
     def test_delete_extra_dhcp_opts_from_port(self):
         resource = 'port'
