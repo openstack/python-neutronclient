@@ -48,6 +48,16 @@ If neutron server does not require authentication, besides these two arguments o
 
 Once you've configured your authentication parameters, you can run ``neutron -h`` to see a complete listing of available commands.
 
+
+Developer Docs
+==============
+
+.. toctree::
+   :maxdepth: 1
+
+   devref/index
+
+
 Release Notes
 =============
 
