@@ -14,6 +14,8 @@
 #    under the License.
 #
 
+import os
+
 from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronv20
 
@@ -71,6 +73,14 @@ class ShowQoSPolicy(neutronv20.ShowCommand):
 
     resource = 'policy'
     shadow_resource = 'qos_policy'
+
+    def format_output_data(self, data):
+        rules = []
+        for rule in data['policy'].get('rules', []):
+            rules.append("%s (type: %s)" % (rule['id'], rule['type']))
+        data['policy']['rules'] = os.linesep.join(rules)
+
+        super(ShowQoSPolicy, self).format_output_data(data)
 
 
 class CreateQoSPolicy(neutronv20.CreateCommand):

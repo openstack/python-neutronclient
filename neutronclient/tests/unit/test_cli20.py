@@ -48,7 +48,7 @@ non_admin_status_resources = ['subnet', 'floatingip', 'security_group',
                               'metering_label_rule', 'net_partition',
                               'fox_socket', 'subnetpool',
                               'rbac_policy', 'address_scope',
-                              'policy']
+                              'policy', 'bandwidth_limit_rule']
 
 
 @contextlib.contextmanager
