@@ -75,6 +75,26 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_subnetpool_with_addrscope(self):
+        """Create subnetpool: myname in addrscope: foo-address-scope"""
+        resource = 'subnetpool'
+        cmd = subnetpool.CreateSubnetPool(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        min_prefixlen = 30
+        prefix1 = '11.11.11.0/24'
+        prefix2 = '12.12.12.0/24'
+        address_scope = 'foo-address-scope'
+        args = [name, '--min-prefixlen', str(min_prefixlen),
+                '--pool-prefix', prefix1, '--pool-prefix', prefix2,
+                '--address-scope', address_scope]
+        position_names = ['name', 'min_prefixlen', 'prefixes',
+                          'address_scope_id']
+        position_values = [name, min_prefixlen, [prefix1, prefix2],
+                           address_scope]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_list_subnetpool_pagination(self):
         cmd = subnetpool.ListSubnetPool(test_cli20.MyApp(sys.stdout), None)
         self.mox.StubOutWithMock(subnetpool.ListSubnetPool, "extend_list")
@@ -113,6 +133,24 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'myname'],
                                    {'name': 'myname'}
+                                   )
+
+    def test_update_subnetpool_with_address_scope(self):
+        """Update subnetpool: myid --address-scope newscope."""
+        resource = 'subnetpool'
+        cmd = subnetpool.UpdateSubnetPool(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--address-scope', 'newscope'],
+                                   {'address_scope_id': 'newscope'}
+                                   )
+
+    def test_update_subnetpool_with_no_address_scope(self):
+        """Update subnetpool: myid --no-address-scope."""
+        resource = 'subnetpool'
+        cmd = subnetpool.UpdateSubnetPool(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--no-address-scope'],
+                                   {'address_scope_id': None}
                                    )
 
     def test_show_subnetpool(self):

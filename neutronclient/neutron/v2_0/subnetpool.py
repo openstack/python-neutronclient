@@ -45,7 +45,7 @@ class ListSubnetPool(neutronV20.ListCommand):
 
     resource = 'subnetpool'
     list_columns = ['id', 'name', 'prefixes',
-                    'default_prefixlen']
+                    'default_prefixlen', 'address-scope']
     pagination_support = True
     sorting_support = True
 
@@ -70,12 +70,25 @@ class CreateSubnetPool(neutronV20.CreateCommand):
         parser.add_argument(
             'name',
             help=_('Name of subnetpool to create.'))
+        parser.add_argument(
+            '--address-scope',
+            metavar='ADDRSCOPE',
+            help=_('ID or name of the address scope with which the subnetpool '
+                   'is associated. Prefixes must be unique across address '
+                   'scopes'))
 
     def args2body(self, parsed_args):
         body = {'subnetpool': {'prefixes': parsed_args.prefixes}}
         updatable_args2body(parsed_args, body)
         if parsed_args.shared:
             body['subnetpool']['shared'] = True
+
+        # Parse and update for "address-scope" option
+        if parsed_args.address_scope:
+            _addrscope_id = neutronV20.find_resourceid_by_name_or_id(
+                self.get_client(), 'address-scope',
+                parsed_args.address_scope)
+            body['subnetpool']['address_scope_id'] = _addrscope_id
         return body
 
 
@@ -94,8 +107,28 @@ class UpdateSubnetPool(neutronV20.UpdateCommand):
         add_updatable_arguments(parser)
         parser.add_argument('--name',
                             help=_('Name of subnetpool to update.'))
+        addrscope_args = parser.add_mutually_exclusive_group()
+        addrscope_args.add_argument('--address-scope',
+                                    metavar='ADDRSCOPE',
+                                    help=_('ID or name of the address scope '
+                                           'with which the subnetpool is '
+                                           'associated. Prefixes must be '
+                                           'unique across address scopes'))
+        addrscope_args.add_argument('--no-address-scope',
+                                    action='store_true',
+                                    help=_('Detach subnetpool from the '
+                                           'address scope'))
 
     def args2body(self, parsed_args):
         body = {'subnetpool': {}}
         updatable_args2body(parsed_args, body, for_create=False)
+
+        # Parse and update for "address-scope" option/s
+        if parsed_args.no_address_scope:
+            body['subnetpool']['address_scope_id'] = None
+        elif parsed_args.address_scope:
+            _addrscope_id = neutronV20.find_resourceid_by_name_or_id(
+                self.get_client(), 'address-scope',
+                parsed_args.address_scope)
+            body['subnetpool']['address_scope_id'] = _addrscope_id
         return body
