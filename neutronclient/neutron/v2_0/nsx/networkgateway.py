@@ -23,8 +23,9 @@ from neutronclient.neutron import v2_0 as neutronV20
 GW_RESOURCE = 'network_gateway'
 DEV_RESOURCE = 'gateway_device'
 CONNECTOR_TYPE_HELP = _("Type of the transport zone connector to use for this "
-                        "device. Valid values are gre, stt, ipsecgre, "
-                        "ipsecstt, and bridge. Defaults to stt.")
+                        "device. Valid values are gre, stt, ipsec_gre, "
+                        "ipsec_stt, and bridge. Defaults to stt. ipsecgre and "
+                        "ipsecstt are also accepted as alternative names")
 CONNECTOR_IP_HELP = _("IP address for this device's transport connector. "
                       "It must correspond to the IP address of the interface "
                       "used for tenant traffic on the NSX gateway node.")
@@ -84,7 +85,8 @@ class CreateGatewayDevice(neutronV20.CreateCommand):
         parser.add_argument(
             '--connector-type',
             default='stt',
-            choices=['stt', 'gre', 'ipsecgre', 'ipsecstt', 'bridge'],
+            choices=['stt', 'gre', 'ipsecgre', 'ipsecstt', 'bridge',
+                     'ipsec_gre', 'ipsec_stt'],
             help=CONNECTOR_TYPE_HELP)
         parser.add_argument(
             '--connector-ip',
@@ -117,7 +119,8 @@ class UpdateGatewayDevice(neutronV20.UpdateCommand):
         parser.add_argument(
             '--connector-type',
             required=False,
-            choices=['stt', 'gre', 'ipsecgre', 'ipsecstt', 'bridge'],
+            choices=['stt', 'gre', 'ipsecgre', 'ipsecstt', 'bridge',
+                     'ipsec_gre', 'ipsec_stt'],
             help=CONNECTOR_TYPE_HELP)
         parser.add_argument(
             '--connector-ip',
