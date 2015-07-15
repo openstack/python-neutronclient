@@ -18,6 +18,7 @@ import sys
 
 import mock
 
+from neutronclient.common import extension
 from neutronclient.neutron.v2_0.contrib import _fox_sockets as fox_sockets
 from neutronclient import shell
 from neutronclient.tests.unit import test_cli20
@@ -94,3 +95,46 @@ class CLITestV20ExtensionJSON(test_cli20.CLITestV20Base):
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id,
                                  args, ['id', 'name'])
+
+
+class CLITestV20ExtensionJSONAlternatePlurals(test_cli20.CLITestV20Base):
+    class IPAddress(extension.NeutronClientExtension):
+        resource = 'ip_address'
+        resource_plural = '%ses' % resource
+        object_path = '/%s' % resource_plural
+        resource_path = '/%s/%%s' % resource_plural
+        versions = ['2.0']
+
+    class IPAddressesList(extension.ClientExtensionList, IPAddress):
+        shell_command = 'ip-address-list'
+
+    def setUp(self):
+        # need to mock before super because extensions loaded on instantiation
+        self._mock_extension_loading()
+        super(CLITestV20ExtensionJSONAlternatePlurals, self).setUp()
+
+    def _create_patch(self, name, func=None):
+        patcher = mock.patch(name)
+        thing = patcher.start()
+        self.addCleanup(patcher.stop)
+        return thing
+
+    def _mock_extension_loading(self):
+        ext_pkg = 'neutronclient.common.extension'
+        contrib = self._create_patch(ext_pkg + '._discover_via_entry_points')
+        ip_address = mock.MagicMock()
+        ip_address.IPAddress = self.IPAddress
+        ip_address.IPAddressesList = self.IPAddressesList
+        contrib.return_value = [("ip_address", ip_address)]
+        return contrib
+
+    def test_ext_cmd_loaded(self):
+        shell.NeutronShell('2.0')
+        ext_cmd = {'ip-address-list': self.IPAddressesList}
+        self.assertDictContainsSubset(ext_cmd, shell.COMMANDS['2.0'])
+
+    def test_list_ip_addresses(self):
+        """List ip_addresses."""
+        resources = 'ip_addresses'
+        cmd = self.IPAddressesList(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd, True)
