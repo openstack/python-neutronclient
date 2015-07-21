@@ -152,12 +152,6 @@ class OverQuotaClient(Conflict):
     pass
 
 
-# TODO(amotoki): It is unused in Neutron, but it is referred to
-# in Horizon code. After Horizon code is updated, remove it.
-class AlreadyAttachedClient(Conflict):
-    pass
-
-
 class IpAddressGenerationFailureClient(Conflict):
     pass
 
