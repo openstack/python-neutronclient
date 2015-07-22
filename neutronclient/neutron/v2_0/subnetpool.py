@@ -45,7 +45,7 @@ class ListSubnetPool(neutronV20.ListCommand):
 
     resource = 'subnetpool'
     list_columns = ['id', 'name', 'prefixes',
-                    'default_prefixlen', 'address-scope']
+                    'default_prefixlen', 'address_scope_id']
     pagination_support = True
     sorting_support = True
 
