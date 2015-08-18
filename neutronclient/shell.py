@@ -72,6 +72,7 @@ from neutronclient.neutron.v2_0.nsx import qos_queue
 from neutronclient.neutron.v2_0 import policyprofile
 from neutronclient.neutron.v2_0 import port
 from neutronclient.neutron.v2_0 import quota
+from neutronclient.neutron.v2_0 import rbac
 from neutronclient.neutron.v2_0 import router
 from neutronclient.neutron.v2_0 import securitygroup
 from neutronclient.neutron.v2_0 import servicetype
@@ -360,6 +361,11 @@ COMMAND_V2 = {
     'nec-packet-filter-create': packetfilter.CreatePacketFilter,
     'nec-packet-filter-update': packetfilter.UpdatePacketFilter,
     'nec-packet-filter-delete': packetfilter.DeletePacketFilter,
+    'rbac-create': rbac.CreateRBACPolicy,
+    'rbac-update': rbac.UpdateRBACPolicy,
+    'rbac-list': rbac.ListRBACPolicy,
+    'rbac-show': rbac.ShowRBACPolicy,
+    'rbac-delete': rbac.DeleteRBACPolicy,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}

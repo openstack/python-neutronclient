@@ -427,6 +427,8 @@ class Client(ClientBase):
     firewall_path = "/fw/firewalls/%s"
     net_partitions_path = "/net-partitions"
     net_partition_path = "/net-partitions/%s"
+    rbac_policies_path = "/rbac-policies"
+    rbac_policy_path = "/rbac-policies/%s"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -458,6 +460,7 @@ class Client(ClientBase):
                      'lbaas_healthmonitors': 'lbaas_healthmonitor',
                      'lbaas_members': 'lbaas_member',
                      'healthmonitors': 'healthmonitor',
+                     'rbac_policies': 'rbac_policy',
                      }
 
     @APIParamsCall
@@ -1599,6 +1602,33 @@ class Client(ClientBase):
     def delete_packet_filter(self, packet_filter_id):
         """Delete the specified packet filter."""
         return self.delete(self.packet_filter_path % packet_filter_id)
+
+    @APIParamsCall
+    def create_rbac_policy(self, body=None):
+        """Create a new RBAC policy."""
+        return self.post(self.rbac_policies_path, body=body)
+
+    @APIParamsCall
+    def update_rbac_policy(self, rbac_policy_id, body=None):
+        """Update a RBAC policy."""
+        return self.put(self.rbac_policy_path % rbac_policy_id, body=body)
+
+    @APIParamsCall
+    def list_rbac_policies(self, retrieve_all=True, **_params):
+        """Fetch a list of all RBAC policies for a tenant."""
+        return self.list('rbac_policies', self.rbac_policies_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_rbac_policy(self, rbac_policy_id, **_params):
+        """Fetch information of a certain RBAC policy."""
+        return self.get(self.rbac_policy_path % rbac_policy_id,
+                        params=_params)
+
+    @APIParamsCall
+    def delete_rbac_policy(self, rbac_policy_id):
+        """Delete the specified RBAC policy."""
+        return self.delete(self.rbac_policy_path % rbac_policy_id)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
