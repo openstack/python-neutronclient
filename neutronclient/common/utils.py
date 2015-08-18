@@ -134,13 +134,13 @@ def http_log_req(_logger, args, kwargs):
     if 'body' in kwargs and kwargs['body']:
         string_parts.append(" -d '%s'" % (kwargs['body']))
     req = encodeutils.safe_encode("".join(string_parts))
-    _logger.debug("\nREQ: %s\n", req)
+    _logger.debug("REQ: %s", req)
 
 
 def http_log_resp(_logger, resp, body):
     if not _logger.isEnabledFor(logging.DEBUG):
         return
-    _logger.debug("RESP:%(code)s %(headers)s %(body)s\n",
+    _logger.debug("RESP: %(code)s %(headers)s %(body)s",
                   {'code': resp.status_code,
                    'headers': resp.headers,
                    'body': body})
