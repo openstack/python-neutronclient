@@ -51,10 +51,11 @@ EOF
 cd $NEUTRONCLIENT_DIR
 
 # Run tests
+VENV=${1:-"functional"}
 echo "Running neutronclient functional test suite"
 set +e
 # Preserve env for OS_ credentials
-sudo -E -H -u jenkins tox -efunctional
+sudo -E -H -u jenkins tox -e $VENV
 EXIT_CODE=$?
 set -e
 
