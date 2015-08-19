@@ -50,6 +50,8 @@ from neutronclient.neutron.v2_0 import agent
 from neutronclient.neutron.v2_0 import agentscheduler
 from neutronclient.neutron.v2_0 import credential
 from neutronclient.neutron.v2_0 import extension
+from neutronclient.neutron.v2_0.flavor import flavor
+from neutronclient.neutron.v2_0.flavor import flavor_profile
 from neutronclient.neutron.v2_0 import floatingip
 from neutronclient.neutron.v2_0.fw import firewall
 from neutronclient.neutron.v2_0.fw import firewallpolicy
@@ -396,6 +398,18 @@ COMMAND_V2 = {
         bandwidth_limit_rule.DeleteQoSBandwidthLimitRule
     ),
     'qos-available-rule-types': qos_rule.ListQoSRuleTypes,
+    'flavor-list': flavor.ListFlavor,
+    'flavor-show': flavor.ShowFlavor,
+    'flavor-create': flavor.CreateFlavor,
+    'flavor-delete': flavor.DeleteFlavor,
+    'flavor-update': flavor.UpdateFlavor,
+    'flavor-associate': flavor.AssociateFlavor,
+    'flavor-disassociate': flavor.DisassociateFlavor,
+    'flavor-profile-list': flavor_profile.ListFlavorProfile,
+    'flavor-profile-show': flavor_profile.ShowFlavorProfile,
+    'flavor-profile-create': flavor_profile.CreateFlavorProfile,
+    'flavor-profile-delete': flavor_profile.DeleteFlavorProfile,
+    'flavor-profile-update': flavor_profile.UpdateFlavorProfile,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}
