@@ -225,7 +225,7 @@ class CLITestV20Base(base.BaseTestCase):
                                       'ipsecpolicy', 'metering_label',
                                       'metering_label_rule', 'net_partition',
                                       'fox_socket', 'subnetpool',
-                                      'rbac_policy']
+                                      'rbac_policy', 'address_scope']
         if not cmd_resource:
             cmd_resource = resource
         if (resource in non_admin_status_resources):
