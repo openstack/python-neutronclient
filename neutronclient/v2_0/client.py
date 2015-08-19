@@ -341,6 +341,8 @@ class Client(ClientBase):
     subnet_path = "/subnets/%s"
     subnetpools_path = "/subnetpools"
     subnetpool_path = "/subnetpools/%s"
+    address_scopes_path = "/address-scopes"
+    address_scope_path = "/address-scopes/%s"
     quotas_path = "/quotas"
     quota_path = "/quotas/%s"
     extensions_path = "/extensions"
@@ -461,6 +463,7 @@ class Client(ClientBase):
                      'lbaas_members': 'lbaas_member',
                      'healthmonitors': 'healthmonitor',
                      'rbac_policies': 'rbac_policy',
+                     'address_scopes': 'address_scope',
                      }
 
     @APIParamsCall
@@ -661,6 +664,33 @@ class Client(ClientBase):
     def delete_router(self, router):
         """Deletes the specified router."""
         return self.delete(self.router_path % (router))
+
+    @APIParamsCall
+    def list_address_scopes(self, retrieve_all=True, **_params):
+        """Fetches a list of all address scopes for a tenant."""
+        return self.list('address_scopes', self.address_scopes_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_address_scope(self, address_scope, **_params):
+        """Fetches information of a certain address scope."""
+        return self.get(self.address_scope_path % (address_scope),
+                        params=_params)
+
+    @APIParamsCall
+    def create_address_scope(self, body=None):
+        """Creates a new address scope."""
+        return self.post(self.address_scopes_path, body=body)
+
+    @APIParamsCall
+    def update_address_scope(self, address_scope, body=None):
+        """Updates a address scope."""
+        return self.put(self.address_scope_path % (address_scope), body=body)
+
+    @APIParamsCall
+    def delete_address_scope(self, address_scope):
+        """Deletes the specified address scope."""
+        return self.delete(self.address_scope_path % (address_scope))
 
     @APIParamsCall
     def add_interface_router(self, router, body=None):

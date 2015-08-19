@@ -45,6 +45,7 @@ from neutronclient.common import exceptions as exc
 from neutronclient.common import extension as client_extension
 from neutronclient.common import utils
 from neutronclient.i18n import _
+from neutronclient.neutron.v2_0 import address_scope
 from neutronclient.neutron.v2_0 import agent
 from neutronclient.neutron.v2_0 import agentscheduler
 from neutronclient.neutron.v2_0 import credential
@@ -366,6 +367,11 @@ COMMAND_V2 = {
     'rbac-list': rbac.ListRBACPolicy,
     'rbac-show': rbac.ShowRBACPolicy,
     'rbac-delete': rbac.DeleteRBACPolicy,
+    'address-scope-list': address_scope.ListAddressScope,
+    'address-scope-show': address_scope.ShowAddressScope,
+    'address-scope-create': address_scope.CreateAddressScope,
+    'address-scope-delete': address_scope.DeleteAddressScope,
+    'address-scope-update': address_scope.UpdateAddressScope,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}
