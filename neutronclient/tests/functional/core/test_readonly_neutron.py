@@ -11,7 +11,6 @@
 #    under the License.
 
 import re
-import unittest2
 
 from tempest_lib import exceptions
 
@@ -123,38 +122,6 @@ class SimpleReadOnlyNeutronClientTest(base.ClientTestBase):
         subnet_list = self.parser.listing(self.neutron('subnet-list'))
         self.assertTableStruct(subnet_list, ['id', 'name', 'cidr',
                                              'allocation_pools'])
-
-    @unittest2.skip("Skipping until 1484148 is resolved")
-    def test_neutron_vpn_ikepolicy_list(self):
-        ikepolicy = self.parser.listing(self.neutron('vpn-ikepolicy-list'))
-        self.assertTableStruct(ikepolicy, ['id', 'name',
-                                           'auth_algorithm',
-                                           'encryption_algorithm',
-                                           'ike_version', 'pfs'])
-
-    @unittest2.skip("Skipping until 1484148 is resolved")
-    def test_neutron_vpn_ipsecpolicy_list(self):
-        ipsecpolicy = self.parser.listing(self.neutron('vpn-ipsecpolicy-list'))
-        self.assertTableStruct(ipsecpolicy, ['id', 'name',
-                                             'auth_algorithm',
-                                             'encryption_algorithm',
-                                             'pfs'])
-
-    @unittest2.skip("Skipping until 1484148 is resolved")
-    def test_neutron_vpn_service_list(self):
-        vpn_list = self.parser.listing(self.neutron('vpn-service-list'))
-        self.assertTableStruct(vpn_list, ['id', 'name',
-                                          'router_id', 'status'])
-
-    @unittest2.skip("Skipping until 1484148 is resolved")
-    def test_neutron_ipsec_site_connection_list(self):
-        ipsec_site = self.parser.listing(self.neutron
-                                         ('ipsec-site-connection-list'))
-        self.assertTableStruct(ipsec_site, ['id', 'name',
-                                            'peer_address',
-                                            'peer_cidrs',
-                                            'route_mode',
-                                            'auth_mode', 'status'])
 
     def test_neutron_firewall_list(self):
         firewall_list = self.parser.listing(self.neutron
