@@ -51,6 +51,18 @@ class CLITestV20ExtensionJSON(test_cli20.CLITestV20Base):
                    'fox-sockets-show': fox_sockets.FoxInSocketsShow}
         self.assertDictContainsSubset(ext_cmd, shell.COMMANDS['2.0'])
 
+    def test_ext_cmd_help_doc_with_extension_name(self):
+        shell.NeutronShell('2.0')
+        ext_cmd = {'fox-sockets-list': fox_sockets.FoxInSocketsList,
+                   'fox-sockets-create': fox_sockets.FoxInSocketsCreate,
+                   'fox-sockets-update': fox_sockets.FoxInSocketsUpdate,
+                   'fox-sockets-delete': fox_sockets.FoxInSocketsDelete,
+                   'fox-sockets-show': fox_sockets.FoxInSocketsShow}
+        self.assertDictContainsSubset(ext_cmd, shell.COMMANDS['2.0'])
+        for item in ext_cmd:
+            cmdcls = shell.COMMANDS['2.0'].get(item)
+            self.assertTrue(cmdcls.__doc__.startswith("[_fox_sockets]"))
+
     def test_delete_fox_socket(self):
         """Delete fox socket: myid."""
         resource = 'fox_socket'

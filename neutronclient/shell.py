@@ -716,9 +716,9 @@ class NeutronShell(app.App):
     def _register_extensions(self, version):
         for name, module in itertools.chain(
                 client_extension._discover_via_entry_points()):
-            self._extend_shell_commands(module, version)
+            self._extend_shell_commands(name, module, version)
 
-    def _extend_shell_commands(self, module, version):
+    def _extend_shell_commands(self, name, module, version):
         classes = inspect.getmembers(module, inspect.isclass)
         for cls_name, cls in classes:
             if (issubclass(cls, client_extension.NeutronClientExtension) and
@@ -728,6 +728,9 @@ class NeutronShell(app.App):
                     if version not in cls.versions:
                         continue
                 try:
+                    name_prefix = "[%s]" % name
+                    cls.__doc__ = ("%s %s" % (name_prefix, cls.__doc__) if
+                                   cls.__doc__ else name_prefix)
                     self.command_manager.add_command(cmd, cls)
                     self.commands[version][cmd] = cls
                 except TypeError:
