@@ -29,8 +29,7 @@ Precedence of command loading
 ------------------------------
 
 * hard coded commands are loaded first
-* contributed commands (those in /contrib)
-* external commands (installed in the environment) are loaded last
+* external commands (installed in the environment) are loaded then
 
 Commands that have the same name will be overwritten by commands that are
 loaded later. To change the execution of a command for your particular
@@ -38,3 +37,11 @@ extension you only need to override the execute method.
 
 Currently this extension support is limited to top-level resources.
 Parent/child relationships may be added if desired.
+
+neutronclient.extension entry_point
+-----------------------------------
+To activate the commands in a specific extension module, add an entry in
+setup.cfg under neutronclient.extension. For example:
+[entry_points]
+neutronclient.extension =
+    fox_sockets = neutronclient.neutron.v2_0.contrib._fox_sockets
