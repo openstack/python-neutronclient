@@ -15,6 +15,7 @@
 #
 
 import contextlib
+import copy
 import itertools
 import sys
 
@@ -37,6 +38,16 @@ API_VERSION = "2.0"
 FORMAT = 'json'
 TOKEN = 'testtoken'
 ENDURL = 'localurl'
+
+non_admin_status_resources = ['subnet', 'floatingip', 'security_group',
+                              'security_group_rule', 'qos_queue',
+                              'network_gateway', 'gateway_device',
+                              'credential', 'network_profile',
+                              'policy_profile', 'ikepolicy',
+                              'ipsecpolicy', 'metering_label',
+                              'metering_label_rule', 'net_partition',
+                              'fox_socket', 'subnetpool',
+                              'rbac_policy', 'address_scope']
 
 
 @contextlib.contextmanager
@@ -186,6 +197,7 @@ class CLITestV20Base(base.BaseTestCase):
         """Prepare the test environment."""
         super(CLITestV20Base, self).setUp()
         client.Client.EXTED_PLURALS.update(constants.PLURALS)
+        self.non_admin_status_resources = copy.copy(non_admin_status_resources)
         if plurals is not None:
             client.Client.EXTED_PLURALS.update(plurals)
         self.metadata = {'plurals': client.Client.EXTED_PLURALS,
@@ -207,6 +219,9 @@ class CLITestV20Base(base.BaseTestCase):
             self._get_attr_metadata))
         self.client = client.Client(token=TOKEN, endpoint_url=self.endurl)
 
+    def register_non_admin_status_resource(self, resource_name):
+        self.non_admin_status_resources.append(resource_name)
+
     def _test_create_resource(self, resource, cmd, name, myid, args,
                               position_names, position_values,
                               tenant_id=None, tags=None, admin_state_up=True,
@@ -217,18 +232,9 @@ class CLITestV20Base(base.BaseTestCase):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
-        non_admin_status_resources = ['subnet', 'floatingip', 'security_group',
-                                      'security_group_rule', 'qos_queue',
-                                      'network_gateway', 'gateway_device',
-                                      'credential', 'network_profile',
-                                      'policy_profile', 'ikepolicy',
-                                      'ipsecpolicy', 'metering_label',
-                                      'metering_label_rule', 'net_partition',
-                                      'fox_socket', 'subnetpool',
-                                      'rbac_policy', 'address_scope']
         if not cmd_resource:
             cmd_resource = resource
-        if (resource in non_admin_status_resources):
+        if (resource in self.non_admin_status_resources):
             body = {resource: {}, }
         else:
             body = {resource: {'admin_state_up': admin_state_up, }, }
