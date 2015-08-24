@@ -14,8 +14,6 @@
 #    under the License.
 #
 
-import argparse
-
 from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronv20
 
@@ -52,11 +50,6 @@ class CreateFirewall(neutronv20.CreateCommand):
             '--description',
             help=_('Description for the firewall rule.'))
         parser.add_argument(
-            '--shared',
-            action='store_true',
-            help=_('Set shared to True (default is False).'),
-            default=argparse.SUPPRESS)
-        parser.add_argument(
             '--admin-state-down',
             dest='admin_state',
             action='store_false',
@@ -83,8 +76,7 @@ class CreateFirewall(neutronv20.CreateCommand):
                 neutronv20.find_resourceid_by_name_or_id(client, 'router', r)
                 for r in parsed_args.routers]
         neutronv20.update_dict(parsed_args, body[self.resource],
-                               ['name', 'description', 'shared',
-                                'tenant_id'])
+                               ['name', 'description', 'tenant_id'])
         return body
 
 
