@@ -72,6 +72,7 @@ from neutronclient.neutron.v2_0.nsx import networkgateway
 from neutronclient.neutron.v2_0.nsx import qos_queue
 from neutronclient.neutron.v2_0 import policyprofile
 from neutronclient.neutron.v2_0 import port
+from neutronclient.neutron.v2_0.qos import policy as qos_policy
 from neutronclient.neutron.v2_0 import quota
 from neutronclient.neutron.v2_0 import rbac
 from neutronclient.neutron.v2_0 import router
@@ -372,6 +373,11 @@ COMMAND_V2 = {
     'address-scope-create': address_scope.CreateAddressScope,
     'address-scope-delete': address_scope.DeleteAddressScope,
     'address-scope-update': address_scope.UpdateAddressScope,
+    'qos-policy-list': qos_policy.ListQoSPolicy,
+    'qos-policy-show': qos_policy.ShowQoSPolicy,
+    'qos-policy-create': qos_policy.CreateQoSPolicy,
+    'qos-policy-update': qos_policy.UpdateQoSPolicy,
+    'qos-policy-delete': qos_policy.DeleteQoSPolicy,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}

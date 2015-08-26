@@ -431,6 +431,8 @@ class Client(ClientBase):
     net_partition_path = "/net-partitions/%s"
     rbac_policies_path = "/rbac-policies"
     rbac_policy_path = "/rbac-policies/%s"
+    qos_policies_path = "/qos/policies"
+    qos_policy_path = "/qos/policies/%s"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -464,6 +466,8 @@ class Client(ClientBase):
                      'healthmonitors': 'healthmonitor',
                      'rbac_policies': 'rbac_policy',
                      'address_scopes': 'address_scope',
+                     'qos_policies': 'qos_policy',
+                     'policies': 'policy',
                      }
 
     @APIParamsCall
@@ -1659,6 +1663,35 @@ class Client(ClientBase):
     def delete_rbac_policy(self, rbac_policy_id):
         """Delete the specified RBAC policy."""
         return self.delete(self.rbac_policy_path % rbac_policy_id)
+
+    @APIParamsCall
+    def list_qos_policies(self, retrieve_all=True, **_params):
+        """Fetches a list of all qos policies for a tenant."""
+        # Pass filters in "params" argument to do_request
+        return self.list('policies', self.qos_policies_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_qos_policy(self, qos_policy, **_params):
+        """Fetches information of a certain qos policy."""
+        return self.get(self.qos_policy_path % qos_policy,
+                        params=_params)
+
+    @APIParamsCall
+    def create_qos_policy(self, body=None):
+        """Creates a new qos policy."""
+        return self.post(self.qos_policies_path, body=body)
+
+    @APIParamsCall
+    def update_qos_policy(self, qos_policy, body=None):
+        """Updates a qos policy."""
+        return self.put(self.qos_policy_path % qos_policy,
+                        body=body)
+
+    @APIParamsCall
+    def delete_qos_policy(self, qos_policy):
+        """Deletes the specified qos policy."""
+        return self.delete(self.qos_policy_path % qos_policy)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""

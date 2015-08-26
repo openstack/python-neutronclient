@@ -136,6 +136,19 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values,
                                    **vlantrans)
 
+    def test_create_network_with_qos_policy(self):
+        """Create net: --qos-policy mypolicy."""
+        resource = 'network'
+        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        qos_policy_name = 'mypolicy'
+        args = [name, '--qos-policy', qos_policy_name]
+        position_names = ['name', 'qos_policy_id']
+        position_values = [name, qos_policy_name]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_list_nets_empty_with_column(self):
         resources = "networks"
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
@@ -485,6 +498,22 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                                    {'name': u'\u7f51\u7edc',
                                     'tags': ['a', 'b'], }
                                    )
+
+    def test_update_network_with_qos_policy(self):
+        """Update net: myid --qos-policy mypolicy."""
+        resource = 'network'
+        cmd = network.UpdateNetwork(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--qos-policy', 'mypolicy'],
+                                   {'qos_policy_id': 'mypolicy', })
+
+    def test_update_network_with_no_qos_policy(self):
+        """Update net: myid --no-qos-policy."""
+        resource = 'network'
+        cmd = network.UpdateNetwork(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--no-qos-policy'],
+                                   {'qos_policy_id': None, })
 
     def test_show_network(self):
         """Show net: --fields id --fields name myid."""
