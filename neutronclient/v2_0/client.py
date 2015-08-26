@@ -339,6 +339,10 @@ class Client(ClientBase):
     lbaas_loadbalancer_path_status = "/lbaas/loadbalancers/%s/statuses"
     lbaas_listeners_path = "/lbaas/listeners"
     lbaas_listener_path = "/lbaas/listeners/%s"
+    lbaas_l7policies_path = "/lbaas/l7policies"
+    lbaas_l7policy_path = lbaas_l7policies_path + "/%s"
+    lbaas_l7rules_path = lbaas_l7policy_path + "/rules"
+    lbaas_l7rule_path = lbaas_l7rules_path + "/%s"
     lbaas_pools_path = "/lbaas/pools"
     lbaas_pool_path = "/lbaas/pools/%s"
     lbaas_healthmonitors_path = "/lbaas/healthmonitors"
@@ -438,6 +442,9 @@ class Client(ClientBase):
                      'metering_label_rules': 'metering_label_rule',
                      'loadbalancers': 'loadbalancer',
                      'listeners': 'listener',
+                     'l7rules': 'l7rule',
+                     'l7policies': 'l7policy',
+                     'lbaas_l7policies': 'lbaas_l7policy',
                      'lbaas_pools': 'lbaas_pool',
                      'lbaas_healthmonitors': 'lbaas_healthmonitor',
                      'lbaas_members': 'lbaas_member',
@@ -447,6 +454,7 @@ class Client(ClientBase):
                      'qos_policies': 'qos_policy',
                      'policies': 'policy',
                      'bandwidth_limit_rules': 'bandwidth_limit_rule',
+                     'rules': 'rule',
                      'rule_types': 'rule_type',
                      'flavors': 'flavor',
                      'bgp_speakers': 'bgp_speaker',
@@ -983,6 +991,62 @@ class Client(ClientBase):
     def delete_listener(self, lbaas_listener):
         """Deletes the specified lbaas_listener."""
         return self.delete(self.lbaas_listener_path % (lbaas_listener))
+
+    @APIParamsCall
+    def list_lbaas_l7policies(self, retrieve_all=True, **_params):
+        """Fetches a list of all L7 policies for a listener."""
+        return self.list('l7policies', self.lbaas_l7policies_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_lbaas_l7policy(self, l7policy, **_params):
+        """Fetches information of a certain listener's L7 policy."""
+        return self.get(self.lbaas_l7policy_path % l7policy,
+                        params=_params)
+
+    @APIParamsCall
+    def create_lbaas_l7policy(self, body=None):
+        """Creates L7 policy for a certain listener."""
+        return self.post(self.lbaas_l7policies_path, body=body)
+
+    @APIParamsCall
+    def update_lbaas_l7policy(self, l7policy, body=None):
+        """Updates L7 policy."""
+        return self.put(self.lbaas_l7policy_path % l7policy,
+                        body=body)
+
+    @APIParamsCall
+    def delete_lbaas_l7policy(self, l7policy):
+        """Deletes the specified L7 policy."""
+        return self.delete(self.lbaas_l7policy_path % l7policy)
+
+    @APIParamsCall
+    def list_lbaas_l7rules(self, l7policy, retrieve_all=True, **_params):
+        """Fetches a list of all rules for L7 policy."""
+        return self.list('rules', self.lbaas_l7rules_path % l7policy,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_lbaas_l7rule(self, l7rule, l7policy, **_params):
+        """Fetches information of a certain L7 policy's rule."""
+        return self.get(self.lbaas_l7rule_path % (l7policy, l7rule),
+                        params=_params)
+
+    @APIParamsCall
+    def create_lbaas_l7rule(self, l7policy, body=None):
+        """Creates rule for a certain L7 policy."""
+        return self.post(self.lbaas_l7rules_path % l7policy, body=body)
+
+    @APIParamsCall
+    def update_lbaas_l7rule(self, l7rule, l7policy, body=None):
+        """Updates L7 rule."""
+        return self.put(self.lbaas_l7rule_path % (l7policy, l7rule),
+                        body=body)
+
+    @APIParamsCall
+    def delete_lbaas_l7rule(self, l7rule, l7policy):
+        """Deletes the specified L7 rule."""
+        return self.delete(self.lbaas_l7rule_path % (l7policy, l7rule))
 
     @APIParamsCall
     def list_lbaas_pools(self, retrieve_all=True, **_params):
