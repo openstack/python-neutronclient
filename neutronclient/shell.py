@@ -72,7 +72,9 @@ from neutronclient.neutron.v2_0.nsx import networkgateway
 from neutronclient.neutron.v2_0.nsx import qos_queue
 from neutronclient.neutron.v2_0 import policyprofile
 from neutronclient.neutron.v2_0 import port
+from neutronclient.neutron.v2_0.qos import bandwidth_limit_rule
 from neutronclient.neutron.v2_0.qos import policy as qos_policy
+from neutronclient.neutron.v2_0.qos import rule as qos_rule
 from neutronclient.neutron.v2_0 import quota
 from neutronclient.neutron.v2_0 import rbac
 from neutronclient.neutron.v2_0 import router
@@ -378,6 +380,22 @@ COMMAND_V2 = {
     'qos-policy-create': qos_policy.CreateQoSPolicy,
     'qos-policy-update': qos_policy.UpdateQoSPolicy,
     'qos-policy-delete': qos_policy.DeleteQoSPolicy,
+    'qos-bandwidth-limit-rule-create': (
+        bandwidth_limit_rule.CreateQoSBandwidthLimitRule
+    ),
+    'qos-bandwidth-limit-rule-show': (
+        bandwidth_limit_rule.ShowQoSBandwidthLimitRule
+    ),
+    'qos-bandwidth-limit-rule-list': (
+        bandwidth_limit_rule.ListQoSBandwidthLimitRules
+    ),
+    'qos-bandwidth-limit-rule-update': (
+        bandwidth_limit_rule.UpdateQoSBandwidthLimitRule
+    ),
+    'qos-bandwidth-limit-rule-delete': (
+        bandwidth_limit_rule.DeleteQoSBandwidthLimitRule
+    ),
+    'qos-available-rule-types': qos_rule.ListQoSRuleTypes,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}
