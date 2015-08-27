@@ -64,14 +64,15 @@ class CreateListener(neutronV20.CreateCommand):
             '--name',
             help=_('The name of the listener.'))
         parser.add_argument(
-            '--default-tls-container-id',
-            dest='default_tls_container_id',
-            help=_('Default TLS container ID to retrieve TLS information.'))
+            '--default-tls-container-ref',
+            dest='default_tls_container_ref',
+            help=_('Default TLS container reference'
+                   ' to retrieve TLS information.'))
         parser.add_argument(
-            '--sni-container-ids',
-            dest='sni_container_ids',
+            '--sni-container-refs',
+            dest='sni_container_refs',
             nargs='+',
-            help=_('List of TLS container IDs for SNI.'))
+            help=_('List of TLS container references for SNI.'))
         parser.add_argument(
             '--loadbalancer',
             required=True,
@@ -105,8 +106,8 @@ class CreateListener(neutronV20.CreateCommand):
         neutronV20.update_dict(parsed_args, body[self.resource],
                                ['connection-limit', 'description',
                                 'loadbalancer_id', 'name',
-                                'default_tls_container_id',
-                                'sni_container_ids',
+                                'default_tls_container_ref',
+                                'sni_container_refs',
                                 'tenant_id'])
         return body
 
