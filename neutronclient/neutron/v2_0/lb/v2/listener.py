@@ -16,16 +16,25 @@
 #
 
 from neutronclient._i18n import _
+from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
 
 
 def _get_loadbalancer_id(client, lb_id_or_name):
     return neutronV20.find_resourceid_by_name_or_id(
-        client,
-        'loadbalancer',
-        lb_id_or_name,
+        client, 'loadbalancer', lb_id_or_name,
         cmd_resource='lbaas_loadbalancer')
+
+
+def _get_pool(client, pool_id_or_name):
+    return neutronV20.find_resource_by_name_or_id(
+        client, 'pool', pool_id_or_name, cmd_resource='lbaas_pool')
+
+
+def _get_pool_id(client, pool_id_or_name):
+    return neutronV20.find_resourceid_by_name_or_id(
+        client, 'pool', pool_id_or_name, cmd_resource='lbaas_pool')
 
 
 class ListListener(neutronV20.ListCommand):
@@ -64,7 +73,8 @@ class CreateListener(neutronV20.CreateCommand):
             help=_('Description of the listener.'))
         parser.add_argument(
             '--name',
-            help=_('The name of the listener.'))
+            help=_('The name of the listener. At least one of --default-pool '
+                   'or --loadbalancer must be specified.'))
         parser.add_argument(
             '--default-tls-container-ref',
             dest='default_tls_container_ref',
@@ -76,8 +86,10 @@ class CreateListener(neutronV20.CreateCommand):
             nargs='+',
             help=_('List of TLS container references for SNI.'))
         parser.add_argument(
+            '--default-pool',
+            help=_('Default pool for the listener.'))
+        parser.add_argument(
             '--loadbalancer',
-            required=True,
             metavar='LOADBALANCER',
             help=_('ID or name of the load balancer.'))
         parser.add_argument(
@@ -93,22 +105,29 @@ class CreateListener(neutronV20.CreateCommand):
             help=_('Protocol port for the listener.'))
 
     def args2body(self, parsed_args):
+        resource = {
+            'protocol': parsed_args.protocol,
+            'protocol_port': parsed_args.protocol_port,
+            'admin_state_up': parsed_args.admin_state
+        }
+        if not parsed_args.loadbalancer and not parsed_args.default_pool:
+            message = _('Either --default-pool or --loadbalancer must be '
+                        'specified.')
+            raise exceptions.CommandError(message)
         if parsed_args.loadbalancer:
-            parsed_args.loadbalancer = _get_loadbalancer_id(
-                self.get_client(),
-                parsed_args.loadbalancer)
-        body = {'loadbalancer_id': parsed_args.loadbalancer,
-                'protocol': parsed_args.protocol,
-                'protocol_port': parsed_args.protocol_port,
-                'admin_state_up': parsed_args.admin_state}
+            loadbalancer_id = _get_loadbalancer_id(
+                self.get_client(), parsed_args.loadbalancer)
+            resource['loadbalancer_id'] = loadbalancer_id
+        if parsed_args.default_pool:
+            default_pool_id = _get_pool_id(
+                self.get_client(), parsed_args.default_pool)
+            resource['default_pool_id'] = default_pool_id
 
-        neutronV20.update_dict(parsed_args, body,
+        neutronV20.update_dict(parsed_args, resource,
                                ['connection_limit', 'description',
-                                'loadbalancer_id', 'name',
-                                'default_tls_container_ref',
-                                'sni_container_refs',
-                                'tenant_id'])
-        return {self.resource: body}
+                                'name', 'default_tls_container_ref',
+                                'sni_container_refs', 'tenant_id'])
+        return {self.resource: resource}
 
 
 class UpdateListener(neutronV20.UpdateCommand):

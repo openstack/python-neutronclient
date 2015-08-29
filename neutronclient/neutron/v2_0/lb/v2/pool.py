@@ -1,6 +1,7 @@
 # Copyright 2013 Mirantis Inc.
 # Copyright 2014 Blue Box Group, Inc.
 # Copyright 2015 Hewlett-Packard Development Company, L.P.
+# Copyright 2015 Blue Box, an IBM Company
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -17,8 +18,25 @@
 #
 
 from neutronclient._i18n import _
+from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
+
+
+def _get_loadbalancer_id(client, lb_id_or_name):
+    return neutronV20.find_resourceid_by_name_or_id(
+        client, 'loadbalancer', lb_id_or_name,
+        cmd_resource='lbaas_loadbalancer')
+
+
+def _get_listener(client, listener_id_or_name):
+    return neutronV20.find_resource_by_name_or_id(
+        client, 'listener', listener_id_or_name)
+
+
+def _get_listener_id(client, listener_id_or_name):
+    return neutronV20.find_resourceid_by_name_or_id(
+        client, 'listener', listener_id_or_name)
 
 
 class ListPool(neutronV20.ListCommand):
@@ -71,15 +89,21 @@ class CreatePool(neutronV20.CreateCommand):
         parser.add_argument(
             '--name', help=_('The name of the pool.'))
         parser.add_argument(
+            '--listener',
+            help=_('Listener whose default-pool should be set to this pool. '
+                   'At least one of --listener or --loadbalancer must be '
+                   'specified.'))
+        parser.add_argument(
+            '--loadbalancer',
+            help=_('Loadbalancer with which this pool should be associated. '
+                   'At least one of --listener or --loadbalancer must be '
+                   'specified.'))
+        parser.add_argument(
             '--lb-algorithm',
             required=True,
             choices=['ROUND_ROBIN', 'LEAST_CONNECTIONS', 'SOURCE_IP'],
             help=_('The algorithm used to distribute load between the members '
                    'of the pool.'))
-        parser.add_argument(
-            '--listener',
-            required=True,
-            help=_('The listener to associate with the pool'))
         parser.add_argument(
             '--protocol',
             required=True,
@@ -88,16 +112,29 @@ class CreatePool(neutronV20.CreateCommand):
             help=_('Protocol for balancing.'))
 
     def args2body(self, parsed_args):
-        _listener_id = neutronV20.find_resourceid_by_name_or_id(
-            self.get_client(), 'listener', parsed_args.listener)
-        body = {'admin_state_up': parsed_args.admin_state,
-                'protocol': parsed_args.protocol,
-                'lb_algorithm': parsed_args.lb_algorithm,
-                'listener_id': _listener_id}
-        neutronV20.update_dict(parsed_args, body,
+        resource = {
+            'admin_state_up': parsed_args.admin_state,
+            'protocol': parsed_args.protocol,
+            'lb_algorithm': parsed_args.lb_algorithm
+        }
+        if not parsed_args.listener and not parsed_args.loadbalancer:
+            message = _('At least one of --listener or --loadbalancer must be '
+                        'specified.')
+            raise exceptions.CommandError(message)
+        if parsed_args.listener:
+            listener_id = _get_listener_id(
+                self.get_client(),
+                parsed_args.listener)
+            resource['listener_id'] = listener_id
+        if parsed_args.loadbalancer:
+            loadbalancer_id = _get_loadbalancer_id(
+                self.get_client(),
+                parsed_args.loadbalancer)
+            resource['loadbalancer_id'] = loadbalancer_id
+        neutronV20.update_dict(parsed_args, resource,
                                ['description', 'name',
                                 'session_persistence', 'tenant_id'])
-        return {self.resource: body}
+        return {self.resource: resource}
 
 
 class UpdatePool(neutronV20.UpdateCommand):

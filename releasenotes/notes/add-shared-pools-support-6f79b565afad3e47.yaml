@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    CLI support for Neutron-LBaaS v2 shared pools added.
+
+    * Pools can be created independently from listeners.
+    * Listeners can share the same default_pool.
+    * Makes Layer 7 switching support much more useful.
