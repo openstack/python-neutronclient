@@ -193,8 +193,35 @@ class UpdateExtraDhcpOptMixin(object):
             port['extra_dhcp_opts'] = ops
 
 
+class UpdatePortAllowedAddressPair(object):
+    """Update Port for allowed_address_pairs"""
+
+    def add_arguments_allowedaddresspairs(self, parser):
+        group_aap = parser.add_mutually_exclusive_group()
+        group_aap.add_argument(
+            '--allowed-address-pair',
+            metavar='ip_address=IP_ADDR[,mac_address=MAC_ADDR]',
+            default=[],
+            action='append',
+            dest='allowed_address_pairs',
+            type=utils.str2dict,
+            help=_('Allowed address pair associated with the port.'
+                   'You can repeat this option.'))
+        group_aap.add_argument(
+            '--no-allowed-address-pairs',
+            action='store_true',
+            help=_('Associate no allowed address pairs with the port.'))
+
+    def args2body_allowedaddresspairs(self, parsed_args, port):
+        if parsed_args.allowed_address_pairs:
+            port['allowed_address_pairs'] = parsed_args.allowed_address_pairs
+        elif parsed_args.no_allowed_address_pairs:
+            port['allowed_address_pairs'] = []
+
+
 class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
-                 UpdateExtraDhcpOptMixin, qos_policy.CreateQosPolicyMixin):
+                 UpdateExtraDhcpOptMixin, qos_policy.CreateQosPolicyMixin,
+                 UpdatePortAllowedAddressPair):
     """Create a port for a given tenant."""
 
     resource = 'port'
@@ -232,6 +259,7 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
         self.add_arguments_secgroup(parser)
         self.add_arguments_extradhcpopt(parser)
         self.add_arguments_qos_policy(parser)
+        self.add_arguments_allowedaddresspairs(parser)
 
         parser.add_argument(
             'network_id', metavar='NETWORK',
@@ -257,6 +285,7 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
         self.args2body_secgroup(parsed_args, body)
         self.args2body_extradhcpopt(parsed_args, body)
         self.args2body_qos_policy(parsed_args, body)
+        self.args2body_allowedaddresspairs(parsed_args, body)
 
         return {'port': body}
 
@@ -268,7 +297,8 @@ class DeletePort(neutronV20.DeleteCommand):
 
 
 class UpdatePort(neutronV20.UpdateCommand, UpdatePortSecGroupMixin,
-                 UpdateExtraDhcpOptMixin, qos_policy.UpdateQosPolicyMixin):
+                 UpdateExtraDhcpOptMixin, qos_policy.UpdateQosPolicyMixin,
+                 UpdatePortAllowedAddressPair):
     """Update port's information."""
 
     resource = 'port'
@@ -286,6 +316,7 @@ class UpdatePort(neutronV20.UpdateCommand, UpdatePortSecGroupMixin,
         self.add_arguments_secgroup(parser)
         self.add_arguments_extradhcpopt(parser)
         self.add_arguments_qos_policy(parser)
+        self.add_arguments_allowedaddresspairs(parser)
 
     def args2body(self, parsed_args):
         body = {}
@@ -297,5 +328,6 @@ class UpdatePort(neutronV20.UpdateCommand, UpdatePortSecGroupMixin,
         self.args2body_secgroup(parsed_args, body)
         self.args2body_extradhcpopt(parsed_args, body)
         self.args2body_qos_policy(parsed_args, body)
+        self.args2body_allowedaddresspairs(parsed_args, body)
 
         return {'port': body}

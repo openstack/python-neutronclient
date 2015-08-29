@@ -28,7 +28,7 @@ fi
 echo "NOTE: User should be admin in order to perform all operations."
 sleep 3
 
-FORMAT=" --request-format xml"
+FORMAT=" --request-format json"
 
 # test the CRUD of network
 network=$net_name
@@ -78,9 +78,30 @@ port_id=`neutron port-list $FORMAT -- --name $port --fields id | tail -n 2 | hea
 echo "ID of port with name $port is $port_id"
 neutron port-show $FORMAT $port ||  die "fail to show port $port"
 neutron port-show $FORMAT $port_id ||  die "fail to show port $port_id"
-
 neutron  port-update $FORMAT $port --device_id deviceid1  ||  die "fail to update port $port"
 neutron  port-update $FORMAT $port_id --device_id deviceid2  ||  die "fail to update port $port_id"
+neutron  port-update $FORMAT $port_id --allowed-address-pair ip_address=1.1.1.11,mac_address=10:00:00:00:00:00 --allowed-address-pair ip_address=1.1.1.12,mac_address=10:00:00:00:00:01 ||  die "fail to update port $port_id --allowed-address-pair"
+neutron port-show $FORMAT $port ||  die "fail to show port $port"
+neutron port-show $FORMAT $port_id ||  die "fail to show port $port_id"
+neutron  port-update $FORMAT $port_id --no-allowed-address-pairs ||  die "fail to update port $port_id --no-allowed-address-pairs"
+neutron port-show $FORMAT $port ||  die "fail to show port $port"
+neutron port-show $FORMAT $port_id ||  die "fail to show port $port_id"
+neutron port-delete $port_id
+
+# test the create port with allowed-address-pairs
+port=$port_name
+neutron port-create $FORMAT $NOAUTH $network --name $port -- --allowed-address-pairs type=dict list=true ip_address=1.1.1.11,mac_address=10:00:00:00:00:00 ip_address=1.1.1.12,mac_address=10:00:00:00:00:01 || die "fail to create port $port"
+tempport=`neutron port-list $FORMAT -- --name $port --fields id | wc -l`
+echo $tempport
+if [ $tempport -ne 5 ]; then
+   die "ports with name $port is not unique or found"
+fi
+port_id=`neutron port-list $FORMAT -- --name $port --fields id | tail -n 2 | head -n 1 |  cut -d' ' -f 2`
+echo "ID of port with name $port is $port_id"
+neutron port-show $FORMAT $port ||  die "fail to show port $port"
+neutron port-show $FORMAT $port_id ||  die "fail to show port $port_id"
+neutron  port-update $FORMAT $port_id --no-allowed-address-pairs ||  die "fail to update port $port_id --no-allowed-address-pairs"
+neutron  port-show $port_id
 
 # test quota commands RUD
 DEFAULT_NETWORKS=10
