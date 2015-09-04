@@ -408,8 +408,6 @@ class Client(ClientBase):
     metering_label_path = "/metering/metering-labels/%s"
     metering_label_rules_path = "/metering/metering-label-rules"
     metering_label_rule_path = "/metering/metering-label-rules/%s"
-    packet_filters_path = "/packet_filters"
-    packet_filter_path = "/packet_filters/%s"
 
     DHCP_NETS = '/dhcp-networks'
     DHCP_AGENTS = '/dhcp-agents'
@@ -461,7 +459,6 @@ class Client(ClientBase):
                      'metering_labels': 'metering_label',
                      'metering_label_rules': 'metering_label_rule',
                      'net_partitions': 'net_partition',
-                     'packet_filters': 'packet_filter',
                      'loadbalancers': 'loadbalancer',
                      'listeners': 'listener',
                      'lbaas_pools': 'lbaas_pool',
@@ -1615,33 +1612,6 @@ class Client(ClientBase):
     def delete_net_partition(self, netpartition):
         """Delete the network partition."""
         return self.delete(self.net_partition_path % netpartition)
-
-    @APIParamsCall
-    def create_packet_filter(self, body=None):
-        """Create a new packet filter."""
-        return self.post(self.packet_filters_path, body=body)
-
-    @APIParamsCall
-    def update_packet_filter(self, packet_filter_id, body=None):
-        """Update a packet filter."""
-        return self.put(self.packet_filter_path % packet_filter_id, body=body)
-
-    @APIParamsCall
-    def list_packet_filters(self, retrieve_all=True, **_params):
-        """Fetch a list of all packet filters for a tenant."""
-        return self.list('packet_filters', self.packet_filters_path,
-                         retrieve_all, **_params)
-
-    @APIParamsCall
-    def show_packet_filter(self, packet_filter_id, **_params):
-        """Fetch information of a certain packet filter."""
-        return self.get(self.packet_filter_path % packet_filter_id,
-                        params=_params)
-
-    @APIParamsCall
-    def delete_packet_filter(self, packet_filter_id):
-        """Delete the specified packet filter."""
-        return self.delete(self.packet_filter_path % packet_filter_id)
 
     @APIParamsCall
     def create_rbac_policy(self, body=None):
