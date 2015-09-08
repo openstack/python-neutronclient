@@ -1631,30 +1631,50 @@ class Client(ClientBase):
         super(Client, self).__init__(**kwargs)
         self._register_extensions(self.version)
 
-    def extend_show(self, resource_plural, path):
+    def extend_show(self, resource_plural, path, parent_resource):
         def _fx(obj, **_params):
             return self.show_ext(path, obj, **_params)
-        setattr(self, "show_%s" % resource_plural, _fx)
 
-    def extend_list(self, resource_plural, path):
+        def _parent_fx(parent_id, obj, **_params):
+            return self.show_ext(path % parent_id, obj, **_params)
+        fn = _fx if not parent_resource else _parent_fx
+        setattr(self, "show_%s" % resource_plural, fn)
+
+    def extend_list(self, resource_plural, path, parent_resource):
         def _fx(**_params):
             return self.list_ext(path, **_params)
-        setattr(self, "list_%s" % resource_plural, _fx)
 
-    def extend_create(self, resource_singular, path):
+        def _parent_fx(parent_id, **_params):
+            return self.list_ext(path % parent_id, **_params)
+        fn = _fx if not parent_resource else _parent_fx
+        setattr(self, "list_%s" % resource_plural, fn)
+
+    def extend_create(self, resource_singular, path, parent_resource):
         def _fx(body=None):
             return self.create_ext(path, body)
-        setattr(self, "create_%s" % resource_singular, _fx)
 
-    def extend_delete(self, resource_singular, path):
+        def _parent_fx(parent_id, body=None):
+            return self.create_ext(path % parent_id, body)
+        fn = _fx if not parent_resource else _parent_fx
+        setattr(self, "create_%s" % resource_singular, fn)
+
+    def extend_delete(self, resource_singular, path, parent_resource):
         def _fx(obj):
             return self.delete_ext(path, obj)
-        setattr(self, "delete_%s" % resource_singular, _fx)
 
-    def extend_update(self, resource_singular, path):
+        def _parent_fx(parent_id, obj):
+            return self.delete_ext(path % parent_id, obj)
+        fn = _fx if not parent_resource else _parent_fx
+        setattr(self, "delete_%s" % resource_singular, fn)
+
+    def extend_update(self, resource_singular, path, parent_resource):
         def _fx(obj, body=None):
             return self.update_ext(path, obj, body)
-        setattr(self, "update_%s" % resource_singular, _fx)
+
+        def _parent_fx(parent_id, obj, body=None):
+            return self.update_ext(path % parent_id, obj, body)
+        fn = _fx if not parent_resource else _parent_fx
+        setattr(self, "update_%s" % resource_singular, fn)
 
     def _extend_client_with_module(self, module, version):
         classes = inspect.getmembers(module, inspect.isclass)
@@ -1662,16 +1682,22 @@ class Client(ClientBase):
             if hasattr(cls, 'versions'):
                 if version not in cls.versions:
                     continue
+            parent_resource = getattr(cls, 'parent_resource', None)
             if issubclass(cls, client_extension.ClientExtensionList):
-                self.extend_list(cls.resource_plural, cls.object_path)
+                self.extend_list(cls.resource_plural, cls.object_path,
+                                 parent_resource)
             elif issubclass(cls, client_extension.ClientExtensionCreate):
-                self.extend_create(cls.resource, cls.object_path)
+                self.extend_create(cls.resource, cls.object_path,
+                                   parent_resource)
             elif issubclass(cls, client_extension.ClientExtensionUpdate):
-                self.extend_update(cls.resource, cls.resource_path)
+                self.extend_update(cls.resource, cls.resource_path,
+                                   parent_resource)
             elif issubclass(cls, client_extension.ClientExtensionDelete):
-                self.extend_delete(cls.resource, cls.resource_path)
+                self.extend_delete(cls.resource, cls.resource_path,
+                                   parent_resource)
             elif issubclass(cls, client_extension.ClientExtensionShow):
-                self.extend_show(cls.resource, cls.resource_path)
+                self.extend_show(cls.resource, cls.resource_path,
+                                 parent_resource)
             elif issubclass(cls, client_extension.NeutronClientExtension):
                 setattr(self, "%s_path" % cls.resource_plural,
                         cls.object_path)
