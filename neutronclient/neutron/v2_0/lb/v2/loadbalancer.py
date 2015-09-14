@@ -56,6 +56,9 @@ class CreateLoadBalancer(neutronV20.CreateCommand):
             '--provider',
             help=_('Provider name of load balancer service.'))
         parser.add_argument(
+            '--flavor',
+            help=_('ID or name of flavor.'))
+        parser.add_argument(
             '--vip-address',
             help=_('VIP address for the load balancer.'))
         parser.add_argument(
@@ -67,6 +70,11 @@ class CreateLoadBalancer(neutronV20.CreateCommand):
             self.get_client(), 'subnet', parsed_args.vip_subnet)
         body = {'vip_subnet_id': _subnet_id,
                 'admin_state_up': parsed_args.admin_state}
+        if parsed_args.flavor:
+            _flavor_id = neutronV20.find_resourceid_by_name_or_id(
+                self.get_client(), 'flavor', parsed_args.flavor)
+            body['flavor_id'] = _flavor_id
+
         neutronV20.update_dict(parsed_args, body,
                                ['description', 'provider', 'vip_address',
                                 'tenant_id', 'name'])
