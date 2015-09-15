@@ -32,6 +32,7 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
         my_id = 'myid'
         protocol = 'tcp'
         action = 'allow'
+        ip_version = 4
         args = ['--tenant-id', tenant_id,
                 '--admin-state-up',
                 '--protocol', protocol,
@@ -42,7 +43,8 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, my_id, args,
                                    position_names, position_values,
                                    protocol=protocol, action=action,
-                                   enabled=enabled, tenant_id=tenant_id)
+                                   enabled=enabled, tenant_id=tenant_id,
+                                   ip_version=ip_version)
 
     def test_create_enabled_firewall_rule_with_mandatory_params_lcase(self):
         self._test_create_firewall_rule_with_mandatory_params(enabled='true')
@@ -56,7 +58,8 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
     def test_create_disabled_firewall_rule_with_mandatory_params(self):
         self._test_create_firewall_rule_with_mandatory_params(enabled='False')
 
-    def _setup_create_firewall_rule_with_all_params(self, protocol='tcp'):
+    def _setup_create_firewall_rule_with_all_params(self, protocol='tcp',
+                                                    ip_version='4'):
         # firewall-rule-create with all params set.
         resource = 'firewall_rule'
         cmd = firewallrule.CreateFirewallRule(test_cli20.MyApp(sys.stdout),
@@ -74,6 +77,7 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
         args = ['--description', description,
                 '--shared',
                 '--protocol', protocol,
+                '--ip-version', ip_version,
                 '--source-ip-address', source_ip,
                 '--destination-ip-address', destination_ip,
                 '--source-port', source_port,
@@ -86,22 +90,41 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
         position_values = []
         if protocol == 'any':
             protocol = None
-        self._test_create_resource(resource, cmd, name, my_id, args,
-                                   position_names, position_values,
-                                   description=description, shared=True,
-                                   protocol=protocol,
-                                   source_ip_address=source_ip,
-                                   destination_ip_address=destination_ip,
-                                   source_port=source_port,
-                                   destination_port=destination_port,
-                                   action=action, enabled='True',
-                                   tenant_id=tenant_id)
+        if ip_version == '4' or ip_version == '6':
+            self._test_create_resource(resource, cmd, name, my_id, args,
+                                       position_names, position_values,
+                                       description=description, shared=True,
+                                       protocol=protocol,
+                                       ip_version=int(ip_version),
+                                       source_ip_address=source_ip,
+                                       destination_ip_address=destination_ip,
+                                       source_port=source_port,
+                                       destination_port=destination_port,
+                                       action=action, enabled='True',
+                                       tenant_id=tenant_id)
+        else:
+            self.assertRaises(SystemExit, self._test_create_resource,
+                              resource, cmd, name, my_id, args,
+                              position_names, position_values,
+                              ip_version=int(ip_version),
+                              source_ip_address=source_ip,
+                              destination_ip_address=destination_ip,
+                              source_port=source_port,
+                              destination_port=destination_port,
+                              action=action, enabled='True',
+                              tenant_id=tenant_id)
 
     def test_create_firewall_rule_with_all_params(self):
         self._setup_create_firewall_rule_with_all_params()
 
     def test_create_firewall_rule_with_proto_any(self):
         self._setup_create_firewall_rule_with_all_params(protocol='any')
+
+    def test_create_firewall_rule_with_IP_version_6(self):
+        self._setup_create_firewall_rule_with_all_params(ip_version='6')
+
+    def test_create_firewall_rule_with_invalid_IP_version(self):
+        self._setup_create_firewall_rule_with_all_params(ip_version='5')
 
     def test_list_firewall_rules(self):
         # firewall-rule-list.
