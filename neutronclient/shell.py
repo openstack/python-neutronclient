@@ -818,6 +818,10 @@ class NeutronShell(app.App):
                          )
             cmd_parser = cmd.get_parser(full_name)
             return run_command(cmd, cmd_parser, sub_argv)
+        except SystemExit:
+            print(_("Try 'neutron help %s' for more information.") %
+                  cmd_name, file=sys.stderr)
+            raise
         except Exception as e:
             if self.options.verbose_level >= self.DEBUG_LEVEL:
                 self.log.exception("%s", e)

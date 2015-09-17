@@ -59,7 +59,9 @@ class ShellTest(testtools.TestCase):
                 fixtures.EnvironmentVariable(
                     var, self.FAKE_ENV[var]))
 
-    def shell(self, argstr, check=False):
+    def shell(self, argstr, check=False, expected_val=0):
+        # expected_val is the expected return value after executing
+        # the command in NeutronShell
         orig = (sys.stdout, sys.stderr)
         clean_env = {}
         _old_env, os.environ = os.environ, clean_env.copy()
@@ -70,7 +72,7 @@ class ShellTest(testtools.TestCase):
             _shell.run(argstr.split())
         except SystemExit:
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            self.assertEqual(0, exc_value.code)
+            self.assertEqual(expected_val, exc_value.code)
         finally:
             stdout = sys.stdout.getvalue()
             stderr = sys.stderr.getvalue()
@@ -211,3 +213,15 @@ class ShellTest(testtools.TestCase):
 
         namespace = parser.parse_args([])
         self.assertEqual(50, namespace.http_timeout)
+
+    def test_run_incomplete_command(self):
+        self.useFixture(fixtures.FakeLogger(level=logging.DEBUG))
+        cmd = (
+            '--os-username test --os-password test --os-project-id test '
+            '--os-auth-strategy keystone --os-auth-url '
+            '%s port-create' %
+            DEFAULT_AUTH_URL)
+        stdout, stderr = self.shell(cmd, check=True, expected_val=2)
+        search_str = "Try 'neutron help port-create' for more information"
+        self.assertTrue(any(search_str in string for string
+                            in stderr.split('\n')))
