@@ -48,6 +48,7 @@ from neutronclient.i18n import _
 from neutronclient.neutron.v2_0 import address_scope
 from neutronclient.neutron.v2_0 import agent
 from neutronclient.neutron.v2_0 import agentscheduler
+from neutronclient.neutron.v2_0 import credential
 from neutronclient.neutron.v2_0 import extension
 from neutronclient.neutron.v2_0 import floatingip
 from neutronclient.neutron.v2_0.fw import firewall
@@ -66,8 +67,10 @@ from neutronclient.neutron.v2_0 import metering
 from neutronclient.neutron.v2_0.nec import packetfilter
 from neutronclient.neutron.v2_0 import netpartition
 from neutronclient.neutron.v2_0 import network
+from neutronclient.neutron.v2_0 import networkprofile
 from neutronclient.neutron.v2_0.nsx import networkgateway
 from neutronclient.neutron.v2_0.nsx import qos_queue
+from neutronclient.neutron.v2_0 import policyprofile
 from neutronclient.neutron.v2_0 import port
 from neutronclient.neutron.v2_0.qos import bandwidth_limit_rule
 from neutronclient.neutron.v2_0.qos import policy as qos_policy
@@ -303,6 +306,18 @@ COMMAND_V2 = {
     'firewall-create': firewall.CreateFirewall,
     'firewall-update': firewall.UpdateFirewall,
     'firewall-delete': firewall.DeleteFirewall,
+    'cisco-credential-list': credential.ListCredential,
+    'cisco-credential-show': credential.ShowCredential,
+    'cisco-credential-create': credential.CreateCredential,
+    'cisco-credential-delete': credential.DeleteCredential,
+    'cisco-network-profile-list': networkprofile.ListNetworkProfile,
+    'cisco-network-profile-show': networkprofile.ShowNetworkProfile,
+    'cisco-network-profile-create': networkprofile.CreateNetworkProfile,
+    'cisco-network-profile-delete': networkprofile.DeleteNetworkProfile,
+    'cisco-network-profile-update': networkprofile.UpdateNetworkProfile,
+    'cisco-policy-profile-list': policyprofile.ListPolicyProfile,
+    'cisco-policy-profile-show': policyprofile.ShowPolicyProfile,
+    'cisco-policy-profile-update': policyprofile.UpdatePolicyProfile,
     'ipsec-site-connection-list': (
         ipsec_site_connection.ListIPsecSiteConnection
     ),
