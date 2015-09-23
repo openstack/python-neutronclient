@@ -73,6 +73,12 @@ class FakeStdout(object):
     def make_string(self):
         result = ''
         for line in self.content:
+            if six.PY3:
+                if isinstance(line, bytes):
+                    try:
+                        line = line.decode(encoding='utf-8')
+                    except UnicodeError:
+                        pass
             result = result + line
         return result
 
