@@ -69,14 +69,10 @@ class CreateFloatingIP(neutronV20.CreateCommand):
         _network_id = neutronV20.find_resourceid_by_name_or_id(
             self.get_client(), 'network', parsed_args.floating_network_id)
         body = {'floating_network_id': _network_id}
-        if parsed_args.port_id:
-            body['port_id'] = parsed_args.port_id
-        if parsed_args.tenant_id:
-            body['tenant_id'] = parsed_args.tenant_id
-        if parsed_args.fixed_ip_address:
-            body['fixed_ip_address'] = parsed_args.fixed_ip_address
-        if parsed_args.floating_ip_address:
-            body['floating_ip_address'] = parsed_args.floating_ip_address
+        neutronV20.update_dict(parsed_args, body,
+                               ['port_id', 'tenant_id',
+                                'fixed_ip_address',
+                                'floating_ip_address'])
         return {self.resource: body}
 
 
@@ -116,10 +112,8 @@ class AssociateFloatingIP(neutronV20.NeutronCommand):
         neutron_client = self.get_client()
         neutron_client.format = parsed_args.request_format
         update_dict = {}
-        if parsed_args.port_id:
-            update_dict['port_id'] = parsed_args.port_id
-        if parsed_args.fixed_ip_address:
-            update_dict['fixed_ip_address'] = parsed_args.fixed_ip_address
+        neutronV20.update_dict(parsed_args, update_dict,
+                               ['port_id', 'fixed_ip_address'])
         neutron_client.update_floatingip(parsed_args.floatingip_id,
                                          {'floatingip': update_dict})
         print(_('Associated floating IP %s') % parsed_args.floatingip_id,

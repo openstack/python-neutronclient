@@ -68,18 +68,10 @@ class CreateNetworkProfile(neutronV20.CreateCommand):
 
     def args2body(self, parsed_args):
         body = {'name': parsed_args.name}
-        if parsed_args.segment_type:
-            body['segment_type'] = parsed_args.segment_type
-        if parsed_args.sub_type:
-            body['sub_type'] = parsed_args.sub_type
-        if parsed_args.segment_range:
-            body['segment_range'] = parsed_args.segment_range
-        if parsed_args.physical_network:
-            body['physical_network'] = parsed_args.physical_network
-        if parsed_args.multicast_ip_range:
-            body['multicast_ip_range'] = parsed_args.multicast_ip_range
-        if parsed_args.add_tenants:
-            body['add_tenants'] = parsed_args.add_tenants
+        neutronV20.update_dict(parsed_args, body,
+                               ['segment_type', 'sub_type', 'segment_range',
+                                'physical_network', 'multicast_ip_range',
+                                'add_tenants'])
         return {'network_profile': body}
 
 
@@ -107,10 +99,8 @@ class UpdateNetworkProfile(neutronV20.UpdateCommand):
 
     def args2body(self, parsed_args):
         body = {}
-        if parsed_args.remove_tenants:
-            body['remove_tenants'] = parsed_args.remove_tenants
-        if parsed_args.add_tenants:
-            body['add_tenants'] = parsed_args.add_tenants
+        neutronV20.update_dict(parsed_args, body,
+                               ['remove_tenants', 'add_tenants'])
         return {'network_profile': body}
 
 

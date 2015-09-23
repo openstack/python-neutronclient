@@ -51,12 +51,8 @@ class CreateMeteringLabel(neutronv20.CreateCommand):
 
     def args2body(self, parsed_args):
         body = {'name': parsed_args.name}
-        if parsed_args.tenant_id:
-            body['tenant_id'] = parsed_args.tenant_id
-        if parsed_args.description:
-            body['description'] = parsed_args.description
-        if parsed_args.shared:
-            body['shared'] = True
+        neutronv20.update_dict(parsed_args, body,
+                               ['tenant_id', 'description', 'shared'])
         return {'metering_label': body}
 
 
@@ -111,11 +107,8 @@ class CreateMeteringLabelRule(neutronv20.CreateCommand):
 
         body = {'metering_label_id': label_id,
                 'remote_ip_prefix': parsed_args.remote_ip_prefix}
-
-        if parsed_args.direction:
-            body['direction'] = parsed_args.direction
-        if parsed_args.excluded:
-            body['excluded'] = True
+        neutronv20.update_dict(parsed_args, body,
+                               ['direction', 'excluded'])
         return {'metering_label_rule': body}
 
 

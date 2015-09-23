@@ -107,22 +107,17 @@ def updatable_args2body(parsed_args, body, for_create=True, ip_version=None):
         raise exceptions.CommandError(_(
             "You cannot enable and disable DHCP at the same time."))
 
+    neutronV20.update_dict(parsed_args, body,
+                           ['name', 'allocation_pools',
+                            'host_routes', 'dns_nameservers'])
     if parsed_args.no_gateway:
         body['gateway_ip'] = None
     elif parsed_args.gateway:
         body['gateway_ip'] = parsed_args.gateway
-    if parsed_args.name:
-        body['name'] = parsed_args.name
     if parsed_args.disable_dhcp:
         body['enable_dhcp'] = False
     if parsed_args.enable_dhcp:
         body['enable_dhcp'] = True
-    if parsed_args.allocation_pools:
-        body['allocation_pools'] = parsed_args.allocation_pools
-    if parsed_args.host_routes:
-        body['host_routes'] = parsed_args.host_routes
-    if parsed_args.dns_nameservers:
-        body['dns_nameservers'] = parsed_args.dns_nameservers
     if for_create and parsed_args.ipv6_ra_mode:
         if ip_version == 4:
             raise exceptions.CommandError(_("--ipv6-ra-mode is invalid "

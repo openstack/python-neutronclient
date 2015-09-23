@@ -124,10 +124,8 @@ class CreateSecurityGroup(neutronV20.CreateCommand):
 
     def args2body(self, parsed_args):
         body = {'name': parsed_args.name}
-        if parsed_args.description:
-            body['description'] = parsed_args.description
-        if parsed_args.tenant_id:
-            body['tenant_id'] = parsed_args.tenant_id
+        neutronV20.update_dict(parsed_args, body,
+                               ['description', 'tenant_id'])
         return {'security_group': body}
 
 
@@ -153,10 +151,8 @@ class UpdateSecurityGroup(neutronV20.UpdateCommand):
 
     def args2body(self, parsed_args):
         body = {}
-        if parsed_args.name:
-            body['name'] = parsed_args.name
-        if parsed_args.description:
-            body['description'] = parsed_args.description
+        neutronV20.update_dict(parsed_args, body,
+                               ['name', 'description'])
         return {'security_group': body}
 
 
@@ -343,21 +339,14 @@ class CreateSecurityGroupRule(neutronV20.CreateCommand):
         body = {'security_group_id': _security_group_id,
                 'direction': parsed_args.direction,
                 'ethertype': parsed_args.ethertype}
-        if parsed_args.protocol:
-            body['protocol'] = parsed_args.protocol
-        if parsed_args.port_range_min:
-            body['port_range_min'] = parsed_args.port_range_min
-        if parsed_args.port_range_max:
-            body['port_range_max'] = parsed_args.port_range_max
-        if parsed_args.remote_ip_prefix:
-            body['remote_ip_prefix'] = parsed_args.remote_ip_prefix
+        neutronV20.update_dict(parsed_args, body,
+                               ['protocol', 'port_range_min', 'port_range_max',
+                                'remote_ip_prefix', 'tenant_id'])
         if parsed_args.remote_group_id:
             _remote_group_id = neutronV20.find_resourceid_by_name_or_id(
                 self.get_client(), 'security_group',
                 parsed_args.remote_group_id)
             body['remote_group_id'] = _remote_group_id
-        if parsed_args.tenant_id:
-            body['tenant_id'] = parsed_args.tenant_id
         return {'security_group_rule': body}
 
 
