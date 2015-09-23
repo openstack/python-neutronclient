@@ -67,17 +67,15 @@ class CreateFirewall(neutronv20.CreateCommand):
         _policy_id = neutronv20.find_resourceid_by_name_or_id(
             client, 'firewall_policy',
             parsed_args.firewall_policy_id)
-        body = {
-            self.resource: {
-                'firewall_policy_id': _policy_id,
-                'admin_state_up': parsed_args.admin_state, }, }
+        body = {'firewall_policy_id': _policy_id,
+                'admin_state_up': parsed_args.admin_state, }
         if parsed_args.routers:
-            body[self.resource]['router_ids'] = [
+            body['router_ids'] = [
                 neutronv20.find_resourceid_by_name_or_id(client, 'router', r)
                 for r in parsed_args.routers]
-        neutronv20.update_dict(parsed_args, body[self.resource],
+        neutronv20.update_dict(parsed_args, body,
                                ['name', 'description', 'tenant_id'])
-        return body
+        return {self.resource: body}
 
 
 class UpdateFirewall(neutronv20.UpdateCommand):

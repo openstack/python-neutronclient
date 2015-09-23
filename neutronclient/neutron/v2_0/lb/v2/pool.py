@@ -90,18 +90,14 @@ class CreatePool(neutronV20.CreateCommand):
                 parsed_args.session_persistence)
         _listener_id = neutronV20.find_resourceid_by_name_or_id(
             self.get_client(), 'listener', parsed_args.listener)
-        body = {
-            self.resource: {
-                'admin_state_up': parsed_args.admin_state,
+        body = {'admin_state_up': parsed_args.admin_state,
                 'protocol': parsed_args.protocol,
                 'lb_algorithm': parsed_args.lb_algorithm,
-                'listener_id': _listener_id,
-            },
-        }
-        neutronV20.update_dict(parsed_args, body[self.resource],
+                'listener_id': _listener_id}
+        neutronV20.update_dict(parsed_args, body,
                                ['description', 'name',
                                 'session_persistence', 'tenant_id'])
-        return body
+        return {self.resource: body}
 
 
 class UpdatePool(neutronV20.UpdateCommand):

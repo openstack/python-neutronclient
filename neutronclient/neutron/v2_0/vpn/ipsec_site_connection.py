@@ -123,7 +123,7 @@ class CreateIPsecSiteConnection(neutronv20.CreateCommand):
             message = _("Invalid MTU value: MTU must be "
                         "greater than or equal to 68")
             raise exceptions.CommandError(message)
-        body = {'ipsec_site_connection': {
+        body = {
             'vpnservice_id': _vpnservice_id,
             'ikepolicy_id': _ikepolicy_id,
             'ipsecpolicy_id': _ipsecpolicy_id,
@@ -133,27 +133,20 @@ class CreateIPsecSiteConnection(neutronv20.CreateCommand):
             'initiator': parsed_args.initiator,
             'psk': parsed_args.psk,
             'admin_state_up': parsed_args.admin_state_down,
-        }, }
+        }
         if parsed_args.name:
-            body['ipsec_site_connection'].update(
-                {'name': parsed_args.name}
-            )
+            body['name'] = parsed_args.name
         if parsed_args.description:
-            body['ipsec_site_connection'].update(
-                {'description': parsed_args.description}
-            )
+            body['description'] = parsed_args.description
         if parsed_args.tenant_id:
-            body['ipsec_site_connection'].update(
-                {'tenant_id': parsed_args.tenant_id}
-            )
+            body['tenant_id'] = parsed_args.tenant_id
         if parsed_args.dpd:
             vpn_utils.validate_dpd_dict(parsed_args.dpd)
-            body['ipsec_site_connection'].update({'dpd': parsed_args.dpd})
+            body['dpd'] = parsed_args.dpd
         if parsed_args.peer_cidrs:
-            body['ipsec_site_connection'][
-                'peer_cidrs'] = parsed_args.peer_cidrs
+            body['peer_cidrs'] = parsed_args.peer_cidrs
 
-        return body
+        return {'ipsec_site_connection': body}
 
 
 class UpdateIPsecSiteConnection(neutronv20.UpdateCommand):
@@ -170,13 +163,11 @@ class UpdateIPsecSiteConnection(neutronv20.UpdateCommand):
             help=vpn_utils.dpd_help("IPsec connection."))
 
     def args2body(self, parsed_args):
-        body = {'ipsec_site_connection': {
-        }, }
-
+        body = {}
         if parsed_args.dpd:
             vpn_utils.validate_dpd_dict(parsed_args.dpd)
-            body['ipsec_site_connection'].update({'dpd': parsed_args.dpd})
-        return body
+            body['dpd'] = parsed_args.dpd
+        return {'ipsec_site_connection': body}
 
 
 class DeleteIPsecSiteConnection(neutronv20.DeleteCommand):

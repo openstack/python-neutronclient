@@ -103,14 +103,14 @@ class CreateQoSPolicy(neutronv20.CreateCommand):
                    'Set shared to True (default is False).'))
 
     def args2body(self, parsed_args):
-        body = {self.resource: {'name': parsed_args.name}, }
+        body = {'name': parsed_args.name}
         if parsed_args.description:
-            body[self.resource]['description'] = parsed_args.description
+            body['description'] = parsed_args.description
         if parsed_args.shared:
-            body[self.resource]['shared'] = parsed_args.shared
+            body['shared'] = parsed_args.shared
         if parsed_args.tenant_id:
-            body[self.resource]['tenant_id'] = parsed_args.tenant_id
-        return body
+            body['tenant_id'] = parsed_args.tenant_id
+        return {self.resource: body}
 
 
 class UpdateQoSPolicy(neutronv20.UpdateCommand):
@@ -133,14 +133,14 @@ class UpdateQoSPolicy(neutronv20.UpdateCommand):
                    'Set shared to True (default is False).'))
 
     def args2body(self, parsed_args):
-        body = {self.resource: {}, }
+        body = {}
         if parsed_args.name:
-            body[self.resource]['name'] = parsed_args.name
+            body['name'] = parsed_args.name
         if parsed_args.description:
-            body[self.resource]['description'] = parsed_args.description
+            body['description'] = parsed_args.description
         if parsed_args.shared:
-            body[self.resource]['shared'] = parsed_args.shared
-        return body
+            body['shared'] = parsed_args.shared
+        return {self.resource: body}
 
 
 class DeleteQoSPolicy(neutronv20.DeleteCommand):

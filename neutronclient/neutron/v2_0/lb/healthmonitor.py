@@ -84,19 +84,15 @@ class CreateHealthMonitor(neutronV20.CreateCommand):
             help=_('One of the predefined health monitor types.'))
 
     def args2body(self, parsed_args):
-        body = {
-            self.resource: {
-                'admin_state_up': parsed_args.admin_state,
+        body = {'admin_state_up': parsed_args.admin_state,
                 'delay': parsed_args.delay,
                 'max_retries': parsed_args.max_retries,
                 'timeout': parsed_args.timeout,
-                'type': parsed_args.type,
-            },
-        }
-        neutronV20.update_dict(parsed_args, body[self.resource],
+                'type': parsed_args.type}
+        neutronV20.update_dict(parsed_args, body,
                                ['expected_codes', 'http_method', 'url_path',
                                 'tenant_id'])
-        return body
+        return {self.resource: body}
 
 
 class UpdateHealthMonitor(neutronV20.UpdateCommand):

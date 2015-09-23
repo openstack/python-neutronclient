@@ -66,14 +66,14 @@ class CreateVPNService(neutronv20.CreateCommand):
             self.get_client(), 'router',
             parsed_args.router)
 
-        body = {self.resource: {'subnet_id': _subnet_id,
-                                'router_id': _router_id,
-                                'admin_state_up': parsed_args.admin_state}, }
-        neutronv20.update_dict(parsed_args, body[self.resource],
+        body = {'subnet_id': _subnet_id,
+                'router_id': _router_id,
+                'admin_state_up': parsed_args.admin_state}
+        neutronv20.update_dict(parsed_args, body,
                                ['name', 'description',
                                 'tenant_id'])
 
-        return body
+        return {self.resource: body}
 
 
 class UpdateVPNService(neutronv20.UpdateCommand):

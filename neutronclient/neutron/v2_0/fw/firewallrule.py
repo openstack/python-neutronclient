@@ -108,10 +108,8 @@ class CreateFirewallRule(neutronv20.CreateCommand):
             help=_('Action for the firewall rule.'))
 
     def args2body(self, parsed_args):
-        body = {
-            self.resource: {},
-        }
-        neutronv20.update_dict(parsed_args, body[self.resource],
+        body = {}
+        neutronv20.update_dict(parsed_args, body,
                                ['name', 'description', 'shared', 'protocol',
                                 'source_ip_address', 'destination_ip_address',
                                 'source_port', 'destination_port',
@@ -119,8 +117,8 @@ class CreateFirewallRule(neutronv20.CreateCommand):
         protocol = parsed_args.protocol
         if protocol == 'any':
             protocol = None
-        body[self.resource]['protocol'] = protocol
-        return body
+        body['protocol'] = protocol
+        return {self.resource: body}
 
 
 class UpdateFirewallRule(neutronv20.UpdateCommand):
@@ -135,15 +133,13 @@ class UpdateFirewallRule(neutronv20.UpdateCommand):
             help=_('Protocol for the firewall rule.'))
 
     def args2body(self, parsed_args):
-        body = {
-            self.resource: {},
-        }
+        body = {}
         protocol = parsed_args.protocol
         if protocol:
             if protocol == 'any':
                 protocol = None
-            body[self.resource]['protocol'] = protocol
-        return body
+            body['protocol'] = protocol
+        return {self.resource: body}
 
 
 class DeleteFirewallRule(neutronv20.DeleteCommand):

@@ -42,8 +42,8 @@ class CreateNetPartition(CreateCommand):
             help='Name of netpartition to create.')
 
     def args2body(self, parsed_args):
-        body = {'net_partition': {'name': parsed_args.name}, }
-        return body
+        body = {'name': parsed_args.name}
+        return {'net_partition': body}
 
 
 class DeleteNetPartition(DeleteCommand):

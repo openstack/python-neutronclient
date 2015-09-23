@@ -175,17 +175,16 @@ class CreateNetworkGateway(neutronV20.CreateCommand):
                    'option for multiple devices for HA gateways.'))
 
     def args2body(self, parsed_args):
-        body = {self.resource: {
-            'name': parsed_args.name}}
+        body = {'name': parsed_args.name}
         devices = []
         if parsed_args.device:
             for device in parsed_args.device:
                 devices.append(utils.str2dict(device))
         if devices:
-            body[self.resource].update({'devices': devices})
+            body['devices'] = devices
         if parsed_args.tenant_id:
-            body[self.resource].update({'tenant_id': parsed_args.tenant_id})
-        return body
+            body['tenant_id'] = parsed_args.tenant_id
+        return {self.resource: body}
 
 
 class DeleteNetworkGateway(neutronV20.DeleteCommand):

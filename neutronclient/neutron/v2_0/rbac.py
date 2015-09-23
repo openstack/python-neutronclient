@@ -68,13 +68,13 @@ class CreateRBACPolicy(neutronV20.CreateCommand):
         neutron_client.format = parsed_args.request_format
         _object_id = get_rbac_object_id(neutron_client, parsed_args.type,
                                         parsed_args.name)
-        body = {self.resource: {
+        body = {
             'object_id': _object_id,
             'object_type': parsed_args.type,
             'target_tenant': parsed_args.target_tenant,
             'action': parsed_args.action,
-        }, }
-        return body
+        }
+        return {self.resource: body}
 
 
 class UpdateRBACPolicy(neutronV20.UpdateCommand):
@@ -89,11 +89,8 @@ class UpdateRBACPolicy(neutronV20.UpdateCommand):
                    'policy will be enforced.'))
 
     def args2body(self, parsed_args):
-
-        body = {self.resource: {
-            'target_tenant': parsed_args.target_tenant,
-        }, }
-        return body
+        body = {'target_tenant': parsed_args.target_tenant}
+        return {self.resource: body}
 
 
 class DeleteRBACPolicy(neutronV20.DeleteCommand):

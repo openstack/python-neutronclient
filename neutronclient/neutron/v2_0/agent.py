@@ -72,9 +72,7 @@ class UpdateAgent(neutronV20.UpdateCommand):
             help=_('Description for the agent.'))
 
     def args2body(self, parsed_args):
-        body = {
-            self.resource: {
-                'admin_state_up': parsed_args.admin_state, }, }
-        neutronV20.update_dict(parsed_args, body[self.resource],
+        body = {'admin_state_up': parsed_args.admin_state}
+        neutronV20.update_dict(parsed_args, body,
                                ['description'])
-        return body
+        return {self.resource: body}

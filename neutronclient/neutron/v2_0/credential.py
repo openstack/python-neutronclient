@@ -51,19 +51,14 @@ class CreateCredential(neutronV20.CreateCommand):
             help=_('Password for the credential.'))
 
     def args2body(self, parsed_args):
-        body = {'credential': {
-            'credential_name': parsed_args.credential_name}}
-
+        body = {'credential_name': parsed_args.credential_name}
         if parsed_args.credential_type:
-            body['credential'].update({'type':
-                                      parsed_args.credential_type})
+            body['type'] = parsed_args.credential_type
         if parsed_args.username:
-            body['credential'].update({'user_name':
-                                      parsed_args.username})
+            body['user_name'] = parsed_args.username
         if parsed_args.password:
-            body['credential'].update({'password':
-                                      parsed_args.password})
-        return body
+            body['password'] = parsed_args.password
+        return {'credential': body}
 
 
 class DeleteCredential(neutronV20.DeleteCommand):

@@ -94,22 +94,18 @@ class CreateListener(neutronV20.CreateCommand):
             parsed_args.loadbalancer = _get_loadbalancer_id(
                 self.get_client(),
                 parsed_args.loadbalancer)
-        body = {
-            self.resource: {
-                'loadbalancer_id': parsed_args.loadbalancer,
+        body = {'loadbalancer_id': parsed_args.loadbalancer,
                 'protocol': parsed_args.protocol,
                 'protocol_port': parsed_args.protocol_port,
-                'admin_state_up': parsed_args.admin_state,
-            },
-        }
+                'admin_state_up': parsed_args.admin_state}
 
-        neutronV20.update_dict(parsed_args, body[self.resource],
+        neutronV20.update_dict(parsed_args, body,
                                ['connection-limit', 'description',
                                 'loadbalancer_id', 'name',
                                 'default_tls_container_ref',
                                 'sni_container_refs',
                                 'tenant_id'])
-        return body
+        return {self.resource: body}
 
 
 class UpdateListener(neutronV20.UpdateCommand):

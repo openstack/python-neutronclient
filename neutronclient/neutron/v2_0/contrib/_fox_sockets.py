@@ -16,7 +16,6 @@
 
 from neutronclient.common import extension
 from neutronclient.i18n import _
-from neutronclient.neutron import v2_0 as neutronV20
 
 
 def _add_updatable_args(parser):
@@ -27,7 +26,7 @@ def _add_updatable_args(parser):
 
 def _updatable_args2body(parsed_args, body, client):
     if parsed_args.name:
-        body['fox_socket'].update({'name': parsed_args.name})
+        body['name'] = parsed_args.name
 
 
 class FoxInSocket(extension.NeutronClientExtension):
@@ -59,11 +58,10 @@ class FoxInSocketsCreate(extension.ClientExtensionCreate, FoxInSocket):
         _add_updatable_args(parser)
 
     def args2body(self, parsed_args):
-        body = {'fox_socket': {}}
+        body = {}
         client = self.get_client()
         _updatable_args2body(parsed_args, body, client)
-        neutronV20.update_dict(parsed_args, body['fox_socket'], [])
-        return body
+        return {'fox_socket': body}
 
 
 class FoxInSocketsUpdate(extension.ClientExtensionUpdate, FoxInSocket):
@@ -79,10 +77,8 @@ class FoxInSocketsUpdate(extension.ClientExtensionUpdate, FoxInSocket):
             help=_('Name of this fox socket.'))
 
     def args2body(self, parsed_args):
-        body = {'fox_socket': {
-            'name': parsed_args.name}, }
-        neutronV20.update_dict(parsed_args, body['fox_socket'], [])
-        return body
+        body = {'name': parsed_args.name}
+        return {'fox_socket': body}
 
 
 class FoxInSocketsDelete(extension.ClientExtensionDelete, FoxInSocket):

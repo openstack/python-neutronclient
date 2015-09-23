@@ -92,20 +92,16 @@ class CreateHealthMonitor(neutronV20.CreateCommand):
         pool_id = neutronV20.find_resourceid_by_name_or_id(
             self.get_client(), 'pool', parsed_args.pool,
             cmd_resource='lbaas_pool')
-        body = {
-            self.resource: {
-                'admin_state_up': parsed_args.admin_state,
+        body = {'admin_state_up': parsed_args.admin_state,
                 'delay': parsed_args.delay,
                 'max_retries': parsed_args.max_retries,
                 'timeout': parsed_args.timeout,
                 'type': parsed_args.type,
-                'pool_id': pool_id
-            },
-        }
-        neutronV20.update_dict(parsed_args, body[self.resource],
+                'pool_id': pool_id}
+        neutronV20.update_dict(parsed_args, body,
                                ['expected_codes', 'http_method', 'url_path',
                                 'tenant_id'])
-        return body
+        return {self.resource: body}
 
 
 class UpdateHealthMonitor(neutronV20.UpdateCommand):
