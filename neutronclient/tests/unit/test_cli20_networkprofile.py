@@ -22,6 +22,8 @@ from neutronclient.tests.unit import test_cli20
 
 class CLITestV20NetworkProfile(test_cli20.CLITestV20Base):
 
+    non_admin_status_resources = ['network_profile']
+
     def test_create_networkprofile(self):
         """Create networkprofile: myid."""
         resource = 'network_profile'

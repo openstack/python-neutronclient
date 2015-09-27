@@ -22,6 +22,8 @@ from neutronclient.tests.unit import test_cli20
 
 class CLITestV20PolicyProfile(test_cli20.CLITestV20Base):
 
+    non_admin_status_resources = ['policy_profile']
+
     def test_list_policyprofile_detail(self):
         """List policyprofile: -D."""
         resources = 'policy_profiles'

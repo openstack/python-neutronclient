@@ -21,6 +21,9 @@ from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20QoSPolicyJSON(test_cli20.CLITestV20Base):
+
+    non_admin_status_resources = ['policy']
+
     def setUp(self):
         super(CLITestV20QoSPolicyJSON, self).setUp()
         self.res = 'policy'

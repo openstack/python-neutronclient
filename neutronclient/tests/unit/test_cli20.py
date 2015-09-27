@@ -15,7 +15,6 @@
 #
 
 import contextlib
-import copy
 import itertools
 import sys
 
@@ -38,17 +37,6 @@ API_VERSION = "2.0"
 FORMAT = 'json'
 TOKEN = 'testtoken'
 ENDURL = 'localurl'
-
-non_admin_status_resources = ['subnet', 'floatingip', 'security_group',
-                              'security_group_rule', 'qos_queue',
-                              'network_gateway', 'gateway_device',
-                              'credential', 'network_profile',
-                              'policy_profile', 'ikepolicy',
-                              'ipsecpolicy', 'metering_label',
-                              'metering_label_rule', 'net_partition',
-                              'fox_socket', 'subnetpool',
-                              'rbac_policy', 'address_scope',
-                              'policy', 'bandwidth_limit_rule']
 
 
 @contextlib.contextmanager
@@ -187,6 +175,8 @@ class CLITestV20Base(base.BaseTestCase):
     test_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
     id_field = 'id'
 
+    non_admin_status_resources = []
+
     def _find_resourceid(self, client, resource, name_or_id,
                          cmd_resource=None, parent_id=None):
         return name_or_id
@@ -198,7 +188,6 @@ class CLITestV20Base(base.BaseTestCase):
         """Prepare the test environment."""
         super(CLITestV20Base, self).setUp()
         client.Client.EXTED_PLURALS.update(constants.PLURALS)
-        self.non_admin_status_resources = copy.copy(non_admin_status_resources)
         if plurals is not None:
             client.Client.EXTED_PLURALS.update(plurals)
         self.metadata = {'plurals': client.Client.EXTED_PLURALS,
@@ -221,6 +210,18 @@ class CLITestV20Base(base.BaseTestCase):
         self.client = client.Client(token=TOKEN, endpoint_url=self.endurl)
 
     def register_non_admin_status_resource(self, resource_name):
+        # TODO(amotoki):
+        # It is recommended to define
+        # "non_admin_status_resources in each test class rather than
+        # using register_non_admin_status_resource method.
+
+        # If we change self.non_admin_status_resources like this,
+        # we need to ensure this should be an instance variable
+        # to avoid changing the class variable.
+        if (id(self.non_admin_status_resources) ==
+                id(self.__class__.non_admin_status_resources)):
+            self.non_admin_status_resources = (self.__class__.
+                                               non_admin_status_resources[:])
         self.non_admin_status_resources.append(resource_name)
 
     def _test_create_resource(self, resource, cmd, name, myid, args,

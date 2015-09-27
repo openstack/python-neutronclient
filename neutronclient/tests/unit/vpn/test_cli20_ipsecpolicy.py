@@ -22,6 +22,8 @@ from neutronclient.tests.unit import test_cli20
 
 class CLITestV20VpnIpsecPolicyJSON(test_cli20.CLITestV20Base):
 
+    non_admin_status_resources = ['ipsecpolicy']
+
     def test_create_ipsecpolicy_all_params(self):
         """vpn-ipsecpolicy-create all params with dashes."""
         resource = 'ipsecpolicy'

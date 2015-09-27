@@ -21,6 +21,9 @@ from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
+
+    non_admin_status_resources = ['floatingip']
+
     def test_create_floatingip(self):
         """Create floatingip: fip1."""
         resource = 'floatingip'
