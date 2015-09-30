@@ -81,6 +81,7 @@ from neutronclient.neutron.v2_0 import securitygroup
 from neutronclient.neutron.v2_0 import servicetype
 from neutronclient.neutron.v2_0 import subnet
 from neutronclient.neutron.v2_0 import subnetpool
+from neutronclient.neutron.v2_0.vpn import endpoint_group
 from neutronclient.neutron.v2_0.vpn import ikepolicy
 from neutronclient.neutron.v2_0.vpn import ipsec_site_connection
 from neutronclient.neutron.v2_0.vpn import ipsecpolicy
@@ -332,6 +333,11 @@ COMMAND_V2 = {
     'ipsec-site-connection-delete': (
         ipsec_site_connection.DeleteIPsecSiteConnection
     ),
+    'vpn-endpoint-group-list': endpoint_group.ListEndpointGroup,
+    'vpn-endpoint-group-show': endpoint_group.ShowEndpointGroup,
+    'vpn-endpoint-group-create': endpoint_group.CreateEndpointGroup,
+    'vpn-endpoint-group-update': endpoint_group.UpdateEndpointGroup,
+    'vpn-endpoint-group-delete': endpoint_group.DeleteEndpointGroup,
     'vpn-service-list': vpnservice.ListVPNService,
     'vpn-service-show': vpnservice.ShowVPNService,
     'vpn-service-create': vpnservice.CreateVPNService,

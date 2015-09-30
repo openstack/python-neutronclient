@@ -355,6 +355,8 @@ class Client(ClientBase):
     security_group_path = "/security-groups/%s"
     security_group_rules_path = "/security-group-rules"
     security_group_rule_path = "/security-group-rules/%s"
+    endpoint_groups_path = "/vpn/endpoint-groups"
+    endpoint_group_path = "/vpn/endpoint-groups/%s"
     vpnservices_path = "/vpn/vpnservices"
     vpnservice_path = "/vpn/vpnservices/%s"
     ipsecpolicies_path = "/vpn/ipsecpolicies"
@@ -447,6 +449,7 @@ class Client(ClientBase):
                      'ikepolicies': 'ikepolicy',
                      'ipsec_site_connections': 'ipsec_site_connection',
                      'vpnservices': 'vpnservice',
+                     'endpoint_groups': 'endpoint_group',
                      'vips': 'vip',
                      'pools': 'pool',
                      'members': 'member',
@@ -801,6 +804,33 @@ class Client(ClientBase):
         """Fetches information of a certain security group rule."""
         return self.get(self.security_group_rule_path % (security_group_rule),
                         params=_params)
+
+    @APIParamsCall
+    def list_endpoint_groups(self, retrieve_all=True, **_params):
+        """Fetches a list of all VPN endpoint groups for a tenant."""
+        return self.list('endpoint_groups', self.endpoint_groups_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_endpoint_group(self, endpointgroup, **_params):
+        """Fetches information for a specific VPN endpoint group."""
+        return self.get(self.endpoint_group_path % endpointgroup,
+                        params=_params)
+
+    @APIParamsCall
+    def create_endpoint_group(self, body=None):
+        """Creates a new VPN endpoint group."""
+        return self.post(self.endpoint_groups_path, body=body)
+
+    @APIParamsCall
+    def update_endpoint_group(self, endpoint_group, body=None):
+        """Updates a VPN endpoint group."""
+        return self.put(self.endpoint_group_path % endpoint_group, body=body)
+
+    @APIParamsCall
+    def delete_endpoint_group(self, endpoint_group):
+        """Deletes the specified VPN endpoint group."""
+        return self.delete(self.endpoint_group_path % endpoint_group)
 
     @APIParamsCall
     def list_vpnservices(self, retrieve_all=True, **_params):
