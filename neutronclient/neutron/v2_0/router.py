@@ -75,10 +75,10 @@ class CreateRouter(neutronV20.CreateCommand):
             help=_('Create a highly available router.'))
 
     def args2body(self, parsed_args):
-        body = {self.resource: {'admin_state_up': parsed_args.admin_state}}
-        neutronV20.update_dict(parsed_args, body[self.resource],
+        body = {'admin_state_up': parsed_args.admin_state}
+        neutronV20.update_dict(parsed_args, body,
                                ['name', 'tenant_id', 'distributed', 'ha'])
-        return body
+        return {self.resource: body}
 
 
 class DeleteRouter(neutronV20.DeleteCommand):
@@ -109,13 +109,12 @@ class UpdateRouter(neutronV20.UpdateCommand):
                    ' distributed mode.'))
 
     def args2body(self, parsed_args):
-        body = {self.resource: {}}
+        body = {}
         if hasattr(parsed_args, 'admin_state'):
-            body[self.resource].update(
-                {'admin_state_up': parsed_args.admin_state})
-        neutronV20.update_dict(parsed_args, body[self.resource],
+            body['admin_state_up'] = parsed_args.admin_state
+        neutronV20.update_dict(parsed_args, body,
                                ['name', 'distributed'])
-        return body
+        return {self.resource: body}
 
 
 class RouterInterfaceCommand(neutronV20.NeutronCommand):

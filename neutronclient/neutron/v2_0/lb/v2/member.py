@@ -97,17 +97,13 @@ class CreateMember(neutronV20.CreateCommand):
         self.parent_id = _get_pool_id(self.get_client(), parsed_args.pool)
         _subnet_id = neutronV20.find_resourceid_by_name_or_id(
             self.get_client(), 'subnet', parsed_args.subnet)
-        body = {
-            self.resource: {
-                'subnet_id': _subnet_id,
+        body = {'subnet_id': _subnet_id,
                 'admin_state_up': parsed_args.admin_state,
                 'protocol_port': parsed_args.protocol_port,
-                'address': parsed_args.address,
-            },
-        }
-        neutronV20.update_dict(parsed_args, body[self.resource],
+                'address': parsed_args.address}
+        neutronV20.update_dict(parsed_args, body,
                                ['weight', 'subnet_id', 'tenant_id'])
-        return body
+        return {self.resource: body}
 
 
 class UpdateMember(neutronV20.UpdateCommand):
@@ -130,12 +126,10 @@ class UpdateMember(neutronV20.UpdateCommand):
 
     def args2body(self, parsed_args):
         self.parent_id = _get_pool_id(self.get_client(), parsed_args.pool)
-        body = {
-            self.resource: {}
-        }
-        neutronV20.update_dict(parsed_args, body[self.resource],
+        body = {}
+        neutronV20.update_dict(parsed_args, body,
                                ['admin_state_up', 'weight'])
-        return body
+        return {self.resource: body}
 
 
 class DeleteMember(LbaasMemberMixin, neutronV20.DeleteCommand):

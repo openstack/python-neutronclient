@@ -35,7 +35,7 @@ def add_updatable_arguments(parser):
 
 
 def updatable_args2body(parsed_args, body, for_create=True):
-    neutronV20.update_dict(parsed_args, body['subnetpool'],
+    neutronV20.update_dict(parsed_args, body,
                            ['name', 'prefixes', 'default_prefixlen',
                             'min_prefixlen', 'max_prefixlen'])
 
@@ -78,18 +78,18 @@ class CreateSubnetPool(neutronV20.CreateCommand):
                    'scopes'))
 
     def args2body(self, parsed_args):
-        body = {'subnetpool': {'prefixes': parsed_args.prefixes}}
+        body = {'prefixes': parsed_args.prefixes}
         updatable_args2body(parsed_args, body)
         if parsed_args.shared:
-            body['subnetpool']['shared'] = True
+            body['shared'] = True
 
         # Parse and update for "address-scope" option
         if parsed_args.address_scope:
             _addrscope_id = neutronV20.find_resourceid_by_name_or_id(
                 self.get_client(), 'address_scope',
                 parsed_args.address_scope)
-            body['subnetpool']['address_scope_id'] = _addrscope_id
-        return body
+            body['address_scope_id'] = _addrscope_id
+        return {'subnetpool': body}
 
 
 class DeleteSubnetPool(neutronV20.DeleteCommand):
@@ -120,15 +120,15 @@ class UpdateSubnetPool(neutronV20.UpdateCommand):
                                            'address scope'))
 
     def args2body(self, parsed_args):
-        body = {'subnetpool': {}}
+        body = {}
         updatable_args2body(parsed_args, body, for_create=False)
 
         # Parse and update for "address-scope" option/s
         if parsed_args.no_address_scope:
-            body['subnetpool']['address_scope_id'] = None
+            body['address_scope_id'] = None
         elif parsed_args.address_scope:
             _addrscope_id = neutronV20.find_resourceid_by_name_or_id(
                 self.get_client(), 'address_scope',
                 parsed_args.address_scope)
-            body['subnetpool']['address_scope_id'] = _addrscope_id
-        return body
+            body['address_scope_id'] = _addrscope_id
+        return {'subnetpool': body}

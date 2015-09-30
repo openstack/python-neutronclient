@@ -69,11 +69,11 @@ def _add_updatable_args(parser):
 
 def _updatable_args2body(parsed_args, body, client):
     if parsed_args.device_id:
-        body['port'].update({'device_id': parsed_args.device_id})
+        body['device_id'] = parsed_args.device_id
     if parsed_args.device_owner:
-        body['port'].update({'device_owner': parsed_args.device_owner})
+        body['device_owner'] = parsed_args.device_owner
     if parsed_args.name:
-        body['port'].update({'name': parsed_args.name})
+        body['name'] = parsed_args.name
     ips = []
     if parsed_args.fixed_ip:
         for ip_spec in parsed_args.fixed_ip:
@@ -85,7 +85,7 @@ def _updatable_args2body(parsed_args, body, client):
                 ip_dict['subnet_id'] = _subnet_id
             ips.append(ip_dict)
     if ips:
-        body['port'].update({'fixed_ips': ips})
+        body['fixed_ips'] = ips
 
 
 class ListPort(neutronV20.ListCommand):
@@ -190,7 +190,7 @@ class UpdateExtraDhcpOptMixin(object):
                     raise exceptions.CommandError(edo_err_msg)
 
         if ops:
-            port.update({'extra_dhcp_opts': ops})
+            port['extra_dhcp_opts'] = ops
 
 
 class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
@@ -241,24 +241,24 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
         client = self.get_client()
         _network_id = neutronV20.find_resourceid_by_name_or_id(
             client, 'network', parsed_args.network_id)
-        body = {'port': {'admin_state_up': parsed_args.admin_state,
-                         'network_id': _network_id, }, }
+        body = {'admin_state_up': parsed_args.admin_state,
+                'network_id': _network_id, }
         _updatable_args2body(parsed_args, body, client)
         if parsed_args.mac_address:
-            body['port'].update({'mac_address': parsed_args.mac_address})
+            body['mac_address'] = parsed_args.mac_address
         if parsed_args.tenant_id:
-            body['port'].update({'tenant_id': parsed_args.tenant_id})
+            body['tenant_id'] = parsed_args.tenant_id
         if parsed_args.vnic_type:
-            body['port'].update({'binding:vnic_type': parsed_args.vnic_type})
+            body['binding:vnic_type'] = parsed_args.vnic_type
         if parsed_args.binding_profile:
-            body['port'].update({'binding:profile':
-                                 jsonutils.loads(parsed_args.binding_profile)})
+            body['binding:profile'] = jsonutils.loads(
+                parsed_args.binding_profile)
 
-        self.args2body_secgroup(parsed_args, body['port'])
-        self.args2body_extradhcpopt(parsed_args, body['port'])
-        self.args2body_qos_policy(parsed_args, body['port'])
+        self.args2body_secgroup(parsed_args, body)
+        self.args2body_extradhcpopt(parsed_args, body)
+        self.args2body_qos_policy(parsed_args, body)
 
-        return body
+        return {'port': body}
 
 
 class DeletePort(neutronV20.DeleteCommand):
@@ -288,15 +288,14 @@ class UpdatePort(neutronV20.UpdateCommand, UpdatePortSecGroupMixin,
         self.add_arguments_qos_policy(parser)
 
     def args2body(self, parsed_args):
-        body = {'port': {}}
+        body = {}
         client = self.get_client()
         _updatable_args2body(parsed_args, body, client)
         if parsed_args.admin_state_up:
-            body['port'].update({'admin_state_up':
-                                parsed_args.admin_state_up})
+            body['admin_state_up'] = parsed_args.admin_state_up
 
-        self.args2body_secgroup(parsed_args, body['port'])
-        self.args2body_extradhcpopt(parsed_args, body['port'])
-        self.args2body_qos_policy(parsed_args, body['port'])
+        self.args2body_secgroup(parsed_args, body)
+        self.args2body_extradhcpopt(parsed_args, body)
+        self.args2body_qos_policy(parsed_args, body)
 
-        return body
+        return {'port': body}

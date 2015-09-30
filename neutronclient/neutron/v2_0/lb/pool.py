@@ -82,16 +82,12 @@ class CreatePool(neutronV20.CreateCommand):
     def args2body(self, parsed_args):
         _subnet_id = neutronV20.find_resourceid_by_name_or_id(
             self.get_client(), 'subnet', parsed_args.subnet_id)
-        body = {
-            self.resource: {
-                'admin_state_up': parsed_args.admin_state,
-                'subnet_id': _subnet_id,
-            },
-        }
-        neutronV20.update_dict(parsed_args, body[self.resource],
+        body = {'admin_state_up': parsed_args.admin_state,
+                'subnet_id': _subnet_id}
+        neutronV20.update_dict(parsed_args, body,
                                ['description', 'lb_method', 'name',
                                 'protocol', 'tenant_id', 'provider'])
-        return body
+        return {self.resource: body}
 
 
 class UpdatePool(neutronV20.UpdateCommand):

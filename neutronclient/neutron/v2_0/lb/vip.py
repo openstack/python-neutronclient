@@ -81,18 +81,14 @@ class CreateVip(neutronV20.CreateCommand):
         _subnet_id = neutronV20.find_resourceid_by_name_or_id(
             self.get_client(), 'subnet', parsed_args.subnet_id)
 
-        body = {
-            self.resource: {
-                'pool_id': _pool_id,
+        body = {'pool_id': _pool_id,
                 'admin_state_up': parsed_args.admin_state,
-                'subnet_id': _subnet_id,
-            },
-        }
-        neutronV20.update_dict(parsed_args, body[self.resource],
+                'subnet_id': _subnet_id}
+        neutronV20.update_dict(parsed_args, body,
                                ['address', 'connection_limit', 'description',
                                 'name', 'protocol_port', 'protocol',
                                 'tenant_id'])
-        return body
+        return {self.resource: body}
 
 
 class UpdateVip(neutronV20.UpdateCommand):

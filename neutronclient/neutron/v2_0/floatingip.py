@@ -68,18 +68,16 @@ class CreateFloatingIP(neutronV20.CreateCommand):
     def args2body(self, parsed_args):
         _network_id = neutronV20.find_resourceid_by_name_or_id(
             self.get_client(), 'network', parsed_args.floating_network_id)
-        body = {self.resource: {'floating_network_id': _network_id}}
+        body = {'floating_network_id': _network_id}
         if parsed_args.port_id:
-            body[self.resource].update({'port_id': parsed_args.port_id})
+            body['port_id'] = parsed_args.port_id
         if parsed_args.tenant_id:
-            body[self.resource].update({'tenant_id': parsed_args.tenant_id})
+            body['tenant_id'] = parsed_args.tenant_id
         if parsed_args.fixed_ip_address:
-            body[self.resource].update({'fixed_ip_address':
-                                        parsed_args.fixed_ip_address})
+            body['fixed_ip_address'] = parsed_args.fixed_ip_address
         if parsed_args.floating_ip_address:
-            body[self.resource].update({'floating_ip_address':
-                                        parsed_args.floating_ip_address})
-        return body
+            body['floating_ip_address'] = parsed_args.floating_ip_address
+        return {self.resource: body}
 
 
 class DeleteFloatingIP(neutronV20.DeleteCommand):

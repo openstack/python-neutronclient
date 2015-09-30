@@ -67,26 +67,20 @@ class CreateNetworkProfile(neutronV20.CreateCommand):
                                    "You can repeat this option."))
 
     def args2body(self, parsed_args):
-        body = {'network_profile': {'name': parsed_args.name}}
+        body = {'name': parsed_args.name}
         if parsed_args.segment_type:
-            body['network_profile'].update({'segment_type':
-                                           parsed_args.segment_type})
+            body['segment_type'] = parsed_args.segment_type
         if parsed_args.sub_type:
-            body['network_profile'].update({'sub_type':
-                                           parsed_args.sub_type})
+            body['sub_type'] = parsed_args.sub_type
         if parsed_args.segment_range:
-            body['network_profile'].update({'segment_range':
-                                           parsed_args.segment_range})
+            body['segment_range'] = parsed_args.segment_range
         if parsed_args.physical_network:
-            body['network_profile'].update({'physical_network':
-                                           parsed_args.physical_network})
+            body['physical_network'] = parsed_args.physical_network
         if parsed_args.multicast_ip_range:
-            body['network_profile'].update({'multicast_ip_range':
-                                           parsed_args.multicast_ip_range})
+            body['multicast_ip_range'] = parsed_args.multicast_ip_range
         if parsed_args.add_tenants:
-            body['network_profile'].update({'add_tenants':
-                                           parsed_args.add_tenants})
-        return body
+            body['add_tenants'] = parsed_args.add_tenants
+        return {'network_profile': body}
 
 
 class DeleteNetworkProfile(neutronV20.DeleteCommand):
@@ -112,13 +106,12 @@ class UpdateNetworkProfile(neutronV20.UpdateCommand):
                                    "You can repeat this option."))
 
     def args2body(self, parsed_args):
-        body = {'network_profile': {}}
+        body = {}
         if parsed_args.remove_tenants:
-            body['network_profile']['remove_tenants'] = (parsed_args.
-                                                         remove_tenants)
+            body['remove_tenants'] = parsed_args.remove_tenants
         if parsed_args.add_tenants:
-            body['network_profile']['add_tenants'] = parsed_args.add_tenants
-        return body
+            body['add_tenants'] = parsed_args.add_tenants
+        return {'network_profile': body}
 
 
 # Aaron: This function is deprecated

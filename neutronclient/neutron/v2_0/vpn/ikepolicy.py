@@ -78,23 +78,23 @@ class CreateIKEPolicy(neutronv20.CreateCommand):
 
     def args2body(self, parsed_args):
 
-        body = {'ikepolicy': {
+        body = {
             'auth_algorithm': parsed_args.auth_algorithm,
             'encryption_algorithm': parsed_args.encryption_algorithm,
             'phase1_negotiation_mode': parsed_args.phase1_negotiation_mode,
             'ike_version': parsed_args.ike_version,
             'pfs': parsed_args.pfs,
-        }, }
+        }
         if parsed_args.name:
-            body['ikepolicy'].update({'name': parsed_args.name})
+            body['name'] = parsed_args.name
         if parsed_args.description:
-            body['ikepolicy'].update({'description': parsed_args.description})
+            body['description'] = parsed_args.description
         if parsed_args.tenant_id:
-            body['ikepolicy'].update({'tenant_id': parsed_args.tenant_id})
+            body['tenant_id'] = parsed_args.tenant_id
         if parsed_args.lifetime:
             vpn_utils.validate_lifetime_dict(parsed_args.lifetime)
-            body['ikepolicy'].update({'lifetime': parsed_args.lifetime})
-        return body
+            body['lifetime'] = parsed_args.lifetime
+        return {'ikepolicy': body}
 
 
 class UpdateIKEPolicy(neutronv20.UpdateCommand):
@@ -111,12 +111,11 @@ class UpdateIKEPolicy(neutronv20.UpdateCommand):
 
     def args2body(self, parsed_args):
 
-        body = {'ikepolicy': {
-        }, }
+        body = {}
         if parsed_args.lifetime:
             vpn_utils.validate_lifetime_dict(parsed_args.lifetime)
-            body['ikepolicy'].update({'lifetime': parsed_args.lifetime})
-        return body
+            body['lifetime'] = parsed_args.lifetime
+        return {'ikepolicy': body}
 
 
 class DeleteIKEPolicy(neutronv20.DeleteCommand):
