@@ -149,7 +149,6 @@ class FirewallPolicyInsertRule(neutronv20.UpdateCommand):
         body = {'firewall_rule_id': _rule,
                 'insert_before': _insert_before,
                 'insert_after': _insert_after}
-        neutronv20.update_dict(parsed_args, body, [])
         return body
 
     def get_parser(self, prog_name):
@@ -197,7 +196,6 @@ class FirewallPolicyRemoveRule(neutronv20.UpdateCommand):
                 self.get_client(), 'firewall_rule',
                 parsed_args.firewall_rule_id)
         body = {'firewall_rule_id': _rule}
-        neutronv20.update_dict(parsed_args, body, [])
         return body
 
     def get_parser(self, prog_name):

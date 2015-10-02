@@ -68,12 +68,8 @@ def _add_updatable_args(parser):
 
 
 def _updatable_args2body(parsed_args, body, client):
-    if parsed_args.device_id:
-        body['device_id'] = parsed_args.device_id
-    if parsed_args.device_owner:
-        body['device_owner'] = parsed_args.device_owner
-    if parsed_args.name:
-        body['name'] = parsed_args.name
+    neutronV20.update_dict(parsed_args, body,
+                           ['device_id', 'device_owner', 'name'])
     ips = []
     if parsed_args.fixed_ip:
         for ip_spec in parsed_args.fixed_ip:
@@ -272,10 +268,8 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
         body = {'admin_state_up': parsed_args.admin_state,
                 'network_id': _network_id, }
         _updatable_args2body(parsed_args, body, client)
-        if parsed_args.mac_address:
-            body['mac_address'] = parsed_args.mac_address
-        if parsed_args.tenant_id:
-            body['tenant_id'] = parsed_args.tenant_id
+        neutronV20.update_dict(parsed_args, body,
+                               ['mac_address', 'tenant_id'])
         if parsed_args.vnic_type:
             body['binding:vnic_type'] = parsed_args.vnic_type
         if parsed_args.binding_profile:

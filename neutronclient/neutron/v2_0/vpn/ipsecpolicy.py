@@ -77,19 +77,11 @@ class CreateIPsecPolicy(neutronv20.CreateCommand):
 
     def args2body(self, parsed_args):
 
-        body = {
-            'auth_algorithm': parsed_args.auth_algorithm,
-            'encryption_algorithm': parsed_args.encryption_algorithm,
-            'encapsulation_mode': parsed_args.encapsulation_mode,
-            'transform_protocol': parsed_args.transform_protocol,
-            'pfs': parsed_args.pfs,
-        }
-        if parsed_args.name:
-            body['name'] = parsed_args.name
-        if parsed_args.description:
-            body['description'] = parsed_args.description
-        if parsed_args.tenant_id:
-            body['tenant_id'] = parsed_args.tenant_id
+        body = {}
+        neutronv20.update_dict(parsed_args, body,
+                               ['auth_algorithm', 'encryption_algorithm',
+                                'encapsulation_mode', 'transform_protocol',
+                                'pfs', 'name', 'description', 'tenant_id'])
         if parsed_args.lifetime:
             vpn_utils.validate_lifetime_dict(parsed_args.lifetime)
             body['lifetime'] = parsed_args.lifetime
