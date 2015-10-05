@@ -50,6 +50,4 @@ class SimpleReadOnlyNeutronVpnClientTest(base.ClientTestBase):
                                          ('ipsec-site-connection-list'))
         self.assertTableStruct(ipsec_site, ['id', 'name',
                                             'peer_address',
-                                            'peer_cidrs',
-                                            'route_mode',
                                             'auth_mode', 'status'])

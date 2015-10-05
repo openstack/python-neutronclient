@@ -73,6 +73,27 @@ class CLITestV20VpnServiceJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, None, my_id, args,
                                    position_names, position_values)
 
+    def test_create_vpnservice_without_subnet(self):
+        """vpn-service-create with no subnet provided."""
+        resource = 'vpnservice'
+        cmd = vpnservice.CreateVPNService(test_cli20.MyApp(sys.stdout), None)
+        router = 'myrouter-id'
+        tenant_id = 'mytenant-id'
+        my_id = 'my-id'
+        admin_state = True
+
+        args = [router,
+                '--tenant-id', tenant_id]
+
+        position_names = ['admin_state_up',
+                          'subnet_id', 'router_id',
+                          'tenant_id']
+
+        position_values = [admin_state, None, router, tenant_id]
+
+        self._test_create_resource(resource, cmd, None, my_id, args,
+                                   position_names, position_values)
+
     def test_list_vpnservice(self):
         """vpn-service-list."""
         resources = "vpnservices"
@@ -131,7 +152,3 @@ class CLITestV20VpnServiceJSON(test_cli20.CLITestV20Base):
         my_id = 'my-id'
         args = [my_id]
         self._test_delete_resource(resource, cmd, my_id, args)
-
-
-class CLITestV20VpnServiceXML(CLITestV20VpnServiceJSON):
-    format = 'xml'

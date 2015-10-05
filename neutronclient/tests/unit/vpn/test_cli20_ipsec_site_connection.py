@@ -23,8 +23,9 @@ from neutronclient.tests.unit import test_cli20
 
 class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
 
-    def test_create_ipsec_site_connection_all_params(self):
-        """ipsecsite-connection-create all params."""
+    # TODO(pcm): Remove, once peer-cidr is deprecated completely
+    def test_create_ipsec_site_connection_all_params_using_peer_cidrs(self):
+        """ipsecsite-connection-create all params using peer CIDRs."""
         resource = 'ipsec_site_connection'
         cmd = ipsec_site_connection.CreateIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
@@ -78,6 +79,63 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values,
                                    extra_body=extra_body)
 
+    def test_create_ipsec_site_conn_all_params(self):
+        """ipsecsite-connection-create all params using endpoint groups."""
+        resource = 'ipsec_site_connection'
+        cmd = ipsec_site_connection.CreateIPsecSiteConnection(
+            test_cli20.MyApp(sys.stdout), None
+        )
+        tenant_id = 'mytenant_id'
+        name = 'connection1'
+        my_id = 'my_id'
+        peer_address = '192.168.2.10'
+        peer_id = '192.168.2.10'
+        psk = 'abcd'
+        mtu = '1500'
+        initiator = 'bi-directional'
+        vpnservice_id = 'vpnservice_id'
+        ikepolicy_id = 'ikepolicy_id'
+        ipsecpolicy_id = 'ipsecpolicy_id'
+        local_ep_group = 'local-epg'
+        peer_ep_group = 'peer-epg'
+        admin_state = True
+        description = 'my-vpn-connection'
+        dpd = 'action=restart,interval=30,timeout=120'
+
+        args = ['--tenant-id', tenant_id,
+                '--peer-address', peer_address, '--peer-id', peer_id,
+                '--psk', psk, '--initiator', initiator,
+                '--vpnservice-id', vpnservice_id,
+                '--ikepolicy-id', ikepolicy_id, '--name', name,
+                '--ipsecpolicy-id', ipsecpolicy_id, '--mtu', mtu,
+                '--description', description,
+                '--local-ep-group', local_ep_group,
+                '--peer-ep-group', peer_ep_group,
+                '--dpd', dpd]
+
+        position_names = ['name', 'tenant_id', 'admin_state_up',
+                          'peer_address', 'peer_id', 'psk', 'mtu',
+                          'local_ep_group_id', 'peer_ep_group_id',
+                          'initiator', 'description',
+                          'vpnservice_id', 'ikepolicy_id',
+                          'ipsecpolicy_id']
+
+        position_values = [name, tenant_id, admin_state, peer_address,
+                           peer_id, psk, mtu, local_ep_group,
+                           peer_ep_group, initiator, description,
+                           vpnservice_id, ikepolicy_id, ipsecpolicy_id]
+        extra_body = {
+            'dpd': {
+                'action': 'restart',
+                'interval': 30,
+                'timeout': 120,
+            },
+        }
+
+        self._test_create_resource(resource, cmd, name, my_id, args,
+                                   position_names, position_values,
+                                   extra_body=extra_body)
+
     def test_create_ipsec_site_connection_with_limited_params(self):
         """ipsecsite-connection-create with limited params."""
         resource = 'ipsec_site_connection'
@@ -94,7 +152,8 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
         vpnservice_id = 'vpnservice_id'
         ikepolicy_id = 'ikepolicy_id'
         ipsecpolicy_id = 'ipsecpolicy_id'
-        peer_cidrs = ['192.168.3.0/24', '192.168.2.0/24']
+        local_ep_group = 'local-epg'
+        peer_ep_group = 'peer-epg'
         admin_state = True
 
         args = ['--tenant-id', tenant_id,
@@ -104,31 +163,30 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
                 '--vpnservice-id', vpnservice_id,
                 '--ikepolicy-id', ikepolicy_id,
                 '--ipsecpolicy-id', ipsecpolicy_id,
-                '--peer-cidr', '192.168.3.0/24',
-                '--peer-cidr', '192.168.2.0/24']
+                '--local-ep-group', local_ep_group,
+                '--peer-ep-group', peer_ep_group]
 
         position_names = ['tenant_id', 'admin_state_up',
-                          'peer_address', 'peer_id', 'peer_cidrs',
+                          'peer_address', 'peer_id',
+                          'local_ep_group_id', 'peer_ep_group_id',
                           'psk', 'mtu', 'initiator',
                           'vpnservice_id', 'ikepolicy_id',
                           'ipsecpolicy_id']
 
-        position_values = [tenant_id, admin_state, peer_address,
-                           peer_id, peer_cidrs, psk, mtu,
-                           initiator,
+        position_values = [tenant_id, admin_state, peer_address, peer_id,
+                           local_ep_group, peer_ep_group, psk, mtu, initiator,
                            vpnservice_id, ikepolicy_id, ipsecpolicy_id]
 
         self._test_create_resource(resource, cmd, None, my_id, args,
                                    position_names, position_values)
 
-    def _test_dpd_values(self, dpd):
-        """ipsecsite-connection-create with invalid dpd values."""
+    def _test_create_failure(self, additional_args=None):
+        """Helper to test failure of IPSec site-to-site creation failure."""
         resource = 'ipsec_site_connection'
         cmd = ipsec_site_connection.CreateIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
         )
         tenant_id = 'mytenant_id'
-        name = 'connection1'
         my_id = 'my_id'
         peer_address = '192.168.2.10'
         peer_id = '192.168.2.10'
@@ -138,91 +196,61 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
         vpnservice_id = 'vpnservice_id'
         ikepolicy_id = 'ikepolicy_id'
         ipsecpolicy_id = 'ipsecpolicy_id'
-        peer_cidrs = ['192.168.3.0/24', '192.168.2.0/24']
         admin_state = True
-        description = 'my-vpn-connection'
 
         args = ['--tenant-id', tenant_id,
-                '--peer-address', peer_address, '--peer-id', peer_id,
-                '--psk', psk, '--initiator', initiator,
+                '--peer-address', peer_address,
+                '--peer-id', peer_id,
+                '--psk', psk,
                 '--vpnservice-id', vpnservice_id,
-                '--ikepolicy-id', ikepolicy_id, '--name', name,
-                '--ipsecpolicy-id', ipsecpolicy_id, '--mtu', mtu,
-                '--description', description,
-                '--peer-cidr', '192.168.3.0/24',
-                '--peer-cidr', '192.168.2.0/24',
-                '--dpd', dpd]
+                '--ikepolicy-id', ikepolicy_id,
+                '--ipsecpolicy-id', ipsecpolicy_id]
+        if additional_args is not None:
+            args += additional_args
+        position_names = ['tenant_id', 'admin_state_up', 'peer_address',
+                          'peer_id', 'psk', 'mtu', 'initiator',
+                          'local_ep_group_id', 'peer_ep_group_id',
+                          'vpnservice_id', 'ikepolicy_id', 'ipsecpolicy_id']
 
-        position_names = ['name', 'tenant_id', 'admin_state_up',
-                          'peer_address', 'peer_id', 'peer_cidrs',
-                          'psk', 'mtu', 'initiator', 'description',
-                          'vpnservice_id', 'ikepolicy_id',
-                          'ipsecpolicy_id']
+        position_values = [tenant_id, admin_state, peer_address, peer_id, psk,
+                           mtu, initiator, None, None, vpnservice_id,
+                           ikepolicy_id, ipsecpolicy_id]
+        self.assertRaises(exceptions.CommandError,
+                          self._test_create_resource,
+                          resource, cmd, None, my_id, args,
+                          position_names, position_values)
 
-        position_values = [name, tenant_id, admin_state, peer_address,
-                           peer_id, peer_cidrs, psk, mtu,
-                           initiator, description,
-                           vpnservice_id, ikepolicy_id, ipsecpolicy_id]
-        self.assertRaises(
-            exceptions.CommandError,
-            self._test_create_resource,
-            resource, cmd, name, my_id, args,
-            position_names, position_values)
-
-    def test_invalid_mtu(self):
+    def test_fail_create_with_invalid_mtu(self):
         """ipsecsite-connection-create with invalid dpd values."""
-        resource = 'ipsec_site_connection'
-        cmd = ipsec_site_connection.CreateIPsecSiteConnection(
-            test_cli20.MyApp(sys.stdout), None
-        )
-        tenant_id = 'mytenant_id'
-        name = 'connection1'
-        my_id = 'my_id'
-        peer_address = '192.168.2.10'
-        peer_id = '192.168.2.10'
-        psk = 'abcd'
-        mtu = '67'
-        initiator = 'bi-directional'
-        vpnservice_id = 'vpnservice_id'
-        ikepolicy_id = 'ikepolicy_id'
-        ipsecpolicy_id = 'ipsecpolicy_id'
-        peer_cidrs = ['192.168.3.0/24', '192.168.2.0/24']
-        admin_state = True
-        description = 'my-vpn-connection'
+        bad_mtu = ['--mtu', '67']
+        self._test_create_failure(bad_mtu)
 
-        args = ['--tenant-id', tenant_id,
-                '--peer-address', peer_address, '--peer-id', peer_id,
-                '--psk', psk, '--initiator', initiator,
-                '--vpnservice-id', vpnservice_id,
-                '--ikepolicy-id', ikepolicy_id, '--name', name,
-                '--ipsecpolicy-id', ipsecpolicy_id, '--mtu', mtu,
-                '--description', description,
-                '--peer-cidr', '192.168.3.0/24',
-                '--peer-cidr', '192.168.2.0/24']
+    def test_fail_create_with_invalid_dpd_keys(self):
+        bad_dpd_key = ['--dpd', 'act=restart,interval=30,time=120']
+        self._test_create_failure(bad_dpd_key)
 
-        position_names = ['name', 'tenant_id', 'admin_state_up',
-                          'peer_address', 'peer_id', 'peer_cidrs',
-                          'psk', 'mtu', 'initiator', 'description',
-                          'vpnservice_id', 'ikepolicy_id',
-                          'ipsecpolicy_id']
+    def test_fail_create_with_invalid_dpd_values(self):
+        bad_dpd_values = ['--dpd', 'action=hold,interval=30,timeout=-1']
+        self._test_create_failure(bad_dpd_values)
 
-        position_values = [name, tenant_id, admin_state, peer_address,
-                           peer_id, peer_cidrs, psk, mtu,
-                           initiator, description,
-                           vpnservice_id, ikepolicy_id, ipsecpolicy_id]
-        self.assertRaises(
-            exceptions.CommandError,
-            self._test_create_resource,
-            resource, cmd, name, my_id, args,
-            position_names, position_values)
+    def test_fail_create_missing_endpoint_groups_or_cidr(self):
+        """Must provide either endpoint groups or peer cidrs."""
+        self._test_create_failure()
 
-    def test_create_ipsec_site_connection_with_invalid_dpd_keys(self):
-        dpd = 'act=restart,interval=30,time=120'
-        self._test_dpd_values(dpd)
+    def test_fail_create_missing_peer_endpoint_group(self):
+        """Fails if dont have both endpoint groups - missing peer."""
+        self._test_create_failure(['--local-ep-group', 'local-epg'])
 
-    def test_create_ipsec_site_connection_with_invalid_dpd_values(self):
-        dpd = 'action=hold,interval=30,timeout=-1'
-        self._test_dpd_values(dpd)
+    def test_fail_create_missing_local_endpoint_group(self):
+        """Fails if dont have both endpoint groups - missing local."""
+        self._test_create_failure(['--peer-ep-group', 'peer-epg'])
+
+    def test_fail_create_when_both_endpoints_and_peer_cidr(self):
+        """Cannot intermix endpoint groups and peer CIDRs for create."""
+        additional_args = ['--local-ep-group', 'local-epg',
+                           '--peer-ep-group', 'peer-epg',
+                           '--peer-cidr', '10.2.0.0/24']
+        self._test_create_failure(additional_args)
 
     def test_list_ipsec_site_connection(self):
         """ipsecsite-connection-list."""
@@ -300,7 +328,3 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id,
                                  args, ['id', 'name'])
-
-
-class CLITestV20IPsecSiteConnectionXML(CLITestV20IPsecSiteConnectionJSON):
-    format = 'xml'
