@@ -612,7 +612,7 @@ class ClientV2TestJson(CLITestV20Base):
         self.mox.UnsetStubs()
 
         # test response with unicode
-        self.assertEqual(res_body, body)
+        self.assertEqual(body, res_body)
 
     def test_do_request_error_without_response_body(self):
         self.client.format = self.format
@@ -765,10 +765,10 @@ class CLITestV20ExceptionHandler(CLITestV20Base):
 
     def test_exception_status(self):
         e = exceptions.BadRequest()
-        self.assertEqual(e.status_code, 400)
+        self.assertEqual(400, e.status_code)
 
         e = exceptions.BadRequest(status_code=499)
-        self.assertEqual(e.status_code, 499)
+        self.assertEqual(499, e.status_code)
 
         # SslCertificateValidationError has no explicit status_code,
         # but should have a 'safe' defined fallback.
@@ -776,7 +776,7 @@ class CLITestV20ExceptionHandler(CLITestV20Base):
         self.assertIsNotNone(e.status_code)
 
         e = exceptions.SslCertificateValidationError(status_code=599)
-        self.assertEqual(e.status_code, 599)
+        self.assertEqual(599, e.status_code)
 
     def test_connection_failed(self):
         self.mox.StubOutWithMock(self.client.httpclient, 'request')

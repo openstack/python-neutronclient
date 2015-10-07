@@ -140,7 +140,7 @@ class CLITestAuthNoAuth(testtools.TestCase):
         self.requests.get(ENDPOINT_URL + '/resource')
         self.client.do_request('/resource', 'GET')
         self.assertEqual(url, self.requests.last_request.url)
-        self.assertEqual(self.client.endpoint_url, ENDPOINT_URL)
+        self.assertEqual(ENDPOINT_URL, self.client.endpoint_url)
 
 
 class CLITestAuthKeystone(testtools.TestCase):
@@ -177,7 +177,7 @@ class CLITestAuthKeystone(testtools.TestCase):
                     'auth_tenant_id': None,
                     'auth_user_id': None,
                     'endpoint_url': self.client.endpoint_url}
-        self.assertEqual(client_.get_auth_info(), expected)
+        self.assertEqual(expected, client_.get_auth_info())
 
     def test_get_token(self):
         auth_session, auth_plugin = setup_keystone_v2(self.requests)
@@ -264,7 +264,7 @@ class CLITestAuthKeystone(testtools.TestCase):
             username=USERNAME, tenant_name=TENANT_NAME, password=PASSWORD,
             auth_url=AUTH_URL, region_name=REGION,
             endpoint_url=ENDPOINT_OVERRIDE)
-        self.assertEqual(self.client.endpoint_url, ENDPOINT_OVERRIDE)
+        self.assertEqual(ENDPOINT_OVERRIDE, self.client.endpoint_url)
 
         token_id = uuid.uuid4().hex
         self.client.auth_token = token_id
@@ -273,7 +273,7 @@ class CLITestAuthKeystone(testtools.TestCase):
 
         self.client.do_request('/resource', 'GET')
 
-        self.assertEqual(self.client.endpoint_url, ENDPOINT_OVERRIDE)
+        self.assertEqual(ENDPOINT_OVERRIDE, self.client.endpoint_url)
         self.assertEqual(token_id,
                          self.requests.last_request.headers['X-Auth-Token'])
 
@@ -316,7 +316,7 @@ class CLITestAuthKeystone(testtools.TestCase):
             auth_url=AUTH_URL, region_name=REGION,
             session=auth_session, auth=auth_plugin)
 
-        self.assertEqual(self.client.endpoint_url, PUBLIC_ENDPOINT_URL)
+        self.assertEqual(PUBLIC_ENDPOINT_URL, self.client.endpoint_url)
 
         # Test admin url
         self.client = client.construct_http_client(
@@ -324,7 +324,7 @@ class CLITestAuthKeystone(testtools.TestCase):
             auth_url=AUTH_URL, region_name=REGION, endpoint_type='adminURL',
             session=auth_session, auth=auth_plugin)
 
-        self.assertEqual(self.client.endpoint_url, ADMIN_ENDPOINT_URL)
+        self.assertEqual(ADMIN_ENDPOINT_URL, self.client.endpoint_url)
 
         # Test public url
         self.client = client.construct_http_client(
@@ -332,7 +332,7 @@ class CLITestAuthKeystone(testtools.TestCase):
             auth_url=AUTH_URL, region_name=REGION, endpoint_type='publicURL',
             session=auth_session, auth=auth_plugin)
 
-        self.assertEqual(self.client.endpoint_url, PUBLIC_ENDPOINT_URL)
+        self.assertEqual(PUBLIC_ENDPOINT_URL, self.client.endpoint_url)
 
         # Test internal url
         self.client = client.construct_http_client(
@@ -340,7 +340,7 @@ class CLITestAuthKeystone(testtools.TestCase):
             auth_url=AUTH_URL, region_name=REGION, endpoint_type='internalURL',
             session=auth_session, auth=auth_plugin)
 
-        self.assertEqual(self.client.endpoint_url, INTERNAL_ENDPOINT_URL)
+        self.assertEqual(INTERNAL_ENDPOINT_URL, self.client.endpoint_url)
 
         # Test url that isn't found in the service catalog
         self.client = client.construct_http_client(

@@ -281,11 +281,11 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _result = [x for x in result[1]]
-        self.assertEqual(len(_result), len(expected))
+        self.assertEqual(len(expected), len(_result))
         for res, exp in zip(_result, expected):
-            self.assertEqual(len(res), len(exp))
-            for a, b in zip(res, exp):
-                self.assertEqual(a, b)
+            self.assertEqual(len(exp), len(res))
+            for obsrvd, expctd in zip(res, exp):
+                self.assertEqual(expctd, obsrvd)
 
     def test_list_nets_extend_subnets(self):
         data = [{'id': 'netid1', 'name': 'net1', 'subnets': ['mysubid1']},

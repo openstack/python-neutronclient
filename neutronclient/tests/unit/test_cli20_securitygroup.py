@@ -384,7 +384,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         self.assertEqual(expected['cols'], result[0])
         # Check data
         _result = [x for x in result[1]]
-        self.assertEqual(len(_result), len(expected['data']))
+        self.assertEqual(len(expected['data']), len(_result))
         for res, exp in zip(_result, expected['data']):
             self.assertEqual(len(exp), len(res))
             self.assertEqual(exp, res)

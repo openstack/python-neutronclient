@@ -77,7 +77,7 @@ class ShellTest(testtools.TestCase):
             _shell.run(argstr.split())
         except SystemExit:
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            self.assertEqual(exc_value.code, 0)
+            self.assertEqual(0, exc_value.code)
         finally:
             stdout = sys.stdout.getvalue()
             stderr = sys.stderr.getvalue()
@@ -444,7 +444,7 @@ class ShellTest(testtools.TestCase):
     def test_build_option_parser(self):
         neutron_shell = openstack_shell.NeutronShell('2.0')
         result = neutron_shell.build_option_parser('descr', '2.0')
-        self.assertEqual(True, isinstance(result, argparse.ArgumentParser))
+        self.assertIsInstance(result, argparse.ArgumentParser)
 
     def test_main_with_unicode(self):
         self.mox.StubOutClassWithMocks(openstack_shell, 'NeutronShell')
@@ -457,7 +457,7 @@ class ShellTest(testtools.TestCase):
         ret = openstack_shell.main(argv=argv)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
-        self.assertEqual(ret, 0)
+        self.assertEqual(0, ret)
 
     def test_endpoint_option(self):
         shell = openstack_shell.NeutronShell('2.0')

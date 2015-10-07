@@ -32,7 +32,7 @@ class TestCommandMeta(testtools.TestCase):
 
         self.assertTrue(helpers.safe_hasattr(FakeCommand, 'log'))
         self.assertIsInstance(FakeCommand.log, logging.getLoggerClass())
-        self.assertEqual(FakeCommand.log.name, __name__ + ".FakeCommand")
+        self.assertEqual(__name__ + ".FakeCommand", FakeCommand.log.name)
 
     def test_neutron_command_log_defined_explicitly(self):
         class FakeCommand(neutronV20.NeutronCommand):
