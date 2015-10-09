@@ -1742,14 +1742,14 @@ class Client(ClientBase):
         super(Client, self).__init__(**kwargs)
         self._register_extensions(self.version)
 
-    def extend_show(self, resource_plural, path, parent_resource):
+    def extend_show(self, resource_singular, path, parent_resource):
         def _fx(obj, **_params):
             return self.show_ext(path, obj, **_params)
 
         def _parent_fx(parent_id, obj, **_params):
             return self.show_ext(path % parent_id, obj, **_params)
         fn = _fx if not parent_resource else _parent_fx
-        setattr(self, "show_%s" % resource_plural, fn)
+        setattr(self, "show_%s" % resource_singular, fn)
 
     def extend_list(self, resource_plural, path, parent_resource):
         def _fx(**_params):
