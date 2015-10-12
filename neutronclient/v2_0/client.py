@@ -1746,7 +1746,7 @@ class Client(ClientBase):
         def _fx(obj, **_params):
             return self.show_ext(path, obj, **_params)
 
-        def _parent_fx(parent_id, obj, **_params):
+        def _parent_fx(obj, parent_id, **_params):
             return self.show_ext(path % parent_id, obj, **_params)
         fn = _fx if not parent_resource else _parent_fx
         setattr(self, "show_%s" % resource_plural, fn)
@@ -1773,7 +1773,7 @@ class Client(ClientBase):
         def _fx(obj):
             return self.delete_ext(path, obj)
 
-        def _parent_fx(parent_id, obj):
+        def _parent_fx(obj, parent_id):
             return self.delete_ext(path % parent_id, obj)
         fn = _fx if not parent_resource else _parent_fx
         setattr(self, "delete_%s" % resource_singular, fn)
@@ -1782,7 +1782,7 @@ class Client(ClientBase):
         def _fx(obj, body=None):
             return self.update_ext(path, obj, body)
 
-        def _parent_fx(parent_id, obj, body=None):
+        def _parent_fx(obj, parent_id, body=None):
             return self.update_ext(path % parent_id, obj, body)
         fn = _fx if not parent_resource else _parent_fx
         setattr(self, "update_%s" % resource_singular, fn)
