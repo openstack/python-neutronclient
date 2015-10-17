@@ -21,8 +21,8 @@ except ImportError:
 import logging
 import os
 
-from keystoneclient import access
-from keystoneclient import adapter
+from keystoneauth1 import access
+from keystoneauth1 import adapter
 import requests
 
 from neutronclient.common import exceptions
@@ -179,7 +179,7 @@ class HTTPClient(object):
 
     def _extract_service_catalog(self, body):
         """Set the client's service catalog from the response data."""
-        self.auth_ref = access.AccessInfo.factory(body=body)
+        self.auth_ref = access.create(body=body)
         self.service_catalog = self.auth_ref.service_catalog
         self.auth_token = self.auth_ref.auth_token
         self.auth_tenant_id = self.auth_ref.tenant_id
@@ -187,9 +187,9 @@ class HTTPClient(object):
 
         if not self.endpoint_url:
             self.endpoint_url = self.service_catalog.url_for(
-                attr='region', filter_value=self.region_name,
+                region_name=self.region_name,
                 service_type=self.service_type,
-                endpoint_type=self.endpoint_type)
+                interface=self.endpoint_type)
 
     def _authenticate_keystone(self):
         if self.user_id:
@@ -355,7 +355,7 @@ def construct_http_client(username=None,
                           timeout=None,
                           endpoint_url=None,
                           insecure=False,
-                          endpoint_type='publicURL',
+                          endpoint_type='public',
                           log_credentials=None,
                           auth_strategy='keystone',
                           ca_cert=None,

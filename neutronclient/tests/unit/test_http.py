@@ -21,7 +21,6 @@ import testtools
 
 from neutronclient import client
 from neutronclient.common import exceptions
-from neutronclient.tests.unit import test_auth
 
 
 AUTH_TOKEN = 'test_token'
@@ -72,14 +71,6 @@ class TestHTTPClientMixin(object):
         headers = {'Accept': 'application/xml',
                    'Content-Type': 'application/xml'}
         self._test_headers(headers, body=BODY, headers=headers)
-
-
-class TestSessionClient(TestHTTPClientMixin, testtools.TestCase):
-
-    def initialize(self):
-        session, auth = test_auth.setup_keystone_v2(self.requests)
-        return [client.SessionClient,
-                client.SessionClient(session=session, auth=auth)]
 
 
 class TestHTTPClient(TestHTTPClientMixin, testtools.TestCase):
