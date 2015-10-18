@@ -39,17 +39,22 @@ class Libv2HTTPClientTestBase(LibraryTestBase):
 
     def _get_client(self):
         creds = func_base.credentials()
+        session_params = {}
+        ks_session = session.Session.construct(session_params)
+        ks_discover = discover.Discover(session=ks_session,
+                                        auth_url=creds['auth_url'])
+        # At the moment, we use keystone v2 API
+        v2_auth_url = ks_discover.url_for('2.0')
         return v2_client.Client(username=creds['username'],
                                 password=creds['password'],
-                                tenant_name=creds['tenant_name'],
-                                auth_url=creds['auth_url'])
+                                tenant_name=creds['project_name'],
+                                auth_url=v2_auth_url)
 
 
 class Libv2SessionClientTestBase(LibraryTestBase):
 
     def _get_client(self):
         creds = func_base.credentials()
-
         session_params = {}
         ks_session = session.Session.construct(session_params)
         ks_discover = discover.Discover(session=ks_session,
@@ -60,7 +65,7 @@ class Libv2SessionClientTestBase(LibraryTestBase):
             v2_auth_url,
             username=creds['username'],
             password=creds['password'],
-            tenant_name=creds['tenant_name'])
+            tenant_name=creds['project_name'])
         return v2_client.Client(session=ks_session)
 
 
