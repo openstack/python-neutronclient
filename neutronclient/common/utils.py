@@ -42,6 +42,10 @@ def env(*vars, **kwargs):
     return kwargs.get('default', '')
 
 
+def convert_to_uppercase(string):
+    return string.upper()
+
+
 def get_client_class(api_name, version, version_map):
     """Returns the client class for the requested API version.
 
