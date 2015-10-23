@@ -91,6 +91,12 @@ def _format_sg_rules(secgroup):
         return ''
 
 
+def generate_default_ethertype(protocol):
+    if protocol == 'icmpv6':
+        return 'IPv6'
+    return 'IPv4'
+
+
 class ListSecurityGroup(neutronV20.ListCommand):
     """List security groups that belong to a given tenant."""
 
@@ -303,7 +309,6 @@ class CreateSecurityGroupRule(neutronV20.CreateCommand):
             help=_('Direction of traffic: ingress/egress.'))
         parser.add_argument(
             '--ethertype',
-            default='IPv4',
             help=_('IPv4/IPv6'))
         parser.add_argument(
             '--protocol',
@@ -338,7 +343,8 @@ class CreateSecurityGroupRule(neutronV20.CreateCommand):
             self.get_client(), 'security_group', parsed_args.security_group_id)
         body = {'security_group_id': _security_group_id,
                 'direction': parsed_args.direction,
-                'ethertype': parsed_args.ethertype}
+                'ethertype': parsed_args.ethertype or
+                generate_default_ethertype(parsed_args.protocol)}
         neutronV20.update_dict(parsed_args, body,
                                ['protocol', 'port_range_min', 'port_range_max',
                                 'remote_ip_prefix', 'tenant_id'])

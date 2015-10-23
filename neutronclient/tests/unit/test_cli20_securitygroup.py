@@ -570,6 +570,14 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         sg_rule = self._prepare_rule(protocol='icmp')
         self.assertEqual('icmp', securitygroup._get_protocol_port(sg_rule))
 
+    def test_get_ethertype_for_protocol_icmpv6(self):
+        self.assertEqual('IPv6',
+                         securitygroup.generate_default_ethertype('icmpv6'))
+
+    def test_get_ethertype_for_protocol_icmp(self):
+        self.assertEqual('IPv4',
+                         securitygroup.generate_default_ethertype('icmp'))
+
     def test__get_protocol_port_udp_code_type(self):
         sg_rule = self._prepare_rule(protocol='icmp',
                                      port_range_min=1, port_range_max=8)
