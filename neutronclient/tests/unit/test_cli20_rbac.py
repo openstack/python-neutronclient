@@ -15,41 +15,54 @@
 
 import sys
 
+import testscenarios
+
 from neutronclient.neutron.v2_0 import rbac
 from neutronclient.tests.unit import test_cli20
 
+load_tests = testscenarios.load_tests_apply_scenarios
 
-class CLITestV20RBACJSON(test_cli20.CLITestV20Base):
 
+class CLITestV20RBACBaseJSON(test_cli20.CLITestV20Base):
     non_admin_status_resources = ['rbac_policy']
 
+    scenarios = [
+        ('network rbac objects',
+         {'object_type_name': 'network', 'object_type_val': 'network'}),
+        ('qos policy rbac objects',
+         {'object_type_name': 'qos-policy', 'object_type_val': 'qos_policy'}),
+    ]
+
     def test_create_rbac_policy_with_mandatory_params(self):
-        # Create rbac: rbac_object --type network --action access_as_shared
+        # Create rbac: rbac_object --type <object_type_name> --action
+        # access_as_shared
         resource = 'rbac_policy'
         cmd = rbac.CreateRBACPolicy(test_cli20.MyApp(sys.stdout), None)
         name = 'rbac_object'
         myid = 'myid'
-        args = [name, '--type', 'network',
+        args = [name, '--type', self.object_type_name,
                 '--action', 'access_as_shared']
         position_names = ['object_id', 'object_type',
                           'target_tenant', 'action']
-        position_values = [name, 'network', None, 'access_as_shared']
+        position_values = [name, self.object_type_val, None,
+                           'access_as_shared']
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
     def test_create_rbac_policy_with_all_params(self):
-        # Create rbac: rbac_object --type network --target-tenant tenant_id
-        # --action access_as_external
+        # Create rbac: rbac_object --type <object_type_name>
+        # --target-tenant tenant_id --action access_as_external
         resource = 'rbac_policy'
         cmd = rbac.CreateRBACPolicy(test_cli20.MyApp(sys.stdout), None)
         name = 'rbac_object'
         myid = 'myid'
-        args = [name, '--type', 'network',
+        args = [name, '--type', self.object_type_name,
                 '--target-tenant', 'tenant_id',
                 '--action', 'access_as_external']
         position_names = ['object_id', 'object_type',
                           'target_tenant', 'action']
-        position_values = [name, 'network', 'tenant_id', 'access_as_external']
+        position_values = [name, self.object_type_val, 'tenant_id',
+                           'access_as_external']
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
@@ -59,12 +72,13 @@ class CLITestV20RBACJSON(test_cli20.CLITestV20Base):
         cmd = rbac.CreateRBACPolicy(test_cli20.MyApp(sys.stdout), None)
         name = u'\u7f51\u7edc'
         myid = 'myid'
-        args = [name, '--type', 'network',
+        args = [name, '--type', self.object_type_name,
                 '--target-tenant', 'tenant_id',
                 '--action', 'access_as_external']
         position_names = ['object_id', 'object_type',
                           'target_tenant', 'action']
-        position_values = [name, 'network', 'tenant_id', 'access_as_external']
+        position_values = [name, self.object_type_val, 'tenant_id',
+                           'access_as_external']
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 

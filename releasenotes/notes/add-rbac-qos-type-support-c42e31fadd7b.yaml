@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    CLI support for QoS policy RBAC.
+
+    * The ``rbac-create`` command include a --type qos-policy
+      option.
+    * The ``rbac-list`` command output includes a new 'type' column.
