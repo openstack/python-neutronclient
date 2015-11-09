@@ -14,14 +14,13 @@
 #    under the License.
 #
 
-from neutronclient.common import exceptions
 from neutronclient.common import utils
-from neutronclient.i18n import _
 
 
 API_NAME = 'network'
 API_VERSIONS = {
     '2.0': 'neutronclient.v2_0.client.Client',
+    '2': 'neutronclient.v2_0.client.Client',
 }
 
 
@@ -35,27 +34,22 @@ def make_client(instance):
     instance.initialize()
     url = instance._url
     url = url.rstrip("/")
-    if '2.0' == instance._api_version[API_NAME]:
-        client = neutron_client(username=instance._username,
-                                tenant_name=instance._tenant_name,
-                                password=instance._password,
-                                region_name=instance._region_name,
-                                auth_url=instance._auth_url,
-                                endpoint_url=url,
-                                endpoint_type=instance._endpoint_type,
-                                token=instance._token,
-                                auth_strategy=instance._auth_strategy,
-                                insecure=instance._insecure,
-                                ca_cert=instance._ca_cert,
-                                retries=instance._retries,
-                                raise_errors=instance._raise_errors,
-                                session=instance._session,
-                                auth=instance._auth)
-        return client
-    else:
-        raise exceptions.UnsupportedVersion(_("API version %s is not "
-                                              "supported") %
-                                            instance._api_version[API_NAME])
+    client = neutron_client(username=instance._username,
+                            tenant_name=instance._tenant_name,
+                            password=instance._password,
+                            region_name=instance._region_name,
+                            auth_url=instance._auth_url,
+                            endpoint_url=url,
+                            endpoint_type=instance._endpoint_type,
+                            token=instance._token,
+                            auth_strategy=instance._auth_strategy,
+                            insecure=instance._insecure,
+                            ca_cert=instance._ca_cert,
+                            retries=instance._retries,
+                            raise_errors=instance._raise_errors,
+                            session=instance._session,
+                            auth=instance._auth)
+    return client
 
 
 def Client(api_version, *args, **kwargs):
