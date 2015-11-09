@@ -12,9 +12,8 @@
 
 import uuid
 
-from keystoneclient.auth.identity import v2 as v2_auth
-from keystoneclient import discover
-from keystoneclient import session
+from keystoneauth1 import plugin as ksa_plugin
+from keystoneauth1 import session
 from tempest_lib import base
 import testtools
 
@@ -38,13 +37,22 @@ class LibraryTestBase(base.BaseTestCase):
 class Libv2HTTPClientTestBase(LibraryTestBase):
 
     def _get_client(self):
+
         creds = func_base.credentials()
-        session_params = {}
-        ks_session = session.Session.construct(session_params)
-        ks_discover = discover.Discover(session=ks_session,
-                                        auth_url=creds['auth_url'])
-        # At the moment, we use keystone v2 API
-        v2_auth_url = ks_discover.url_for('2.0')
+        cloud_config = func_base.get_cloud_config()
+
+        # We're getting a session so we can find the v2 url via KSA
+        keystone_auth = cloud_config.get_auth()
+        (verify, cert) = cloud_config.get_requests_verify_args()
+
+        ks_session = session.Session(
+            auth=keystone_auth, verify=verify, cert=cert)
+
+        # for the old HTTPClient, we use keystone v2 API, regardless of
+        # whether v3 also exists or is configured
+        v2_auth_url = keystone_auth.get_endpoint(
+            ks_session, interface=ksa_plugin.AUTH_INTERFACE, version=(2, 0))
+
         return v2_client.Client(username=creds['username'],
                                 password=creds['password'],
                                 tenant_name=creds['project_name'],
@@ -54,18 +62,14 @@ class Libv2HTTPClientTestBase(LibraryTestBase):
 class Libv2SessionClientTestBase(LibraryTestBase):
 
     def _get_client(self):
-        creds = func_base.credentials()
-        session_params = {}
-        ks_session = session.Session.construct(session_params)
-        ks_discover = discover.Discover(session=ks_session,
-                                        auth_url=creds['auth_url'])
-        # At the moment, we use keystone v2 API
-        v2_auth_url = ks_discover.url_for('2.0')
-        ks_session.auth = v2_auth.Password(
-            v2_auth_url,
-            username=creds['username'],
-            password=creds['password'],
-            tenant_name=creds['project_name'])
+        cloud_config = func_base.get_cloud_config()
+        keystone_auth = cloud_config.get_auth()
+        (verify, cert) = cloud_config.get_requests_verify_args()
+
+        ks_session = session.Session(
+            auth=keystone_auth,
+            verify=verify,
+            cert=cert)
         return v2_client.Client(session=ks_session)
 
 
