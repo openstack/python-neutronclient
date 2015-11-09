@@ -64,6 +64,10 @@ class CreateFloatingIP(neutronV20.CreateCommand):
         parser.add_argument(
             '--floating-ip-address',
             help=_('IP address of the floating IP'))
+        parser.add_argument(
+            '--subnet',
+            dest='subnet_id',
+            help=_('Subnet ID on which you want to create the floating IP.'))
 
     def args2body(self, parsed_args):
         _network_id = neutronV20.find_resourceid_by_name_or_id(
@@ -72,7 +76,7 @@ class CreateFloatingIP(neutronV20.CreateCommand):
         neutronV20.update_dict(parsed_args, body,
                                ['port_id', 'tenant_id',
                                 'fixed_ip_address',
-                                'floating_ip_address'])
+                                'floating_ip_address', 'subnet_id'])
         return {self.resource: body}
 
 
