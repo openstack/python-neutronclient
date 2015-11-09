@@ -26,6 +26,9 @@ from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20ExtensionJSON(test_cli20.CLITestV20Base):
+
+    non_admin_status_resources = ['fox_socket']
+
     def setUp(self):
         # need to mock before super because extensions loaded on instantiation
         self._mock_extension_loading()

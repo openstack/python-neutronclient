@@ -21,6 +21,9 @@ from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20QosQueueJSON(test_cli20.CLITestV20Base):
+
+    non_admin_status_resources = ['qos_queue']
+
     def setUp(self):
         super(CLITestV20QosQueueJSON, self).setUp(
             plurals={'qos_queues': 'qos_queue'})

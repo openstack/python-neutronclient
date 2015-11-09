@@ -28,6 +28,8 @@ class CLITestV20NetworkGatewayJSON(test_cli20.CLITestV20Base):
     gw_resource = "network_gateway"
     dev_resource = "gateway_device"
 
+    non_admin_status_resources = ['network_gateway', 'gateway_device']
+
     def setUp(self):
         super(CLITestV20NetworkGatewayJSON, self).setUp(
             plurals={'devices': 'device',

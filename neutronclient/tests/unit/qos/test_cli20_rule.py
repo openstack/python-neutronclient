@@ -22,6 +22,9 @@ from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20QoSRuleJSON(test_cli20.CLITestV20Base):
+
+    non_admin_status_resources = ['bandwidth_limit_rule']
+
     def setUp(self):
         super(CLITestV20QoSRuleJSON, self).setUp()
         self.res = 'bandwidth_limit_rule'

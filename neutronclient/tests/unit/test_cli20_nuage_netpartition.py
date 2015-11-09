@@ -21,6 +21,7 @@ from neutronclient.tests.unit import test_cli20
 
 class CLITestV20NetPartitionJSON(test_cli20.CLITestV20Base):
     resource = 'net_partition'
+    non_admin_status_resources = ['net_partition']
 
     def test_create_netpartition(self):
         cmd = netpartition.CreateNetPartition(test_cli20.MyApp(sys.stdout),

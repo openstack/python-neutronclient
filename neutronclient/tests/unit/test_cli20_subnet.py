@@ -25,6 +25,9 @@ from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
+
+    non_admin_status_resources = ['subnet']
+
     def setUp(self):
         super(CLITestV20SubnetJSON, self).setUp(plurals={'tags': 'tag'})
 

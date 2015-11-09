@@ -24,6 +24,9 @@ from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20AddressScopeJSON(test_cli20.CLITestV20Base):
+
+    non_admin_status_resources = ['address_scope']
+
     def setUp(self):
         super(CLITestV20AddressScopeJSON, self).setUp(plurals={'tags': 'tag'})
 

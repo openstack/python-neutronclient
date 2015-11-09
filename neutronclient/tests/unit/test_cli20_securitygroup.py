@@ -27,6 +27,9 @@ from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
+
+    non_admin_status_resources = ['security_group', 'security_group_rule']
+
     def test_create_security_group(self):
         """Create security group: webservers."""
         resource = 'security_group'

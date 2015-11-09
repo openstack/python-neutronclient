@@ -19,6 +19,9 @@ from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20MeteringJSON(test_cli20.CLITestV20Base):
+
+    non_admin_status_resources = ['metering_label', 'metering_label_rule']
+
     def test_create_metering_label(self):
         """Create a metering label."""
         resource = 'metering_label'

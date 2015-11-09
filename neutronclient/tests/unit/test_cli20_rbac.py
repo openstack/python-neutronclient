@@ -20,6 +20,9 @@ from neutronclient.tests.unit import test_cli20
 
 
 class CLITestV20RBACJSON(test_cli20.CLITestV20Base):
+
+    non_admin_status_resources = ['rbac_policy']
+
     def test_create_rbac_policy_with_mandatory_params(self):
         """Create rbac: rbac_object --type network --action access_as_shared"""
         resource = 'rbac_policy'

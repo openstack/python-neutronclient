@@ -22,6 +22,8 @@ from neutronclient.tests.unit import test_cli20
 
 class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
 
+    non_admin_status_resources = ['ikepolicy']
+
     def test_create_ikepolicy_all_params(self):
         """vpn-ikepolicy-create all params."""
         resource = 'ikepolicy'

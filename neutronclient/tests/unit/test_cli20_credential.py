@@ -22,6 +22,8 @@ from neutronclient.tests.unit import test_cli20
 
 class CLITestV20Credential(test_cli20.CLITestV20Base):
 
+    non_admin_status_resources = ['credential']
+
     def test_create_credential(self):
         """Create credential: myid."""
         resource = 'credential'
