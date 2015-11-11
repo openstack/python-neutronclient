@@ -57,7 +57,8 @@ class CreateListener(neutronV20.CreateCommand):
         parser.add_argument(
             '--connection-limit',
             help=_('The maximum number of connections per second allowed for '
-                   'the vip. Positive integer or -1 for unlimited (default).'))
+                   'the vip. Positive integer or -1 for unlimited (default).'),
+            type=int)
         parser.add_argument(
             '--description',
             help=_('Description of the listener.'))
@@ -102,7 +103,7 @@ class CreateListener(neutronV20.CreateCommand):
                 'admin_state_up': parsed_args.admin_state}
 
         neutronV20.update_dict(parsed_args, body,
-                               ['connection-limit', 'description',
+                               ['connection_limit', 'description',
                                 'loadbalancer_id', 'name',
                                 'default_tls_container_ref',
                                 'sni_container_refs',
