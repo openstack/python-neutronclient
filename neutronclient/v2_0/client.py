@@ -437,6 +437,12 @@ class Client(ClientBase):
     qos_bandwidth_limit_rule_path = "/qos/policies/%s/bandwidth_limit_rules/%s"
     qos_rule_types_path = "/qos/rule-types"
     qos_rule_type_path = "/qos/rule-types/%s"
+    flavors_path = "/flavors"
+    flavor_path = "/flavors/%s"
+    service_profiles_path = "/service_profiles"
+    service_profile_path = "/service_profiles/%s"
+    flavor_profile_bindings_path = flavor_path + service_profiles_path
+    flavor_profile_binding_path = flavor_path + service_profile_path
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -474,6 +480,7 @@ class Client(ClientBase):
                      'policies': 'policy',
                      'bandwidth_limit_rules': 'bandwidth_limit_rule',
                      'rule_types': 'rule_type',
+                     'flavors': 'flavor',
                      }
 
     @APIParamsCall
@@ -1736,6 +1743,72 @@ class Client(ClientBase):
         """Deletes a bandwidth limit rule."""
         return self.delete(self.qos_bandwidth_limit_rule_path %
                            (policy, rule))
+
+    @APIParamsCall
+    def create_flavor(self, body=None):
+        """Creates a new Neutron service flavor."""
+        return self.post(self.flavors_path, body=body)
+
+    @APIParamsCall
+    def delete_flavor(self, flavor):
+        """Deletes the specified Neutron service flavor."""
+        return self.delete(self.flavor_path % (flavor))
+
+    @APIParamsCall
+    def list_flavors(self, retrieve_all=True, **_params):
+        """Fetches a list of all Neutron service flavors for a tenant."""
+        return self.list('flavors', self.flavors_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_flavor(self, flavor, **_params):
+        """Fetches information for a certain Neutron service flavor."""
+        return self.get(self.flavor_path % (flavor), params=_params)
+
+    @APIParamsCall
+    def update_flavor(self, flavor, body):
+        """Update a Neutron service flavor."""
+        return self.put(self.flavor_path % (flavor), body=body)
+
+    @APIParamsCall
+    def associate_flavor(self, flavor, body):
+        """Associate a Neutron service flavor with a profile."""
+        return self.post(self.flavor_profile_bindings_path %
+                         (flavor), body=body)
+
+    @APIParamsCall
+    def disassociate_flavor(self, flavor, flavor_profile):
+        """Disassociate a Neutron service flavor with a profile."""
+        return self.delete(self.flavor_profile_binding_path %
+                           (flavor, flavor_profile))
+
+    @APIParamsCall
+    def create_service_profile(self, body=None):
+        """Creates a new Neutron service flavor profile."""
+        return self.post(self.service_profiles_path, body=body)
+
+    @APIParamsCall
+    def delete_service_profile(self, flavor_profile):
+        """Deletes the specified Neutron service flavor profile."""
+        return self.delete(self.service_profile_path % (flavor_profile))
+
+    @APIParamsCall
+    def list_service_profiles(self, retrieve_all=True, **_params):
+        """Fetches a list of all Neutron service flavor profiles."""
+        return self.list('service_profiles', self.service_profiles_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_service_profile(self, flavor_profile, **_params):
+        """Fetches information for a certain Neutron service flavor profile."""
+        return self.get(self.service_profile_path % (flavor_profile),
+                        params=_params)
+
+    @APIParamsCall
+    def update_service_profile(self, service_profile, body):
+        """Update a Neutron service profile."""
+        return self.put(self.service_profile_path % (service_profile),
+                        body=body)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
