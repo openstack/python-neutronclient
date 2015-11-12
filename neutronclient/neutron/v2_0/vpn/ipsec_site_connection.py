@@ -37,8 +37,7 @@ class ListIPsecSiteConnection(neutronv20.ListCommand):
     resource = 'ipsec_site_connection'
     _formatters = {'peer_cidrs': _format_peer_cidrs}
     list_columns = [
-        'id', 'name', 'peer_address', 'peer_cidrs', 'route_mode',
-        'auth_mode', 'status']
+        'id', 'name', 'peer_address', 'auth_mode', 'status']
     pagination_support = True
     sorting_support = True
 
@@ -49,7 +48,46 @@ class ShowIPsecSiteConnection(neutronv20.ShowCommand):
     resource = 'ipsec_site_connection'
 
 
-class CreateIPsecSiteConnection(neutronv20.CreateCommand):
+class IPsecSiteConnectionMixin(object):
+
+    def add_known_arguments(self, parser):
+        parser.add_argument(
+            '--dpd',
+            metavar="action=ACTION,interval=INTERVAL,timeout=TIMEOUT",
+            type=utils.str2dict,
+            help=vpn_utils.dpd_help("IPsec connection."))
+        parser.add_argument(
+            '--local-ep-group',
+            help=_('Local endpoint group ID/name with subnet(s) for '
+                   'IPSec connection.'))
+        parser.add_argument(
+            '--peer-ep-group',
+            help=_('Peer endpoint group ID/name with CIDR(s) for '
+                   'IPsec connection.'))
+
+    def args2body(self, parsed_args, body=None):
+        """Add in conditional args and then return all conn info."""
+
+        if body is None:
+            body = {}
+        if parsed_args.dpd:
+            vpn_utils.validate_dpd_dict(parsed_args.dpd)
+            body['dpd'] = parsed_args.dpd
+        if parsed_args.local_ep_group:
+            _local_epg = neutronv20.find_resourceid_by_name_or_id(
+                self.get_client(), 'endpoint_group',
+                parsed_args.local_ep_group)
+            body['local_ep_group_id'] = _local_epg
+        if parsed_args.peer_ep_group:
+            _peer_epg = neutronv20.find_resourceid_by_name_or_id(
+                self.get_client(), 'endpoint_group',
+                parsed_args.peer_ep_group)
+            body['peer_ep_group_id'] = _peer_epg
+        return {self.resource: body}
+
+
+class CreateIPsecSiteConnection(IPsecSiteConnectionMixin,
+                                neutronv20.CreateCommand):
     """Create an IPsec site connection."""
     resource = 'ipsec_site_connection'
 
@@ -74,11 +112,6 @@ class CreateIPsecSiteConnection(neutronv20.CreateCommand):
                                                'response-only'],
             help=_('Initiator state in lowercase, default:bi-directional'))
         parser.add_argument(
-            '--dpd',
-            metavar="action=ACTION,interval=INTERVAL,timeout=TIMEOUT",
-            type=utils.str2dict,
-            help=vpn_utils.dpd_help("IPsec connection."))
-        parser.add_argument(
             '--vpnservice-id', metavar='VPNSERVICE',
             required=True,
             help=_('VPN service instance ID associated with this connection.'))
@@ -102,12 +135,14 @@ class CreateIPsecSiteConnection(neutronv20.CreateCommand):
         parser.add_argument(
             '--peer-cidr',
             action='append', dest='peer_cidrs',
-            required=True,
-            help=_('Remote subnet(s) in CIDR format.'))
+            help=_('[DEPRECATED in Mitaka] Remote subnet(s) in CIDR format. '
+                   'Cannot be specified when using endpoint groups. Only '
+                   'applicable, if subnet provided for VPN service.'))
         parser.add_argument(
             '--psk',
             required=True,
             help=_('Pre-shared key string.'))
+        super(CreateIPsecSiteConnection, self).add_known_arguments(parser)
 
     def args2body(self, parsed_args):
         _vpnservice_id = neutronv20.find_resourceid_by_name_or_id(
@@ -123,51 +158,44 @@ class CreateIPsecSiteConnection(neutronv20.CreateCommand):
             message = _("Invalid MTU value: MTU must be "
                         "greater than or equal to 68")
             raise exceptions.CommandError(message)
+        if (bool(parsed_args.local_ep_group) !=
+                bool(parsed_args.peer_ep_group)):
+            message = _("You must specify both local and peer endpoint "
+                        "groups.")
+            raise exceptions.CommandError(message)
+        if parsed_args.peer_cidrs and parsed_args.local_ep_group:
+            message = _("You cannot specify both endpoint groups and peer "
+                        "CIDR(s).")
+            raise exceptions.CommandError(message)
+        if not parsed_args.peer_cidrs and not parsed_args.local_ep_group:
+            message = _("You must specify endpoint groups or peer CIDR(s).")
+            raise exceptions.CommandError(message)
         body = {
             'vpnservice_id': _vpnservice_id,
             'ikepolicy_id': _ikepolicy_id,
             'ipsecpolicy_id': _ipsecpolicy_id,
-            'peer_address': parsed_args.peer_address,
-            'peer_id': parsed_args.peer_id,
-            'mtu': parsed_args.mtu,
-            'initiator': parsed_args.initiator,
-            'psk': parsed_args.psk,
             'admin_state_up': parsed_args.admin_state_down,
         }
+        neutronv20.update_dict(parsed_args, body,
+                               ['peer_id', 'mtu', 'initiator', 'psk',
+                                'peer_address'])
         if parsed_args.name:
             body['name'] = parsed_args.name
         if parsed_args.description:
             body['description'] = parsed_args.description
         if parsed_args.tenant_id:
             body['tenant_id'] = parsed_args.tenant_id
-        if parsed_args.dpd:
-            vpn_utils.validate_dpd_dict(parsed_args.dpd)
-            body['dpd'] = parsed_args.dpd
         if parsed_args.peer_cidrs:
             body['peer_cidrs'] = parsed_args.peer_cidrs
+        return super(CreateIPsecSiteConnection, self).args2body(parsed_args,
+                                                                body)
 
-        return {'ipsec_site_connection': body}
 
-
-class UpdateIPsecSiteConnection(neutronv20.UpdateCommand):
+class UpdateIPsecSiteConnection(IPsecSiteConnectionMixin,
+                                neutronv20.UpdateCommand):
     """Update a given IPsec site connection."""
 
     resource = 'ipsec_site_connection'
-
-    def add_known_arguments(self, parser):
-
-        parser.add_argument(
-            '--dpd',
-            metavar="action=ACTION,interval=INTERVAL,timeout=TIMEOUT",
-            type=utils.str2dict,
-            help=vpn_utils.dpd_help("IPsec connection."))
-
-    def args2body(self, parsed_args):
-        body = {}
-        if parsed_args.dpd:
-            vpn_utils.validate_dpd_dict(parsed_args.dpd)
-            body['dpd'] = parsed_args.dpd
-        return {'ipsec_site_connection': body}
 
 
 class DeleteIPsecSiteConnection(neutronv20.DeleteCommand):
