@@ -196,6 +196,68 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
                                    {'distributed': 'false'}
                                    )
 
+    def test_update_router_no_routes(self):
+        """Update router: myid --no-routes"""
+        resource = 'router'
+        cmd = router.UpdateRouter(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--no-routes'],
+                                   {'routes': None})
+
+    def test_update_router_add_route(self):
+        """Update router: myid
+        --route destination=10.0.3.0/24,nexthop=10.0.0.10
+        """
+        resource = 'router'
+        cmd = router.UpdateRouter(test_cli20.MyApp(sys.stdout), None)
+        myid = 'myid'
+        args = [myid,
+                '--route',
+                'destination=10.0.3.0/24,nexthop=10.0.0.10']
+        routes = [{'destination': '10.0.3.0/24',
+                  'nexthop': '10.0.0.10'}]
+        updatefields = {'routes': routes}
+        self._test_update_resource(resource, cmd, myid, args, updatefields)
+
+    def test_update_router_add_routes(self):
+        """Update router: myid
+        --route destination=10.0.3.0/24,nexthop=10.0.0.10
+        --route destination=fd7a:1d63:2063::/64,
+                nexthop=fd7a:1d63:2063:0:f816:3eff:fe0e:a697
+        """
+        resource = 'router'
+        cmd = router.UpdateRouter(test_cli20.MyApp(sys.stdout), None)
+        myid = 'myid'
+        args = [myid,
+                '--route',
+                'destination=10.0.3.0/24,nexthop=10.0.0.10',
+                '--route',
+                'destination=fd7a:1d63:2063::/64,'
+                'nexthop=fd7a:1d63:2063:0:f816:3eff:fe0e:a697']
+        routes = [{'destination': '10.0.3.0/24',
+                  'nexthop': '10.0.0.10'},
+                  {'destination': 'fd7a:1d63:2063::/64',
+                  'nexthop': 'fd7a:1d63:2063:0:f816:3eff:fe0e:a697'}]
+        updatefields = {'routes': routes}
+        self._test_update_resource(resource, cmd, myid, args, updatefields)
+
+    def test_update_router_no_routes_with_add_route(self):
+        """Update router: --no-routes with --route"""
+        resource = 'router'
+        cmd = router.UpdateRouter(test_cli20.MyApp(sys.stdout), None)
+        myid = 'myid'
+        args = [myid,
+                '--no-routes',
+                '--route',
+                'destination=10.0.3.0/24,nexthop=10.0.0.10']
+        actual_error_code = 0
+        try:
+            self._test_update_resource(resource, cmd, myid, args, None)
+        except SystemExit:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            actual_error_code = exc_value.code
+        self.assertEqual(2, actual_error_code)
+
     def test_delete_router(self):
         """Delete router: myid."""
         resource = 'router'

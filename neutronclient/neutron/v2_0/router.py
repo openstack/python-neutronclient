@@ -107,6 +107,16 @@ class UpdateRouter(neutronV20.UpdateCommand):
             parser, '--distributed', dest='distributed',
             help=_('True means this router should operate in'
                    ' distributed mode.'))
+        routes_group = parser.add_mutually_exclusive_group()
+        routes_group.add_argument(
+            '--route', metavar='destination=CIDR,nexthop=IP_ADDR',
+            action='append', dest='routes', type=utils.str2dict,
+            help=_('Route to associate with the router.'
+                   ' You can repeat this option.'))
+        routes_group.add_argument(
+            '--no-routes',
+            action='store_true',
+            help=_('Remove routes associated with the router.'))
 
     def args2body(self, parsed_args):
         body = {}
@@ -114,6 +124,10 @@ class UpdateRouter(neutronV20.UpdateCommand):
             body['admin_state_up'] = parsed_args.admin_state
         neutronV20.update_dict(parsed_args, body,
                                ['name', 'distributed'])
+        if parsed_args.no_routes:
+            body['routes'] = None
+        elif parsed_args.routes:
+            body['routes'] = parsed_args.routes
         return {self.resource: body}
 
 
