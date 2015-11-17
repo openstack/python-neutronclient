@@ -53,12 +53,14 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
         pool_id = 'pool-id'
         subnet_id = 'subnet-id'
         weight = '100'
+        name = 'member1'
         args = ['--address', address, '--protocol-port', protocol_port,
                 '--subnet', subnet_id, pool_id, '--weight', weight,
-                '--admin-state-down']
+                '--admin-state-down', '--name', name]
         position_names = ['admin_state_up', 'address', 'protocol_port',
-                          'subnet_id', 'weight']
-        position_values = [False, address, protocol_port, subnet_id, weight]
+                          'subnet_id', 'weight', 'name']
+        position_values = [False, address, protocol_port,
+                           subnet_id, weight, name]
         self._test_create_resource(resource, cmd, '', my_id, args,
                                    position_names, position_values,
                                    cmd_resource=cmd_resource,
