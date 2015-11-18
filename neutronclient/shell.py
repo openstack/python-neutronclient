@@ -204,6 +204,7 @@ COMMAND_V2 = {
     'lbaas-loadbalancer-update': lbaas_loadbalancer.UpdateLoadBalancer,
     'lbaas-loadbalancer-delete': lbaas_loadbalancer.DeleteLoadBalancer,
     'lbaas-loadbalancer-stats': lbaas_loadbalancer.RetrieveLoadBalancerStats,
+    'lbaas-loadbalancer-status': lbaas_loadbalancer.RetrieveLoadBalancerStatus,
     'lbaas-listener-list': lbaas_listener.ListListener,
     'lbaas-listener-show': lbaas_listener.ShowListener,
     'lbaas-listener-create': lbaas_listener.CreateListener,
