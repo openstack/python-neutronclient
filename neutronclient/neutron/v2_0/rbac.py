@@ -32,12 +32,14 @@ class ListRBACPolicy(neutronV20.ListCommand):
     list_columns = ['id', 'object_id']
     pagination_support = True
     sorting_support = True
+    allow_names = False
 
 
 class ShowRBACPolicy(neutronV20.ShowCommand):
     """Show information of a given RBAC policy."""
 
     resource = 'rbac_policy'
+    allow_names = False
 
 
 class CreateRBACPolicy(neutronV20.CreateCommand):
@@ -81,6 +83,7 @@ class UpdateRBACPolicy(neutronV20.UpdateCommand):
     """Update RBAC policy for given tenant."""
 
     resource = 'rbac_policy'
+    allow_names = False
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -97,3 +100,4 @@ class DeleteRBACPolicy(neutronV20.DeleteCommand):
     """Delete a RBAC policy."""
 
     resource = 'rbac_policy'
+    allow_names = False
