@@ -9,6 +9,7 @@ build-stamp
 cover/*
 doc/build/
 doc/source/api/
+releasenotes/build/
 python_neutronclient.egg-info/*
 neutron/vcsversion.py
 neutronclient/versioninfo

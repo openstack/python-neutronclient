@@ -17,4 +17,5 @@
 import pbr.version
 
 
-__version__ = pbr.version.VersionInfo('python-neutronclient').version_string()
+version_info = pbr.version.VersionInfo('python-neutronclient')
+__version__ = version_info.version_string()
