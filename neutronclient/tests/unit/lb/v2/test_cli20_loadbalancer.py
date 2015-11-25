@@ -44,13 +44,14 @@ class CLITestV20LbLoadBalancerJSON(test_cli20.CLITestV20Base):
         cmd = lb.CreateLoadBalancer(test_cli20.MyApp(sys.stdout), None)
         name = 'lbaas-loadbalancer-name'
         description = 'lbaas-loadbalancer-desc'
+        flavor_id = 'lbaas-loadbalancer-flavor'
         vip_subnet_id = 'vip-subnet'
         my_id = 'my-id'
         args = ['--admin-state-down', '--description', description,
-                '--name', name, vip_subnet_id]
+                '--name', name, '--flavor', flavor_id, vip_subnet_id]
         position_names = ['admin_state_up', 'description', 'name',
-                          'vip_subnet_id']
-        position_values = [False, description, name, vip_subnet_id]
+                          'flavor_id', 'vip_subnet_id']
+        position_values = [False, description, name, flavor_id, vip_subnet_id]
         self._test_create_resource(resource, cmd, name, my_id, args,
                                    position_names, position_values,
                                    cmd_resource=cmd_resource)
