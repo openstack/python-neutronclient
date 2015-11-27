@@ -70,6 +70,7 @@ neutronclient.extension entry_point
 
 To activate the commands in a specific extension module, add an entry in
 setup.cfg under neutronclient.extension. For example::
-  [entry_points]
-  neutronclient.extension =
-      fox_sockets = neutronclient.neutron.v2_0.contrib._fox_sockets
+
+    [entry_points]
+    neutronclient.extension =
+        fox_sockets = neutronclient.neutron.v2_0.contrib._fox_sockets
