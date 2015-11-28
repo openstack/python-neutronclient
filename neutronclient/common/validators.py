@@ -15,8 +15,8 @@
 
 import netaddr
 
+from neutronclient._i18n import _
 from neutronclient.common import exceptions
-from neutronclient.i18n import _
 
 
 def validate_int_range(parsed_args, attr_name, min_value=None, max_value=None):

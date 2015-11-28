@@ -18,8 +18,8 @@
 """VPN Utilities and helper functions."""
 
 
+from neutronclient._i18n import _
 from neutronclient.common import exceptions
-from neutronclient.i18n import _
 
 dpd_supported_actions = ['hold', 'clear', 'restart',
                          'restart-by-peer', 'disabled']

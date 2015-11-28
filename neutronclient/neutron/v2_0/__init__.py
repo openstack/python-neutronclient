@@ -27,10 +27,10 @@ from cliff import show
 from oslo_serialization import jsonutils
 import six
 
+from neutronclient._i18n import _
 from neutronclient.common import command
 from neutronclient.common import exceptions
 from neutronclient.common import utils
-from neutronclient.i18n import _
 
 HEX_ELEM = '[0-9A-Fa-f]'
 UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',

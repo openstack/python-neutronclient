@@ -23,12 +23,12 @@ import time
 import requests
 import six.moves.urllib.parse as urlparse
 
+from neutronclient._i18n import _
 from neutronclient import client
 from neutronclient.common import exceptions
 from neutronclient.common import extension as client_extension
 from neutronclient.common import serializer
 from neutronclient.common import utils
-from neutronclient.i18n import _
 
 
 _logger = logging.getLogger(__name__)
