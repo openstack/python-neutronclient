@@ -1,0 +1,25 @@
+---
+features:
+  - Support os-client-config. OS_CLOUD environment variable is used for
+    selecting named cloud configuration.
+  - Support keystoneauth1 library which brings us better kyestone v3 support.
+  - Client command extension now supports a child resource.
+  - New CLI for VPNaaS multiple local subnets.
+  - New CLI for VPNaaS endpoint group API.
+  - New CLI for flavor argument to loadbalancer v2 create.
+  - New CLI for Neutron flavor framework.
+  - Support creating floating IP on a specific subnet ID.
+  - NSX gateway extension adds new transport type values (ipsec_gre and ipsec_stt).
+  - New router-update option to update static routes (--route and --no-routes).
+  - New allowed-address-pairs option to port-update
+upgrade:
+  - Cisco-specific neutron client commands have been removed.
+    These commands are ported to networking-cisco.
+  - py26 support has been dropped.
+fixes:
+  - Name is no longer looked up on RBAC policies,
+    RBAC policies have no name field so the name query to
+    the server was always returning all entries since the
+    name filter was ignored. (bug 1517818)
+other:
+  - cliff-tablib has been removed from test dependencies.
