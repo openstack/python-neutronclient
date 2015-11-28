@@ -26,6 +26,7 @@ lower level programming details or APIs.
    :maxdepth: 2
 
    devref/client_command_extensions
+   devref/cli_option_guideline
 
 History
 -------
