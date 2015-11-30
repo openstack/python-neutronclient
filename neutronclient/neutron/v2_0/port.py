@@ -239,12 +239,12 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
             '--mac_address',
             help=argparse.SUPPRESS)
         parser.add_argument(
-            '--vnic-type', metavar='<direct | macvtap | normal>',
-            choices=['direct', 'macvtap', 'normal'],
+            '--vnic-type', metavar='<direct | macvtap | normal | baremetal>',
+            choices=['direct', 'macvtap', 'normal', 'baremetal'],
             help=_('VNIC type for this port.'))
         parser.add_argument(
             '--vnic_type',
-            choices=['direct', 'macvtap', 'normal'],
+            choices=['direct', 'macvtap', 'normal', 'baremetal'],
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--binding-profile',
