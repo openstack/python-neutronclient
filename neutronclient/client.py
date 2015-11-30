@@ -57,6 +57,8 @@ class HTTPClient(object):
                  endpoint_type='publicURL',
                  auth_strategy='keystone', ca_cert=None, log_credentials=False,
                  service_type='network',
+                 # Neutron API url variable
+                 neutron_api_url=None,
                  **kwargs):
 
         self.username = username
@@ -79,6 +81,11 @@ class HTTPClient(object):
             self.verify_cert = False
         else:
             self.verify_cert = ca_cert if ca_cert else True
+
+        # Neutron API url variable
+        self.neutron_api_url=neutron_api_url
+        if neutron_api_url is not None:
+            self.endpoint_url = self.neutron_api_url	
 
     def _cs_request(self, *args, **kwargs):
         kargs = {}
@@ -361,6 +368,8 @@ def construct_http_client(username=None,
                           ca_cert=None,
                           service_type='network',
                           session=None,
+                          # Neutron API url variable
+                          neutron_api_url=None,
                           **kwargs):
 
     if session:
@@ -369,6 +378,8 @@ def construct_http_client(username=None,
         return SessionClient(session=session,
                              service_type=service_type,
                              region_name=region_name,
+                             # Neutron API url variable
+                             endpoint_override=neutron_api_url,
                              **kwargs)
     else:
         # FIXME(bklei): username and password are now optional. Need
@@ -389,4 +400,6 @@ def construct_http_client(username=None,
                           service_type=service_type,
                           ca_cert=ca_cert,
                           log_credentials=log_credentials,
-                          auth_strategy=auth_strategy)
+                          auth_strategy=auth_strategy,
+                          # Neutron API url variable
+                          neutron_api_url=neutron_api_url)

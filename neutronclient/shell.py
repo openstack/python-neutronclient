@@ -671,6 +671,18 @@ class NeutronShell(app.App):
                    "not be verified against any certificate authorities. "
                    "This option should be used with caution."))
 
+        # Here we handle the environment variable NEUTRONCLIENT_BYPASS_URL used                                                                                                    
+        # to force neutronclient to use a given neutron API just like what                                                                                                         
+        # NOVACLIENT_BYPASS_URL do.                                                                                                                                                
+        parser.add_argument('--bypass-url',                                                                                                                                        
+            metavar='<bypass-url>',                                                                                                                                            
+            default=env('NEUTRONCLIENT_BYPASS_URL'),                                                                                                                           
+            help=_('Use this API endpoint instead of the Service Catalog'                                                                                                      
+            '. Defaults to env[NEUTRONCLIENT_BYPASS_URL]'))                                                                                                                    
+        parser.add_argument(                                                                                                                                                       
+            '--bypass_url',                                                                                                                                                        
+            help=argparse.SUPPRESS)
+
     def _bash_completion(self):
         """Prints all of the commands and options for bash-completion."""
         commands = set()
@@ -874,7 +886,10 @@ class NeutronShell(app.App):
             raise_errors=False,
             session=auth_session,
             auth=auth,
-            log_credentials=True)
+            log_credentials=True,
+	    # Neutron API url variable
+	    neutron_api_url=self.options.bypass_url)
+
         return
 
     def initialize_app(self, argv):
