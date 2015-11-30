@@ -67,6 +67,8 @@ class ClientManager(object):
                  raise_errors=True,
                  session=None,
                  auth=None,
+		 # Neutron API url variable
+		 neutron_api_url=None
                  ):
         self._token = token
         self._url = url
@@ -90,6 +92,7 @@ class ClientManager(object):
         self._raise_errors = raise_errors
         self._session = session
         self._auth = auth
+	self._neutron_api_url = neutron_api_url
         return
 
     def initialize(self):
@@ -109,7 +112,9 @@ class ClientManager(object):
                 timeout=self._timeout,
                 session=self._session,
                 auth=self._auth,
-                log_credentials=self._log_credentials)
+                log_credentials=self._log_credentials,
+		# Neutron API url variable
+		neutron_api_url=self._neutron_api_url)
             httpclient.authenticate()
             # Populate other password flow attributes
             self._token = httpclient.auth_token

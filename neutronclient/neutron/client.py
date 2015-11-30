@@ -50,7 +50,9 @@ def make_client(instance):
                                 retries=instance._retries,
                                 raise_errors=instance._raise_errors,
                                 session=instance._session,
-                                auth=instance._auth)
+                                auth=instance._auth,
+                                # Neutron API url variable
+                                neutron_api_url=instance._neutron_api_url)
         return client
     else:
         raise exceptions.UnsupportedVersion(_("API version %s is not "
