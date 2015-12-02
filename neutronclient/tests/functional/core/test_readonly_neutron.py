@@ -116,7 +116,7 @@ class SimpleReadOnlyNeutronClientTest(base.ClientTestBase):
                                            ('security-group-rule-list'))
         self.assertTableStruct(security_grp, ['id', 'security_group',
                                               'direction', 'ethertype',
-                                              'protocol/port', 'remote'])
+                                              'port/protocol', 'remote'])
 
     def test_neutron_subnet_list(self):
         subnet_list = self.parser.listing(self.neutron('subnet-list'))
