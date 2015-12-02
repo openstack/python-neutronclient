@@ -683,9 +683,9 @@ class ListCommand(NeutronCommand, lister.Lister):
     def extend_list(self, data, parsed_args):
         """Update a retrieved list.
 
-        This method provides a way to modify a original list returned from
+        This method provides a way to modify an original list returned from
         the neutron server. For example, you can add subnet cidr information
-        to a list network.
+        to a network list.
         """
         pass
 
