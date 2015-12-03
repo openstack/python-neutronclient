@@ -30,7 +30,5 @@ lower level programming details or APIs.
 History
 -------
 
-.. toctree::
-   :maxdepth: 1
-
-   history
+Release notes is available at
+http://docs.openstack.org/releasenotes/python-neutronclient/.
