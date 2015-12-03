@@ -23,7 +23,7 @@ from neutronclient.tests.unit import test_cli20
 class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
 
     def test_create_pool_with_mandatory_params(self):
-        """lbaas-pool-create with mandatory params only."""
+        # lbaas-pool-create with mandatory params only.
         resource = 'pool'
         cmd_resource = 'lbaas_pool'
         cmd = pool.CreatePool(test_cli20.MyApp(sys.stdout), None)
@@ -41,7 +41,7 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                    cmd_resource=cmd_resource)
 
     def test_create_pool_with_all_params(self):
-        """lbaas-pool-create with all params set."""
+        # lbaas-pool-create with all params set.
         resource = 'pool'
         cmd_resource = 'lbaas_pool'
         cmd = pool.CreatePool(test_cli20.MyApp(sys.stdout), None)
@@ -68,7 +68,7 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                    cmd_resource=cmd_resource)
 
     def test_list_pools(self):
-        """lbaas-pool-list."""
+        # lbaas-pool-list.
         resources = 'pools'
         cmd_resources = 'lbaas_pools'
         cmd = pool.ListPool(test_cli20.MyApp(sys.stdout), None)
@@ -76,7 +76,7 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                   cmd_resources=cmd_resources)
 
     def test_list_pools_pagination(self):
-        """lbaas-pool-list with pagination."""
+        # lbaas-pool-list with pagination.
         resources = 'pools'
         cmd_resources = 'lbaas_pools'
         cmd = pool.ListPool(test_cli20.MyApp(sys.stdout), None)
@@ -84,7 +84,7 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                                   cmd_resources=cmd_resources)
 
     def test_list_pools_sort(self):
-        """lbaas-pool-list --sort-key id --sort-key asc."""
+        # lbaas-pool-list --sort-key id --sort-key asc.
         resources = 'pools'
         cmd_resources = 'lbaas_pools'
         cmd = pool.ListPool(test_cli20.MyApp(sys.stdout), None)
@@ -92,7 +92,7 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                   cmd_resources=cmd_resources)
 
     def test_list_pools_limit(self):
-        """lbaas-pool-list -P."""
+        # lbaas-pool-list -P.
         resources = 'pools'
         cmd_resources = 'lbaas_pools'
         cmd = pool.ListPool(test_cli20.MyApp(sys.stdout), None)
@@ -100,7 +100,7 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                   cmd_resources=cmd_resources)
 
     def test_show_pool_id(self):
-        """lbaas-pool-show test_id."""
+        # lbaas-pool-show test_id.
         resource = 'pool'
         cmd_resource = 'lbaas_pool'
         cmd = pool.ShowPool(test_cli20.MyApp(sys.stdout), None)
@@ -109,7 +109,7 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                  cmd_resource=cmd_resource)
 
     def test_show_pool_id_name(self):
-        """lbaas-pool-show."""
+        # lbaas-pool-show.
         resource = 'pool'
         cmd_resource = 'lbaas_pool'
         cmd = pool.ShowPool(test_cli20.MyApp(sys.stdout), None)
@@ -119,7 +119,7 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                  cmd_resource=cmd_resource)
 
     def test_update_pool(self):
-        """lbaas-pool-update myid --name newname."""
+        # lbaas-pool-update myid --name newname.
         resource = 'pool'
         cmd_resource = 'lbaas_pool'
         cmd = pool.UpdatePool(test_cli20.MyApp(sys.stdout), None)
@@ -129,7 +129,7 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                    cmd_resource=cmd_resource)
 
     def test_delete_pool(self):
-        """lbaas-pool-delete my-id."""
+        # lbaas-pool-delete my-id.
         resource = 'pool'
         cmd_resource = 'lbaas_pool'
         cmd = pool.DeletePool(test_cli20.MyApp(sys.stdout), None)

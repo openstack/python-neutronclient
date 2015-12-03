@@ -25,7 +25,7 @@ from neutronclient.tests.unit import test_cli20
 class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
 
     def test_create_pool_with_mandatory_params(self):
-        """lb-pool-create with mandatory params only."""
+        # lb-pool-create with mandatory params only.
         resource = 'pool'
         cmd = pool.CreatePool(test_cli20.MyApp(sys.stdout), None)
         name = 'my-name'
@@ -47,7 +47,7 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_pool_with_all_params(self):
-        """lb-pool-create with all params set."""
+        # lb-pool-create with all params set.
         resource = 'pool'
         cmd = pool.CreatePool(test_cli20.MyApp(sys.stdout), None)
         name = 'my-name'
@@ -74,21 +74,20 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_list_pools(self):
-        """lb-pool-list."""
+        # lb-pool-list.
         resources = "pools"
         cmd = pool.ListPool(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_pools_pagination(self):
-        """lb-pool-list."""
+        # lb-pool-list.
         resources = "pools"
         cmd = pool.ListPool(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources_with_pagination(resources, cmd)
 
     def test_list_pools_sort(self):
-        """lb-pool-list --sort-key name --sort-key id --sort-key asc
-        --sort-key desc
-        """
+        # lb-pool-list --sort-key name --sort-key id --sort-key asc
+        # --sort-key desc
         resources = "pools"
         cmd = pool.ListPool(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
@@ -96,20 +95,20 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_pools_limit(self):
-        """lb-pool-list -P."""
+        # lb-pool-list -P.
         resources = "pools"
         cmd = pool.ListPool(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_show_pool_id(self):
-        """lb-pool-show test_id."""
+        # lb-pool-show test_id.
         resource = 'pool'
         cmd = pool.ShowPool(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
     def test_show_pool_id_name(self):
-        """lb-pool-show."""
+        # lb-pool-show.
         resource = 'pool'
         cmd = pool.ShowPool(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
@@ -117,7 +116,7 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                  args, ['id', 'name'])
 
     def test_update_pool(self):
-        """lb-pool-update myid --name newname --tags a b."""
+        # lb-pool-update myid --name newname --tags a b.
         resource = 'pool'
         cmd = pool.UpdatePool(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -125,7 +124,7 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                    {'name': 'newname', })
 
     def test_delete_pool(self):
-        """lb-pool-delete my-id."""
+        # lb-pool-delete my-id.
         resource = 'pool'
         cmd = pool.DeletePool(test_cli20.MyApp(sys.stdout), None)
         my_id = 'my-id'
@@ -133,7 +132,7 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
         self._test_delete_resource(resource, cmd, my_id, args)
 
     def test_retrieve_pool_stats(self):
-        """lb-pool-stats test_id."""
+        # lb-pool-stats test_id.
         resource = 'pool'
         cmd = pool.RetrievePoolStats(test_cli20.MyApp(sys.stdout), None)
         my_id = self.test_id

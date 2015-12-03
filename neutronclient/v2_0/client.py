@@ -88,8 +88,7 @@ def exception_handler_v20(status_code, error_content):
 
 
 class APIParamsCall(object):
-    """A Decorator to add support for format and tenant overriding and filters.
-    """
+    """A Decorator to support formating and tenant overriding and filters."""
     def __init__(self, function):
         self.function = function
 
@@ -152,7 +151,6 @@ class ClientBase(object):
 
         nets = neutron.list_networks()
         ...
-
     """
 
     # API has no way to report plurals, so we have to hard code them
@@ -453,38 +451,32 @@ class Client(ClientBase):
 
     @APIParamsCall
     def list_ext(self, path, **_params):
-        """Client extension hook for lists.
-        """
+        """Client extension hook for lists."""
         return self.get(path, params=_params)
 
     @APIParamsCall
     def show_ext(self, path, id, **_params):
-        """Client extension hook for shows.
-        """
+        """Client extension hook for shows."""
         return self.get(path % id, params=_params)
 
     @APIParamsCall
     def create_ext(self, path, body=None):
-        """Client extension hook for creates.
-        """
+        """Client extension hook for creates."""
         return self.post(path, body=body)
 
     @APIParamsCall
     def update_ext(self, path, id, body=None):
-        """Client extension hook for updates.
-        """
+        """Client extension hook for updates."""
         return self.put(path % id, body=body)
 
     @APIParamsCall
     def delete_ext(self, path, id):
-        """Client extension hook for deletes.
-        """
+        """Client extension hook for deletes."""
         return self.delete(path % id)
 
     @APIParamsCall
     def get_quotas_tenant(self, **_params):
-        """Fetch tenant info in server's context for following quota operation.
-        """
+        """Fetch tenant info for following quota operation."""
         return self.get(self.quota_path % 'tenant', params=_params)
 
     @APIParamsCall

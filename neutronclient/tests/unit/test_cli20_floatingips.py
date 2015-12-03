@@ -25,7 +25,7 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
     non_admin_status_resources = ['floatingip']
 
     def test_create_floatingip(self):
-        """Create floatingip: fip1."""
+        # Create floatingip: fip1.
         resource = 'floatingip'
         cmd = fip.CreateFloatingIP(test_cli20.MyApp(sys.stdout), None)
         name = 'fip1'
@@ -37,7 +37,7 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_floatingip_and_port(self):
-        """Create floatingip: fip1."""
+        # Create floatingip: fip1.
         resource = 'floatingip'
         cmd = fip.CreateFloatingIP(test_cli20.MyApp(sys.stdout), None)
         name = 'fip1'
@@ -56,7 +56,7 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_floatingip_and_port_and_address(self):
-        """Create floatingip: fip1 with a given port and address."""
+        # Create floatingip: fip1 with a given port and address.
         resource = 'floatingip'
         cmd = fip.CreateFloatingIP(test_cli20.MyApp(sys.stdout), None)
         name = 'fip1'
@@ -75,7 +75,7 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_floatingip_with_ip_address_of_floating_ip(self):
-        """Create floatingip: fip1 with a given IP address of floating IP."""
+        # Create floatingip: fip1 with a given IP address of floating IP.
         resource = 'floatingip'
         cmd = fip.CreateFloatingIP(test_cli20.MyApp(sys.stdout), None)
         name = 'fip1'
@@ -89,7 +89,7 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_floatingip_with_subnet_id(self):
-        """Create floatingip: fip1 on a given subnet id."""
+        # Create floatingip: fip1 on a given subnet id.
         resource = 'floatingip'
         cmd = fip.CreateFloatingIP(test_cli20.MyApp(sys.stdout), None)
         name = 'fip1'
@@ -103,7 +103,7 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_floatingip_with_subnet_id_and_port(self):
-        """Create floatingip: fip1 on a given subnet id and port."""
+        # Create floatingip: fip1 on a given subnet id and port.
         resource = 'floatingip'
         cmd = fip.CreateFloatingIP(test_cli20.MyApp(sys.stdout), None)
         name = 'fip1'
@@ -118,7 +118,7 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_list_floatingips(self):
-        """list floatingips: -D."""
+        # list floatingips: -D.
         resources = 'floatingips'
         cmd = fip.ListFloatingIP(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
@@ -129,9 +129,8 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
         self._test_list_resources_with_pagination(resources, cmd)
 
     def test_list_floatingips_sort(self):
-        """list floatingips: --sort-key name --sort-key id --sort-key asc
-        --sort-key desc
-        """
+        # list floatingips:
+        # --sort-key name --sort-key id --sort-key asc --sort-key desc
         resources = 'floatingips'
         cmd = fip.ListFloatingIP(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
@@ -139,13 +138,13 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_floatingips_limit(self):
-        """list floatingips: -P."""
+        # list floatingips: -P.
         resources = 'floatingips'
         cmd = fip.ListFloatingIP(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_delete_floatingip(self):
-        """Delete floatingip: fip1."""
+        # Delete floatingip: fip1.
         resource = 'floatingip'
         cmd = fip.DeleteFloatingIP(test_cli20.MyApp(sys.stdout), None)
         myid = 'myid'
@@ -153,7 +152,7 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
         self._test_delete_resource(resource, cmd, myid, args)
 
     def test_show_floatingip(self):
-        """Show floatingip: --fields id."""
+        # Show floatingip: --fields id.
         resource = 'floatingip'
         cmd = fip.ShowFloatingIP(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', self.test_id]
@@ -161,7 +160,7 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
                                  args, ['id'])
 
     def test_disassociate_ip(self):
-        """Disassociate floating IP: myid."""
+        # Disassociate floating IP: myid.
         resource = 'floatingip'
         cmd = fip.DisassociateFloatingIP(test_cli20.MyApp(sys.stdout), None)
         args = ['myid']
@@ -170,7 +169,7 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
                                    )
 
     def test_associate_ip(self):
-        """Associate floating IP: myid portid."""
+        # Associate floating IP: myid portid.
         resource = 'floatingip'
         cmd = fip.AssociateFloatingIP(test_cli20.MyApp(sys.stdout), None)
         args = ['myid', 'portid']

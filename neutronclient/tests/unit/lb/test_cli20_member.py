@@ -25,7 +25,7 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
         super(CLITestV20LbMemberJSON, self).setUp(plurals={'tags': 'tag'})
 
     def test_create_member(self):
-        """lb-member-create with mandatory params only."""
+        # lb-member-create with mandatory params only.
         resource = 'member'
         cmd = member.CreateMember(test_cli20.MyApp(sys.stdout), None)
         address = '10.0.0.1'
@@ -43,7 +43,7 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                                    admin_state_up=None)
 
     def test_create_member_all_params(self):
-        """lb-member-create with all available params."""
+        # lb-member-create with all available params.
         resource = 'member'
         cmd = member.CreateMember(test_cli20.MyApp(sys.stdout), None)
         address = '10.0.0.1'
@@ -67,21 +67,20 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                                    admin_state_up=None)
 
     def test_list_members(self):
-        """lb-member-list."""
+        # lb-member-list.
         resources = "members"
         cmd = member.ListMember(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_members_pagination(self):
-        """lb-member-list."""
+        # lb-member-list.
         resources = "members"
         cmd = member.ListMember(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources_with_pagination(resources, cmd)
 
     def test_list_members_sort(self):
-        """lb-member-list --sort-key name --sort-key id --sort-key asc
-        --sort-key desc
-        """
+        # lb-member-list --sort-key name --sort-key id --sort-key asc
+        # --sort-key desc
         resources = "members"
         cmd = member.ListMember(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
@@ -89,20 +88,20 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_members_limit(self):
-        """lb-member-list -P."""
+        # lb-member-list -P.
         resources = "members"
         cmd = member.ListMember(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_show_member_id(self):
-        """lb-member-show test_id."""
+        # lb-member-show test_id.
         resource = 'member'
         cmd = member.ShowMember(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
     def test_update_member(self):
-        """lb-member-update  myid --name myname --tags a b."""
+        # lb-member-update  myid --name myname --tags a b.
         resource = 'member'
         cmd = member.UpdateMember(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -111,7 +110,7 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                                    {'name': 'myname', 'tags': ['a', 'b'], })
 
     def test_delete_member(self):
-        """lb-member-delete my-id."""
+        # lb-member-delete my-id.
         resource = 'member'
         cmd = member.DeleteMember(test_cli20.MyApp(sys.stdout), None)
         my_id = 'my-id'

@@ -31,7 +31,7 @@ class CLITestV20AddressScopeJSON(test_cli20.CLITestV20Base):
         super(CLITestV20AddressScopeJSON, self).setUp(plurals={'tags': 'tag'})
 
     def test_create_address_scope_with_minimum_option(self):
-        """Create address_scope: foo-address-scope with minimum option."""
+        # Create address_scope: foo-address-scope with minimum option.
         resource = 'address_scope'
         cmd = address_scope.CreateAddressScope(
             test_cli20.MyApp(sys.stdout), None)
@@ -44,7 +44,7 @@ class CLITestV20AddressScopeJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_address_scope_with_all_option(self):
-        """Create address_scope: foo-address-scope with all options."""
+        # Create address_scope: foo-address-scope with all options.
         resource = 'address_scope'
         cmd = address_scope.CreateAddressScope(
             test_cli20.MyApp(sys.stdout), None)
@@ -57,7 +57,7 @@ class CLITestV20AddressScopeJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_address_scope_with_unicode(self):
-        """Create address_scope: u'\u7f51\u7edc'."""
+        # Create address_scope: u'\u7f51\u7edc'.
         resource = 'address_scope'
         cmd = address_scope.CreateAddressScope(
             test_cli20.MyApp(sys.stdout), None)
@@ -70,7 +70,7 @@ class CLITestV20AddressScopeJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_update_address_scope_exception(self):
-        """Update address_scope (Negative) : myid."""
+        # Update address_scope (Negative) : myid.
         resource = 'address_scope'
         cmd = address_scope.UpdateAddressScope(
             test_cli20.MyApp(sys.stdout), None)
@@ -78,7 +78,7 @@ class CLITestV20AddressScopeJSON(test_cli20.CLITestV20Base):
                           resource, cmd, 'myid', ['myid'], {})
 
     def test_update_address_scope(self):
-        """Update address_scope: myid --name newname-address-scope."""
+        # Update address_scope: myid --name newname-address-scope.
         resource = 'address_scope'
         cmd = address_scope.UpdateAddressScope(
             test_cli20.MyApp(sys.stdout), None)
@@ -88,14 +88,14 @@ class CLITestV20AddressScopeJSON(test_cli20.CLITestV20Base):
                                    )
 
     def test_list_address_scope(self):
-        """address_scope-list."""
+        # address_scope-list.
         resources = "address_scopes"
         cmd = address_scope.ListAddressScope(test_cli20.MyApp(sys.stdout),
                                              None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_address_scope_pagination(self):
-        """address_scope-list."""
+        # address_scope-list.
         cmd = address_scope.ListAddressScope(test_cli20.MyApp(sys.stdout),
                                              None)
         self.mox.StubOutWithMock(address_scope.ListAddressScope,
@@ -108,9 +108,9 @@ class CLITestV20AddressScopeJSON(test_cli20.CLITestV20Base):
         self.mox.UnsetStubs()
 
     def test_list_address_scope_sort(self):
-        """sorted list: address_scope-list --sort-key name --sort-key id
-        --sort-key asc --sort-key desc
-        """
+        # sorted list:
+        # address_scope-list --sort-key name --sort-key id --sort-key asc
+        # --sort-key desc
         resources = "address_scopes"
         cmd = address_scope.ListAddressScope(test_cli20.MyApp(sys.stdout),
                                              None)
@@ -119,14 +119,14 @@ class CLITestV20AddressScopeJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_address_scope_limit(self):
-        """size (1000) limited list: address_scope-list -P."""
+        # size (1000) limited list: address_scope-list -P.
         resources = "address_scopes"
         cmd = address_scope.ListAddressScope(test_cli20.MyApp(sys.stdout),
                                              None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_show_address_scope(self):
-        """Show address_scope: --fields id --fields name myid."""
+        # Show address_scope: --fields id --fields name myid.
         resource = 'address_scope'
         cmd = address_scope.ShowAddressScope(
             test_cli20.MyApp(sys.stdout), None)
@@ -135,7 +135,7 @@ class CLITestV20AddressScopeJSON(test_cli20.CLITestV20Base):
                                  ['id', 'name'])
 
     def test_delete_address_scope(self):
-        """Delete address_scope: address_scope_id."""
+        # Delete address_scope: address_scope_id.
         resource = 'address_scope'
         cmd = address_scope.DeleteAddressScope(
             test_cli20.MyApp(sys.stdout), None)

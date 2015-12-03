@@ -28,7 +28,7 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
         super(CLITestV20FirewallPolicyJSON, self).setUp()
 
     def test_create_firewall_policy_with_mandatory_params(self):
-        """firewall-policy-create with mandatory (none) params only."""
+        # firewall-policy-create with mandatory (none) params only.
         resource = 'firewall_policy'
         cmd = firewallpolicy.CreateFirewallPolicy(test_cli20.MyApp(sys.stdout),
                                                   None)
@@ -45,7 +45,7 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
                                    admin_state_up=True, tenant_id=tenant_id)
 
     def test_create_firewall_policy_with_all_params(self):
-        """firewall-policy-create with rule param of misc format."""
+        # firewall-policy-create with rule param of misc format.
         resource = 'firewall_policy'
         cmd = firewallpolicy.CreateFirewallPolicy(test_cli20.MyApp(sys.stdout),
                                                   None)
@@ -74,23 +74,22 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
                                        tenant_id=tenant_id)
 
     def test_list_firewall_policies(self):
-        """firewall-policy-list."""
+        # firewall-policy-list.
         resources = "firewall_policies"
         cmd = firewallpolicy.ListFirewallPolicy(test_cli20.MyApp(sys.stdout),
                                                 None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_firewall_policies_pagination(self):
-        """firewall-policy-list."""
+        # firewall-policy-list."""
         resources = "firewall_policies"
         cmd = firewallpolicy.ListFirewallPolicy(test_cli20.MyApp(sys.stdout),
                                                 None)
         self._test_list_resources_with_pagination(resources, cmd)
 
     def test_list_firewall_policies_sort(self):
-        """sorted list: firewall-policy-list --sort-key name --sort-key id
-        --sort-key asc --sort-key desc
-        """
+        # sorted list: firewall-policy-list --sort-key name --sort-key id
+        # --sort-key asc --sort-key desc
         resources = "firewall_policies"
         cmd = firewallpolicy.ListFirewallPolicy(test_cli20.MyApp(sys.stdout),
                                                 None)
@@ -99,14 +98,14 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_firewall_policies_limit(self):
-        """size (1000) limited list: firewall-policy-list -P."""
+        # size (1000) limited list: firewall-policy-list -P.
         resources = "firewall_policies"
         cmd = firewallpolicy.ListFirewallPolicy(test_cli20.MyApp(sys.stdout),
                                                 None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_show_firewall_policy_id(self):
-        """firewall-policy-show test_id."""
+        # firewall-policy-show test_id.
         resource = 'firewall_policy'
         cmd = firewallpolicy.ShowFirewallPolicy(test_cli20.MyApp(sys.stdout),
                                                 None)
@@ -114,7 +113,7 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
     def test_show_firewall_policy_id_name(self):
-        """firewall-policy-show."""
+        # firewall-policy-show.
         resource = 'firewall_policy'
         cmd = firewallpolicy.ShowFirewallPolicy(test_cli20.MyApp(sys.stdout),
                                                 None)
@@ -123,7 +122,7 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
                                  args, ['id', 'name'])
 
     def test_update_firewall_policy(self):
-        """firewall-policy-update myid --name newname."""
+        # firewall-policy-update myid --name newname.
         resource = 'firewall_policy'
         cmd = firewallpolicy.UpdateFirewallPolicy(test_cli20.MyApp(sys.stdout),
                                                   None)
@@ -132,7 +131,7 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
                                    {'name': 'newname', })
 
     def test_update_firewall_policy_with_rules(self):
-        """firewall-policy-update myid --firewall-rules "rule1 rule2"."""
+        # firewall-policy-update myid --firewall-rules "rule1 rule2".
         resource = 'firewall_policy'
         cmd = firewallpolicy.UpdateFirewallPolicy(test_cli20.MyApp(sys.stdout),
                                                   None)
@@ -144,7 +143,7 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
             {'firewall_rules': firewall_rules_res, })
 
     def test_delete_firewall_policy(self):
-        """firewall-policy-delete my-id."""
+        # firewall-policy-delete my-id.
         resource = 'firewall_policy'
         cmd = firewallpolicy.DeleteFirewallPolicy(test_cli20.MyApp(sys.stdout),
                                                   None)
@@ -153,10 +152,8 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
         self._test_delete_resource(resource, cmd, my_id, args)
 
     def test_insert_firewall_rule(self):
-        """firewall-policy-insert-rule myid newruleid
-        --insert-before ruleAid
-        --insert-after ruleBid
-        """
+        # firewall-policy-insert-rule myid newruleid --insert-before ruleAid
+        # --insert-after ruleBid
         resource = 'firewall_policy'
         cmd = firewallpolicy.FirewallPolicyInsertRule(
             test_cli20.MyApp(sys.stdout),
@@ -189,8 +186,7 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
         self.mox.UnsetStubs()
 
     def test_remove_firewall_rule(self):
-        """firewall-policy-remove-rule myid ruleid
-        """
+        # firewall-policy-remove-rule myid ruleid
         resource = 'firewall_policy'
         cmd = firewallpolicy.FirewallPolicyRemoveRule(
             test_cli20.MyApp(sys.stdout),

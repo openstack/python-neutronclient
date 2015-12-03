@@ -398,7 +398,9 @@ COMMANDS = {'2.0': COMMAND_V2}
 
 
 class HelpAction(argparse.Action):
-    """Provide a custom action so the -h and --help options
+    """Print help message including sub-commands
+
+    Provide a custom action so the -h and --help options
     to the main app will print a list of the commands.
 
     The commands are determined by checking the CommandManager
@@ -831,7 +833,9 @@ class NeutronShell(app.App):
         return 1
 
     def authenticate_user(self):
-        """Make sure the user has provided all of the authentication
+        """Confirm user authentication
+
+        Make sure the user has provided all of the authentication
         info we need.
         """
         cloud_config = os_client_config.OpenStackConfig().get_one_cloud(

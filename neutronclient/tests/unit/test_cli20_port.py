@@ -29,7 +29,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         super(CLITestV20PortJSON, self).setUp(plurals={'tags': 'tag'})
 
     def test_create_port(self):
-        """Create port: netid."""
+        # Create port: netid.
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -43,7 +43,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_port_extra_dhcp_opts_args(self):
-        """Create port: netid --extra_dhcp_opt."""
+        # Create port: netid --extra_dhcp_opt.
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -67,7 +67,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_port_extra_dhcp_opts_args_ip_version(self):
-        """Create port: netid --extra_dhcp_opt."""
+        # Create port: netid --extra_dhcp_opt.
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -95,7 +95,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_port_full(self):
-        """Create port: --mac_address mac --device_id deviceid netid."""
+        # Create port: --mac_address mac --device_id deviceid netid.
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -114,7 +114,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_port_vnic_type_normal(self):
-        """Create port: --vnic_type normal netid."""
+        # Create port: --vnic_type normal netid.
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -134,7 +134,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_port_vnic_type_direct(self):
-        """Create port: --vnic_type direct netid."""
+        # Create port: --vnic_type direct netid.
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -154,7 +154,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_port_vnic_type_macvtap(self):
-        """Create port: --vnic_type macvtap netid."""
+        # Create port: --vnic_type macvtap netid.
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -174,7 +174,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_port_vnic_type_baremetal(self):
-        """Create port: --vnic_type baremetal netid."""
+        # Create port: --vnic_type baremetal netid.
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -213,7 +213,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_port_tenant(self):
-        """Create port: --tenant_id tenantid netid."""
+        # Create port: --tenant_id tenantid netid.
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -234,7 +234,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    tenant_id='tenantid')
 
     def test_create_port_tags(self):
-        """Create port: netid mac_address device_id --tags a b."""
+        # Create port: netid mac_address device_id --tags a b.
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -249,7 +249,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    tags=['a', 'b'])
 
     def test_create_port_secgroup(self):
-        """Create port: --security-group sg1_id netid."""
+        # Create port: --security-group sg1_id netid.
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -262,11 +262,9 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_port_secgroups(self):
-        """Create port: <security_groups> netid
-
-        The <security_groups> are
-        --security-group sg1_id --security-group sg2_id
-        """
+        # Create port: <security_groups> netid
+        # The <security_groups> are --security-group sg1_id
+        # --security-group sg2_id
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -293,10 +291,8 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_port_secgroups_list(self):
-        """Create port: netid <security_groups>
-        The <security_groups> are
-        --security-groups list=true sg_id1 sg_id2
-        """
+        # Create port: netid <security_groups>
+        # The <security_groups> are --security-groups list=true sg_id1 sg_id2
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -309,7 +305,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_port_with_qos_policy(self):
-        """Create port: --qos-policy mypolicy."""
+        # Create port: --qos-policy mypolicy.
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -323,10 +319,9 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_port_with_allowed_address_pair_ipaddr(self):
-        """Create port:
-        --allowed-address-pair ip_address=addr0
-        --allowed-address-pair ip_address=addr1
-        """
+        # Create port:
+        # --allowed-address-pair ip_address=addr0
+        # --allowed-address-pair ip_address=addr1
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -346,10 +341,9 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_port_with_allowed_address_pair(self):
-        """Create port:
-        --allowed-address-pair ip_address=addr0,mac_address=mac0
-        --allowed-address-pair ip_address=addr1,mac_address=mac1
-        """
+        # Create port:
+        # --allowed-address-pair ip_address=addr0,mac_address=mac0
+        # --allowed-address-pair ip_address=addr1,mac_address=mac1
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -371,7 +365,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_list_ports(self):
-        """List ports: -D."""
+        # List ports: -D.
         resources = "ports"
         cmd = port.ListPort(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
@@ -382,9 +376,8 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_list_resources_with_pagination(resources, cmd)
 
     def test_list_ports_sort(self):
-        """list ports: --sort-key name --sort-key id --sort-key asc
-        --sort-key desc
-        """
+        # list ports:
+        # --sort-key name --sort-key id --sort-key asc --sort-key desc
         resources = "ports"
         cmd = port.ListPort(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
@@ -392,32 +385,32 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_ports_limit(self):
-        """list ports: -P."""
+        # list ports: -P.
         resources = "ports"
         cmd = port.ListPort(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_list_ports_tags(self):
-        """List ports: -- --tags a b."""
+        # List ports: -- --tags a b.
         resources = "ports"
         cmd = port.ListPort(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, tags=['a', 'b'])
 
     def test_list_ports_detail_tags(self):
-        """List ports: -D -- --tags a b."""
+        # List ports: -D -- --tags a b.
         resources = "ports"
         cmd = port.ListPort(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, detail=True, tags=['a', 'b'])
 
     def test_list_ports_fields(self):
-        """List ports: --fields a --fields b -- --fields c d."""
+        # List ports: --fields a --fields b -- --fields c d.
         resources = "ports"
         cmd = port.ListPort(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
                                   fields_1=['a', 'b'], fields_2=['c', 'd'])
 
     def test_list_ports_with_fixed_ips_in_csv(self):
-        """List ports: -f csv."""
+        # List ports: -f csv.
         resources = "ports"
         cmd = port.ListPort(test_cli20.MyApp(sys.stdout), None)
         fixed_ips = [{"subnet_id": "30422057-d6df-4c90-8314-aefb5e326666",
@@ -493,28 +486,28 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self.assertIn('myid1', _str)
 
     def test_list_router_ports(self):
-        """List router ports: -D."""
+        # List router ports: -D.
         resources = "ports"
         cmd = port.ListRouterPort(test_cli20.MyApp(sys.stdout), None)
         self._test_list_router_port(resources, cmd,
                                     self.test_id, True)
 
     def test_list_router_ports_tags(self):
-        """List router ports: -- --tags a b."""
+        # List router ports: -- --tags a b.
         resources = "ports"
         cmd = port.ListRouterPort(test_cli20.MyApp(sys.stdout), None)
         self._test_list_router_port(resources, cmd,
                                     self.test_id, tags=['a', 'b'])
 
     def test_list_router_ports_detail_tags(self):
-        """List router ports: -D -- --tags a b."""
+        # List router ports: -D -- --tags a b.
         resources = "ports"
         cmd = port.ListRouterPort(test_cli20.MyApp(sys.stdout), None)
         self._test_list_router_port(resources, cmd, self.test_id,
                                     detail=True, tags=['a', 'b'])
 
     def test_list_router_ports_fields(self):
-        """List ports: --fields a --fields b -- --fields c d."""
+        # List ports: --fields a --fields b -- --fields c d.
         resources = "ports"
         cmd = port.ListRouterPort(test_cli20.MyApp(sys.stdout), None)
         self._test_list_router_port(resources, cmd, self.test_id,
@@ -522,9 +515,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                     fields_2=['c', 'd'])
 
     def test_update_port(self):
-        """Update port: myid --name myname --admin-state-up False
-        --tags a b.
-         """
+        # Update port: myid --name myname --admin-state-up False --tags a b.
         resource = 'port'
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -554,7 +545,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, myid, args, updatefields)
 
     def test_update_port_extra_dhcp_opts(self):
-        """Update port: myid --extra_dhcp_opt."""
+        # Update port: myid --extra_dhcp_opt.
         resource = 'port'
         myid = 'myid'
         args = [myid,
@@ -598,7 +589,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, myid, args, updatefields)
 
     def test_update_port_extra_dhcp_opts_ip_version(self):
-        """Update port: myid --extra_dhcp_opt."""
+        # Update port: myid --extra_dhcp_opt.
         resource = 'port'
         myid = 'myid'
         args = [myid,
@@ -622,7 +613,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, myid, args, updatedfields)
 
     def test_update_port_with_qos_policy(self):
-        """Update port: myid --qos-policy mypolicy."""
+        # Update port: myid --qos-policy mypolicy.
         resource = 'port'
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -630,7 +621,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    {'qos_policy_id': 'mypolicy', })
 
     def test_update_port_with_no_qos_policy(self):
-        """Update port: myid --no-qos-policy."""
+        # Update port: myid --no-qos-policy.
         resource = 'port'
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -660,7 +651,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, myid, args, updatedfields)
 
     def test_update_port_security_group_off(self):
-        """Update port: --no-security-groups myid."""
+        # Update port: --no-security-groups myid.
         resource = 'port'
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -668,10 +659,9 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    {'security_groups': []})
 
     def test_update_port_allowed_address_pair_ipaddr(self):
-        """Update port(ip_address only):
-        --allowed-address-pairs ip_address=addr0
-        --allowed-address-pairs ip_address=addr1
-        """
+        # Update port(ip_address only):
+        # --allowed-address-pairs ip_address=addr0
+        # --allowed-address-pairs ip_address=addr1
         import sys
         resource = 'port'
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
@@ -687,12 +677,9 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, myid, args, updatefields)
 
     def test_update_port_allowed_address_pair(self):
-        """Update port:
-        --allowed-address-pair
-        ip_address=addr0,mac_address=mac0
-        --allowed-address-pair
-        ip_address_addr1,mac_address=mac1
-        """
+        # Update port:
+        # --allowed-address-pair ip_address=addr0,mac_address=mac0
+        # --allowed-address-pair ip_address_addr1,mac_address=mac1
         resource = 'port'
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
         myid = 'myid'
@@ -709,7 +696,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, myid, args, updatefields)
 
     def test_update_port_allowed_address_pairs_off(self):
-        """Update port: --no-allowed-address-pairs."""
+        # Update port: --no-allowed-address-pairs.
         resource = 'port'
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -717,7 +704,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                    {'allowed_address_pairs': []})
 
     def test_show_port(self):
-        """Show port: --fields id --fields name myid."""
+        # Show port: --fields id --fields name myid.
         resource = 'port'
         cmd = port.ShowPort(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
@@ -725,7 +712,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
                                  args, ['id', 'name'])
 
     def test_delete_port(self):
-        """Delete port: myid."""
+        # Delete port: myid.
         resource = 'port'
         cmd = port.DeletePort(test_cli20.MyApp(sys.stdout), None)
         myid = 'myid'

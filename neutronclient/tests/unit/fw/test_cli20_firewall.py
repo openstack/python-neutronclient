@@ -23,7 +23,7 @@ from neutronclient.tests.unit import test_cli20
 class CLITestV20FirewallJSON(test_cli20.CLITestV20Base):
 
     def test_create_firewall_with_mandatory_params(self):
-        """firewall-create with mandatory (none) params."""
+        # firewall-create with mandatory (none) params.
         resource = 'firewall'
         cmd = firewall.CreateFirewall(test_cli20.MyApp(sys.stdout), None)
         name = ''
@@ -38,7 +38,7 @@ class CLITestV20FirewallJSON(test_cli20.CLITestV20Base):
                                    admin_state_up=True, tenant_id=tenant_id)
 
     def test_create_firewall_with_all_params(self):
-        """firewall-create with all params set."""
+        # firewall-create with all params set.
         resource = 'firewall'
         cmd = firewall.CreateFirewall(test_cli20.MyApp(sys.stdout), None)
         name = 'my-name'
@@ -72,21 +72,20 @@ class CLITestV20FirewallJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_list_firewalls(self):
-        """firewall-list."""
+        # firewall-list.
         resources = "firewalls"
         cmd = firewall.ListFirewall(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_firewalls_pagination(self):
-        """firewall-list with pagination."""
+        # firewall-list with pagination.
         resources = "firewalls"
         cmd = firewall.ListFirewall(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources_with_pagination(resources, cmd)
 
     def test_list_firewalls_sort(self):
-        """sorted list: firewall-list --sort-key name --sort-key id
-        --sort-key asc --sort-key desc
-        """
+        # sorted list: firewall-list --sort-key name --sort-key id
+        # --sort-key asc --sort-key desc
         resources = "firewalls"
         cmd = firewall.ListFirewall(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
@@ -94,20 +93,20 @@ class CLITestV20FirewallJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_firewalls_limit(self):
-        """size (1000) limited list: firewall-list -P."""
+        # size (1000) limited list: firewall-list -P.
         resources = "firewalls"
         cmd = firewall.ListFirewall(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_show_firewall_id(self):
-        """firewall-show test_id."""
+        # firewall-show test_id.
         resource = 'firewall'
         cmd = firewall.ShowFirewall(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
     def test_show_firewall_id_name(self):
-        """firewall-show."""
+        # firewall-show.
         resource = 'firewall'
         cmd = firewall.ShowFirewall(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
@@ -115,7 +114,7 @@ class CLITestV20FirewallJSON(test_cli20.CLITestV20Base):
                                  args, ['id', 'name'])
 
     def test_update_firewall(self):
-        """firewall-update myid --name newname --tags a b."""
+        # firewall-update myid --name newname --tags a b.
         resource = 'firewall'
         cmd = firewall.UpdateFirewall(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -123,7 +122,7 @@ class CLITestV20FirewallJSON(test_cli20.CLITestV20Base):
                                    {'name': 'newname', })
 
     def test_update_firewall_using_policy_name(self):
-        """firewall-update myid --policy newpolicy."""
+        # firewall-update myid --policy newpolicy.
         resource = 'firewall'
         cmd = firewall.UpdateFirewall(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -155,7 +154,7 @@ class CLITestV20FirewallJSON(test_cli20.CLITestV20Base):
             ['myid', '--no-routers', '--router', 'fake-id'], {})
 
     def test_delete_firewall(self):
-        """firewall-delete my-id."""
+        # firewall-delete my-id.
         resource = 'firewall'
         cmd = firewall.DeleteFirewall(test_cli20.MyApp(sys.stdout), None)
         my_id = 'my-id'

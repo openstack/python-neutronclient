@@ -23,7 +23,7 @@ from neutronclient.tests.unit import test_cli20
 class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
 
     def _test_create_firewall_rule_with_mandatory_params(self, enabled):
-        """firewall-rule-create with mandatory (none) params only."""
+        # firewall-rule-create with mandatory (none) params only.
         resource = 'firewall_rule'
         cmd = firewallrule.CreateFirewallRule(test_cli20.MyApp(sys.stdout),
                                               None)
@@ -57,7 +57,7 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
         self._test_create_firewall_rule_with_mandatory_params(enabled='False')
 
     def _setup_create_firewall_rule_with_all_params(self, protocol='tcp'):
-        """firewall-rule-create with all params set."""
+        # firewall-rule-create with all params set.
         resource = 'firewall_rule'
         cmd = firewallrule.CreateFirewallRule(test_cli20.MyApp(sys.stdout),
                                               None)
@@ -104,23 +104,22 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
         self._setup_create_firewall_rule_with_all_params(protocol='any')
 
     def test_list_firewall_rules(self):
-        """firewall-rule-list."""
+        # firewall-rule-list.
         resources = "firewall_rules"
         cmd = firewallrule.ListFirewallRule(test_cli20.MyApp(sys.stdout),
                                             None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_firewall_rules_pagination(self):
-        """firewall-rule-list."""
+        # firewall-rule-list.
         resources = "firewall_rules"
         cmd = firewallrule.ListFirewallRule(test_cli20.MyApp(sys.stdout),
                                             None)
         self._test_list_resources_with_pagination(resources, cmd)
 
     def test_list_firewall_rules_sort(self):
-        """firewall-rule-list --sort-key name --sort-key id --sort-key asc
-        --sort-key desc
-        """
+        # firewall-rule-list --sort-key name --sort-key id --sort-key asc
+        # --sort-key desc
         resources = "firewall_rules"
         cmd = firewallrule.ListFirewallRule(test_cli20.MyApp(sys.stdout),
                                             None)
@@ -129,14 +128,14 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_firewall_rules_limit(self):
-        """firewall-rule-list -P."""
+        # firewall-rule-list -P."""
         resources = "firewall_rules"
         cmd = firewallrule.ListFirewallRule(test_cli20.MyApp(sys.stdout),
                                             None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_show_firewall_rule_id(self):
-        """firewall-rule-show test_id."""
+        # firewall-rule-show test_id.
         resource = 'firewall_rule'
         cmd = firewallrule.ShowFirewallRule(test_cli20.MyApp(sys.stdout),
                                             None)
@@ -144,7 +143,7 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
     def test_show_firewall_rule_id_name(self):
-        """firewall-rule-show."""
+        # firewall-rule-show.
         resource = 'firewall_rule'
         cmd = firewallrule.ShowFirewallRule(test_cli20.MyApp(sys.stdout),
                                             None)
@@ -153,7 +152,7 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
                                  args, ['id', 'name'])
 
     def test_update_firewall_rule(self):
-        """firewall-rule-update myid --name newname."""
+        # firewall-rule-update myid --name newname.
         resource = 'firewall_rule'
         cmd = firewallrule.UpdateFirewallRule(test_cli20.MyApp(sys.stdout),
                                               None)
@@ -162,7 +161,7 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
                                    {'name': 'newname', })
 
     def test_update_firewall_rule_protocol(self):
-        """firewall-rule-update myid --protocol any."""
+        # firewall-rule-update myid --protocol any.
         resource = 'firewall_rule'
         cmd = firewallrule.UpdateFirewallRule(test_cli20.MyApp(sys.stdout),
                                               None)
@@ -171,7 +170,7 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
                                    {'protocol': None, })
 
     def test_delete_firewall_rule(self):
-        """firewall-rule-delete my-id."""
+        # firewall-rule-delete my-id.
         resource = 'firewall_rule'
         cmd = firewallrule.DeleteFirewallRule(test_cli20.MyApp(sys.stdout),
                                               None)

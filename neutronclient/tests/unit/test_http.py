@@ -44,7 +44,7 @@ class TestHTTPClientMixin(object):
         """Return client class, instance."""
 
     def _test_headers(self, expected_headers, **kwargs):
-        """Test headers."""
+        # Test headers.
         self.requests.register_uri(METHOD, URL,
                                    request_headers=expected_headers)
         self.http.request(URL, METHOD, **kwargs)

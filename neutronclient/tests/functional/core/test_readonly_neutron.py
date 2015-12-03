@@ -20,14 +20,13 @@ from neutronclient.tests.functional import base
 class SimpleReadOnlyNeutronClientTest(base.ClientTestBase):
 
     """This is a first pass at a simple read only python-neutronclient test.
-    This only exercises client commands that are read only.
 
+    This only exercises client commands that are read only.
     This should test commands:
     * as a regular user
     * as a admin user
     * with and without optional parameters
     * initially just check return codes, and later test command outputs
-
     """
 
     def test_admin_fake_action(self):

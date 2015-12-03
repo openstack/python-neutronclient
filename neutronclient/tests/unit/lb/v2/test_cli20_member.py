@@ -23,7 +23,7 @@ from neutronclient.tests.unit import test_cli20
 class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
 
     def test_create_member_with_mandatory_params(self):
-        """lbaas-member-create with mandatory params only."""
+        # lbaas-member-create with mandatory params only.
         resource = 'member'
         cmd_resource = 'lbaas_member'
         cmd = member.CreateMember(test_cli20.MyApp(sys.stdout), None)
@@ -43,7 +43,7 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                                    parent_id=pool_id)
 
     def test_create_member_with_all_params(self):
-        """lbaas-member-create with all params set."""
+        # lbaas-member-create with all params set.
         resource = 'member'
         cmd_resource = 'lbaas_member'
         cmd = member.CreateMember(test_cli20.MyApp(sys.stdout), None)
@@ -65,7 +65,7 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                                    parent_id=pool_id)
 
     def test_list_members(self):
-        """lbaas-member-list."""
+        # lbaas-member-list.
         resources = 'members'
         cmd_resources = 'lbaas_members'
         pool_id = 'pool-id'
@@ -76,7 +76,7 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                                   query="pool_id=%s" % pool_id)
 
     def test_list_members_pagination(self):
-        """lbaas-member-list with pagination."""
+        # lbaas-member-list with pagination.
         resources = 'members'
         cmd_resources = 'lbaas_members'
         pool_id = 'pool-id'
@@ -88,7 +88,7 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                                                   query="pool_id=%s" % pool_id)
 
     def test_list_members_sort(self):
-        """lbaas-member-list --sort-key id --sort-key asc."""
+        # lbaas-member-list --sort-key id --sort-key asc.
         resources = 'members'
         cmd_resources = 'lbaas_members'
         pool_id = 'pool-id'
@@ -99,7 +99,7 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                                   query="pool_id=%s" % pool_id)
 
     def test_list_members_limit(self):
-        """lbaas-member-list -P."""
+        # lbaas-member-list -P.
         resources = 'members'
         cmd_resources = 'lbaas_members'
         pool_id = 'pool-id'
@@ -111,7 +111,7 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                                   query="pool_id=%s" % pool_id)
 
     def test_show_member_id(self):
-        """lbaas-member-show test_id."""
+        # lbaas-member-show test_id.
         resource = 'member'
         cmd_resource = 'lbaas_member'
         pool_id = 'pool-id'
@@ -121,7 +121,7 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                                  cmd_resource=cmd_resource, parent_id=pool_id)
 
     def test_show_member_id_name(self):
-        """lbaas-member-show."""
+        # lbaas-member-show.
         resource = 'member'
         cmd_resource = 'lbaas_member'
         pool_id = 'pool-id'
@@ -132,7 +132,7 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                                  cmd_resource=cmd_resource, parent_id=pool_id)
 
     def test_update_member(self):
-        """lbaas-member-update myid --name newname."""
+        # lbaas-member-update myid --name newname.
         resource = 'member'
         cmd_resource = 'lbaas_member'
         my_id = 'my-id'
@@ -145,7 +145,7 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                                    parent_id=pool_id)
 
     def test_delete_member(self):
-        """lbaas-member-delete my-id."""
+        # lbaas-member-delete my-id.
         resource = 'member'
         cmd_resource = 'lbaas_member'
         cmd = member.DeleteMember(test_cli20.MyApp(sys.stdout), None)

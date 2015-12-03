@@ -124,8 +124,7 @@ class AssociateFloatingIP(neutronV20.NeutronCommand):
 
 
 class DisassociateFloatingIP(neutronV20.NeutronCommand):
-    """Remove a mapping from a floating IP to a fixed IP.
-    """
+    """Remove a mapping from a floating IP to a fixed IP."""
 
     api = 'network'
     resource = 'floatingip'

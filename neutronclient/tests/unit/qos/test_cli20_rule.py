@@ -138,7 +138,7 @@ class CLITestV20QoSRuleJSON(test_cli20.CLITestV20Base):
                                  parent_id=policy_id)
 
     def test_list_qos_rule_types(self):
-        """qos_rule_types."""
+        # qos_rule_types.
         resources = 'rule_types'
         cmd_resources = 'qos_rule_types'
         response_contents = [{'type': 'bandwidth_limit'}]

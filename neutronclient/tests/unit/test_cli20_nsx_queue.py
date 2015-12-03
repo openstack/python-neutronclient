@@ -29,7 +29,7 @@ class CLITestV20QosQueueJSON(test_cli20.CLITestV20Base):
             plurals={'qos_queues': 'qos_queue'})
 
     def test_create_qos_queue(self):
-        """Create a qos queue."""
+        # Create a qos queue.
         resource = 'qos_queue'
         cmd = qos.CreateQoSQueue(
             test_cli20.MyApp(sys.stdout), None)
@@ -43,7 +43,7 @@ class CLITestV20QosQueueJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_qos_queue_all_values(self):
-        """Create a qos queue."""
+        # Create a qos queue.
         resource = 'qos_queue'
         cmd = qos.CreateQoSQueue(
             test_cli20.MyApp(sys.stdout), None)

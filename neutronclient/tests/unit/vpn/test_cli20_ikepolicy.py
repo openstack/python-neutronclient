@@ -25,7 +25,7 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
     non_admin_status_resources = ['ikepolicy']
 
     def test_create_ikepolicy_all_params(self):
-        """vpn-ikepolicy-create all params."""
+        # vpn-ikepolicy-create all params.
         resource = 'ikepolicy'
         cmd = ikepolicy.CreateIKEPolicy(test_cli20.MyApp(sys.stdout), None)
         name = 'ikepolicy1'
@@ -71,7 +71,7 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
                                    extra_body=extra_body)
 
     def test_create_ikepolicy_with_limited_params(self):
-        """vpn-ikepolicy-create with limited params."""
+        # vpn-ikepolicy-create with limited params.
         resource = 'ikepolicy'
         cmd = ikepolicy.CreateIKEPolicy(test_cli20.MyApp(sys.stdout), None)
         name = 'ikepolicy1'
@@ -150,21 +150,20 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
         self._test_lifetime_values(lifetime)
 
     def test_list_ikepolicy(self):
-        """vpn-ikepolicy-list."""
+        # vpn-ikepolicy-list.
         resources = "ikepolicies"
         cmd = ikepolicy.ListIKEPolicy(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_ikepolicy_pagination(self):
-        """vpn-ikepolicy-list."""
+        # vpn-ikepolicy-list.
         resources = "ikepolicies"
         cmd = ikepolicy.ListIKEPolicy(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources_with_pagination(resources, cmd)
 
     def test_list_ikepolicy_sort(self):
-        """vpn-ikepolicy-list --sort-key name --sort-key id --sort-key asc
-        --sort-key desc
-        """
+        # vpn-ikepolicy-list --sort-key name --sort-key id --sort-key asc
+        # --sort-key desc
         resources = "ikepolicies"
         cmd = ikepolicy.ListIKEPolicy(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
@@ -172,20 +171,20 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_ikepolicy_limit(self):
-        """vpn-ikepolicy-list -P."""
+        # vpn-ikepolicy-list -P.
         resources = "ikepolicies"
         cmd = ikepolicy.ListIKEPolicy(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_show_ikepolicy_id(self):
-        """vpn-ikepolicy-show ikepolicy_id."""
+        # vpn-ikepolicy-show ikepolicy_id.
         resource = 'ikepolicy'
         cmd = ikepolicy.ShowIKEPolicy(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
     def test_show_ikepolicy_id_name(self):
-        """vpn-ikepolicy-show."""
+        # vpn-ikepolicy-show.
         resource = 'ikepolicy'
         cmd = ikepolicy.ShowIKEPolicy(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
@@ -193,7 +192,7 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
                                  args, ['id', 'name'])
 
     def test_update_ikepolicy(self):
-        """vpn-ikepolicy-update myid --name newname --tags a b."""
+        # vpn-ikepolicy-update myid --name newname --tags a b.
         resource = 'ikepolicy'
         cmd = ikepolicy.UpdateIKEPolicy(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -201,7 +200,7 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
                                    {'name': 'newname', })
 
     def test_delete_ikepolicy(self):
-        """vpn-ikepolicy-delete my-id."""
+        # vpn-ikepolicy-delete my-id.
         resource = 'ikepolicy'
         cmd = ikepolicy.DeleteIKEPolicy(test_cli20.MyApp(sys.stdout), None)
         my_id = 'my-id'

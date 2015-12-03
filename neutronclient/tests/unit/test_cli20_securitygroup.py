@@ -31,7 +31,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
     non_admin_status_resources = ['security_group', 'security_group_rule']
 
     def test_create_security_group(self):
-        """Create security group: webservers."""
+        # Create security group: webservers.
         resource = 'security_group'
         cmd = securitygroup.CreateSecurityGroup(
             test_cli20.MyApp(sys.stdout), None)
@@ -44,7 +44,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_security_group_tenant(self):
-        """Create security group: webservers."""
+        # Create security group: webservers.
         resource = 'security_group'
         cmd = securitygroup.CreateSecurityGroup(
             test_cli20.MyApp(sys.stdout), None)
@@ -59,7 +59,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                                    tenant_id='tenant_id')
 
     def test_create_security_group_with_description(self):
-        """Create security group: webservers."""
+        # Create security group: webservers.
         resource = 'security_group'
         cmd = securitygroup.CreateSecurityGroup(
             test_cli20.MyApp(sys.stdout), None)
@@ -115,7 +115,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                                  args, ['id', 'name'])
 
     def test_delete_security_group(self):
-        """Delete security group: myid."""
+        # Delete security group: myid.
         resource = 'security_group'
         cmd = securitygroup.DeleteSecurityGroup(
             test_cli20.MyApp(sys.stdout), None)
@@ -124,7 +124,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         self._test_delete_resource(resource, cmd, myid, args)
 
     def test_update_security_group(self):
-        """Update security group: myid --name myname --description desc."""
+        # Update security group: myid --name myname --description desc.
         resource = 'security_group'
         cmd = securitygroup.UpdateSecurityGroup(
             test_cli20.MyApp(sys.stdout), None)
@@ -147,7 +147,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                                    )
 
     def test_create_security_group_rule_full(self):
-        """Create security group rule."""
+        # Create security group rule.
         resource = 'security_group_rule'
         cmd = securitygroup.CreateSecurityGroupRule(
             test_cli20.MyApp(sys.stdout), None)
@@ -175,7 +175,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_delete_security_group_rule(self):
-        """Delete security group rule: myid."""
+        # Delete security group rule: myid.
         resource = 'security_group_rule'
         cmd = securitygroup.DeleteSecurityGroupRule(
             test_cli20.MyApp(sys.stdout), None)

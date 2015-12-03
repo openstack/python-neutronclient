@@ -23,7 +23,7 @@ class CLITestV20MeteringJSON(test_cli20.CLITestV20Base):
     non_admin_status_resources = ['metering_label', 'metering_label_rule']
 
     def test_create_metering_label(self):
-        """Create a metering label."""
+        # Create a metering label.
         resource = 'metering_label'
         cmd = metering.CreateMeteringLabel(
             test_cli20.MyApp(sys.stdout), None)
@@ -43,7 +43,7 @@ class CLITestV20MeteringJSON(test_cli20.CLITestV20Base):
         self._test_list_resources(resources, cmd)
 
     def test_delete_metering_label(self):
-        """Delete a metering label."""
+        # Delete a metering label.
         resource = 'metering_label'
         cmd = metering.DeleteMeteringLabel(
             test_cli20.MyApp(sys.stdout), None)

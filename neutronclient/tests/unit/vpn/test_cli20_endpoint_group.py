@@ -27,7 +27,7 @@ class CLITestV20VpnEndpointGroupJSON(test_cli20.CLITestV20Base):
         self.register_non_admin_status_resource('endpoint_group')
 
     def test_create_endpoint_group_with_cidrs(self):
-        """vpn-endpoint-group-create with CIDR endpoints."""
+        # vpn-endpoint-group-create with CIDR endpoints."""
         resource = 'endpoint_group'
         cmd = endpoint_group.CreateEndpointGroup(test_cli20.MyApp(sys.stdout),
                                                  None)
@@ -55,7 +55,7 @@ class CLITestV20VpnEndpointGroupJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_endpoint_group_with_subnets(self):
-        """vpn-endpoint-group-create with subnet endpoints."""
+        # vpn-endpoint-group-create with subnet endpoints."""
         resource = 'endpoint_group'
         cmd = endpoint_group.CreateEndpointGroup(test_cli20.MyApp(sys.stdout),
                                                  None)
@@ -77,23 +77,22 @@ class CLITestV20VpnEndpointGroupJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_list_endpoint_group(self):
-        """vpn-endpoint-group-list."""
+        # vpn-endpoint-group-list.
         resources = "endpoint_groups"
         cmd = endpoint_group.ListEndpointGroup(test_cli20.MyApp(sys.stdout),
                                                None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_endpoint_group_pagination(self):
-        """vpn-endpoint-group-list."""
+        # vpn-endpoint-group-list.
         resources = "endpoint_groups"
         cmd = endpoint_group.ListEndpointGroup(test_cli20.MyApp(sys.stdout),
                                                None)
         self._test_list_resources_with_pagination(resources, cmd)
 
     def test_list_endpoint_group_sort(self):
-        """vpn-endpoint-group-list --sort-key name --sort-key id
-        --sort-key asc --sort-key desc
-        """
+        # vpn-endpoint-group-list --sort-key name --sort-key id
+        # --sort-key asc --sort-key desc
         resources = "endpoint_groups"
         cmd = endpoint_group.ListEndpointGroup(test_cli20.MyApp(sys.stdout),
                                                None)
@@ -102,14 +101,14 @@ class CLITestV20VpnEndpointGroupJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_endpoint_group_limit(self):
-        """vpn-endpoint-group-list -P."""
+        # vpn-endpoint-group-list -P.
         resources = "endpoint_groups"
         cmd = endpoint_group.ListEndpointGroup(test_cli20.MyApp(sys.stdout),
                                                None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_show_endpoint_group_id(self):
-        """vpn-endpoint-group-show test_id."""
+        # vpn-endpoint-group-show test_id.
         resource = 'endpoint_group'
         cmd = endpoint_group.ShowEndpointGroup(test_cli20.MyApp(sys.stdout),
                                                None)
@@ -117,7 +116,7 @@ class CLITestV20VpnEndpointGroupJSON(test_cli20.CLITestV20Base):
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
     def test_show_endpoint_group_id_name(self):
-        """vpn-endpoint-group-show."""
+        # vpn-endpoint-group-show.
         resource = 'endpoint_group'
         cmd = endpoint_group.ShowEndpointGroup(test_cli20.MyApp(sys.stdout),
                                                None)
@@ -126,9 +125,7 @@ class CLITestV20VpnEndpointGroupJSON(test_cli20.CLITestV20Base):
                                  args, ['id', 'name'])
 
     def test_update_endpoint_group(self):
-        """vpn-endpoint-group-update myid --name newname
-        --description newdesc.
-        """
+        # vpn-endpoint-group-update myid --name newname --description newdesc.
         resource = 'endpoint_group'
         cmd = endpoint_group.UpdateEndpointGroup(test_cli20.MyApp(sys.stdout),
                                                  None)
@@ -139,7 +136,7 @@ class CLITestV20VpnEndpointGroupJSON(test_cli20.CLITestV20Base):
                                     'description': 'newdesc'})
 
     def test_delete_endpoint_group(self):
-        """vpn-endpoint-group-delete my-id."""
+        # vpn-endpoint-group-delete my-id.
         resource = 'endpoint_group'
         cmd = endpoint_group.DeleteEndpointGroup(test_cli20.MyApp(sys.stdout),
                                                  None)

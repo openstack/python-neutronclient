@@ -15,15 +15,15 @@ from neutronclient.tests.functional import base
 
 class SimpleReadOnlyNeutronVpnClientTest(base.ClientTestBase):
 
-    """This is a first pass at a simple read only python-neutronclient test.
-    This only exercises vpn based client commands that are read only.
+    """Tests for vpn based client commands that are read only
 
+    This is a first pass at a simple read only python-neutronclient test.
+    This only exercises vpn based client commands that are read only.
     This should test commands:
     * as a regular user
     * as a admin user
     * with and without optional parameters
     * initially just check return codes, and later test command outputs
-
     """
 
     def test_neutron_vpn_ikepolicy_list(self):

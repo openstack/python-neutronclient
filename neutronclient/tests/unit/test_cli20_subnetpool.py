@@ -31,7 +31,7 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
         super(CLITestV20SubnetPoolJSON, self).setUp(plurals={'tags': 'tag'})
 
     def test_create_subnetpool_shared(self):
-        """Create subnetpool: myname."""
+        # Create subnetpool: myname.
         resource = 'subnetpool'
         cmd = subnetpool.CreateSubnetPool(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -48,7 +48,7 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_subnetpool_not_shared(self):
-        """Create subnetpool: myname."""
+        # Create subnetpool: myname.
         resource = 'subnetpool'
         cmd = subnetpool.CreateSubnetPool(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -64,7 +64,7 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_subnetpool_with_unicode(self):
-        """Create subnetpool: u'\u7f51\u7edc'."""
+        # Create subnetpool: u'\u7f51\u7edc'.
         resource = 'subnetpool'
         cmd = subnetpool.CreateSubnetPool(test_cli20.MyApp(sys.stdout), None)
         name = u'\u7f51\u7edc'
@@ -79,7 +79,7 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_subnetpool_with_addrscope(self):
-        """Create subnetpool: myname in addrscope: foo-address-scope"""
+        # Create subnetpool: myname in addrscope: foo-address-scope
         resource = 'subnetpool'
         cmd = subnetpool.CreateSubnetPool(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -107,9 +107,8 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
         self.mox.UnsetStubs()
 
     def test_list_subnetpools_sort(self):
-        """List subnetpools: --sort-key name --sort-key id --sort-key asc
-        --sort-key desc
-        """
+        # List subnetpools:
+        # --sort-key name --sort-key id --sort-key asc --sort-key desc
         resources = "subnetpools"
         cmd = subnetpool.ListSubnetPool(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
@@ -117,20 +116,20 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_subnetpools_limit(self):
-        """List subnetpools: -P."""
+        # List subnetpools: -P.
         resources = "subnetpools"
         cmd = subnetpool.ListSubnetPool(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_update_subnetpool_exception(self):
-        """Update subnetpool: myid."""
+        # Update subnetpool: myid.
         resource = 'subnetpool'
         cmd = subnetpool.UpdateSubnetPool(test_cli20.MyApp(sys.stdout), None)
         self.assertRaises(exceptions.CommandError, self._test_update_resource,
                           resource, cmd, 'myid', ['myid'], {})
 
     def test_update_subnetpool(self):
-        """Update subnetpool: myid --name myname."""
+        # Update subnetpool: myid --name myname.
         resource = 'subnetpool'
         cmd = subnetpool.UpdateSubnetPool(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -139,7 +138,7 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
                                    )
 
     def test_update_subnetpool_with_address_scope(self):
-        """Update subnetpool: myid --address-scope newscope."""
+        # Update subnetpool: myid --address-scope newscope.
         resource = 'subnetpool'
         cmd = subnetpool.UpdateSubnetPool(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -148,7 +147,7 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
                                    )
 
     def test_update_subnetpool_with_no_address_scope(self):
-        """Update subnetpool: myid --no-address-scope."""
+        # Update subnetpool: myid --no-address-scope.
         resource = 'subnetpool'
         cmd = subnetpool.UpdateSubnetPool(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -157,7 +156,7 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
                                    )
 
     def test_show_subnetpool(self):
-        """Show subnetpool: --fields id --fields name myid."""
+        # Show subnetpool: --fields id --fields name myid.
         resource = 'subnetpool'
         cmd = subnetpool.ShowSubnetPool(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
@@ -165,7 +164,7 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
                                  ['id', 'name'])
 
     def test_delete_subnetpool(self):
-        """Delete subnetpool: subnetpoolid."""
+        # Delete subnetpool: subnetpoolid.
         resource = 'subnetpool'
         cmd = subnetpool.DeleteSubnetPool(test_cli20.MyApp(sys.stdout), None)
         myid = 'myid'

@@ -23,7 +23,7 @@ from neutronclient.tests.unit import test_cli20
 class CLITestV20VpnServiceJSON(test_cli20.CLITestV20Base):
 
     def test_create_vpnservice_all_params(self):
-        """vpn-service-create all params."""
+        # vpn-service-create all params.
         resource = 'vpnservice'
         cmd = vpnservice.CreateVPNService(test_cli20.MyApp(sys.stdout), None)
         subnet = 'mysubnet-id'
@@ -51,7 +51,7 @@ class CLITestV20VpnServiceJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_vpnservice_with_limited_params(self):
-        """vpn-service-create with limited params."""
+        # vpn-service-create with limited params.
         resource = 'vpnservice'
         cmd = vpnservice.CreateVPNService(test_cli20.MyApp(sys.stdout), None)
         subnet = 'mysubnet-id'
@@ -74,7 +74,7 @@ class CLITestV20VpnServiceJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_vpnservice_without_subnet(self):
-        """vpn-service-create with no subnet provided."""
+        # vpn-service-create with no subnet provided.
         resource = 'vpnservice'
         cmd = vpnservice.CreateVPNService(test_cli20.MyApp(sys.stdout), None)
         router = 'myrouter-id'
@@ -95,21 +95,20 @@ class CLITestV20VpnServiceJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_list_vpnservice(self):
-        """vpn-service-list."""
+        # vpn-service-list.
         resources = "vpnservices"
         cmd = vpnservice.ListVPNService(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
     def test_list_vpnservice_pagination(self):
-        """vpn-service-list."""
+        # vpn-service-list.
         resources = "vpnservices"
         cmd = vpnservice.ListVPNService(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources_with_pagination(resources, cmd)
 
     def test_list_vpnservice_sort(self):
-        """vpn-service-list --sort-key name --sort-key id --sort-key asc
-        --sort-key desc
-        """
+        # vpn-service-list --sort-key name --sort-key id --sort-key asc
+        # --sort-key desc
         resources = "vpnservices"
         cmd = vpnservice.ListVPNService(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd,
@@ -117,20 +116,20 @@ class CLITestV20VpnServiceJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_vpnservice_limit(self):
-        """vpn-service-list -P."""
+        # vpn-service-list -P.
         resources = "vpnservices"
         cmd = vpnservice.ListVPNService(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_show_vpnservice_id(self):
-        """vpn-service-show test_id."""
+        # vpn-service-show test_id.
         resource = 'vpnservice'
         cmd = vpnservice.ShowVPNService(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
     def test_show_vpnservice_id_name(self):
-        """vpn-service-show."""
+        # vpn-service-show."""
         resource = 'vpnservice'
         cmd = vpnservice.ShowVPNService(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
@@ -138,7 +137,7 @@ class CLITestV20VpnServiceJSON(test_cli20.CLITestV20Base):
                                  args, ['id', 'name'])
 
     def test_update_vpnservice(self):
-        """vpn-service-update myid --name newname --tags a b."""
+        # vpn-service-update myid --name newname --tags a b.
         resource = 'vpnservice'
         cmd = vpnservice.UpdateVPNService(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
@@ -146,7 +145,7 @@ class CLITestV20VpnServiceJSON(test_cli20.CLITestV20Base):
                                    {'name': 'newname', })
 
     def test_delete_vpnservice(self):
-        """vpn-service-delete my-id."""
+        # vpn-service-delete my-id.
         resource = 'vpnservice'
         cmd = vpnservice.DeleteVPNService(test_cli20.MyApp(sys.stdout), None)
         my_id = 'my-id'

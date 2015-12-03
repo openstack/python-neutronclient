@@ -25,7 +25,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
 
     # TODO(pcm): Remove, once peer-cidr is deprecated completely
     def test_create_ipsec_site_connection_all_params_using_peer_cidrs(self):
-        """ipsecsite-connection-create all params using peer CIDRs."""
+        # ipsecsite-connection-create all params using peer CIDRs.
         resource = 'ipsec_site_connection'
         cmd = ipsec_site_connection.CreateIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
@@ -80,7 +80,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
                                    extra_body=extra_body)
 
     def test_create_ipsec_site_conn_all_params(self):
-        """ipsecsite-connection-create all params using endpoint groups."""
+        # ipsecsite-connection-create all params using endpoint groups.
         resource = 'ipsec_site_connection'
         cmd = ipsec_site_connection.CreateIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
@@ -137,7 +137,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
                                    extra_body=extra_body)
 
     def test_create_ipsec_site_connection_with_limited_params(self):
-        """ipsecsite-connection-create with limited params."""
+        # ipsecsite-connection-create with limited params.
         resource = 'ipsec_site_connection'
         cmd = ipsec_site_connection.CreateIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
@@ -181,7 +181,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def _test_create_failure(self, additional_args=None):
-        """Helper to test failure of IPSec site-to-site creation failure."""
+        # Helper to test failure of IPSec site-to-site creation failure.
         resource = 'ipsec_site_connection'
         cmd = ipsec_site_connection.CreateIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
@@ -221,7 +221,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
                           position_names, position_values)
 
     def test_fail_create_with_invalid_mtu(self):
-        """ipsecsite-connection-create with invalid dpd values."""
+        # ipsecsite-connection-create with invalid dpd values.
         bad_mtu = ['--mtu', '67']
         self._test_create_failure(bad_mtu)
 
@@ -234,26 +234,26 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
         self._test_create_failure(bad_dpd_values)
 
     def test_fail_create_missing_endpoint_groups_or_cidr(self):
-        """Must provide either endpoint groups or peer cidrs."""
+        # Must provide either endpoint groups or peer cidrs.
         self._test_create_failure()
 
     def test_fail_create_missing_peer_endpoint_group(self):
-        """Fails if dont have both endpoint groups - missing peer."""
+        # Fails if dont have both endpoint groups - missing peer.
         self._test_create_failure(['--local-ep-group', 'local-epg'])
 
     def test_fail_create_missing_local_endpoint_group(self):
-        """Fails if dont have both endpoint groups - missing local."""
+        # Fails if dont have both endpoint groups - missing local.
         self._test_create_failure(['--peer-ep-group', 'peer-epg'])
 
     def test_fail_create_when_both_endpoints_and_peer_cidr(self):
-        """Cannot intermix endpoint groups and peer CIDRs for create."""
+        # Cannot intermix endpoint groups and peer CIDRs for create.
         additional_args = ['--local-ep-group', 'local-epg',
                            '--peer-ep-group', 'peer-epg',
                            '--peer-cidr', '10.2.0.0/24']
         self._test_create_failure(additional_args)
 
     def test_list_ipsec_site_connection(self):
-        """ipsecsite-connection-list."""
+        # ipsecsite-connection-list.
         resources = "ipsec_site_connections"
         cmd = ipsec_site_connection.ListIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
@@ -261,7 +261,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
         self._test_list_resources(resources, cmd, True)
 
     def test_list_ipsec_site_connection_pagination(self):
-        """ipsecsite-connection-list."""
+        # ipsecsite-connection-list.
         resources = "ipsec_site_connections"
         cmd = ipsec_site_connection.ListIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
@@ -269,9 +269,8 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
         self._test_list_resources_with_pagination(resources, cmd)
 
     def test_list_ipsec_site_connection_sort(self):
-        """ipsecsite-connection-list.
-        --sort-key name --sort-key id --sort-key asc --sort-key desc
-        """
+        # ipsecsite-connection-list.
+        # --sort-key name --sort-key id --sort-key asc --sort-key desc
         resources = "ipsec_site_connections"
         cmd = ipsec_site_connection.ListIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
@@ -281,7 +280,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
                                   sort_dir=["asc", "desc"])
 
     def test_list_ipsec_site_connection_limit(self):
-        """ipsecsite-connection-list -P."""
+        # ipsecsite-connection-list -P.
         resources = "ipsec_site_connections"
         cmd = ipsec_site_connection.ListIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
@@ -289,7 +288,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
         self._test_list_resources(resources, cmd, page_size=1000)
 
     def test_delete_ipsec_site_connection(self):
-        """ipsecsite-connection-delete my-id."""
+        # ipsecsite-connection-delete my-id.
         resource = 'ipsec_site_connection'
         cmd = ipsec_site_connection.DeleteIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
@@ -299,7 +298,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
         self._test_delete_resource(resource, cmd, my_id, args)
 
     def test_update_ipsec_site_connection(self):
-        """ipsecsite-connection-update  myid --name myname --tags a b."""
+        # ipsecsite-connection-update  myid --name myname --tags a b."""
         resource = 'ipsec_site_connection'
         cmd = ipsec_site_connection.UpdateIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
@@ -311,7 +310,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
                                     'tags': ['a', 'b'], })
 
     def test_show_ipsec_site_connection_id(self):
-        """ipsecsite-connection-show test_id."""
+        # ipsecsite-connection-show test_id."""
         resource = 'ipsec_site_connection'
         cmd = ipsec_site_connection.ShowIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
@@ -320,7 +319,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
         self._test_show_resource(resource, cmd, self.test_id, args, ['id'])
 
     def test_show_ipsec_site_connection_id_name(self):
-        """ipsecsite-connection-show."""
+        # ipsecsite-connection-show."""
         resource = 'ipsec_site_connection'
         cmd = ipsec_site_connection.ShowIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None

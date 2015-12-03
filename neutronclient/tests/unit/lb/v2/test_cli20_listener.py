@@ -23,7 +23,7 @@ from neutronclient.tests.unit import test_cli20
 class CLITestV20LbListenerJSON(test_cli20.CLITestV20Base):
 
     def test_create_listener_with_mandatory_params(self):
-        """lbaas-listener-create with mandatory params only."""
+        # lbaas-listener-create with mandatory params only.
         resource = 'listener'
         cmd_resource = 'lbaas_listener'
         cmd = listener.CreateListener(test_cli20.MyApp(sys.stdout), None)
@@ -41,7 +41,7 @@ class CLITestV20LbListenerJSON(test_cli20.CLITestV20Base):
                                    cmd_resource=cmd_resource)
 
     def test_create_listener_with_all_params(self):
-        """lbaas-listener-create with all params set."""
+        # lbaas-listener-create with all params set.
         resource = 'listener'
         cmd_resource = 'lbaas_listener'
         cmd = listener.CreateListener(test_cli20.MyApp(sys.stdout), None)
@@ -65,7 +65,7 @@ class CLITestV20LbListenerJSON(test_cli20.CLITestV20Base):
                                    cmd_resource=cmd_resource)
 
     def test_list_listeners(self):
-        """lbaas-listener-list."""
+        # lbaas-listener-list.
         resources = 'listeners'
         cmd_resources = 'lbaas_listeners'
         cmd = listener.ListListener(test_cli20.MyApp(sys.stdout), None)
@@ -73,7 +73,7 @@ class CLITestV20LbListenerJSON(test_cli20.CLITestV20Base):
                                   cmd_resources=cmd_resources)
 
     def test_list_listeners_pagination(self):
-        """lbaas-listener-list with pagination."""
+        # lbaas-listener-list with pagination.
         resources = 'listeners'
         cmd_resources = 'lbaas_listeners'
         cmd = listener.ListListener(test_cli20.MyApp(sys.stdout), None)
@@ -81,7 +81,7 @@ class CLITestV20LbListenerJSON(test_cli20.CLITestV20Base):
                                                   cmd_resources=cmd_resources)
 
     def test_list_listeners_sort(self):
-        """lbaas-listener-list --sort-key id --sort-key asc."""
+        # lbaas-listener-list --sort-key id --sort-key asc.
         resources = 'listeners'
         cmd_resources = 'lbaas_listeners'
         cmd = listener.ListListener(test_cli20.MyApp(sys.stdout), None)
@@ -89,7 +89,7 @@ class CLITestV20LbListenerJSON(test_cli20.CLITestV20Base):
                                   cmd_resources=cmd_resources)
 
     def test_list_listeners_limit(self):
-        """lbaas-listener-list -P."""
+        # lbaas-listener-list -P.
         resources = 'listeners'
         cmd_resources = 'lbaas_listeners'
         cmd = listener.ListListener(test_cli20.MyApp(sys.stdout), None)
@@ -97,7 +97,7 @@ class CLITestV20LbListenerJSON(test_cli20.CLITestV20Base):
                                   cmd_resources=cmd_resources)
 
     def test_show_listener_id(self):
-        """lbaas-listener-show test_id."""
+        # lbaas-listener-show test_id.
         resource = 'listener'
         cmd_resource = 'lbaas_listener'
         cmd = listener.ShowListener(test_cli20.MyApp(sys.stdout), None)
@@ -106,7 +106,7 @@ class CLITestV20LbListenerJSON(test_cli20.CLITestV20Base):
                                  cmd_resource=cmd_resource)
 
     def test_show_listener_id_name(self):
-        """lbaas-listener-show."""
+        # lbaas-listener-show.
         resource = 'listener'
         cmd_resource = 'lbaas_listener'
         cmd = listener.ShowListener(test_cli20.MyApp(sys.stdout), None)
@@ -116,7 +116,7 @@ class CLITestV20LbListenerJSON(test_cli20.CLITestV20Base):
                                  cmd_resource=cmd_resource)
 
     def test_update_listener(self):
-        """lbaas-listener-update myid --name newname."""
+        # lbaas-listener-update myid --name newname.
         resource = 'listener'
         cmd_resource = 'lbaas_listener'
         cmd = listener.UpdateListener(test_cli20.MyApp(sys.stdout), None)
@@ -126,7 +126,7 @@ class CLITestV20LbListenerJSON(test_cli20.CLITestV20Base):
                                    cmd_resource=cmd_resource)
 
     def test_delete_listener(self):
-        """lbaas-listener-delete my-id."""
+        # lbaas-listener-delete my-id.
         resource = 'listener'
         cmd_resource = 'lbaas_listener'
         cmd = listener.DeleteListener(test_cli20.MyApp(sys.stdout), None)

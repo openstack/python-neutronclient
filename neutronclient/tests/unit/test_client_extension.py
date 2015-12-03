@@ -68,7 +68,7 @@ class CLITestV20ExtensionJSON(test_cli20.CLITestV20Base):
             self.assertTrue(cmdcls.__doc__.startswith("[_fox_sockets]"))
 
     def test_delete_fox_socket(self):
-        """Delete fox socket: myid."""
+        # Delete fox socket: myid.
         resource = 'fox_socket'
         cmd = fox_sockets.FoxInSocketsDelete(test_cli20.MyApp(sys.stdout),
                                              None)
@@ -77,7 +77,7 @@ class CLITestV20ExtensionJSON(test_cli20.CLITestV20Base):
         self._test_delete_resource(resource, cmd, myid, args)
 
     def test_update_fox_socket(self):
-        """Update fox_socket: myid --name myname."""
+        # Update fox_socket: myid --name myname.
         resource = 'fox_socket'
         cmd = fox_sockets.FoxInSocketsUpdate(test_cli20.MyApp(sys.stdout),
                                              None)
@@ -86,7 +86,7 @@ class CLITestV20ExtensionJSON(test_cli20.CLITestV20Base):
                                    {'name': 'myname'})
 
     def test_create_fox_socket(self):
-        """Create fox_socket: myname."""
+        # Create fox_socket: myname.
         resource = 'fox_socket'
         cmd = fox_sockets.FoxInSocketsCreate(test_cli20.MyApp(sys.stdout),
                                              None)
@@ -99,13 +99,13 @@ class CLITestV20ExtensionJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_list_fox_sockets(self):
-        """List fox_sockets."""
+        # List fox_sockets.
         resources = 'fox_sockets'
         cmd = fox_sockets.FoxInSocketsList(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
     def test_show_fox_socket(self):
-        """Show fox_socket: --fields id --fields name myid."""
+        # Show fox_socket: --fields id --fields name myid.
         resource = 'fox_socket'
         cmd = fox_sockets.FoxInSocketsShow(test_cli20.MyApp(sys.stdout), None)
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
@@ -150,7 +150,7 @@ class CLITestV20ExtensionJSONAlternatePlurals(test_cli20.CLITestV20Base):
         self.assertDictContainsSubset(ext_cmd, shell.COMMANDS['2.0'])
 
     def test_list_ip_addresses(self):
-        """List ip_addresses."""
+        # List ip_addresses.
         resources = 'ip_addresses'
         cmd = self.IPAddressesList(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)

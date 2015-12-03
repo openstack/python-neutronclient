@@ -219,7 +219,9 @@ class CommandError(NeutronCLIError):
 
 
 class UnsupportedVersion(NeutronCLIError):
-    """Indicates that the user is trying to use an unsupported version of
+    """Indicates usage of an unsupported API version
+
+    Indicates that the user is trying to use an unsupported version of
     the API.
     """
     pass

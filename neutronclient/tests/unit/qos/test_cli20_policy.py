@@ -32,7 +32,7 @@ class CLITestV20QoSPolicyJSON(test_cli20.CLITestV20Base):
         self.cmd_ress = 'qos_policies'
 
     def test_create_policy_with_only_keyattributes(self):
-        """Create qos policy abc."""
+        # Create qos policy abc.
         cmd = policy.CreateQoSPolicy(test_cli20.MyApp(sys.stdout),
                                      None)
         myid = 'myid'
@@ -45,7 +45,7 @@ class CLITestV20QoSPolicyJSON(test_cli20.CLITestV20Base):
                                    cmd_resource=self.cmd_res)
 
     def test_create_policy_with_description(self):
-        """Create qos policy xyz --description abc."""
+        # Create qos policy xyz --description abc.
         cmd = policy.CreateQoSPolicy(test_cli20.MyApp(sys.stdout),
                                      None)
         myid = 'myid'
@@ -59,7 +59,7 @@ class CLITestV20QoSPolicyJSON(test_cli20.CLITestV20Base):
                                    cmd_resource=self.cmd_res)
 
     def test_create_policy_with_shared(self):
-        """Create qos policy abc shared across tenants"""
+        # Create qos policy abc shared across tenants
         cmd = policy.CreateQoSPolicy(test_cli20.MyApp(sys.stdout),
                                      None)
         myid = 'myid'
@@ -73,7 +73,7 @@ class CLITestV20QoSPolicyJSON(test_cli20.CLITestV20Base):
                                    cmd_resource=self.cmd_res)
 
     def test_create_policy_with_unicode(self):
-        """Create qos policy u'\u7f51\u7edc'."""
+        # Create qos policy u'\u7f51\u7edc'.
         cmd = policy.CreateQoSPolicy(test_cli20.MyApp(sys.stdout),
                                      None)
         myid = 'myid'
@@ -87,7 +87,7 @@ class CLITestV20QoSPolicyJSON(test_cli20.CLITestV20Base):
                                    cmd_resource=self.cmd_res)
 
     def test_update_policy(self):
-        """policy-update myid --name newname."""
+        # policy-update myid --name newname.
         cmd = policy.UpdateQoSPolicy(test_cli20.MyApp(sys.stdout),
                                      None)
         self._test_update_resource(self.res, cmd, 'myid',
@@ -96,7 +96,7 @@ class CLITestV20QoSPolicyJSON(test_cli20.CLITestV20Base):
                                    cmd_resource=self.cmd_res)
 
     def test_update_policy_description(self):
-        """policy-update myid --name newname --description newdesc"""
+        # policy-update myid --name newname --description newdesc
         cmd = policy.UpdateQoSPolicy(test_cli20.MyApp(sys.stdout),
                                      None)
         self._test_update_resource(self.res, cmd, 'myid',
@@ -105,23 +105,22 @@ class CLITestV20QoSPolicyJSON(test_cli20.CLITestV20Base):
                                    cmd_resource=self.cmd_res)
 
     def test_list_policies(self):
-        """qos-policy-list."""
+        # qos-policy-list.
         cmd = policy.ListQoSPolicy(test_cli20.MyApp(sys.stdout),
                                    None)
         self._test_list_resources(self.ress, cmd, True,
                                   cmd_resources=self.cmd_ress)
 
     def test_list_policies_pagination(self):
-        """qos-policy-list for pagination."""
+        # qos-policy-list for pagination.
         cmd = policy.ListQoSPolicy(test_cli20.MyApp(sys.stdout),
                                    None)
         self._test_list_resources_with_pagination(self.ress, cmd,
                                                   cmd_resources=self.cmd_ress)
 
     def test_list_policies_sort(self):
-        """sorted list: qos-policy-list --sort-key name --sort-key id
-        --sort-key asc --sort-key desc
-        """
+        # sorted list: qos-policy-list --sort-key name --sort-key id
+        # --sort-key asc --sort-key desc
         cmd = policy.ListQoSPolicy(test_cli20.MyApp(sys.stdout),
                                    None)
         self._test_list_resources(self.ress, cmd,
@@ -130,14 +129,14 @@ class CLITestV20QoSPolicyJSON(test_cli20.CLITestV20Base):
                                   cmd_resources=self.cmd_ress)
 
     def test_list_policies_limit(self):
-        """size (1000) limited list: qos-policy-list -P."""
+        # size (1000) limited list: qos-policy-list -P.
         cmd = policy.ListQoSPolicy(test_cli20.MyApp(sys.stdout),
                                    None)
         self._test_list_resources(self.ress, cmd, page_size=1000,
                                   cmd_resources=self.cmd_ress)
 
     def test_show_policy_id(self):
-        """qos-policy-show test_id."""
+        # qos-policy-show test_id.
         cmd = policy.ShowQoSPolicy(test_cli20.MyApp(sys.stdout),
                                    None)
         args = ['--fields', 'id', self.test_id]
@@ -145,7 +144,7 @@ class CLITestV20QoSPolicyJSON(test_cli20.CLITestV20Base):
                                  ['id'], cmd_resource=self.cmd_res)
 
     def test_show_policy_name(self):
-        """qos-policy-show."""
+        # qos-policy-show.
         cmd = policy.ShowQoSPolicy(test_cli20.MyApp(sys.stdout),
                                    None)
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
@@ -154,7 +153,7 @@ class CLITestV20QoSPolicyJSON(test_cli20.CLITestV20Base):
                                  cmd_resource=self.cmd_res)
 
     def test_delete_policy(self):
-        """qos-policy-delete my-id."""
+        # qos-policy-delete my-id.
         cmd = policy.DeleteQoSPolicy(test_cli20.MyApp(sys.stdout),
                                      None)
         my_id = 'myid1'
