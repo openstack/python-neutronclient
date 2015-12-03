@@ -492,7 +492,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                                    remote_ip_prefix='10.2.0.0/16')]
         expected = {
             'cols': ['id', 'security_group', 'direction', 'ethertype',
-                     'protocol/port', 'remote'],
+                     'port/protocol', 'remote'],
             'data': [
                 ('ruleid1', 'group1', 'ingress', 'IPv4', '22/tcp', 'any'),
                 ('ruleid2', 'group2', 'egress', 'IPv6', '80-81/udp', 'any'),

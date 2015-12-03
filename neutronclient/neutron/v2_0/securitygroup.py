@@ -167,15 +167,20 @@ class ListSecurityGroupRule(neutronV20.ListCommand):
 
     resource = 'security_group_rule'
     list_columns = ['id', 'security_group_id', 'direction',
-                    'ethertype', 'protocol/port', 'remote']
+                    'ethertype', 'port/protocol', 'remote']
     # replace_rules: key is an attribute name in Neutron API and
     # corresponding value is a display name shown by CLI.
     replace_rules = {'security_group_id': 'security_group',
                      'remote_group_id': 'remote_group'}
     digest_fields = {
+        # The entry 'protocol/port' is leaving deliberetely for keep
+        # compatibility,
         'remote': {
             'method': _get_remote,
             'depends_on': ['remote_ip_prefix', 'remote_group_id']},
+        'port/protocol': {
+            'method': _get_protocol_port,
+            'depends_on': ['protocol', 'port_range_min', 'port_range_max']},
         'protocol/port': {
             'method': _get_protocol_port,
             'depends_on': ['protocol', 'port_range_min', 'port_range_max']}}
