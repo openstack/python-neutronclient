@@ -47,7 +47,7 @@ def exception_handler_v20(status_code, error_content):
     if isinstance(error_content, dict):
         error_dict = error_content.get('NeutronError')
     # Find real error type
-    bad_neutron_error_flag = False
+    client_exc = None
     if error_dict:
         # If Neutron key is found, it will definitely contain
         # a 'message' and 'type' keys?
@@ -56,35 +56,29 @@ def exception_handler_v20(status_code, error_content):
             error_message = error_dict['message']
             if error_dict['detail']:
                 error_message += "\n" + error_dict['detail']
-        except Exception:
-            bad_neutron_error_flag = True
-        if not bad_neutron_error_flag:
             # If corresponding exception is defined, use it.
             client_exc = getattr(exceptions, '%sClient' % error_type, None)
-            # Otherwise look up per status-code client exception
-            if not client_exc:
-                client_exc = exceptions.HTTP_EXCEPTION_MAP.get(status_code)
-            if client_exc:
-                raise client_exc(message=error_message,
-                                 status_code=status_code)
-            else:
-                raise exceptions.NeutronClientException(
-                    status_code=status_code, message=error_message)
-        else:
-            raise exceptions.NeutronClientException(status_code=status_code,
-                                                    message=error_dict)
+        except Exception:
+            error_message = "%s" % error_dict
     else:
-        message = None
+        error_message = None
         if isinstance(error_content, dict):
-            message = error_content.get('message')
-        if message:
-            raise exceptions.NeutronClientException(status_code=status_code,
-                                                    message=message)
+            error_message = error_content.get('message')
+        if not error_message:
+            # If we end up here the exception was not a neutron error
+            error_message = "%s-%s" % (status_code, error_content)
 
-    # If we end up here the exception was not a neutron error
-    msg = "%s-%s" % (status_code, error_content)
-    raise exceptions.NeutronClientException(status_code=status_code,
-                                            message=msg)
+    # If an exception corresponding to the error type is not found,
+    # look up per status-code client exception.
+    if not client_exc:
+        client_exc = exceptions.HTTP_EXCEPTION_MAP.get(status_code)
+    # If there is no exception per status-code,
+    # Use NeutronClientException as fallback.
+    if not client_exc:
+        client_exc = exceptions.NeutronClientException
+
+    raise client_exc(message=error_message,
+                     status_code=status_code)
 
 
 class APIParamsCall(object):
