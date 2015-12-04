@@ -167,11 +167,145 @@ the order of ``-c`` options.
     | f4789225-26d0-409f-8047-82d2c7a87a95 | network:router_interface | {"subnet_id": "cdcc616b-0cff-482f-96f5-06fc63d21247", "ip_address": "fd12:877c:1d66::1"}                    |
     +--------------------------------------+--------------------------+-------------------------------------------------------------------------------------------------------------+
 
-Extra argument mechanism
-------------------------
+.. _cli_extra_arguments:
 
-[TODO: Write the extra argument mechanism. It is the most tricky area around
-neutron CLI usage.]
+Extra arguments for create/update operation
+-------------------------------------------
+
+**neutron** CLI has a mechanism called the *extra arguments* for ``*-create``
+and ``*-update`` commands. It allows users to specify a set of *unknown
+options* which are not defined as options and not shown in the help text.
+**Unknown options MUST be placed at the end of the command line.**
+*unknown options* will be directly passed to the API layer.  By this mechanism,
+you can pass an attribute which is not defined in the upstream **neutron**
+CLI. For example, when you are developing a new feature which add a new
+attribute to an existing resource, it is useful because we can test your
+feature without changing the existing neutron CLI.
+
+For example, if you run the following command::
+
+    neutron resource-update <ID> --key1 value1 --key2 value2
+
+where ``resource`` is some resource name and ``--key1`` and ``--key2`` are
+unknown options, then the following JSON will be sent to the neutron API::
+
+    PUT /v2.0/resources/<ID>
+
+    {
+        "resource": {
+            "key2": "value2",
+            "key1": "value1"
+        }
+    }
+
+Key interpretation
+~~~~~~~~~~~~~~~~~~
+
+This means an option name (``--key1`` in this case) must be one of valid
+resources of a corresponding resource. An option name ``--foo_bar`` is
+recognized as an attribute name ``foo_bar``. ``--foo-bar`` is also interpreted
+as an attribute name ``foo_bar``.
+
+Value interpretation
+~~~~~~~~~~~~~~~~~~~~
+
+By default, if the number of values is 1, the option value is interpreted as a
+string and is passed to the API layer as specified in a command-line.
+
+If the number of values is greater than 1, the option value is interpreted as a
+list and the result in the API layer will be same as when specifying a list as
+described below.
+
+    neutron resource-update <ID> --key1 val1 val2 val3 --key2 val4
+
+In the above example, a value of ``key1`` is interpreted as
+``["val1", "val2", "val3"]`` and a value of ``key2`` is interpreted
+as ``val4``.
+
+The extra argument mechanism supports more complex value like a list or a dict.
+
+Specify a list value
+++++++++++++++++++++
+
+A command-line::
+
+    neutron resource-update <ID> --key list=true val1 val2 val3
+
+will send the following in the API layer::
+
+    {
+        "key": [
+            "val1",
+            "val2",
+            "val3"
+        ]
+    }
+
+.. note::
+
+   If you want to specify a list value, it is recommended to specify
+   ``list=true``. When ``list=true`` is specified, specified values are
+   interpreted as a list even regardless of the number of values.
+
+   If ``list=true`` is not specified, specified values are interpreted
+   depends on the number of values how. If the number of values is more than 2,
+   the specified values are interpreted as a list. If 1, the value
+   is interpreted as a string.
+
+Specify a dict value
+++++++++++++++++++++
+
+A command-line::
+
+    neutron resource-update <ID> --key type=dict key1=val1,key2=val2,key3=val3
+
+will send the following in the API layer::
+
+    {
+        "key": {
+            "key1": "val1"
+            "key2": "val2",
+            "key3": "val3",
+        }
+    }
+
+.. note::
+
+   ``type=bool True/False`` and ``type=int 10`` are also supported.
+
+Specify a list of dicts
++++++++++++++++++++++++
+
+A command-line::
+
+    neutron resource-update <ID> --key type=dict list=true key1=val1 key2=val2 key3=val3
+
+will send the following in the API layer::
+
+    {
+        "key": [
+            {"key1": "val1"},
+            {"key2": "val2"},
+            {"key3": "val3"}
+        ]
+    }
+
+Passing None as a value
+~~~~~~~~~~~~~~~~~~~~~~~
+
+There is a case where we would like to pass ``None`` (``null`` in JSON)
+in the API layer. To do this::
+
+    neutron resource-update <ID> --key action=clear
+
+The following body will be in the API layer::
+
+    {"key": null}
+
+.. note::
+
+   If ``action=clear`` is specified, ``list=true`` or ``type=dict`` is ignored.
+   It means when ``action=clear`` is specified ``None`` is always sent.
 
 Debugging
 ---------
