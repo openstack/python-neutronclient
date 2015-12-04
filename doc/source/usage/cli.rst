@@ -30,6 +30,50 @@ commands.  All commands take the form of:
 Run **neutron help** to get a full list of all possible commands, and run
 **neutron help <command>** to get detailed help for that command.
 
+Using with os-client-config
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`os-client-config <http://docs.openstack.org/developer/os-client-config/>`_
+provides more convenient way to manage a collection of client configurations
+and you can easily switch multiple OpenStack-based configurations.
+
+To use os-client-config, you first need to prepare
+``~/.config/openstack/clouds.yaml`` like the following.
+
+.. code-block:: yaml
+
+    clouds:
+      devstack:
+        auth:
+          auth_url: http://auth.example.com:5000
+          password: your-secret
+          project_domain_id: default
+          project_name: demo
+          user_domain_id: default
+          username: demo
+        identity_api_version: '3'
+        region_name: RegionOne
+      devstack-admin:
+        auth:
+          auth_url: http://auth.example.com:35357
+          password: another-secret
+          project_domain_id: default
+          project_name: admin
+          user_domain_id: default
+          username: admin
+        identity_api_version: '3'
+        region_name: RegionOne
+
+Then, you need to specify a configuration name defined in the above clouds.yaml.
+
+.. code-block:: shell
+
+    export OS_CLOUD=devstack
+
+For more detail information, see the
+`os-client-config <http://docs.openstack.org/developer/os-client-config/>`_
+documentation.
+
 Using with keystone token
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
