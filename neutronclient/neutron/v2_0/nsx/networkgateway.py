@@ -237,7 +237,6 @@ class ConnectNetworkGateway(NetworkGatewayInterfaceCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         (gateway_id, network_id) = self.retrieve_ids(neutron_client,
                                                      parsed_args)
         neutron_client.connect_network_gateway(
@@ -256,7 +255,6 @@ class DisconnectNetworkGateway(NetworkGatewayInterfaceCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         (gateway_id, network_id) = self.retrieve_ids(neutron_client,
                                                      parsed_args)
         neutron_client.disconnect_network_gateway(

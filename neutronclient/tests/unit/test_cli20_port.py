@@ -731,7 +731,3 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         myid = 'myid'
         args = [myid]
         self._test_delete_resource(resource, cmd, myid, args)
-
-
-class CLITestV20PortXML(CLITestV20PortJSON):
-    format = 'xml'

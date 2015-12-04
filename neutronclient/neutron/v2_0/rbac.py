@@ -67,7 +67,6 @@ class CreateRBACPolicy(neutronV20.CreateCommand):
 
     def args2body(self, parsed_args):
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         _object_id = get_rbac_object_id(neutron_client, parsed_args.type,
                                         parsed_args.name)
         body = {

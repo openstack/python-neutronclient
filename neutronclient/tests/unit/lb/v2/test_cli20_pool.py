@@ -137,7 +137,3 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
         args = [my_id]
         self._test_delete_resource(resource, cmd, my_id, args,
                                    cmd_resource=cmd_resource)
-
-
-class CLITestV20LbPoolXML(CLITestV20LbPoolJSON):
-    format = 'xml'

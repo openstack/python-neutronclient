@@ -113,7 +113,6 @@ class ListRouterPort(neutronV20.ListCommand):
 
     def get_data(self, parsed_args):
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         _id = neutronV20.find_resourceid_by_name_or_id(
             neutron_client, 'router', parsed_args.id)
         self.values_specs.append('--device_id=%s' % _id)

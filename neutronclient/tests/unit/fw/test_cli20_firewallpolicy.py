@@ -182,7 +182,6 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token',
                 test_cli20.TOKEN)).AndReturn((test_cli20.MyResp(204), None))
-        args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser(resource + "_insert_rule")
         shell.run_command(cmd, cmd_parser, args)
@@ -213,13 +212,8 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token',
                 test_cli20.TOKEN)).AndReturn((test_cli20.MyResp(204), None))
-        args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser(resource + "_remove_rule")
         shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
-
-
-class CLITestV20FirewallPolicyXML(CLITestV20FirewallPolicyJSON):
-    format = 'xml'

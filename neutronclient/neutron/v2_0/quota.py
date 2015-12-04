@@ -53,7 +53,6 @@ class DeleteQuota(neutronV20.NeutronCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         tenant_id = get_tenant_id(parsed_args.tenant_id,
                                   neutron_client)
         obj_deleter = getattr(neutron_client,
@@ -81,7 +80,6 @@ class ListQuota(neutronV20.NeutronCommand, lister.Lister):
         neutron_client = self.get_client()
         search_opts = {}
         self.log.debug('search options: %s', search_opts)
-        neutron_client.format = parsed_args.request_format
         obj_lister = getattr(neutron_client,
                              "list_%ss" % self.resource)
         data = obj_lister(**search_opts)
@@ -114,7 +112,6 @@ class ShowQuota(neutronV20.NeutronCommand, show.ShowOne):
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)', parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         tenant_id = get_tenant_id(parsed_args.tenant_id,
                                   neutron_client)
         params = {}
@@ -212,7 +209,6 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
     def get_data(self, parsed_args):
         self.log.debug('run(%s)', parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         _extra_values = neutronV20.parse_args_to_dict(self.values_specs)
         neutronV20._merge_args(self, parsed_args, _extra_values,
                                self.values_specs)

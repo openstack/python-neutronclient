@@ -382,7 +382,3 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, 'externalid',
                                    args, {"external_gateway_info": {}}
                                    )
-
-
-class CLITestV20RouterXML(CLITestV20RouterJSON):
-    format = 'xml'

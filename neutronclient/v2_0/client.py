@@ -24,7 +24,6 @@ import requests
 import six.moves.urllib.parse as urlparse
 
 from neutronclient import client
-from neutronclient.common import constants
 from neutronclient.common import exceptions
 from neutronclient.common import extension as client_extension
 from neutronclient.common import serializer
@@ -195,9 +194,7 @@ class ClientBase(object):
         if body:
             body = self.serialize(body)
 
-        resp, replybody = self.httpclient.do_request(
-            action, method, body=body,
-            content_type=self.content_type())
+        resp, replybody = self.httpclient.do_request(action, method, body=body)
 
         status_code = resp.status_code
         if status_code in (requests.codes.ok,
@@ -214,7 +211,7 @@ class ClientBase(object):
         return self.httpclient.get_auth_info()
 
     def serialize(self, data):
-        """Serializes a dictionary into either XML or JSON.
+        """Serializes a dictionary into JSON.
 
         A dictionary with a single key can be passed and it can contain any
         structure.
@@ -222,39 +219,17 @@ class ClientBase(object):
         if data is None:
             return None
         elif type(data) is dict:
-            return serializer.Serializer(
-                self.get_attr_metadata()).serialize(data, self.content_type())
+            return serializer.Serializer().serialize(data)
         else:
             raise Exception(_("Unable to serialize object of type = '%s'") %
                             type(data))
 
     def deserialize(self, data, status_code):
-        """Deserializes an XML or JSON string into a dictionary."""
+        """Deserializes a JSON string into a dictionary."""
         if status_code == 204:
             return data
-        return serializer.Serializer(self.get_attr_metadata()).deserialize(
-            data, self.content_type())['body']
-
-    def get_attr_metadata(self):
-        if self.format == 'json':
-            return {}
-        old_request_format = self.format
-        self.format = 'json'
-        exts = self.list_extensions()['extensions']
-        self.format = old_request_format
-        ns = dict([(ext['alias'], ext['namespace']) for ext in exts])
-        self.EXTED_PLURALS.update(constants.PLURALS)
-        return {'plurals': self.EXTED_PLURALS,
-                'xmlns': constants.XML_NS_V20,
-                constants.EXT_NS: ns}
-
-    def content_type(self, _format=None):
-        """Returns the mime-type for either 'xml' or 'json'.
-
-        Defaults to the currently set format.
-        """
-        _format = _format or self.format
-        return "application/%s" % (_format)
+        return serializer.Serializer().deserialize(
+            data)['body']
 
     def retry_request(self, method, action, body=None,
                       headers=None, params=None):

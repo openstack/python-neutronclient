@@ -41,7 +41,6 @@ class AddNetworkToDhcpAgent(neutronV20.NeutronCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         _net_id = neutronV20.find_resourceid_by_name_or_id(
             neutron_client, 'network', parsed_args.network)
         neutron_client.add_network_to_dhcp_agent(parsed_args.dhcp_agent,
@@ -66,7 +65,6 @@ class RemoveNetworkFromDhcpAgent(neutronV20.NeutronCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         _net_id = neutronV20.find_resourceid_by_name_or_id(
             neutron_client, 'network', parsed_args.network)
         neutron_client.remove_network_from_dhcp_agent(
@@ -139,7 +137,6 @@ class AddRouterToL3Agent(neutronV20.NeutronCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         _id = neutronV20.find_resourceid_by_name_or_id(
             neutron_client, 'router', parsed_args.router)
         neutron_client.add_router_to_l3_agent(parsed_args.l3_agent,
@@ -164,7 +161,6 @@ class RemoveRouterFromL3Agent(neutronV20.NeutronCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         _id = neutronV20.find_resourceid_by_name_or_id(
             neutron_client, 'router', parsed_args.router)
         neutron_client.remove_router_from_l3_agent(

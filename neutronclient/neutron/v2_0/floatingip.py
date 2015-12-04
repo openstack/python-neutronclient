@@ -114,7 +114,6 @@ class AssociateFloatingIP(neutronV20.NeutronCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         update_dict = {}
         neutronV20.update_dict(parsed_args, update_dict,
                                ['port_id', 'fixed_ip_address'])
@@ -141,7 +140,6 @@ class DisassociateFloatingIP(neutronV20.NeutronCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         neutron_client.update_floatingip(parsed_args.floatingip_id,
                                          {'floatingip': {'port_id': None}})
         print(_('Disassociated floating IP %s') % parsed_args.floatingip_id,

@@ -609,7 +609,3 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                          ]
         expected = '\n'.join(sorted(expected_data))
         self.assertEqual(expected, securitygroup._format_sg_rules(sg))
-
-
-class CLITestV20SecurityGroupsXML(CLITestV20SecurityGroupsJSON):
-    format = 'xml'

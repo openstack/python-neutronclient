@@ -160,7 +160,6 @@ class RouterInterfaceCommand(neutronV20.NeutronCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
 
         if '=' in parsed_args.interface:
             resource, value = parsed_args.interface.split('=', 1)
@@ -232,7 +231,6 @@ class SetGatewayRouter(neutronV20.NeutronCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         _router_id = neutronV20.find_resourceid_by_name_or_id(
             neutron_client, self.resource, parsed_args.router)
         _ext_net_id = neutronV20.find_resourceid_by_name_or_id(
@@ -272,7 +270,6 @@ class RemoveGatewayRouter(neutronV20.NeutronCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         _router_id = neutronV20.find_resourceid_by_name_or_id(
             neutron_client, self.resource, parsed_args.router)
         neutron_client.remove_gateway_router(_router_id)

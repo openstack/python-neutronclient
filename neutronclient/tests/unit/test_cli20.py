@@ -190,10 +190,7 @@ class CLITestV20Base(base.BaseTestCase):
         client.Client.EXTED_PLURALS.update(constants.PLURALS)
         if plurals is not None:
             client.Client.EXTED_PLURALS.update(plurals)
-        self.metadata = {'plurals': client.Client.EXTED_PLURALS,
-                         'xmlns': constants.XML_NS_V20,
-                         constants.EXT_NS: {'prefix':
-                                            'http://xxxx.yy.com'}}
+        self.metadata = {'plurals': client.Client.EXTED_PLURALS}
         self.mox = mox.Mox()
         self.endurl = ENDURL
         self.fake_stdout = FakeStdout()
@@ -208,6 +205,7 @@ class CLITestV20Base(base.BaseTestCase):
             'neutronclient.v2_0.client.Client.get_attr_metadata',
             self._get_attr_metadata))
         self.client = client.Client(token=TOKEN, endpoint_url=self.endurl)
+        self.client.format = self.format
 
     def register_non_admin_status_resource(self, resource_name):
         # TODO(amotoki):
@@ -254,7 +252,6 @@ class CLITestV20Base(base.BaseTestCase):
                 {self.id_field: myid}, }
         if name:
             ress[resource].update({'name': name})
-        self.client.format = self.format
         resstr = self.client.serialize(ress)
         # url method body
         resource_plural = neutronV2_0._get_resource_plural(cmd_resource,
@@ -262,19 +259,14 @@ class CLITestV20Base(base.BaseTestCase):
         path = getattr(self.client, resource_plural + "_path")
         if parent_id:
             path = path % parent_id
-        # Work around for LP #1217791. XML deserializer called from
-        # MyComparator does not decodes XML string correctly.
-        if self.format == 'json':
-            mox_body = MyComparator(body, self.client)
-        else:
-            mox_body = self.client.serialize(body)
+        mox_body = MyComparator(body, self.client)
+
         if not no_api_call:
             self.client.httpclient.request(
                 end_url(path, format=self.format), 'POST',
                 body=mox_body,
                 headers=mox.ContainsKeyValue(
                     'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
-        args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser('create_' + resource)
         if expected_exception:
@@ -295,7 +287,6 @@ class CLITestV20Base(base.BaseTestCase):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
-        self.client.format = self.format
         if not cmd_resources:
             cmd_resources = resources
 
@@ -309,7 +300,6 @@ class CLITestV20Base(base.BaseTestCase):
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
-        args = tuple(args) + ('--request-format', self.format)
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("list_" + cmd_resources)
         shell.run_command(cmd, cmd_parser, args)
@@ -332,13 +322,11 @@ class CLITestV20Base(base.BaseTestCase):
         else:
             contents = response_contents
         reses = {resources: contents}
-        self.client.format = self.format
         resstr = self.client.serialize(reses)
         # url method body
         args = base_args if base_args is not None else []
         if detail:
             args.append('-D')
-        args.extend(['--request-format', self.format])
         if fields_1:
             for field in fields_1:
                 args.append('--fields')
@@ -438,7 +426,6 @@ class CLITestV20Base(base.BaseTestCase):
                                             'rel': 'next'}]}
         reses2 = {resources: [{'id': 'myid3', },
                               {'id': 'myid4', }]}
-        self.client.format = self.format
         resstr1 = self.client.serialize(reses1)
         resstr2 = self.client.serialize(reses2)
         self.client.httpclient.request(
@@ -455,7 +442,6 @@ class CLITestV20Base(base.BaseTestCase):
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("list_" + cmd_resources)
         args = base_args if base_args is not None else []
-        args.extend(['--request-format', self.format])
         shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
@@ -474,13 +460,8 @@ class CLITestV20Base(base.BaseTestCase):
             path = path % (parent_id, myid)
         else:
             path = path % myid
-        self.client.format = self.format
-        # Work around for LP #1217791. XML deserializer called from
-        # MyComparator does not decodes XML string correctly.
-        if self.format == 'json':
-            mox_body = MyComparator(body, self.client)
-        else:
-            mox_body = self.client.serialize(body)
+        mox_body = MyComparator(body, self.client)
+
         self.client.httpclient.request(
             MyUrlComparator(end_url(path, format=self.format),
                             self.client),
@@ -488,7 +469,6 @@ class CLITestV20Base(base.BaseTestCase):
             body=mox_body,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(204), None))
-        args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("update_" + cmd_resource)
         shell.run_command(cmd, cmd_parser, args)
@@ -509,7 +489,6 @@ class CLITestV20Base(base.BaseTestCase):
         expected_res = {resource:
                         {self.id_field: myid,
                          'name': 'myname', }, }
-        self.client.format = self.format
         resstr = self.client.serialize(expected_res)
         path = getattr(self.client, cmd_resource + "_path")
         if parent_id:
@@ -521,7 +500,6 @@ class CLITestV20Base(base.BaseTestCase):
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
-        args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("show_" + cmd_resource)
         shell.run_command(cmd, cmd_parser, args)
@@ -548,7 +526,6 @@ class CLITestV20Base(base.BaseTestCase):
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(204), None))
-        args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("delete_" + cmd_resource)
         shell.run_command(cmd, cmd_parser, args)
@@ -571,7 +548,6 @@ class CLITestV20Base(base.BaseTestCase):
             body=MyComparator(body, self.client),
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(204), retval))
-        args.extend(['--request-format', self.format])
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("delete_" + cmd_resource)
         shell.run_command(cmd, cmd_parser, args)
@@ -583,7 +559,6 @@ class CLITestV20Base(base.BaseTestCase):
 
 class ClientV2TestJson(CLITestV20Base):
     def test_do_request_unicode(self):
-        self.client.format = self.format
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         unicode_text = u'\u7f51\u7edc'
         # url with unicode
@@ -616,7 +591,6 @@ class ClientV2TestJson(CLITestV20Base):
         self.assertEqual(body, res_body)
 
     def test_do_request_error_without_response_body(self):
-        self.client.format = self.format
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         params = {'test': 'value'}
         expect_query = six.moves.urllib.parse.urlencode(params)
@@ -647,10 +621,6 @@ class ClientV2TestJson(CLITestV20Base):
             self.assertNotEqual(cm.excess, 0)
         else:
             self.fail('Expected exception NOT raised')
-
-
-class ClientV2UnicodeTestXML(ClientV2TestJson):
-    format = 'xml'
 
 
 class CLITestV20ExceptionHandler(CLITestV20Base):

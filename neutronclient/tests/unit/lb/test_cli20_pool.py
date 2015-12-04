@@ -164,7 +164,3 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
         _str = self.fake_stdout.make_string()
         self.assertIn('bytes_in', _str)
         self.assertIn('bytes_out', _str)
-
-
-class CLITestV20LbPoolXML(CLITestV20LbPoolJSON):
-    format = 'xml'

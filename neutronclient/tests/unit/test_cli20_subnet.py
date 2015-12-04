@@ -574,12 +574,6 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         cmd = subnet.ListSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, tags=['a', 'b'])
 
-    def test_list_subnets_known_option_after_unknown(self):
-        """List subnets: -- --tags a b --request-format xml."""
-        resources = "subnets"
-        cmd = subnet.ListSubnet(test_cli20.MyApp(sys.stdout), None)
-        self._test_list_resources(resources, cmd, tags=['a', 'b'])
-
     def test_list_subnets_detail_tags(self):
         """List subnets: -D -- --tags a b."""
         resources = "subnets"
@@ -624,36 +618,13 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
                                    {'name': 'myname', 'tags': ['a', 'b'], }
                                    )
 
-    def test_update_subnet_known_option_before_id(self):
-        """Update subnet: --request-format json myid --name myname."""
-        # --request-format xml is known option
-        resource = 'subnet'
-        cmd = subnet.UpdateSubnet(test_cli20.MyApp(sys.stdout), None)
-        self._test_update_resource(resource, cmd, 'myid',
-                                   ['--request-format', 'json',
-                                    'myid', '--name', 'myname'],
-                                   {'name': 'myname', }
-                                   )
-
-    def test_update_subnet_known_option_after_id(self):
-        """Update subnet: myid --name myname --request-format json."""
-        # --request-format xml is known option
-        resource = 'subnet'
-        cmd = subnet.UpdateSubnet(test_cli20.MyApp(sys.stdout), None)
-        self._test_update_resource(resource, cmd, 'myid',
-                                   ['myid', '--name', 'myname',
-                                    '--request-format', 'json'],
-                                   {'name': 'myname', }
-                                   )
-
     def test_update_subnet_allocation_pools(self):
         """Update subnet: myid --name myname --tags a b."""
         resource = 'subnet'
         cmd = subnet.UpdateSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--allocation-pool',
-                                    'start=1.2.0.2,end=1.2.0.127',
-                                    '--request-format', 'json'],
+                                    'start=1.2.0.2,end=1.2.0.127'],
                                    {'allocation_pools': [{'start': '1.2.0.2',
                                                           'end': '1.2.0.127'}]}
                                    )
@@ -687,7 +658,3 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         myid = 'myid'
         args = [myid]
         self._test_delete_resource(resource, cmd, myid, args)
-
-
-class CLITestV20SubnetXML(CLITestV20SubnetJSON):
-    format = 'xml'

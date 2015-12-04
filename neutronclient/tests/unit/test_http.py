@@ -59,17 +59,17 @@ class TestHTTPClientMixin(object):
         self._test_headers(headers, body=BODY)
 
     def test_headers_without_body_with_content_type(self):
-        headers = {'Accept': 'application/xml'}
-        self._test_headers(headers, content_type='application/xml')
+        headers = {'Accept': 'application/json'}
+        self._test_headers(headers, content_type='application/json')
 
     def test_headers_with_body_with_content_type(self):
-        headers = {'Accept': 'application/xml',
-                   'Content-Type': 'application/xml'}
-        self._test_headers(headers, body=BODY, content_type='application/xml')
+        headers = {'Accept': 'application/json',
+                   'Content-Type': 'application/json'}
+        self._test_headers(headers, body=BODY, content_type='application/json')
 
     def test_headers_defined_in_headers(self):
-        headers = {'Accept': 'application/xml',
-                   'Content-Type': 'application/xml'}
+        headers = {'Accept': 'application/json',
+                   'Content-Type': 'application/json'}
         self._test_headers(headers, body=BODY, headers=headers)
 
 

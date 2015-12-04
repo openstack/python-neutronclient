@@ -201,7 +201,3 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
         cmd.run(parsed_args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
-
-
-class CLITestV20LbHealthmonitorXML(CLITestV20LbHealthmonitorJSON):
-    format = 'xml'
