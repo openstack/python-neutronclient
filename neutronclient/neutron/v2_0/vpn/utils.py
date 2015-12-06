@@ -35,14 +35,14 @@ def validate_dpd_dict(dpd_dict):
             message = _(
                 "DPD Dictionary KeyError: "
                 "Reason-Invalid DPD key : "
-                "'%(key)s' not in %(supported_key)s ") % {
+                "'%(key)s' not in %(supported_key)s") % {
                     'key': key, 'supported_key': dpd_supported_keys}
             raise exceptions.CommandError(message)
         if key == 'action' and value not in dpd_supported_actions:
             message = _(
                 "DPD Dictionary ValueError: "
                 "Reason-Invalid DPD action : "
-                "'%(key_value)s' not in %(supported_action)s ") % {
+                "'%(key_value)s' not in %(supported_action)s") % {
                     'key_value': value,
                     'supported_action': dpd_supported_actions}
             raise exceptions.CommandError(message)
@@ -54,7 +54,7 @@ def validate_dpd_dict(dpd_dict):
                 message = _(
                     "DPD Dictionary ValueError: "
                     "Reason-Invalid positive integer value: "
-                    "'%(key)s' = %(value)s ") % {
+                    "'%(key)s' = %(value)s") % {
                         'key': key, 'value': value}
                 raise exceptions.CommandError(message)
             else:
@@ -69,14 +69,14 @@ def validate_lifetime_dict(lifetime_dict):
             message = _(
                 "Lifetime Dictionary KeyError: "
                 "Reason-Invalid unit key : "
-                "'%(key)s' not in %(supported_key)s ") % {
+                "'%(key)s' not in %(supported_key)s") % {
                     'key': key, 'supported_key': lifetime_keys}
             raise exceptions.CommandError(message)
         if key == 'units' and value not in lifetime_units:
             message = _(
                 "Lifetime Dictionary ValueError: "
                 "Reason-Invalid units : "
-                "'%(key_value)s' not in %(supported_units)s ") % {
+                "'%(key_value)s' not in %(supported_units)s") % {
                     'key_value': key, 'supported_units': lifetime_units}
             raise exceptions.CommandError(message)
         if key == 'value':
@@ -87,7 +87,7 @@ def validate_lifetime_dict(lifetime_dict):
                 message = _(
                     "Lifetime Dictionary ValueError: "
                     "Reason-Invalid value should be at least 60:"
-                    "'%(key_value)s' = %(value)s ") % {
+                    "'%(key_value)s' = %(value)s") % {
                         'key_value': key, 'value': value}
                 raise exceptions.CommandError(message)
             else:
