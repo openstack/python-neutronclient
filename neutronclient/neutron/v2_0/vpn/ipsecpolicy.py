@@ -70,7 +70,7 @@ class CreateIPsecPolicy(neutronv20.CreateCommand):
         parser.add_argument(
             '--lifetime',
             metavar="units=UNITS,value=VALUE",
-            type=utils.str2dict,
+            type=utils.str2dict_type(optional_keys=['units', 'value']),
             help=vpn_utils.lifetime_help("IPsec"))
         parser.add_argument(
             'name', metavar='NAME',
@@ -99,7 +99,7 @@ class UpdateIPsecPolicy(neutronv20.UpdateCommand):
         parser.add_argument(
             '--lifetime',
             metavar="units=UNITS,value=VALUE",
-            type=utils.str2dict,
+            type=utils.str2dict_type(optional_keys=['units', 'value']),
             help=vpn_utils.lifetime_help("IPsec"))
 
     def args2body(self, parsed_args):

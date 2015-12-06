@@ -589,13 +589,14 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         resource = 'port'
         cmd = port.UpdatePort(test_cli20.MyApp(sys.stdout), None)
         myid = 'myid'
-        net_id = 'net_id'
+        subnet_id = 'subnet_id'
         ip_addr = '123.123.123.123'
         args = [myid,
-                '--fixed-ip', "network_id=%(net_id)s,ip_address=%(ip_addr)s" %
-                {'net_id': net_id,
+                '--fixed-ip',
+                "subnet_id=%(subnet_id)s,ip_address=%(ip_addr)s" %
+                {'subnet_id': subnet_id,
                  'ip_addr': ip_addr}]
-        updated_fields = {"fixed_ips": [{'network_id': net_id,
+        updated_fields = {"fixed_ips": [{'subnet_id': subnet_id,
                                          'ip_address': ip_addr}]}
         self._test_update_resource(resource, cmd, myid, args, updated_fields)
 

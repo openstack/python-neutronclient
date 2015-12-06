@@ -55,7 +55,8 @@ class IPsecSiteConnectionMixin(object):
         parser.add_argument(
             '--dpd',
             metavar="action=ACTION,interval=INTERVAL,timeout=TIMEOUT",
-            type=utils.str2dict,
+            type=utils.str2dict_type(
+                optional_keys=['action', 'interval', 'timeout']),
             help=vpn_utils.dpd_help("IPsec connection."))
         parser.add_argument(
             '--local-ep-group',

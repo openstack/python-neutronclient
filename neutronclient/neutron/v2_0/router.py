@@ -114,7 +114,8 @@ class UpdateRouter(neutronV20.UpdateCommand):
         routes_group = parser.add_mutually_exclusive_group()
         routes_group.add_argument(
             '--route', metavar='destination=CIDR,nexthop=IP_ADDR',
-            action='append', dest='routes', type=utils.str2dict,
+            action='append', dest='routes',
+            type=utils.str2dict_type(required_keys=['destination', 'nexthop']),
             help=_('Route to associate with the router.'
                    ' You can repeat this option.'))
         routes_group.add_argument(
@@ -226,6 +227,8 @@ class SetGatewayRouter(neutronV20.NeutronCommand):
         parser.add_argument(
             '--fixed-ip', metavar='subnet_id=SUBNET,ip_address=IP_ADDR',
             action='append',
+            type=utils.str2dict_type(optional_keys=['subnet_id',
+                                                    'ip_address']),
             help=_('Desired IP and/or subnet on external network: '
                    'subnet_id=<name_or_id>,ip_address=<ip>. '
                    'You can specify both of subnet_id and ip_address or '
@@ -246,13 +249,12 @@ class SetGatewayRouter(neutronV20.NeutronCommand):
         if parsed_args.fixed_ip:
             ips = []
             for ip_spec in parsed_args.fixed_ip:
-                ip_dict = utils.str2dict(ip_spec)
-                subnet_name_id = ip_dict.get('subnet_id')
+                subnet_name_id = ip_spec.get('subnet_id')
                 if subnet_name_id:
                     subnet_id = neutronV20.find_resourceid_by_name_or_id(
                         neutron_client, 'subnet', subnet_name_id)
-                    ip_dict['subnet_id'] = subnet_id
-                ips.append(ip_dict)
+                    ip_spec['subnet_id'] = subnet_id
+                ips.append(ip_spec)
             router_dict['external_fixed_ips'] = ips
         neutron_client.add_gateway_router(_router_id, router_dict)
         print(_('Set gateway for router %s') % parsed_args.router,

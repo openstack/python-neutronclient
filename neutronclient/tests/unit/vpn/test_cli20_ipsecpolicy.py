@@ -16,6 +16,7 @@
 
 import sys
 
+from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0.vpn import ipsecpolicy
 from neutronclient.tests.unit import test_cli20
 
@@ -98,7 +99,7 @@ class CLITestV20VpnIpsecPolicyJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, my_id, args,
                                    position_names, position_values)
 
-    def _test_lifetime_values(self, lifetime):
+    def _test_lifetime_values(self, lifetime, expected_exc=None):
         resource = 'ipsecpolicy'
         cmd = ipsecpolicy.CreateIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
         name = 'ipsecpolicy1'
@@ -131,19 +132,24 @@ class CLITestV20VpnIpsecPolicyJSON(test_cli20.CLITestV20Base):
                            auth_algorithm, encryption_algorithm,
                            phase1_negotiation_mode, ike_version, pfs,
                            tenant_id]
-        try:
-            self._test_create_resource(resource, cmd, name, my_id, args,
-                                       position_names, position_values)
-        except Exception:
-            return
-        self.fail("IPsecPolicy Lifetime Error")
+        if not expected_exc:
+            expected_exc = exceptions.CommandError
+        self.assertRaises(
+            expected_exc,
+            self._test_create_resource,
+            resource, cmd, name, my_id, args,
+            position_names, position_values)
 
     def test_create_ipsecpolicy_with_invalid_lifetime_keys(self):
         lifetime = 'uts=seconds,val=20000'
+        self._test_lifetime_values(lifetime, SystemExit)
+
+    def test_create_ipsecpolicy_with_invalid_lifetime_units(self):
+        lifetime = 'units=minutes,value=600'
         self._test_lifetime_values(lifetime)
 
-    def test_create_ipsecpolicy_with_invalide_lifetime_values(self):
-        lifetime = 'units=minutes,value=0'
+    def test_create_ipsecpolicy_with_invalid_lifetime_value(self):
+        lifetime = 'units=seconds,value=0'
         self._test_lifetime_values(lifetime)
 
     def test_list_ipsecpolicy(self):
