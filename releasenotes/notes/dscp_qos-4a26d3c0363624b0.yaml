@@ -1,0 +1,6 @@
+---
+prelude: >
+    Adding new QoS DSCP marking rule commands.
+features:
+  - New create, update, list, show, and delete commands are added for QoS
+    DSCP marking rule functionality.

@@ -508,6 +508,8 @@ class Client(ClientBase):
     qos_policy_path = "/qos/policies/%s"
     qos_bandwidth_limit_rules_path = "/qos/policies/%s/bandwidth_limit_rules"
     qos_bandwidth_limit_rule_path = "/qos/policies/%s/bandwidth_limit_rules/%s"
+    qos_dscp_marking_rules_path = "/qos/policies/%s/dscp_marking_rules"
+    qos_dscp_marking_rule_path = "/qos/policies/%s/dscp_marking_rules/%s"
     qos_rule_types_path = "/qos/rule-types"
     qos_rule_type_path = "/qos/rule-types/%s"
     flavors_path = "/flavors"
@@ -565,6 +567,7 @@ class Client(ClientBase):
                      'policies': 'policy',
                      'bandwidth_limit_rules': 'bandwidth_limit_rule',
                      'rules': 'rule',
+                     'dscp_marking_rules': 'dscp_marking_rule',
                      'rule_types': 'rule_type',
                      'flavors': 'flavor',
                      'bgp_speakers': 'bgp_speaker',
@@ -1795,7 +1798,7 @@ class Client(ClientBase):
     @APIParamsCall
     def list_bandwidth_limit_rules(self, policy_id,
                                    retrieve_all=True, **_params):
-        """Fetches a list of all qos rules for the given policy."""
+        """Fetches a list of all bandwidth limit rules for the given policy."""
         return self.list('bandwidth_limit_rules',
                          self.qos_bandwidth_limit_rules_path % policy_id,
                          retrieve_all, **_params)
@@ -1822,6 +1825,38 @@ class Client(ClientBase):
     def delete_bandwidth_limit_rule(self, rule, policy):
         """Deletes a bandwidth limit rule."""
         return self.delete(self.qos_bandwidth_limit_rule_path %
+                           (policy, rule))
+
+    @APIParamsCall
+    def list_dscp_marking_rules(self, policy_id,
+                                retrieve_all=True, **_params):
+        """Fetches a list of all DSCP marking rules for the given policy."""
+        return self.list('dscp_marking_rules',
+                         self.qos_dscp_marking_rules_path % policy_id,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_dscp_marking_rule(self, rule, policy, body=None):
+        """Shows information of a certain DSCP marking rule."""
+        return self.get(self.qos_dscp_marking_rule_path %
+                        (policy, rule), body=body)
+
+    @APIParamsCall
+    def create_dscp_marking_rule(self, policy, body=None):
+        """Creates a new DSCP marking rule."""
+        return self.post(self.qos_dscp_marking_rules_path % policy,
+                         body=body)
+
+    @APIParamsCall
+    def update_dscp_marking_rule(self, rule, policy, body=None):
+        """Updates a DSCP marking rule."""
+        return self.put(self.qos_dscp_marking_rule_path %
+                        (policy, rule), body=body)
+
+    @APIParamsCall
+    def delete_dscp_marking_rule(self, rule, policy):
+        """Deletes a DSCP marking rule."""
+        return self.delete(self.qos_dscp_marking_rule_path %
                            (policy, rule))
 
     @APIParamsCall
