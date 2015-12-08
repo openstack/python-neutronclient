@@ -13,6 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from oslo_utils import encodeutils
 import six
 
 from neutronclient._i18n import _
@@ -31,6 +32,14 @@ Exceptions are classified into three categories:
 """
 
 
+# NOTE: This method is defined here to avoid
+# an import loop between common.utils and this module.
+def _safe_decode_dict(kwargs):
+    for k, v in kwargs.items():
+        kwargs[k] = encodeutils.safe_decode(v)
+    return kwargs
+
+
 @six.python_2_unicode_compatible
 class NeutronException(Exception):
     """Base Neutron Exception.
@@ -45,7 +54,7 @@ class NeutronException(Exception):
         if message:
             self.message = message
         try:
-            self._error_string = self.message % kwargs
+            self._error_string = self.message % _safe_decode_dict(kwargs)
         except Exception:
             # at least get the core message out if something happened
             self._error_string = self.message

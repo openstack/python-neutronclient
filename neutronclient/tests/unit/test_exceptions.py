@@ -13,6 +13,8 @@
 #    under the License.
 
 import fixtures
+from oslo_utils import encodeutils
+import six
 import testtools
 
 from neutronclient.common import exceptions
@@ -34,3 +36,13 @@ class TestExceptions(testtools.TestCase):
             print(e)
         self.assertEqual('Exception with %s' % multibyte_unicode_string,
                          fixture.getDetails().get('stdout').as_text())
+
+    def test_exception_message_with_encoded_unicode(self):
+        class TestException(exceptions.NeutronException):
+            message = _('Exception with %(reason)s')
+
+        multibyte_string = u'\uff21\uff22\uff23'
+        multibyte_binary = encodeutils.safe_encode(multibyte_string)
+        e = TestException(reason=multibyte_binary)
+        self.assertEqual('Exception with %s' % multibyte_string,
+                         six.text_type(e))
