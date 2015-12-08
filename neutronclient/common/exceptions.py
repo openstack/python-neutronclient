@@ -13,6 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import six
+
 from neutronclient._i18n import _
 
 """
@@ -29,6 +31,7 @@ Exceptions are classified into three categories:
 """
 
 
+@six.python_2_unicode_compatible
 class NeutronException(Exception):
     """Base Neutron Exception.
 
