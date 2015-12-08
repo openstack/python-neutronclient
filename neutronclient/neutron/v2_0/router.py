@@ -24,6 +24,7 @@ from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
+from neutronclient.neutron.v2_0 import availability_zone
 
 
 def _format_external_gateway_info(router):
@@ -74,10 +75,13 @@ class CreateRouter(neutronV20.CreateCommand):
             parser, '--ha', dest='ha',
             help=_('Create a highly available router.'))
 
+        availability_zone.add_az_hint_argument(parser, self.resource)
+
     def args2body(self, parsed_args):
         body = {'admin_state_up': parsed_args.admin_state}
         neutronV20.update_dict(parsed_args, body,
                                ['name', 'tenant_id', 'distributed', 'ha'])
+        availability_zone.args2body_az_hint(parsed_args, body)
         return {self.resource: body}
 
 

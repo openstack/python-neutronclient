@@ -111,6 +111,21 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
         """Create router: --distributed=false."""
         self._create_router_distributed_or_ha(distributed='false')
 
+    def test_create_router_with_az_hint(self):
+        """Create router: --availability-zone-hint zone1
+        --availability-zone-hint zone2.
+        """
+        resource = 'router'
+        cmd = router.CreateRouter(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        args = ['--availability-zone-hint', 'zone1',
+                '--availability-zone-hint', 'zone2', name]
+        position_names = ['availability_zone_hints', 'name']
+        position_values = [['zone1', 'zone2'], name]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_list_routers_detail(self):
         """list routers: -D."""
         resources = "routers"
