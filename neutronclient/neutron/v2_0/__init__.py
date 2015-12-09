@@ -429,7 +429,6 @@ class NeutronCommand(command.Command):
         pass
 
     def format_output_data(self, data):
-        self.cleanup_output_data(data)
         # Modify data to make it more readable
         if self.resource in data:
             for k, v in six.iteritems(data[self.resource]):
@@ -484,7 +483,9 @@ class CreateCommand(NeutronCommand, show.ShowOne):
             data = obj_creator(self.parent_id, body)
         else:
             data = obj_creator(body)
-        self.format_output_data(data)
+        self.cleanup_output_data(data)
+        if parsed_args.formatter == 'table':
+            self.format_output_data(data)
         info = self.resource in data and data[self.resource] or None
         if info:
             if parsed_args.formatter == 'table':
@@ -754,9 +755,14 @@ class ListCommand(NeutronCommand, lister.Lister):
             # Also Keep their order the same as in list_columns
             _columns = [x for x in self.list_columns if x in _columns]
 
-        formatters = self._formatters
-        if hasattr(self, '_formatters_csv') and parsed_args.formatter == 'csv':
+        if parsed_args.formatter == 'table':
+            formatters = self._formatters
+        elif (parsed_args.formatter == 'csv'
+              and hasattr(self, '_formatters_csv')):
             formatters = self._formatters_csv
+        else:
+            # For other formatters, we use raw value returned from neutron
+            formatters = {}
 
         return (_columns, (utils.get_item_properties(
             s, _columns, formatters=formatters, )
@@ -814,7 +820,9 @@ class ShowCommand(NeutronCommand, show.ShowOne):
             data = obj_shower(_id, self.parent_id, **params)
         else:
             data = obj_shower(_id, **params)
-        self.format_output_data(data)
+        self.cleanup_output_data(data)
+        if parsed_args.formatter == 'table':
+            self.format_output_data(data)
         resource = data[self.resource]
         if self.resource in data:
             return zip(*sorted(six.iteritems(resource)))
