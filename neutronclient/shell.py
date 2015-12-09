@@ -61,7 +61,6 @@ from neutronclient.neutron.v2_0.lb.v2 import member as lbaas_member
 from neutronclient.neutron.v2_0.lb.v2 import pool as lbaas_pool
 from neutronclient.neutron.v2_0.lb import vip as lb_vip
 from neutronclient.neutron.v2_0 import metering
-from neutronclient.neutron.v2_0 import netpartition
 from neutronclient.neutron.v2_0 import network
 from neutronclient.neutron.v2_0.nsx import networkgateway
 from neutronclient.neutron.v2_0.nsx import qos_queue
@@ -344,10 +343,6 @@ COMMAND_V2 = {
     'meter-label-rule-list': metering.ListMeteringLabelRule,
     'meter-label-rule-show': metering.ShowMeteringLabelRule,
     'meter-label-rule-delete': metering.DeleteMeteringLabelRule,
-    'nuage-netpartition-list': netpartition.ListNetPartition,
-    'nuage-netpartition-show': netpartition.ShowNetPartition,
-    'nuage-netpartition-create': netpartition.CreateNetPartition,
-    'nuage-netpartition-delete': netpartition.DeleteNetPartition,
     'rbac-create': rbac.CreateRBACPolicy,
     'rbac-update': rbac.UpdateRBACPolicy,
     'rbac-list': rbac.ListRBACPolicy,
