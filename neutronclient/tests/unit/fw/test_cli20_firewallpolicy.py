@@ -213,3 +213,14 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
         shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
+
+    def test_update_firewall_policy_name_shared_audited(self):
+        # firewall-policy-update myid --name newname2 --shared --audited
+        resource = 'firewall_policy'
+        cmd = firewallpolicy.UpdateFirewallPolicy(test_cli20.MyApp(sys.stdout),
+                                                  None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--name', 'newname2',
+                                    '--shared', 'True', '--audited', 'True'],
+                                   {'name': 'newname2',
+                                    'shared': 'True', 'audited': 'True'})
