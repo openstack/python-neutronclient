@@ -435,6 +435,7 @@ class Client(ClientBase):
     service_profile_path = "/service_profiles/%s"
     flavor_profile_bindings_path = flavor_path + service_profiles_path
     flavor_profile_binding_path = flavor_path + service_profile_path
+    availability_zones_path = "/availability_zones"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -1728,6 +1729,12 @@ class Client(ClientBase):
         """Update a Neutron service profile."""
         return self.put(self.service_profile_path % (service_profile),
                         body=body)
+
+    @APIParamsCall
+    def list_availability_zones(self, retrieve_all=True, **_params):
+        """Fetches a list of all availability zones."""
+        return self.list('availability_zones', self.availability_zones_path,
+                         retrieve_all, **_params)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""

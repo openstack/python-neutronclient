@@ -149,6 +149,21 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_network_with_az_hint(self):
+        """Create net: --availability-zone-hint zone1
+        --availability-zone-hint zone2.
+        """
+        resource = 'network'
+        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        args = ['--availability-zone-hint', 'zone1',
+                '--availability-zone-hint', 'zone2', name]
+        position_names = ['availability_zone_hints', 'name']
+        position_values = [['zone1', 'zone2'], name]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_list_nets_empty_with_column(self):
         resources = "networks"
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)

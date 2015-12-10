@@ -20,6 +20,7 @@ from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
+from neutronclient.neutron.v2_0 import availability_zone
 from neutronclient.neutron.v2_0.qos import policy as qos_policy
 
 
@@ -146,6 +147,7 @@ class CreateNetwork(neutronV20.CreateCommand, qos_policy.CreateQosPolicyMixin):
             help=_('Name of network to create.'))
 
         self.add_arguments_qos_policy(parser)
+        availability_zone.add_az_hint_argument(parser, self.resource)
 
     def args2body(self, parsed_args):
         body = {'name': parsed_args.name,
@@ -158,6 +160,7 @@ class CreateNetwork(neutronV20.CreateCommand, qos_policy.CreateQosPolicyMixin):
                                 'provider:segmentation_id'])
 
         self.args2body_qos_policy(parsed_args, body)
+        availability_zone.args2body_az_hint(parsed_args, body)
 
         return {'network': body}
 
