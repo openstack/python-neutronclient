@@ -44,6 +44,23 @@ class ListNetwork(neutronV20.ListCommand):
     pagination_support = True
     sorting_support = True
 
+    filter_attrs = [
+        'tenant_id',
+        'name',
+        'admin_state_up',
+        {'name': 'status',
+         'help': _("Filter %s according to their operation status."
+                   "(For example: ACTIVE, ERROR etc)"),
+         'boolean': False,
+         'argparse_kwargs': {'type': utils.convert_to_uppercase}},
+        {'name': 'shared',
+         'help': _('Filter and list the networks which are shared.'),
+         'boolean': True},
+        {'name': 'router:external',
+         'help': _('Filter and list the networks which are external.'),
+         'boolean': True},
+    ]
+
     def extend_list(self, data, parsed_args):
         """Add subnet information to a network list."""
         neutron_client = self.get_client()
