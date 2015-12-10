@@ -82,6 +82,7 @@ class CreatePool(neutronV20.CreateCommand):
             '--protocol',
             required=True,
             choices=['HTTP', 'HTTPS', 'TCP'],
+            type=utils.convert_to_uppercase,
             help=_('Protocol for balancing.'))
 
     def args2body(self, parsed_args):

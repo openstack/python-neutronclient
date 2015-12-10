@@ -15,6 +15,7 @@
 #    under the License.
 #
 
+from neutronclient.common import utils
 from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
 
@@ -82,6 +83,7 @@ class CreateListener(neutronV20.CreateCommand):
             '--protocol',
             required=True,
             choices=['TCP', 'HTTP', 'HTTPS', 'TERMINATED_HTTPS'],
+            type=utils.convert_to_uppercase,
             help=_('Protocol for the listener.'))
         parser.add_argument(
             '--protocol-port',
