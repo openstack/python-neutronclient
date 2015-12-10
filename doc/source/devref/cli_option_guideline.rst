@@ -26,10 +26,10 @@ General conventions
 
 #. Do not use ``nargs='?'`` without a special reason.
 
-   * The behavior of ``nargs='?'`` of python argparse is a bit tricky
-     and it sometimes leads to unexpected option parsing which is
-     different from the help message. The detail is described
-     in :ref:`the Background section <background-nargs>` below.
+   * The behavior of ``nargs='?'`` option for python argparse is
+     bit tricky and may lead to unexpected option parsing different
+     from the help message. The detail is described in the
+     :ref:`Background section <background-nargs>` below.
 
 #. (option) Avoid using positional options as much as possible.
 
@@ -156,21 +156,18 @@ Options for Boolean value
 
 .. _background-nargs:
 
-Avoid using positional options
-------------------------------
+Avoid using nargs in positional or optional arguments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The behavior of ``nargs='?'`` of python argparse is a bit tricky.
-When we use ``nargs='?'``, if the order of command-line options is
-swapped a bit, a command-line parser fails to parse the options easily.
-
-There are two examples of such failures.
-
-Example 1 shows that an actual behavior is different from
-a way shown in a help message. The help message at ``[5]``
-shows we can use ``--bb CC``, but as you see at ``[7]``
-the arguent parsing fails.
+The behavior of ``nargs='?'`` option for python argparse is bit tricky.
+When we use ``nargs='?'`` and if the order of command-line options is
+changed then the command-line parser may fail to parse the arguments
+correctly. Two examples of such failures are provided below.
 
 Example 1:
+This example shows how the actual behavior can differ from the provided
+help message. In the below block, help message at ``[5]`` says ``--bb CC``
+is a valid format but the argument parsing for the same format fails at ``[7]``.
 
 .. code-block:: console
 
@@ -200,12 +197,9 @@ Example 1:
    SystemExit: 2
 
 
-The second example shows how fragile ``nargs='?'`` is when a user
-specifies options in a way different from the help message.
-Most CLI usesr do not care the the order of command-line options,
-so this fragile behavior should be avoided.
-
 Example 2:
+This example shows how fragile ``nargs='?'`` can be when user specifies
+options in different order from the help message.
 
 .. code-block:: console
 
@@ -243,4 +237,6 @@ Example 2:
    To exit: use 'exit', 'quit', or Ctrl-D.
    To exit: use 'exit', 'quit', or Ctrl-D.
 
+Note: Most CLI users don't care about the order of the command-line
+options. Hence, such fragile behavior should be avoided.
 
