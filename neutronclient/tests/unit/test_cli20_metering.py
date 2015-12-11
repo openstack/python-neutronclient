@@ -97,7 +97,3 @@ class CLITestV20MeteringJSON(test_cli20.CLITestV20Base):
         args = ['--fields', 'id', self.test_id]
         self._test_show_resource(resource, cmd, self.test_id,
                                  args, ['id'])
-
-
-class CLITestV20MeteringXML(CLITestV20MeteringJSON):
-    format = 'xml'

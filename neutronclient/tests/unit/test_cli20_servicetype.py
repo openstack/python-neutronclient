@@ -53,7 +53,3 @@ class CLITestV20ServiceProvidersJSON(test_cli20.CLITestV20Base):
         cmd = servicetype.ListServiceProvider(test_cli20.MyApp(sys.stdout),
                                               None)
         self._test_list_resources(resources, cmd, page_size=1000)
-
-
-class CLITestV20ServiceProvidersXML(CLITestV20ServiceProvidersJSON):
-    format = 'xml'

@@ -204,7 +204,3 @@ class CLITestV20VpnIpsecPolicyJSON(test_cli20.CLITestV20Base):
         my_id = 'my-id'
         args = [my_id]
         self._test_delete_resource(resource, cmd, my_id, args)
-
-
-class CLITestV20VpnIpsecPolicyXML(CLITestV20VpnIpsecPolicyJSON):
-    format = 'xml'

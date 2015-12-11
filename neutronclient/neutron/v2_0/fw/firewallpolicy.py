@@ -170,7 +170,6 @@ class FirewallPolicyInsertRule(neutronv20.UpdateCommand):
 
     def run(self, parsed_args):
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         body = self.args2body(parsed_args)
         _id = neutronv20.find_resourceid_by_name_or_id(neutron_client,
                                                        self.resource,
@@ -209,7 +208,6 @@ class FirewallPolicyRemoveRule(neutronv20.UpdateCommand):
 
     def run(self, parsed_args):
         neutron_client = self.get_client()
-        neutron_client.format = parsed_args.request_format
         body = self.args2body(parsed_args)
         _id = neutronv20.find_resourceid_by_name_or_id(neutron_client,
                                                        self.resource,

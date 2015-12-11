@@ -615,7 +615,3 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                         'X-Auth-Token', test_cli20.TOKEN)).AndReturn(response)
 
         self._test_extend_list(mox_calls)
-
-
-class CLITestV20NetworkXML(CLITestV20NetworkJSON):
-    format = 'xml'

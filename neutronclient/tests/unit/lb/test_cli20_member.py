@@ -117,7 +117,3 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
         my_id = 'my-id'
         args = [my_id]
         self._test_delete_resource(resource, cmd, my_id, args)
-
-
-class CLITestV20LbMemberXML(CLITestV20LbMemberJSON):
-    format = 'xml'

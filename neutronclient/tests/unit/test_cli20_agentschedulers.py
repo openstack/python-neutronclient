@@ -206,7 +206,3 @@ class CLITestV20LBaaSV2AgentScheduler(test_cli20.CLITestV20Base):
         contents = {self.id_field: 'myid1', 'alive': True}
         self._test_list_resources(resources, cmd, base_args=[lb_id],
                                   path=path, response_contents=contents)
-
-
-class CLITestV20LBaaSAgentSchedulerXML(CLITestV20LBaaSAgentScheduler):
-    format = 'xml'

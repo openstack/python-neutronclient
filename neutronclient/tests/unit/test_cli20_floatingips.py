@@ -177,7 +177,3 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, 'myid',
                                    args, {"port_id": "portid"}
                                    )
-
-
-class CLITestV20FloatingIpsXML(CLITestV20FloatingIpsJSON):
-    format = 'xml'

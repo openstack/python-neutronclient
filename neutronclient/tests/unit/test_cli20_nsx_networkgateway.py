@@ -261,7 +261,3 @@ class CLITestV20NetworkGatewayJSON(test_cli20.CLITestV20Base):
         args = ['--fields', 'id', '--fields', 'name', self.test_id]
         self._test_show_resource(self.dev_resource, cmd, self.test_id, args,
                                  ['id', 'name'])
-
-
-class CLITestV20NetworkGatewayXML(CLITestV20NetworkGatewayJSON):
-    format = 'xml'

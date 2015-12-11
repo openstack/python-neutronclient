@@ -178,7 +178,3 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
         my_id = 'myid1'
         args = [my_id]
         self._test_delete_resource(resource, cmd, my_id, args)
-
-
-class CLITestV20FirewallRuleXML(CLITestV20FirewallRuleJSON):
-    format = 'xml'

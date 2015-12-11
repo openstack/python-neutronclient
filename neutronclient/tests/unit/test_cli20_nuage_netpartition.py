@@ -53,7 +53,3 @@ class CLITestV20NetPartitionJSON(test_cli20.CLITestV20Base):
         myid = 'myid'
         args = [myid]
         self._test_delete_resource(self.resource, cmd, myid, args)
-
-
-class CLITestV20NetPartitionXML(CLITestV20NetPartitionJSON):
-    format = 'xml'
