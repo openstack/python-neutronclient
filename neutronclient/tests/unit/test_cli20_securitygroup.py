@@ -174,6 +174,33 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, None, myid, args,
                                    position_names, position_values)
 
+    def test_create_security_group_rule_with_integer_protocol_value(self):
+        resource = 'security_group_rule'
+        cmd = securitygroup.CreateSecurityGroupRule(
+            test_cli20.MyApp(sys.stdout), None)
+        myid = 'myid'
+        direction = 'ingress'
+        ethertype = 'IPv4'
+        protocol = '2'
+        port_range_min = '22'
+        port_range_max = '22'
+        remote_ip_prefix = '10.0.0.0/24'
+        security_group_id = '1'
+        remote_group_id = '1'
+        args = ['--remote_ip_prefix', remote_ip_prefix, '--direction',
+                direction, '--ethertype', ethertype, '--protocol', protocol,
+                '--port_range_min', port_range_min, '--port_range_max',
+                port_range_max, '--remote_group_id', remote_group_id,
+                security_group_id]
+        position_names = ['remote_ip_prefix', 'direction', 'ethertype',
+                          'protocol', 'port_range_min', 'port_range_max',
+                          'remote_group_id', 'security_group_id']
+        position_values = [remote_ip_prefix, direction, ethertype, protocol,
+                           port_range_min, port_range_max, remote_group_id,
+                           security_group_id]
+        self._test_create_resource(resource, cmd, None, myid, args,
+                                   position_names, position_values)
+
     def test_delete_security_group_rule(self):
         """Delete security group rule: myid."""
         resource = 'security_group_rule'
