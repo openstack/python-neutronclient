@@ -31,13 +31,14 @@ def add_common_args(parser):
         dest='routers',
         metavar='ROUTER',
         action='append',
-        help=_('Firewall associated router name or ID (requires FWaaS '
-               'router insertion extension, this option can be repeated)'))
+        help=_('ID or name of the router associated with the firewall '
+               '(requires FWaaS router insertion extension to be enabled). '
+               'This option can be repeated.'))
     router.add_argument(
         '--no-routers',
         action='store_true',
         help=_('Associate no routers with the firewall (requires FWaaS '
-               'router insertion extension)'))
+               'router insertion extension).'))
 
 
 def parse_common_args(client, parsed_args):
@@ -84,7 +85,8 @@ class CreateFirewall(neutronv20.CreateCommand):
         add_common_args(parser)
         parser.add_argument(
             'policy', metavar='POLICY',
-            help=_('Firewall policy name or ID.'))
+            help=_('ID or name of the firewall policy '
+                   'associated to this firewall.'))
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state',
@@ -107,11 +109,12 @@ class UpdateFirewall(neutronv20.UpdateCommand):
         add_common_args(parser)
         parser.add_argument(
             '--policy', metavar='POLICY',
-            help=_('Firewall policy name or ID.'))
+            help=_('ID or name of the firewall policy '
+                   'associated to this firewall.'))
         utils.add_boolean_argument(
             parser, '--admin-state-up', dest='admin_state_up',
-            help=_('Update the admin state for the firewall'
-                   '(True means UP)'))
+            help=_('Update the admin state for the firewall '
+                   '(True means UP).'))
 
     def args2body(self, parsed_args):
         body = parse_common_args(self.get_client(), parsed_args)

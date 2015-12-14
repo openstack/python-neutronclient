@@ -48,7 +48,8 @@ class CreateFloatingIP(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'floating_network_id', metavar='FLOATING_NETWORK',
-            help=_('Network name or ID to allocate floating IP from.'))
+            help=_('ID or name of the network from which '
+                   'the floating IP is allocated.'))
         parser.add_argument(
             '--description',
             help=_('Description of the floating IP.'))

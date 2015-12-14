@@ -67,7 +67,7 @@ class CreateRouter(neutronV20.CreateCommand):
             help=argparse.SUPPRESS)
         parser.add_argument(
             'name', metavar='NAME',
-            help=_('Name of router to create.'))
+            help=_('Name of the router to be created.'))
         parser.add_argument(
             '--description',
             help=_('Description of router.'))
@@ -103,21 +103,21 @@ class UpdateRouter(neutronV20.UpdateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--name',
-            help=_('Name of this router.'))
+            help=_('Updated name of the router.'))
         parser.add_argument(
             '--description',
             help=_('Description of router.'))
         utils.add_boolean_argument(
             parser, '--admin-state-up', dest='admin_state',
-            help=_('Specify the administrative state of the router'
-                   ' (True meaning "Up")'))
+            help=_('Specify the administrative state of the router '
+                   '(True means "Up").'))
         utils.add_boolean_argument(
             parser, '--admin_state_up', dest='admin_state',
             help=argparse.SUPPRESS)
         utils.add_boolean_argument(
             parser, '--distributed', dest='distributed',
-            help=_('True means this router should operate in'
-                   ' distributed mode.'))
+            help=_('True means this router should operate in '
+                   'distributed mode.'))
         routes_group = parser.add_mutually_exclusive_group()
         routes_group.add_argument(
             '--route', metavar='destination=CIDR,nexthop=IP_ADDR',

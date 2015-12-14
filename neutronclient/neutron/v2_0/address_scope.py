@@ -76,7 +76,7 @@ class UpdateAddressScope(neutronV20.UpdateCommand):
 
     def add_known_arguments(self, parser):
         parser.add_argument('--name',
-                            help=_('Name of the address scope to update.'))
+                            help=_('Updated name of the address scope.'))
 
     def args2body(self, parsed_args):
         body = {}

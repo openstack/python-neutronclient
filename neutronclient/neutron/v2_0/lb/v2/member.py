@@ -45,7 +45,7 @@ def _add_common_args(parser):
             help=_('Name of the member.'))
         parser.add_argument(
             '--weight',
-            help=_('Weight of member in the pool (default:1, [0..256]).'))
+            help=_('Weight of the member in the pool (default:1, [0..256]).'))
 
 
 def _parse_common_args(body, parsed_args):

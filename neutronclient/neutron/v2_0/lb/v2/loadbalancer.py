@@ -64,10 +64,10 @@ class CreateLoadBalancer(neutronV20.CreateCommand):
             help=_('Set admin state up to false.'))
         parser.add_argument(
             '--provider',
-            help=_('Provider name of load balancer service.'))
+            help=_('Provider name of the load balancer service.'))
         parser.add_argument(
             '--flavor',
-            help=_('ID or name of flavor.'))
+            help=_('ID or name of the flavor.'))
         parser.add_argument(
             '--vip-address',
             help=_('VIP address for the load balancer.'))
@@ -146,7 +146,7 @@ class RetrieveLoadBalancerStats(neutronV20.ShowCommand):
             # | ...                | ...   |
             # +--------------------+-------+
             # it has two columns and the Filed column is alphabetical,
-            # here covert the data dict to the 1-1 vector format below:
+            # here convert the data dict to the 1-1 vector format below:
             # [(field1, field2, field3, ...), (value1, value2, value3, ...)]
             return list(zip(*sorted(stats.items())))
 

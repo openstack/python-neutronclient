@@ -169,21 +169,21 @@ class CreateNetwork(neutronV20.CreateCommand, qos_policy.CreateQosPolicyMixin):
         parser.add_argument(
             '--provider:physical_network',
             metavar='<physical_network_name>',
-            help=_('Name of the physical network over which the virtual'
-                   ' network is implemented.'))
+            help=_('Name of the physical network over which the virtual '
+                   'network is implemented.'))
         parser.add_argument(
             '--provider:segmentation_id',
             metavar='<segmentation_id>',
-            help=_('VLAN ID for VLAN networks or tunnel-id for GRE/VXLAN'
-                   ' networks.'))
+            help=_('VLAN ID for VLAN networks or tunnel-id for GRE/VXLAN '
+                   'networks.'))
         utils.add_boolean_argument(
             parser,
             '--vlan-transparent',
             default=argparse.SUPPRESS,
-            help=_('Create a vlan transparent network.'))
+            help=_('Create a VLAN transparent network.'))
         parser.add_argument(
             'name', metavar='NAME',
-            help=_('Name of network to create.'))
+            help=_('Name of the network to be created.'))
         parser.add_argument(
             '--description',
             help=_('Description of network.'))

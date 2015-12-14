@@ -77,7 +77,7 @@ class CreatePool(neutronV20.CreateCommand):
                    'located.'))
         parser.add_argument(
             '--provider',
-            help=_('Provider name of loadbalancer service.'))
+            help=_('Provider name of the loadbalancer service.'))
 
     def args2body(self, parsed_args):
         _subnet_id = neutronV20.find_resourceid_by_name_or_id(

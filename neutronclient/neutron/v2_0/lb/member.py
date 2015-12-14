@@ -60,7 +60,7 @@ class CreateMember(neutronV20.CreateCommand):
                    'connections.'))
         parser.add_argument(
             'pool_id', metavar='POOL',
-            help=_('Pool ID or name this vip belongs to.'))
+            help=_('ID or name of the pool this vip belongs to.'))
 
     def args2body(self, parsed_args):
         _pool_id = neutronV20.find_resourceid_by_name_or_id(
