@@ -29,8 +29,8 @@ from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
 
 
-def get_tenant_id(tenant_id, client):
-    return (tenant_id if tenant_id else
+def get_tenant_id(args, client):
+    return (args.pos_tenant_id or args.tenant_id or
             client.get_quotas_tenant()['tenant']['tenant_id'])
 
 
@@ -48,13 +48,15 @@ class DeleteQuota(neutronV20.NeutronCommand):
         parser.add_argument(
             '--tenant_id',
             help=argparse.SUPPRESS)
+        parser.add_argument(
+            'pos_tenant_id',
+            help=argparse.SUPPRESS, nargs='?')
         return parser
 
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
-        tenant_id = get_tenant_id(parsed_args.tenant_id,
-                                  neutron_client)
+        tenant_id = get_tenant_id(parsed_args, neutron_client)
         obj_deleter = getattr(neutron_client,
                               "delete_%s" % self.resource)
         obj_deleter(tenant_id)
@@ -107,13 +109,18 @@ class ShowQuota(neutronV20.NeutronCommand, show.ShowOne):
         parser.add_argument(
             '--tenant_id',
             help=argparse.SUPPRESS)
+        # allow people to do neutron quota-show <tenant-id>.
+        # we use a different name for this because the default will
+        # override whatever is in the named arg otherwise.
+        parser.add_argument(
+            'pos_tenant_id',
+            help=argparse.SUPPRESS, nargs='?')
         return parser
 
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)', parsed_args)
         neutron_client = self.get_client()
-        tenant_id = get_tenant_id(parsed_args.tenant_id,
-                                  neutron_client)
+        tenant_id = get_tenant_id(parsed_args, neutron_client)
         params = {}
         obj_shower = getattr(neutron_client,
                              "show_%s" % self.resource)
@@ -183,6 +190,9 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
         parser.add_argument(
             '--health-monitor', metavar='health_monitors',
             help=_('The limit of health monitors.'))
+        parser.add_argument(
+            'pos_tenant_id',
+            help=argparse.SUPPRESS, nargs='?')
 
         return parser
 
@@ -219,8 +229,7 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
             body[self.resource] = _extra_values
         obj_updator = getattr(neutron_client,
                               "update_%s" % self.resource)
-        tenant_id = get_tenant_id(parsed_args.tenant_id,
-                                  neutron_client)
+        tenant_id = get_tenant_id(parsed_args, neutron_client)
         data = obj_updator(tenant_id, body)
         if self.resource in data:
             for k, v in six.iteritems(data[self.resource]):

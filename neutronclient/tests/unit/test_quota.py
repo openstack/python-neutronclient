@@ -42,3 +42,20 @@ class CLITestV20Quota(test_cli20.CLITestV20Base):
     def test_delete_quota_get_parser(self):
         cmd = test_cli20.MyApp(sys.stdout)
         test_quota.DeleteQuota(cmd, None).get_parser(cmd)
+
+    def test_show_quota_positional(self):
+        resource = 'quota'
+        cmd = test_quota.ShowQuota(
+            test_cli20.MyApp(sys.stdout), None)
+        args = [self.test_id]
+        self._test_show_resource(resource, cmd, self.test_id, args)
+
+    def test_update_quota_positional(self):
+        resource = 'quota'
+        cmd = test_quota.UpdateQuota(
+            test_cli20.MyApp(sys.stdout), None)
+        args = [self.test_id, '--network', 'test']
+        self.assertRaises(
+            exceptions.NeutronClientException, self._test_update_resource,
+            resource, cmd, self.test_id, args=args,
+            extrafields={'network': 'new'})
