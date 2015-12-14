@@ -103,18 +103,20 @@ class CreateFirewallRule(neutronv20.CreateCommand):
             help=_('Whether to enable or disable this rule.'))
         parser.add_argument(
             '--protocol', choices=['tcp', 'udp', 'icmp', 'any'],
+            type=utils.convert_to_lowercase,
             required=True,
             help=_('Protocol for the firewall rule.'))
         parser.add_argument(
             '--action',
             required=True,
+            type=utils.convert_to_lowercase,
             choices=['allow', 'deny', 'reject'],
             help=_('Action for the firewall rule.'))
 
     def args2body(self, parsed_args):
         body = {}
         neutronv20.update_dict(parsed_args, body,
-                               ['name', 'description', 'shared', 'protocol',
+                               ['name', 'description', 'shared',
                                 'source_ip_address', 'destination_ip_address',
                                 'source_port', 'destination_port',
                                 'action', 'enabled', 'tenant_id',
@@ -135,7 +137,10 @@ class UpdateFirewallRule(neutronv20.UpdateCommand):
         parser.add_argument(
             '--protocol', choices=['tcp', 'udp', 'icmp', 'any'],
             required=False,
+            type=utils.convert_to_lowercase,
             help=_('Protocol for the firewall rule.'))
+        # TODO(reedip) : Need to add the option for action once
+        # action also comes into Update Firewall Rule
 
     def args2body(self, parsed_args):
         body = {}

@@ -58,8 +58,9 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
     def test_create_disabled_firewall_rule_with_mandatory_params(self):
         self._test_create_firewall_rule_with_mandatory_params(enabled='False')
 
-    def _setup_create_firewall_rule_with_all_params(self, protocol='tcp',
-                                                    ip_version='4'):
+    def _setup_create_firewall_rule_with_all_params(
+            self, protocol='tcp', protocol_cli=None,
+            action='allow', action_cli=None, ip_version='4'):
         # firewall-rule-create with all params set.
         resource = 'firewall_rule'
         cmd = firewallrule.CreateFirewallRule(test_cli20.MyApp(sys.stdout),
@@ -70,19 +71,18 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
         destination_ip = '192.168.2.0/24'
         source_port = '0:65535'
         destination_port = '0:65535'
-        action = 'allow'
         tenant_id = 'my-tenant'
         my_id = 'myid'
         enabled = 'True'
         args = ['--description', description,
                 '--shared',
-                '--protocol', protocol,
+                '--protocol', protocol_cli or protocol,
                 '--ip-version', ip_version,
                 '--source-ip-address', source_ip,
                 '--destination-ip-address', destination_ip,
                 '--source-port', source_port,
                 '--destination-port', destination_port,
-                '--action', action,
+                '--action', action_cli or action,
                 '--enabled', enabled,
                 '--admin-state-up',
                 '--tenant-id', tenant_id]
@@ -125,6 +125,16 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
 
     def test_create_firewall_rule_with_invalid_IP_version(self):
         self._setup_create_firewall_rule_with_all_params(ip_version='5')
+
+    def test_create_firewall_rule_with_proto_action_upper_capitalized(self):
+        for protocol in ('TCP', 'Tcp', 'ANY', 'AnY'):
+            self._setup_create_firewall_rule_with_all_params(
+                protocol=protocol.lower(),
+                protocol_cli=protocol)
+        for action in ('Allow', 'DENY', 'reject'):
+            self._setup_create_firewall_rule_with_all_params(
+                action=action.lower(),
+                action_cli=action)
 
     def test_list_firewall_rules(self):
         # firewall-rule-list.
