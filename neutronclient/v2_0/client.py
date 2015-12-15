@@ -392,8 +392,6 @@ class Client(ClientBase):
     firewall_policy_remove_path = "/fw/firewall_policies/%s/remove_rule"
     firewalls_path = "/fw/firewalls"
     firewall_path = "/fw/firewalls/%s"
-    net_partitions_path = "/net-partitions"
-    net_partition_path = "/net-partitions/%s"
     rbac_policies_path = "/rbac-policies"
     rbac_policy_path = "/rbac-policies/%s"
     qos_policies_path = "/qos/policies"
@@ -433,7 +431,6 @@ class Client(ClientBase):
                      'firewalls': 'firewall',
                      'metering_labels': 'metering_label',
                      'metering_label_rules': 'metering_label_rule',
-                     'net_partitions': 'net_partition',
                      'loadbalancers': 'loadbalancer',
                      'listeners': 'listener',
                      'lbaas_pools': 'lbaas_pool',
@@ -1515,27 +1512,6 @@ class Client(ClientBase):
         """Fetches information of a certain metering label rule."""
         return self.get(self.metering_label_rule_path %
                         (metering_label_rule), params=_params)
-
-    @APIParamsCall
-    def list_net_partitions(self, **params):
-        """Fetch a list of all network partitions for a tenant."""
-        return self.get(self.net_partitions_path, params=params)
-
-    @APIParamsCall
-    def show_net_partition(self, netpartition, **params):
-        """Fetch a network partition."""
-        return self.get(self.net_partition_path % (netpartition),
-                        params=params)
-
-    @APIParamsCall
-    def create_net_partition(self, body=None):
-        """Create a network partition."""
-        return self.post(self.net_partitions_path, body=body)
-
-    @APIParamsCall
-    def delete_net_partition(self, netpartition):
-        """Delete the network partition."""
-        return self.delete(self.net_partition_path % netpartition)
 
     @APIParamsCall
     def create_rbac_policy(self, body=None):
