@@ -54,6 +54,22 @@ class CLITestV20Agent(test_cli20.CLITestV20Base):
         self.assertIn("alive", ag.keys())
         self.assertIn(smile, ag.values())
 
+    def test_list_agents_zone_field(self):
+        contents = {'agents': [{'availability_zone': 'myzone'}]}
+        args = ['-f', 'json']
+        resources = "agents"
+
+        cmd = agent.ListAgent(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_columns(cmd, resources, contents, args)
+        _str = self.fake_stdout.make_string()
+
+        returned_agents = jsonutils.loads(_str)
+        self.assertEqual(1, len(returned_agents))
+        ag = returned_agents[0]
+        self.assertEqual(1, len(ag))
+        self.assertIn("availability_zone", ag.keys())
+        self.assertIn('myzone', ag.values())
+
     def test_update_agent(self):
         # agent-update myid --admin-state-down --description mydescr.
         resource = 'agent'
