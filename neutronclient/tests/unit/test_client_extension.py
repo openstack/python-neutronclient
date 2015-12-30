@@ -104,6 +104,11 @@ class CLITestV20ExtensionJSON(test_cli20.CLITestV20Base):
         cmd = fox_sockets.FoxInSocketsList(test_cli20.MyApp(sys.stdout), None)
         self._test_list_resources(resources, cmd, True)
 
+    def test_list_fox_pagination(self):
+        resources = 'fox_sockets'
+        cmd = fox_sockets.FoxInSocketsList(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_resources_with_pagination(resources, cmd)
+
     def test_show_fox_socket(self):
         # Show fox_socket: --fields id --fields name myid.
         resource = 'fox_socket'

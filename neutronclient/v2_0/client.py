@@ -447,9 +447,9 @@ class Client(ClientBase):
                      }
 
     @APIParamsCall
-    def list_ext(self, path, **_params):
+    def list_ext(self, collection, path, retrieve_all, **_params):
         """Client extension hook for lists."""
-        return self.get(path, params=_params)
+        return self.list(collection, path, retrieve_all, **_params)
 
     @APIParamsCall
     def show_ext(self, path, id, **_params):
@@ -1694,11 +1694,13 @@ class Client(ClientBase):
         setattr(self, "show_%s" % resource_singular, fn)
 
     def extend_list(self, resource_plural, path, parent_resource):
-        def _fx(**_params):
-            return self.list_ext(path, **_params)
+        def _fx(retrieve_all=True, **_params):
+            return self.list_ext(resource_plural, path,
+                                 retrieve_all, **_params)
 
-        def _parent_fx(parent_id, **_params):
-            return self.list_ext(path % parent_id, **_params)
+        def _parent_fx(parent_id, retrieve_all=True, **_params):
+            return self.list_ext(resource_plural, path % parent_id,
+                                 retrieve_all, **_params)
         fn = _fx if not parent_resource else _parent_fx
         setattr(self, "list_%s" % resource_plural, fn)
 
