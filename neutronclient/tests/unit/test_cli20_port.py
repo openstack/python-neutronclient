@@ -284,7 +284,7 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        args = ['--no-security-group', netid]
+        args = ['--no-security-groups', netid]
         position_names = ['network_id', 'security_groups']
         position_values = [netid, []]
         self._test_create_resource(resource, cmd, name, myid, args,
