@@ -24,7 +24,7 @@ class ListHealthMonitor(neutronV20.ListCommand):
 
     resource = 'healthmonitor'
     shadow_resource = 'lbaas_healthmonitor'
-    list_columns = ['id', 'type', 'admin_state_up']
+    list_columns = ['id', 'name', 'type', 'admin_state_up']
     pagination_support = True
     sorting_support = True
 
@@ -43,6 +43,9 @@ class CreateHealthMonitor(neutronV20.CreateCommand):
     shadow_resource = 'lbaas_healthmonitor'
 
     def add_known_arguments(self, parser):
+        parser.add_argument(
+            '--name',
+            help=_('Name of the health monitor to be created.'))
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
@@ -100,7 +103,7 @@ class CreateHealthMonitor(neutronV20.CreateCommand):
                 'pool_id': pool_id}
         neutronV20.update_dict(parsed_args, body,
                                ['expected_codes', 'http_method', 'url_path',
-                                'tenant_id'])
+                                'tenant_id', 'name'])
         return {self.resource: body}
 
 
@@ -109,7 +112,16 @@ class UpdateHealthMonitor(neutronV20.UpdateCommand):
 
     resource = 'healthmonitor'
     shadow_resource = 'lbaas_healthmonitor'
-    allow_names = False
+
+    def add_known_arguments(self, parser):
+        parser.add_argument(
+            '--name',
+            help=_('Updated name of the health monitor.'))
+
+    def args2body(self, parsed_args):
+        body = {}
+        neutronV20.update_dict(parsed_args, body, ['name'])
+        return {self.resource: body}
 
 
 class DeleteHealthMonitor(neutronV20.DeleteCommand):

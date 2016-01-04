@@ -57,15 +57,17 @@ class CLITestV20LbHealthMonitorJSON(test_cli20.CLITestV20Base):
         expected_codes = '201'
         url_path = '/somepath'
         pool = 'pool1'
+        name = 'healthmonitor1'
         args = ['--admin-state-down', '--http-method', http_method,
                 '--expected-codes', expected_codes, '--url-path', url_path,
                 '--type', type, '--max-retries', max_retries,
-                '--delay', delay, '--timeout', timeout, '--pool', pool]
+                '--delay', delay, '--timeout', timeout, '--pool', pool,
+                '--name', name]
         position_names = ['admin_state_up', 'http_method', 'expected_codes',
                           'url_path', 'type', 'max_retries', 'delay',
-                          'timeout', 'pool_id']
+                          'timeout', 'pool_id', 'name']
         position_values = [False, http_method, expected_codes, url_path,
-                           type, max_retries, delay, timeout, pool]
+                           type, max_retries, delay, timeout, pool, name]
         self._test_create_resource(resource, cmd, '', my_id, args,
                                    position_names, position_values,
                                    cmd_resource=cmd_resource)
