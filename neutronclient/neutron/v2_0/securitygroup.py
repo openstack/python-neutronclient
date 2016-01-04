@@ -317,16 +317,18 @@ class CreateSecurityGroupRule(neutronV20.CreateCommand):
             help=_('IPv4/IPv6'))
         parser.add_argument(
             '--protocol',
-            help=_('Protocol of packet.'))
+            help=_('Protocol of packet. Allowed values are '
+                   '[icmp, icmpv6, tcp, udp] and '
+                   'integer representations [0-255]'))
         parser.add_argument(
             '--port-range-min',
-            help=_('Starting port range.'))
+            help=_('Starting port range. For ICMP it is type.'))
         parser.add_argument(
             '--port_range_min',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--port-range-max',
-            help=_('Ending port range.'))
+            help=_('Ending port range. For ICMP it is code.'))
         parser.add_argument(
             '--port_range_max',
             help=argparse.SUPPRESS)
