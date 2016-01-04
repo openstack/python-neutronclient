@@ -4,6 +4,7 @@
 pbr>=1.6
 argparse
 cliff>=1.15.0 # Apache-2.0
+debtcollector>=0.3.0  # Apache-2.0
 iso8601>=0.1.9
 netaddr!=0.7.16,>=0.7.12
 oslo.i18n>=1.5.0 # Apache-2.0

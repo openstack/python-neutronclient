@@ -16,9 +16,9 @@
 
 import argparse
 
+from neutronclient._i18n import _
 from neutronclient.common import exceptions
 from neutronclient.common import utils
-from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
 from neutronclient.neutron.v2_0 import availability_zone
 from neutronclient.neutron.v2_0.qos import policy as qos_policy

@@ -25,9 +25,9 @@ from keystoneauth1 import access
 from keystoneauth1 import adapter
 import requests
 
+from neutronclient._i18n import _
 from neutronclient.common import exceptions
 from neutronclient.common import utils
-from neutronclient.i18n import _
 
 _logger = logging.getLogger(__name__)
 

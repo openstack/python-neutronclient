@@ -34,12 +34,12 @@ from oslo_utils import encodeutils
 from cliff import app
 from cliff import commandmanager
 
+from neutronclient._i18n import _
 from neutronclient.common import clientmanager
 from neutronclient.common import command as openstack_command
 from neutronclient.common import exceptions as exc
 from neutronclient.common import extension as client_extension
 from neutronclient.common import utils
-from neutronclient.i18n import _
 from neutronclient.neutron.v2_0 import address_scope
 from neutronclient.neutron.v2_0 import agent
 from neutronclient.neutron.v2_0 import agentscheduler

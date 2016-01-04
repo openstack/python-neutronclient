@@ -26,8 +26,8 @@ from oslo_utils import encodeutils
 from oslo_utils import importutils
 import six
 
+from neutronclient._i18n import _
 from neutronclient.common import exceptions
-from neutronclient.i18n import _
 
 
 def env(*vars, **kwargs):

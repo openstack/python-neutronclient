@@ -18,8 +18,8 @@ import logging
 from oslo_serialization import jsonutils
 import six
 
+from neutronclient._i18n import _
 from neutronclient.common import exceptions as exception
-from neutronclient.i18n import _
 
 LOG = logging.getLogger(__name__)
 
