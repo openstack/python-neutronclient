@@ -898,11 +898,22 @@ class NeutronShell(app.App):
             cloud=self.options.os_cloud, argparse=self.options,
             network_api_version=self.api_version)
         verify, cert = cloud_config.get_requests_verify_args()
-        auth = cloud_config.get_auth()
 
-        auth_session = session.Session(
-            auth=auth, verify=verify, cert=cert,
-            timeout=self.options.http_timeout)
+        # TODO(singhj): Remove dependancy on HTTPClient
+        # for the case of token-endpoint authentication
+
+        # When using token-endpoint authentication legacy
+        # HTTPClient will be used, otherwise SessionClient
+        # will be used.
+        if self.options.os_token and self.options.os_url:
+            auth = None
+            auth_session = None
+        else:
+            auth = cloud_config.get_auth()
+
+            auth_session = session.Session(
+                auth=auth, verify=verify, cert=cert,
+                timeout=self.options.http_timeout)
 
         interface = self.options.os_endpoint_type or self.endpoint_type
         if interface.endswith('URL'):
@@ -911,6 +922,8 @@ class NeutronShell(app.App):
             retries=self.options.retries,
             raise_errors=False,
             session=auth_session,
+            url=self.options.os_url,
+            token=self.options.os_token,
             region_name=cloud_config.get_region_name(),
             api_version=cloud_config.get_api_version('network'),
             service_type=cloud_config.get_service_type('network'),
