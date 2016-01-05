@@ -504,14 +504,7 @@ class CLITestV20Base(base.BaseTestCase):
         self.assertIn(myid, _str)
         self.assertIn('myname', _str)
 
-    def _test_delete_resource(self, resource, cmd, myid, args,
-                              cmd_resource=None, parent_id=None):
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
-        if not cmd_resource:
-            cmd_resource = resource
-        path = getattr(self.client, cmd_resource + "_path")
+    def _test_set_path_and_delete(self, path, parent_id, myid):
         if parent_id:
             path = path % (parent_id, myid)
         else:
@@ -521,6 +514,20 @@ class CLITestV20Base(base.BaseTestCase):
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(204), None))
+
+    def _test_delete_resource(self, resource, cmd, myid, args,
+                              cmd_resource=None, parent_id=None,
+                              extra_ids=None):
+        self.mox.StubOutWithMock(cmd, "get_client")
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        cmd.get_client().MultipleTimes().AndReturn(self.client)
+        if not cmd_resource:
+            cmd_resource = resource
+        path = getattr(self.client, cmd_resource + "_path")
+        self._test_set_path_and_delete(path, parent_id, myid)
+        # extra_ids is used to test for bulk_delete
+        if extra_ids:
+            self._test_set_path_and_delete(path, parent_id, extra_ids)
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("delete_" + cmd_resource)
         shell.run_command(cmd, cmd_parser, args)
@@ -528,6 +535,8 @@ class CLITestV20Base(base.BaseTestCase):
         self.mox.UnsetStubs()
         _str = self.fake_stdout.make_string()
         self.assertIn(myid, _str)
+        if extra_ids:
+            self.assertIn(extra_ids, _str)
 
     def _test_update_resource_action(self, resource, cmd, myid, action, args,
                                      body, retval=None, cmd_resource=None):

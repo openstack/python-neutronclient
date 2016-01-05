@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    CLI support for bulk delete.
+
+    * By using this feature, multiple resource
+      can be deleted using a single command.
+    * Example: ``neutron router-delete router_a router_b``
+      deletes both router_a and router_b.
