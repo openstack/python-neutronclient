@@ -39,6 +39,29 @@ def _get_listener_id(client, listener_id_or_name):
         client, 'listener', listener_id_or_name)
 
 
+def _add_common_args(parser):
+    parser.add_argument(
+        '--description',
+        help=_('Description of the pool.'))
+    parser.add_argument(
+        '--name', help=_('The name of the pool.'))
+    parser.add_argument(
+        '--lb-algorithm',
+        required=True,
+        type=utils.convert_to_uppercase,
+        choices=['ROUND_ROBIN', 'LEAST_CONNECTIONS', 'SOURCE_IP'],
+        help=_('The algorithm used to distribute load between the members '
+               'of the pool.'))
+
+
+def _parse_common_args(parsed_args):
+    body = {}
+    neutronV20.update_dict(parsed_args,
+                           body, ['description', 'lb_algorithm', 'name',
+                                  'session_persistence'])
+    return body
+
+
 class ListPool(neutronV20.ListCommand):
     """LBaaS v2 List pools that belong to a given tenant."""
 
@@ -72,22 +95,11 @@ class CreatePool(neutronV20.CreateCommand):
     shadow_resource = 'lbaas_pool'
 
     def add_known_arguments(self, parser):
+        _add_common_args(parser)
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
             help=_('Set admin state up to false.'))
-        parser.add_argument(
-            '--description',
-            help=_('Description of the pool.'))
-        parser.add_argument(
-            '--session-persistence',
-            metavar='type=TYPE[,cookie_name=COOKIE_NAME]',
-            type=utils.str2dict_type(required_keys=['type'],
-                                     optional_keys=['cookie_name']),
-            help=_('The type of session persistence to use and associated '
-                   'cookie name'))
-        parser.add_argument(
-            '--name', help=_('The name of the pool.'))
         parser.add_argument(
             '--listener',
             help=_('Listener whose default-pool should be set to this pool. '
@@ -99,42 +111,39 @@ class CreatePool(neutronV20.CreateCommand):
                    'At least one of --listener or --loadbalancer must be '
                    'specified.'))
         parser.add_argument(
-            '--lb-algorithm',
-            required=True,
-            choices=['ROUND_ROBIN', 'LEAST_CONNECTIONS', 'SOURCE_IP'],
-            help=_('The algorithm used to distribute load between the members '
-                   'of the pool.'))
-        parser.add_argument(
             '--protocol',
+            type=utils.convert_to_uppercase,
             required=True,
             choices=['HTTP', 'HTTPS', 'TCP'],
-            type=utils.convert_to_uppercase,
             help=_('Protocol for balancing.'))
+        parser.add_argument(
+            '--session-persistence',
+            metavar='type=TYPE[,cookie_name=COOKIE_NAME]',
+            type=utils.str2dict_type(required_keys=['type'],
+                                     optional_keys=['cookie_name']),
+            help=_('The type of session persistence to use and associated '
+                   'cookie name.'))
 
     def args2body(self, parsed_args):
-        resource = {
-            'admin_state_up': parsed_args.admin_state,
-            'protocol': parsed_args.protocol,
-            'lb_algorithm': parsed_args.lb_algorithm
-        }
         if not parsed_args.listener and not parsed_args.loadbalancer:
             message = _('At least one of --listener or --loadbalancer must be '
                         'specified.')
             raise exceptions.CommandError(message)
+        body = _parse_common_args(parsed_args)
         if parsed_args.listener:
             listener_id = _get_listener_id(
                 self.get_client(),
                 parsed_args.listener)
-            resource['listener_id'] = listener_id
+            body['listener_id'] = listener_id
         if parsed_args.loadbalancer:
             loadbalancer_id = _get_loadbalancer_id(
                 self.get_client(),
                 parsed_args.loadbalancer)
-            resource['loadbalancer_id'] = loadbalancer_id
-        neutronV20.update_dict(parsed_args, resource,
-                               ['description', 'name',
-                                'session_persistence', 'tenant_id'])
-        return {self.resource: resource}
+            body['loadbalancer_id'] = loadbalancer_id
+        body['admin_state_up'] = parsed_args.admin_state
+        neutronV20.update_dict(parsed_args, body,
+                               ['tenant_id', 'protocol'])
+        return {self.resource: body}
 
 
 class UpdatePool(neutronV20.UpdateCommand):
@@ -142,6 +151,26 @@ class UpdatePool(neutronV20.UpdateCommand):
 
     resource = 'pool'
     shadow_resource = 'lbaas_pool'
+
+    def add_known_arguments(self, parser):
+        utils.add_boolean_argument(
+            parser, '--admin-state-up',
+            help=_('Update the administrative state of '
+                   'the pool (True meaning "Up").'))
+        parser.add_argument(
+            '--session-persistence',
+            metavar='type=TYPE[,cookie_name=COOKIE_NAME]',
+            type=utils.str2dict_type(required_keys=['type'],
+                                     optional_keys=['cookie_name']),
+            help=_('The type of session persistence to use and associated '
+                   'cookie name.'))
+        _add_common_args(parser)
+
+    def args2body(self, parsed_args):
+        body = _parse_common_args(parsed_args)
+        neutronV20.update_dict(parsed_args, body,
+                               ['admin_state_up'])
+        return {self.resource: body}
 
 
 class DeletePool(neutronV20.DeleteCommand):
