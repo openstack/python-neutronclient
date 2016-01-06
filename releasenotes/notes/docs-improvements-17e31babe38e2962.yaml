@@ -1,0 +1,5 @@
+---
+other:
+  - |
+    Addition of CLI user documentation including output filters, extra
+    options, and operation using os-client-config.

@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    CLI support for availability zones.
+
+    * The ``availability-zone-list`` command provides a list of
+      availability zones.
+    * The ``net-create`` and ``router-create`` commands include a
+      ``--availability-zone-hint`` option.
+    * The ``agent-list`` command output includes availability zones.

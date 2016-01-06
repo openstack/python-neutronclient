@@ -1,0 +1,3 @@
+---
+upgrade:
+  - Remove Nuage-specific commands.
