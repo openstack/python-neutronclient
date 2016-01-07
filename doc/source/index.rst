@@ -40,13 +40,15 @@ Developer Guide
 ---------------
 
 In the Developer Guide, you will find information on Neutron’s client
-lower level programming details or APIs.
+lower level programming details or APIs as well as the transition to
+OpenStack client.
 
 .. toctree::
    :maxdepth: 2
 
    devref/client_command_extensions
    devref/cli_option_guideline
+   devref/transition_to_osc
 
 History
 -------
