@@ -32,11 +32,11 @@ import os_client_config
 from oslo_utils import encodeutils
 
 from cliff import app
+from cliff import command
 from cliff import commandmanager
 
 from neutronclient._i18n import _
 from neutronclient.common import clientmanager
-from neutronclient.common import command as openstack_command
 from neutronclient.common import exceptions as exc
 from neutronclient.common import extension as client_extension
 from neutronclient.common import utils
@@ -140,9 +140,12 @@ def check_non_negative_int(value):
     return value
 
 
-class BashCompletionCommand(openstack_command.OpenStackCommand):
+class BashCompletionCommand(command.Command):
     """Prints all of the commands and options for bash-completion."""
-    resource = "bash_completion"
+
+    def take_action(self, parsed_args):
+        pass
+
 
 COMMAND_V2 = {
     'bash-completion': BashCompletionCommand,
@@ -727,9 +730,9 @@ class NeutronShell(app.App):
         options = set()
         for option, _action in self.parser._option_string_actions.items():
             options.add(option)
-        for command_name, command in self.command_manager:
-            commands.add(command_name)
-            cmd_factory = command.load()
+        for _name, _command in self.command_manager:
+            commands.add(_name)
+            cmd_factory = _command.load()
             cmd = cmd_factory(self, None)
             cmd_parser = cmd.get_parser('')
             for option, _action in cmd_parser._option_string_actions.items():

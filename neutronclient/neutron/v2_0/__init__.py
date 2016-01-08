@@ -21,13 +21,13 @@ import argparse
 import logging
 import re
 
+from cliff import command
 from cliff import lister
 from cliff import show
 from oslo_serialization import jsonutils
 import six
 
 from neutronclient._i18n import _
-from neutronclient.common import command
 from neutronclient.common import exceptions
 from neutronclient.common import utils
 
@@ -369,7 +369,7 @@ def update_dict(obj, dict, attributes):
             dict[attribute] = getattr(obj, attribute)
 
 
-# command.OpenStackCommand is abstract class so that metaclass of
+# cliff.command.Command is abstract class so that metaclass of
 # subclass must be subclass of metaclass of all its base.
 # otherwise metaclass conflict exception is raised.
 class NeutronCommandMeta(abc.ABCMeta):
@@ -382,14 +382,24 @@ class NeutronCommandMeta(abc.ABCMeta):
 
 
 @six.add_metaclass(NeutronCommandMeta)
-class NeutronCommand(command.OpenStackCommand):
+class NeutronCommand(command.Command):
 
+    # TODO(amotoki): Get rid of 'api' attribute. There is no such convention
+    # in OpenStack client. It may be an ancient convention though.
     api = 'network'
     values_specs = []
     json_indent = None
     resource = None
     shadow_resource = None
     parent_id = None
+
+    # TODO(amotoki): Remove the usage of get_data and use take_action directly.
+    # Overriding take_action() is recommended when implementing cliff command.
+    def get_data(self, parsed_args):
+        pass
+
+    def take_action(self, parsed_args):
+        return self.get_data(parsed_args)
 
     @property
     def cmd_resource(self):
