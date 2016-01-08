@@ -153,7 +153,7 @@ class AddPeerToSpeaker(neutronv20.NeutronCommand):
             help=_('ID or name of the BGP peer to add.'))
         return parser
 
-    def run(self, parsed_args):
+    def take_action(self, parsed_args):
         neutron_client = self.get_client()
         _speaker_id = get_bgp_speaker_id(neutron_client,
                                          parsed_args.bgp_speaker)
@@ -182,7 +182,7 @@ class RemovePeerFromSpeaker(neutronv20.NeutronCommand):
             help=_('ID or name of the BGP peer to remove.'))
         return parser
 
-    def run(self, parsed_args):
+    def take_action(self, parsed_args):
         neutron_client = self.get_client()
         _speaker_id = get_bgp_speaker_id(neutron_client,
                                          parsed_args.bgp_speaker)
@@ -211,7 +211,7 @@ class AddNetworkToSpeaker(neutronv20.NeutronCommand):
             help=_('ID or name of the network to add.'))
         return parser
 
-    def run(self, parsed_args):
+    def take_action(self, parsed_args):
         neutron_client = self.get_client()
         _speaker_id = get_bgp_speaker_id(neutron_client,
                                          parsed_args.bgp_speaker)
@@ -239,7 +239,7 @@ class RemoveNetworkFromSpeaker(neutronv20.NeutronCommand):
             help=_('ID or name of the network to remove.'))
         return parser
 
-    def run(self, parsed_args):
+    def take_action(self, parsed_args):
         neutron_client = self.get_client()
         _speaker_id = get_bgp_speaker_id(neutron_client,
                                          parsed_args.bgp_speaker)
