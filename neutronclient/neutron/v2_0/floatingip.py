@@ -90,7 +90,6 @@ class DeleteFloatingIP(neutronV20.DeleteCommand):
 class AssociateFloatingIP(neutronV20.NeutronCommand):
     """Create a mapping between a floating IP and a fixed IP."""
 
-    api = 'network'
     resource = 'floatingip'
 
     def get_parser(self, prog_name):
@@ -126,7 +125,6 @@ class AssociateFloatingIP(neutronV20.NeutronCommand):
 class DisassociateFloatingIP(neutronV20.NeutronCommand):
     """Remove a mapping from a floating IP to a fixed IP."""
 
-    api = 'network'
     resource = 'floatingip'
 
     def get_parser(self, prog_name):

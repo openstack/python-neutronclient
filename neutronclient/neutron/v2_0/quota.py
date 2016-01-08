@@ -37,7 +37,6 @@ def get_tenant_id(args, client):
 class DeleteQuota(neutronV20.NeutronCommand):
     """Delete defined quotas of a given tenant."""
 
-    api = 'network'
     resource = 'quota'
 
     def get_parser(self, prog_name):
@@ -70,7 +69,6 @@ class DeleteQuota(neutronV20.NeutronCommand):
 class ListQuota(neutronV20.NeutronCommand, lister.Lister):
     """List quotas of all tenants who have non-default quota values."""
 
-    api = 'network'
     resource = 'quota'
 
     def get_parser(self, prog_name):
@@ -98,7 +96,6 @@ class ShowQuota(neutronV20.NeutronCommand, show.ShowOne):
     """Show quotas of a given tenant.
 
     """
-    api = 'network'
     resource = "quota"
 
     def get_parser(self, prog_name):

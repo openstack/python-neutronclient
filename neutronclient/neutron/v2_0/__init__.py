@@ -384,9 +384,6 @@ class NeutronCommandMeta(abc.ABCMeta):
 @six.add_metaclass(NeutronCommandMeta)
 class NeutronCommand(command.Command):
 
-    # TODO(amotoki): Get rid of 'api' attribute. There is no such convention
-    # in OpenStack client. It may be an ancient convention though.
-    api = 'network'
     values_specs = []
     json_indent = None
     resource = None
@@ -456,7 +453,6 @@ class NeutronCommand(command.Command):
 class CreateCommand(NeutronCommand, show.ShowOne):
     """Create a resource for a given tenant."""
 
-    api = 'network'
     log = None
 
     def get_parser(self, prog_name):
@@ -498,7 +494,6 @@ class CreateCommand(NeutronCommand, show.ShowOne):
 class UpdateCommand(NeutronCommand):
     """Update resource's information."""
 
-    api = 'network'
     log = None
     allow_names = True
 
@@ -553,7 +548,6 @@ class UpdateCommand(NeutronCommand):
 class DeleteCommand(NeutronCommand):
     """Delete a given resource."""
 
-    api = 'network'
     log = None
     allow_names = True
 
@@ -599,7 +593,6 @@ class DeleteCommand(NeutronCommand):
 class ListCommand(NeutronCommand, lister.Lister):
     """List resources that belong to a given tenant."""
 
-    api = 'network'
     log = None
     _formatters = {}
     list_columns = []
@@ -705,7 +698,6 @@ class ListCommand(NeutronCommand, lister.Lister):
 class ShowCommand(NeutronCommand, show.ShowOne):
     """Show information of a given resource."""
 
-    api = 'network'
     log = None
     allow_names = True
 

@@ -138,7 +138,6 @@ class UpdateRouter(neutronV20.UpdateCommand):
 class RouterInterfaceCommand(neutronV20.NeutronCommand):
     """Based class to Add/Remove router interface."""
 
-    api = 'network'
     resource = 'router'
 
     def call_api(self, neutron_client, router_id, body):
@@ -211,7 +210,6 @@ class RemoveInterfaceRouter(RouterInterfaceCommand):
 class SetGatewayRouter(neutronV20.NeutronCommand):
     """Set the external network gateway for a router."""
 
-    api = 'network'
     resource = 'router'
 
     def get_parser(self, prog_name):
@@ -264,7 +262,6 @@ class SetGatewayRouter(neutronV20.NeutronCommand):
 class RemoveGatewayRouter(neutronV20.NeutronCommand):
     """Remove an external network gateway from a router."""
 
-    api = 'network'
     resource = 'router'
 
     def get_parser(self, prog_name):
