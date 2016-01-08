@@ -397,6 +397,10 @@ class NeutronCommand(command.Command):
     shadow_resource = None
     parent_id = None
 
+    def run(self, parsed_args):
+        self.log.debug('run(%s)', parsed_args)
+        return super(NeutronCommand, self).run(parsed_args)
+
     @property
     def cmd_resource(self):
         if self.shadow_resource:
@@ -466,7 +470,6 @@ class CreateCommand(NeutronCommand, show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        self.log.debug('run(%s)' % parsed_args)
         self.set_extra_attrs(parsed_args)
         neutron_client = self.get_client()
         _extra_values = parse_args_to_dict(self.values_specs)
@@ -512,7 +515,6 @@ class UpdateCommand(NeutronCommand):
         return parser
 
     def take_action(self, parsed_args):
-        self.log.debug('run(%s)', parsed_args)
         self.set_extra_attrs(parsed_args)
         neutron_client = self.get_client()
         _extra_values = parse_args_to_dict(self.values_specs)
@@ -569,7 +571,6 @@ class DeleteCommand(NeutronCommand):
         return parser
 
     def take_action(self, parsed_args):
-        self.log.debug('run(%s)', parsed_args)
         self.set_extra_attrs(parsed_args)
         neutron_client = self.get_client()
         obj_deleter = getattr(neutron_client,
@@ -758,7 +759,6 @@ class ListCommand(NeutronCommand, lister.Lister):
             for s in info), )
 
     def take_action(self, parsed_args):
-        self.log.debug('run(%s)', parsed_args)
         self.set_extra_attrs(parsed_args)
         data = self.retrieve_list(parsed_args)
         self.extend_list(data, parsed_args)
@@ -788,7 +788,6 @@ class ShowCommand(NeutronCommand, show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        self.log.debug('run(%s)', parsed_args)
         self.set_extra_attrs(parsed_args)
         neutron_client = self.get_client()
 

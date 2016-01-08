@@ -108,7 +108,6 @@ class RetrievePoolStats(neutronV20.ShowCommand):
     resource = 'pool'
 
     def take_action(self, parsed_args):
-        self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
         pool_id = neutronV20.find_resourceid_by_name_or_id(
             self.get_client(), 'pool', parsed_args.id)
