@@ -153,6 +153,26 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_port_vnic_type_direct_physical(self):
+        # Create port: --vnic_type direct-physical netid.
+        resource = 'port'
+        cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        args = ['--vnic_type', 'direct-physical', netid]
+        position_names = ['binding:vnic_type', 'network_id']
+        position_values = ['direct-physical', netid]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
+        # Test dashed options
+        args = ['--vnic-type', 'direct-physical', netid]
+        position_names = ['binding:vnic_type', 'network_id']
+        position_values = ['direct-physical', netid]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_create_port_vnic_type_macvtap(self):
         # Create port: --vnic_type macvtap netid.
         resource = 'port'

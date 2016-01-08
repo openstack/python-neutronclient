@@ -1,0 +1,6 @@
+---
+features:
+  - Added new 'direct-physical' vnic-type option for port-create CLI command.
+    Passing this particular value allows for a port to be create with the
+    vnic-type used for assigning SR-IOV physical functions to
+    instances.
