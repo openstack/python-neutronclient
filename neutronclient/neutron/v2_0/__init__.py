@@ -390,11 +390,9 @@ class NeutronCommand(command.Command):
     shadow_resource = None
     parent_id = None
 
-    # TODO(amotoki): Remove the usage of get_data and use take_action directly.
-    # Overriding take_action() is recommended when implementing cliff command.
-    def get_data(self, parsed_args):
-        pass
-
+    # TODO(amotoki): Remove take_action here. It should be an abstract method
+    # as cliff.command.Command does. To do this, we need to avoid overriding
+    # run() directly.
     def take_action(self, parsed_args):
         return self.get_data(parsed_args)
 
@@ -466,8 +464,8 @@ class CreateCommand(NeutronCommand, show.ShowOne):
         self.add_known_arguments(parser)
         return parser
 
-    def get_data(self, parsed_args):
-        self.log.debug('get_data(%s)' % parsed_args)
+    def take_action(self, parsed_args):
+        self.log.debug('run(%s)' % parsed_args)
         self.set_extra_attrs(parsed_args)
         neutron_client = self.get_client()
         _extra_values = parse_args_to_dict(self.values_specs)
@@ -687,8 +685,8 @@ class ListCommand(NeutronCommand, lister.Lister):
             s, _columns, formatters=formatters, )
             for s in info), )
 
-    def get_data(self, parsed_args):
-        self.log.debug('get_data(%s)', parsed_args)
+    def take_action(self, parsed_args):
+        self.log.debug('run(%s)', parsed_args)
         self.set_extra_attrs(parsed_args)
         data = self.retrieve_list(parsed_args)
         self.extend_list(data, parsed_args)
@@ -714,8 +712,8 @@ class ShowCommand(NeutronCommand, show.ShowOne):
         self.add_known_arguments(parser)
         return parser
 
-    def get_data(self, parsed_args):
-        self.log.debug('get_data(%s)', parsed_args)
+    def take_action(self, parsed_args):
+        self.log.debug('run(%s)', parsed_args)
         self.set_extra_attrs(parsed_args)
         neutron_client = self.get_client()
 

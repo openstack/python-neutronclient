@@ -288,7 +288,7 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         args = []
         cmd_parser = cmd.get_parser('list_networks')
         parsed_args = cmd_parser.parse_args(args)
-        result = cmd.get_data(parsed_args)
+        result = cmd.take_action(parsed_args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         _result = [x for x in result[1]]

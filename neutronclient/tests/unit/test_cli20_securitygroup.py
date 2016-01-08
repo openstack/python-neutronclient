@@ -407,7 +407,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
 
         cmd_parser = cmd.get_parser('list_security_group_rules')
         parsed_args = cmd_parser.parse_args(args)
-        result = cmd.get_data(parsed_args)
+        result = cmd.take_action(parsed_args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
         # Check columns

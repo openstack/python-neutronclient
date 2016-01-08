@@ -49,10 +49,10 @@ class ListMember(LbaasMemberMixin, neutronV20.ListCommand):
     pagination_support = True
     sorting_support = True
 
-    def get_data(self, parsed_args):
+    def take_action(self, parsed_args):
         self.parent_id = _get_pool_id(self.get_client(), parsed_args.pool)
         self.values_specs.append('--pool_id=%s' % self.parent_id)
-        return super(ListMember, self).get_data(parsed_args)
+        return super(ListMember, self).take_action(parsed_args)
 
 
 class ShowMember(LbaasMemberMixin, neutronV20.ShowCommand):
