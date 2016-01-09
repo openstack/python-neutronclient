@@ -681,7 +681,8 @@ class ListCommand(NeutronCommand, lister.Lister):
             # if no -c(s) by user and list_columns, we use columns in
             # both list_columns and returned resource.
             # Also Keep their order the same as in list_columns
-            _columns = [x for x in self.list_columns if x in _columns]
+            _columns = self._setup_columns_with_tenant_id(self.list_columns,
+                                                          _columns)
 
         formatters = self._formatters
         if hasattr(self, '_formatters_csv') and parsed_args.formatter == 'csv':
@@ -690,6 +691,32 @@ class ListCommand(NeutronCommand, lister.Lister):
         return (_columns, (utils.get_item_properties(
             s, _columns, formatters=formatters, )
             for s in info), )
+
+    def _setup_columns_with_tenant_id(self, display_columns, avail_columns):
+        _columns = [x for x in display_columns if x in avail_columns]
+        if 'tenant_id' in display_columns:
+            return _columns
+        if 'tenant_id' not in avail_columns:
+            return _columns
+        if not self.is_admin_role():
+            return _columns
+        try:
+            pos_id = _columns.index('id')
+        except ValueError:
+            pos_id = 0
+        try:
+            pos_name = _columns.index('name')
+        except ValueError:
+            pos_name = 0
+        _columns.insert(max(pos_id, pos_name) + 1, 'tenant_id')
+        return _columns
+
+    def is_admin_role(self):
+        client = self.get_client()
+        auth_ref = client.httpclient.get_auth_ref()
+        if not auth_ref:
+            return False
+        return 'admin' in auth_ref.role_names
 
     def take_action(self, parsed_args):
         self.log.debug('run(%s)', parsed_args)

@@ -91,6 +91,13 @@ class LibraryTestCase(object):
         with testtools.ExpectedException(exceptions.NetworkNotFoundClient):
             self.client.show_network(net_id)
 
+    def test_get_auth_ref(self):
+        # Call some API call to ensure the client is authenticated.
+        self.client.list_networks()
+        auth_ref = self.client.httpclient.get_auth_ref()
+        self.assertIsNotNone(auth_ref)
+        self.assertIsNotNone(auth_ref.role_names)
+
 
 class LibraryHTTPClientTest(LibraryTestCase, Libv2HTTPClientTestBase):
     pass

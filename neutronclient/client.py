@@ -271,6 +271,9 @@ class HTTPClient(object):
                 'auth_user_id': self.auth_user_id,
                 'endpoint_url': self.endpoint_url}
 
+    def get_auth_ref(self):
+        return getattr(self, 'auth_ref', None)
+
 
 class SessionClient(adapter.Adapter):
 
@@ -340,6 +343,9 @@ class SessionClient(adapter.Adapter):
             auth_info['auth_user_id'] = auth_ref.user_id
 
         return auth_info
+
+    def get_auth_ref(self):
+        return self.session.auth.get_auth_ref(self.session)
 
 
 # FIXME(bklei): Should refactor this to use kwargs and only
