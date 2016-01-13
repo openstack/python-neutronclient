@@ -46,6 +46,10 @@ def convert_to_uppercase(string):
     return string.upper()
 
 
+def convert_to_lowercase(string):
+    return string.lower()
+
+
 def get_client_class(api_name, version, version_map):
     """Returns the client class for the requested API version.
 
