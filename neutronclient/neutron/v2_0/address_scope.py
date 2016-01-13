@@ -22,7 +22,7 @@ class ListAddressScope(neutronV20.ListCommand):
     """List address scopes that belong to a given tenant."""
 
     resource = 'address_scope'
-    list_columns = ['id', 'name']
+    list_columns = ['id', 'name', 'ip_version']
     pagination_support = True
     sorting_support = True
 
@@ -46,9 +46,16 @@ class CreateAddressScope(neutronV20.CreateCommand):
         parser.add_argument(
             'name',
             help=_('Specify the name of the address scope.'))
+        parser.add_argument(
+            'ip_version',
+            metavar='IP_VERSION',
+            type=int,
+            choices=[4, 6],
+            help=_('Specify the address family of the address scope.'))
 
     def args2body(self, parsed_args):
-        body = {'name': parsed_args.name}
+        body = {'name': parsed_args.name,
+                'ip_version': parsed_args.ip_version}
         if parsed_args.shared:
             body['shared'] = True
         neutronV20.update_dict(parsed_args, body, ['tenant_id'])
