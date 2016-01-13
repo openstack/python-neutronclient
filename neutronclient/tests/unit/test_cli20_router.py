@@ -383,6 +383,21 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
                                          {"subnet_id": "mysubnet"}]}}
                                    )
 
+    def test_set_gateway_external_ip_and_subnet(self):
+        # set external gateway for router: myid externalid --fixed-ip ...
+        resource = 'router'
+        cmd = router.SetGatewayRouter(test_cli20.MyApp(sys.stdout), None)
+        args = ['myid', 'externalid', '--fixed-ip',
+                'ip_address=10.0.0.2,subnet_id=mysubnet']
+        self._test_update_resource(resource, cmd, 'myid',
+                                   args,
+                                   {"external_gateway_info":
+                                    {"network_id": "externalid",
+                                     "external_fixed_ips": [
+                                         {"subnet_id": "mysubnet",
+                                          "ip_address": "10.0.0.2"}]}}
+                                   )
+
     def test_remove_gateway(self):
         # Remove external gateway from router: externalid.
         resource = 'router'

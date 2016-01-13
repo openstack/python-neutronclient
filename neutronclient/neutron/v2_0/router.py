@@ -226,9 +226,12 @@ class SetGatewayRouter(neutronV20.NeutronCommand):
             '--disable-snat', action='store_true',
             help=_('Disable source NAT on the router gateway.'))
         parser.add_argument(
-            '--fixed-ip', action='append',
+            '--fixed-ip', metavar='subnet_id=SUBNET,ip_address=IP_ADDR',
+            action='append',
             help=_('Desired IP and/or subnet on external network: '
                    'subnet_id=<name_or_id>,ip_address=<ip>. '
+                   'You can specify both of subnet_id and ip_address or '
+                   'specify one of them as well. '
                    'You can repeat this option.'))
         return parser
 
