@@ -21,7 +21,6 @@ import argparse
 import logging
 import re
 
-from cliff.formatters import table
 from cliff import lister
 from cliff import show
 from oslo_serialization import jsonutils
@@ -370,19 +369,6 @@ def update_dict(obj, dict, attributes):
             dict[attribute] = getattr(obj, attribute)
 
 
-class TableFormater(table.TableFormatter):
-    """This class is used to keep consistency with prettytable 0.6.
-
-    https://bugs.launchpad.net/python-neutronclient/+bug/1165962
-    """
-    def emit_list(self, column_names, data, stdout, parsed_args):
-        if column_names:
-            super(TableFormater, self).emit_list(column_names, data, stdout,
-                                                 parsed_args)
-        else:
-            stdout.write('\n')
-
-
 # command.OpenStackCommand is abstract class so that metaclass of
 # subclass must be subclass of metaclass of all its base.
 # otherwise metaclass conflict exception is raised.
@@ -404,14 +390,6 @@ class NeutronCommand(command.OpenStackCommand):
     resource = None
     shadow_resource = None
     parent_id = None
-
-    def __init__(self, app, app_args):
-        super(NeutronCommand, self).__init__(app, app_args)
-        # NOTE(markmcclain): This is no longer supported in cliff version 1.5.2
-        # see https://bugs.launchpad.net/python-neutronclient/+bug/1265926
-
-        # if hasattr(self, 'formatters'):
-        #     self.formatters['table'] = TableFormater()
 
     @property
     def cmd_resource(self):
