@@ -82,6 +82,10 @@ class CreateFirewallRule(neutronv20.CreateCommand):
             help=_('Set shared to True (default is False).'),
             default=argparse.SUPPRESS)
         parser.add_argument(
+            '--ip-version',
+            type=int, choices=[4, 6], default=4,
+            help=_('IP version for the firewall rule (default is 4).'))
+        parser.add_argument(
             '--source-ip-address',
             help=_('Source IP address or subnet.'))
         parser.add_argument(
@@ -113,7 +117,8 @@ class CreateFirewallRule(neutronv20.CreateCommand):
                                ['name', 'description', 'shared', 'protocol',
                                 'source_ip_address', 'destination_ip_address',
                                 'source_port', 'destination_port',
-                                'action', 'enabled', 'tenant_id'])
+                                'action', 'enabled', 'tenant_id',
+                                'ip_version'])
         protocol = parsed_args.protocol
         if protocol == 'any':
             protocol = None
