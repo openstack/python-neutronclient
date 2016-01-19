@@ -412,6 +412,8 @@ class Client(ClientBase):
     bgp_speaker_path = "/bgp-speakers/%s"
     bgp_peers_path = "/bgp-peers"
     bgp_peer_path = "/bgp-peers/%s"
+    network_ip_availabilities_path = '/network-ip-availabilities'
+    network_ip_availability_path = '/network-ip-availabilities/%s'
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -451,6 +453,7 @@ class Client(ClientBase):
                      'flavors': 'flavor',
                      'bgp_speakers': 'bgp_speaker',
                      'bgp_peers': 'bgp_peer',
+                     'network_ip_availabilities': 'network_ip_availability',
                      }
 
     @APIParamsCall
@@ -1811,6 +1814,19 @@ class Client(ClientBase):
     def delete_bgp_peer(self, peer_id):
         """Deletes the specified BGP peer."""
         return self.delete(self.bgp_peer_path % peer_id)
+
+    @APIParamsCall
+    def list_network_ip_availabilities(self, retrieve_all=True, **_params):
+        """Fetches IP availibility information for all networks"""
+        return self.list('network_ip_availabilities',
+                         self.network_ip_availabilities_path,
+                         retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_network_ip_availability(self, network, **_params):
+        """Fetches IP availability information for a specified network"""
+        return self.get(self.network_ip_availability_path % (network),
+                        params=_params)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
