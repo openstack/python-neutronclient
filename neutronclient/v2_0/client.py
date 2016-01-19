@@ -88,7 +88,7 @@ def exception_handler_v20(status_code, error_content):
 
 
 class APIParamsCall(object):
-    """A Decorator to support formating and tenant overriding and filters."""
+    """A Decorator to support formatting and tenant overriding and filters."""
     def __init__(self, function):
         self.function = function
 
