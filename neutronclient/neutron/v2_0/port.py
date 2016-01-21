@@ -111,12 +111,12 @@ class ListRouterPort(neutronV20.ListCommand):
             help=_('ID or name of router to look up.'))
         return parser
 
-    def get_data(self, parsed_args):
+    def take_action(self, parsed_args):
         neutron_client = self.get_client()
         _id = neutronV20.find_resourceid_by_name_or_id(
             neutron_client, 'router', parsed_args.id)
         self.values_specs.append('--device_id=%s' % _id)
-        return super(ListRouterPort, self).get_data(parsed_args)
+        return super(ListRouterPort, self).take_action(parsed_args)
 
 
 class ShowPort(neutronV20.ShowCommand):
