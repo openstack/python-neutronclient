@@ -300,7 +300,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
         self._test_delete_resource(resource, cmd, my_id, args)
 
     def test_update_ipsec_site_connection(self):
-        # ipsecsite-connection-update  myid --name myname --tags a b."""
+        # ipsecsite-connection-update  myid --name Branch-new --tags a b.
         resource = 'ipsec_site_connection'
         cmd = ipsec_site_connection.UpdateIPsecSiteConnection(
             test_cli20.MyApp(sys.stdout), None
@@ -310,6 +310,17 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
                                     '--tags', 'a', 'b'],
                                    {'name': 'Branch-new',
                                     'tags': ['a', 'b'], })
+        # ipsecsite-connection-update myid --mtu 69 --initiator response-only
+        # --peer-id '192.168.2.11' --peer-ep-group 'update-grp'
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--mtu', '69',
+                                    '--initiator', 'response-only',
+                                    '--peer-id', '192.168.2.11',
+                                    '--peer-ep-group', 'update-grp'],
+                                   {'mtu': '69',
+                                    'initiator': 'response-only',
+                                    'peer_id': '192.168.2.11',
+                                    'peer_ep_group_id': 'update-grp', },)
 
     def test_show_ipsec_site_connection_id(self):
         # ipsecsite-connection-show test_id."""
