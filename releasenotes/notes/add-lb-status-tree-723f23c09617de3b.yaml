@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    CLI support for load balancer status tree.
+
+    * The ``lbaas-loadbalancer-status`` command provides the status
+      tree of a specific load balancer.

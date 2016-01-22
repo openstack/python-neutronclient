@@ -166,3 +166,40 @@ class CLITestV20LbLoadBalancerJSON(test_cli20.CLITestV20Base):
         self.assertIn('1234', _str)
         self.assertIn('bytes_out', _str)
         self.assertIn('4321', _str)
+
+    def test_get_loadbalancer_statuses(self):
+        # lbaas-loadbalancer-status test_id.
+        resource = 'loadbalancer'
+        cmd = lb.RetrieveLoadBalancerStatus(test_cli20.MyApp(sys.stdout), None)
+        my_id = self.test_id
+        args = [my_id]
+
+        self.mox.StubOutWithMock(cmd, "get_client")
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        cmd.get_client().MultipleTimes().AndReturn(self.client)
+
+        expected_res = {'statuses': {'operating_status': 'ONLINE',
+                                     'provisioning_status': 'ACTIVE'}}
+
+        resstr = self.client.serialize(expected_res)
+
+        path = getattr(self.client, "lbaas_loadbalancer_path_status")
+        return_tup = (test_cli20.MyResp(200), resstr)
+        self.client.httpclient.request(
+            test_cli20.end_url(path % my_id), 'GET',
+            body=None,
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(return_tup)
+        self.mox.ReplayAll()
+
+        cmd_parser = cmd.get_parser("test_" + resource)
+        parsed_args = cmd_parser.parse_args(args)
+        cmd.run(parsed_args)
+
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
+        _str = self.fake_stdout.make_string()
+        self.assertIn('operating_status', _str)
+        self.assertIn('ONLINE', _str)
+        self.assertIn('provisioning_status', _str)
+        self.assertIn('ACTIVE', _str)
