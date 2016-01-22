@@ -494,6 +494,7 @@ class UpdateCommand(NeutronCommand):
 
     log = None
     allow_names = True
+    help_resource = None
 
     def get_parser(self, prog_name):
         parser = super(UpdateCommand, self).get_parser(prog_name)
@@ -501,9 +502,11 @@ class UpdateCommand(NeutronCommand):
             help_str = _('ID or name of %s to update.')
         else:
             help_str = _('ID of %s to update.')
+        if not self.help_resource:
+            self.help_resource = self.resource
         parser.add_argument(
             'id', metavar=self.resource.upper(),
-            help=help_str % self.resource)
+            help=help_str % self.help_resource)
         self.add_known_arguments(parser)
         return parser
 
@@ -548,6 +551,7 @@ class DeleteCommand(NeutronCommand):
 
     log = None
     allow_names = True
+    help_resource = None
 
     def get_parser(self, prog_name):
         parser = super(DeleteCommand, self).get_parser(prog_name)
@@ -555,9 +559,11 @@ class DeleteCommand(NeutronCommand):
             help_str = _('ID or name of %s to delete.')
         else:
             help_str = _('ID of %s to delete.')
+        if not self.help_resource:
+            self.help_resource = self.resource
         parser.add_argument(
             'id', metavar=self.resource.upper(),
-            help=help_str % self.resource)
+            help=help_str % self.help_resource)
         self.add_known_arguments(parser)
         return parser
 
@@ -698,6 +704,7 @@ class ShowCommand(NeutronCommand, show.ShowOne):
 
     log = None
     allow_names = True
+    help_resource = None
 
     def get_parser(self, prog_name):
         parser = super(ShowCommand, self).get_parser(prog_name)
@@ -706,9 +713,11 @@ class ShowCommand(NeutronCommand, show.ShowOne):
             help_str = _('ID or name of %s to look up.')
         else:
             help_str = _('ID of %s to look up.')
+        if not self.help_resource:
+            self.help_resource = self.resource
         parser.add_argument(
             'id', metavar=self.resource.upper(),
-            help=help_str % self.resource)
+            help=help_str % self.help_resource)
         self.add_known_arguments(parser)
         return parser
 

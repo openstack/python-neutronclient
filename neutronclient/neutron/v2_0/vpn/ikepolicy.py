@@ -35,6 +35,7 @@ class ShowIKEPolicy(neutronv20.ShowCommand):
     """Show information of a given IKE policy."""
 
     resource = 'ikepolicy'
+    help_resource = 'IKE policy'
 
 
 class CreateIKEPolicy(neutronv20.CreateCommand):
@@ -93,6 +94,7 @@ class UpdateIKEPolicy(neutronv20.UpdateCommand):
     """Update a given IKE policy."""
 
     resource = 'ikepolicy'
+    help_resource = 'IKE policy'
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -114,3 +116,4 @@ class DeleteIKEPolicy(neutronv20.DeleteCommand):
     """Delete a given IKE policy."""
 
     resource = 'ikepolicy'
+    help_resource = 'IKE policy'

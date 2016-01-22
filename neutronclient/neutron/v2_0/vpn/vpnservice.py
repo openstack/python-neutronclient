@@ -34,6 +34,7 @@ class ShowVPNService(neutronv20.ShowCommand):
     """Show information of a given VPN service."""
 
     resource = 'vpnservice'
+    help_resource = 'VPN service'
 
 
 class CreateVPNService(neutronv20.CreateCommand):
@@ -83,9 +84,11 @@ class UpdateVPNService(neutronv20.UpdateCommand):
     """Update a given VPN service."""
 
     resource = 'vpnservice'
+    help_resource = 'VPN service'
 
 
 class DeleteVPNService(neutronv20.DeleteCommand):
     """Delete a given VPN service."""
 
     resource = 'vpnservice'
+    help_resource = 'VPN service'

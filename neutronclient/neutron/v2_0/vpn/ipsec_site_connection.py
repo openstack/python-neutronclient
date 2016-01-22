@@ -46,6 +46,7 @@ class ShowIPsecSiteConnection(neutronv20.ShowCommand):
     """Show information of a given IPsec site connection."""
 
     resource = 'ipsec_site_connection'
+    help_resource = 'IPsec site connection'
 
 
 class IPsecSiteConnectionMixin(object):
@@ -196,9 +197,11 @@ class UpdateIPsecSiteConnection(IPsecSiteConnectionMixin,
     """Update a given IPsec site connection."""
 
     resource = 'ipsec_site_connection'
+    help_resource = 'IPsec site connection'
 
 
 class DeleteIPsecSiteConnection(neutronv20.DeleteCommand):
     """Delete a given IPsec site connection."""
 
     resource = 'ipsec_site_connection'
+    help_resource = 'IPsec site connection'

@@ -35,6 +35,7 @@ class ShowIPsecPolicy(neutronv20.ShowCommand):
     """Show information of a given IPsec policy."""
 
     resource = 'ipsecpolicy'
+    help_resource = 'IPsec policy'
 
 
 class CreateIPsecPolicy(neutronv20.CreateCommand):
@@ -92,6 +93,7 @@ class UpdateIPsecPolicy(neutronv20.UpdateCommand):
     """Update a given IPsec policy."""
 
     resource = 'ipsecpolicy'
+    help_resource = 'IPsec policy'
 
     def add_known_arguments(self, parser):
         parser.add_argument(
@@ -113,3 +115,4 @@ class DeleteIPsecPolicy(neutronv20.DeleteCommand):
     """Delete a given IPsec policy."""
 
     resource = 'ipsecpolicy'
+    help_resource = 'IPsec policy'
