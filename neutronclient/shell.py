@@ -43,6 +43,7 @@ from neutronclient.common import utils
 from neutronclient.neutron.v2_0 import address_scope
 from neutronclient.neutron.v2_0 import agent
 from neutronclient.neutron.v2_0 import agentscheduler
+from neutronclient.neutron.v2_0 import auto_allocated_topology
 from neutronclient.neutron.v2_0 import availability_zone
 from neutronclient.neutron.v2_0 import extension
 from neutronclient.neutron.v2_0.flavor import flavor
@@ -392,6 +393,8 @@ COMMAND_V2 = {
     'flavor-profile-delete': flavor_profile.DeleteFlavorProfile,
     'flavor-profile-update': flavor_profile.UpdateFlavorProfile,
     'availability-zone-list': availability_zone.ListAvailabilityZone,
+    'auto-allocated-topology-show': (
+        auto_allocated_topology.ShowAutoAllocatedTopology),
 }
 
 COMMANDS = {'2.0': COMMAND_V2}

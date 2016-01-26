@@ -409,6 +409,7 @@ class Client(ClientBase):
     flavor_profile_bindings_path = flavor_path + service_profiles_path
     flavor_profile_binding_path = flavor_path + service_profile_path
     availability_zones_path = "/availability_zones"
+    auto_allocated_topology_path = "/auto-allocated-topology/%s"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -1692,6 +1693,13 @@ class Client(ClientBase):
         """Fetches a list of all availability zones."""
         return self.list('availability_zones', self.availability_zones_path,
                          retrieve_all, **_params)
+
+    @APIParamsCall
+    def show_auto_allocated_topology(self, tenant_id, **_params):
+        """Fetch information about a tenant's auto-allocated topology."""
+        return self.get(
+            self.auto_allocated_topology_path % tenant_id,
+            params=_params)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
