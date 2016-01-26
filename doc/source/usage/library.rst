@@ -54,6 +54,8 @@ Now you can call various methods on the client instance.
 Alternatively, you can create a client instance using an auth token
 and a service endpoint URL directly.
 
+.. code-block:: python
+
     >>> from neutronclient.v2_0 import client
     >>> neutron = client.Client(endpoint_url='http://192.168.206.130:9696/',
-                                token='d3f9226f27774f338019aa2611112ef6')
+    ...                         token='d3f9226f27774f338019aa2611112ef6')
