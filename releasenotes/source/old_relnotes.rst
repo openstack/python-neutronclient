@@ -10,7 +10,6 @@ Old Release Notes
 * made the publicURL the default endpoint instead of adminURL
 * add ability to update security group name (requires 2013.2-Havana or later)
 * add flake8 and pbr support for testing and building
-* add ability to retrieve a specific load balancer's status tree
 
 2.2.0
 -----
