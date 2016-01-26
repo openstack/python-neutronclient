@@ -16,6 +16,7 @@ upgrade:
   - Cisco-specific neutron client commands have been removed.
     These commands are ported to networking-cisco.
   - py26 support has been dropped.
+  - py33 support has been dropped.
 fixes:
   - Name is no longer looked up on RBAC policies,
     RBAC policies have no name field so the name query to
