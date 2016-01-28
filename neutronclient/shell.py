@@ -894,7 +894,8 @@ class NeutronShell(app.App):
         """
         cloud_config = os_client_config.OpenStackConfig().get_one_cloud(
             cloud=self.options.os_cloud, argparse=self.options,
-            network_api_version=self.api_version)
+            network_api_version=self.api_version,
+            verify=not self.options.insecure)
         verify, cert = cloud_config.get_requests_verify_args()
 
         # TODO(singhj): Remove dependancy on HTTPClient
@@ -928,6 +929,7 @@ class NeutronShell(app.App):
             service_name=cloud_config.get_service_name('network'),
             endpoint_type=interface,
             auth=auth,
+            insecure=not verify,
             log_credentials=True)
         return
 
