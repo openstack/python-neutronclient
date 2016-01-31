@@ -82,6 +82,7 @@ class CreateSubnetPool(neutronV20.CreateCommand):
             help=_('Set the subnetpool as shared.'))
         parser.add_argument(
             'name',
+            metavar='NAME',
             help=_('Name of subnetpool to create.'))
         parser.add_argument(
             '--address-scope',

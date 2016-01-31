@@ -45,6 +45,7 @@ class CreateAddressScope(neutronV20.CreateCommand):
             help=_('Set the address scope as shared.'))
         parser.add_argument(
             'name',
+            metavar='NAME',
             help=_('Specify the name of the address scope.'))
         parser.add_argument(
             'ip_version',

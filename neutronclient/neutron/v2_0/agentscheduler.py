@@ -32,9 +32,11 @@ class AddNetworkToDhcpAgent(neutronV20.NeutronCommand):
         parser = super(AddNetworkToDhcpAgent, self).get_parser(prog_name)
         parser.add_argument(
             'dhcp_agent',
+            metavar='DHCP_AGENT',
             help=_('ID of the DHCP agent.'))
         parser.add_argument(
             'network',
+            metavar='NETWORK',
             help=_('Network to add.'))
         return parser
 
@@ -56,9 +58,11 @@ class RemoveNetworkFromDhcpAgent(neutronV20.NeutronCommand):
         parser = super(RemoveNetworkFromDhcpAgent, self).get_parser(prog_name)
         parser.add_argument(
             'dhcp_agent',
+            metavar='DHCP_AGENT',
             help=_('ID of the DHCP agent.'))
         parser.add_argument(
             'network',
+            metavar='NETWORK',
             help=_('Network to remove.'))
         return parser
 
@@ -83,6 +87,7 @@ class ListNetworksOnDhcpAgent(network.ListNetwork):
                        self).get_parser(prog_name)
         parser.add_argument(
             'dhcp_agent',
+            metavar='DHCP_AGENT',
             help=_('ID of the DHCP agent.'))
         return parser
 
@@ -105,6 +110,7 @@ class ListDhcpAgentsHostingNetwork(neutronV20.ListCommand):
                        self).get_parser(prog_name)
         parser.add_argument(
             'network',
+            metavar='NETWORK',
             help=_('Network to query.'))
         return parser
 
@@ -128,9 +134,11 @@ class AddRouterToL3Agent(neutronV20.NeutronCommand):
         parser = super(AddRouterToL3Agent, self).get_parser(prog_name)
         parser.add_argument(
             'l3_agent',
+            metavar='L3_AGENT',
             help=_('ID of the L3 agent.'))
         parser.add_argument(
             'router',
+            metavar='ROUTER',
             help=_('Router to add.'))
         return parser
 
@@ -152,9 +160,11 @@ class RemoveRouterFromL3Agent(neutronV20.NeutronCommand):
         parser = super(RemoveRouterFromL3Agent, self).get_parser(prog_name)
         parser.add_argument(
             'l3_agent',
+            metavar='L3_AGENT',
             help=_('ID of the L3 agent.'))
         parser.add_argument(
             'router',
+            metavar='ROUTER',
             help=_('Router to remove.'))
         return parser
 
@@ -183,6 +193,7 @@ class ListRoutersOnL3Agent(neutronV20.ListCommand):
                        self).get_parser(prog_name)
         parser.add_argument(
             'l3_agent',
+            metavar='L3_AGENT',
             help=_('ID of the L3 agent to query.'))
         return parser
 
@@ -204,6 +215,7 @@ class ListL3AgentsHostingRouter(neutronV20.ListCommand):
         parser = super(ListL3AgentsHostingRouter,
                        self).get_parser(prog_name)
         parser.add_argument('router',
+                            metavar='ROUTER',
                             help=_('Router to query.'))
         return parser
 
@@ -236,6 +248,7 @@ class ListPoolsOnLbaasAgent(neutronV20.ListCommand):
         parser = super(ListPoolsOnLbaasAgent, self).get_parser(prog_name)
         parser.add_argument(
             'lbaas_agent',
+            metavar='LBAAS_AGENT',
             help=_('ID of the loadbalancer agent to query.'))
         return parser
 
@@ -260,6 +273,7 @@ class GetLbaasAgentHostingPool(neutronV20.ListCommand):
         parser = super(GetLbaasAgentHostingPool,
                        self).get_parser(prog_name)
         parser.add_argument('pool',
+                            metavar='POOL',
                             help=_('Pool to query.'))
         return parser
 
@@ -289,6 +303,7 @@ class ListLoadBalancersOnLbaasAgent(neutronV20.ListCommand):
             prog_name)
         parser.add_argument(
             'lbaas_agent',
+            metavar='LBAAS_AGENT',
             help=_('ID of the loadbalancer agent to query.'))
         return parser
 
@@ -313,6 +328,7 @@ class GetLbaasAgentHostingLoadBalancer(neutronV20.ListCommand):
         parser = super(GetLbaasAgentHostingLoadBalancer,
                        self).get_parser(prog_name)
         parser.add_argument('loadbalancer',
+                            metavar='LOADBALANCER',
                             help=_('LoadBalancer to query.'))
         return parser
 
