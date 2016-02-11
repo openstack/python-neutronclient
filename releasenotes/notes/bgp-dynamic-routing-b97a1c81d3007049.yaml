@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    CLI support for the BGP dynamic routing functionality will help
+    advertising neutron fixed-ips and dvr host routes via BGP.

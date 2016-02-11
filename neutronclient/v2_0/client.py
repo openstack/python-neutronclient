@@ -410,6 +410,14 @@ class Client(ClientBase):
     flavor_profile_binding_path = flavor_path + service_profile_path
     availability_zones_path = "/availability_zones"
     auto_allocated_topology_path = "/auto-allocated-topology/%s"
+    BGP_DRINSTANCES = "/bgp-drinstances"
+    BGP_DRINSTANCE = "/bgp-drinstance/%s"
+    BGP_DRAGENTS = "/bgp-dragents"
+    BGP_DRAGENT = "/bgp-dragents/%s"
+    bgp_speakers_path = "/bgp-speakers"
+    bgp_speaker_path = "/bgp-speakers/%s"
+    bgp_peers_path = "/bgp-peers"
+    bgp_peer_path = "/bgp-peers/%s"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -447,6 +455,8 @@ class Client(ClientBase):
                      'bandwidth_limit_rules': 'bandwidth_limit_rule',
                      'rule_types': 'rule_type',
                      'flavors': 'flavor',
+                     'bgp_speakers': 'bgp_speaker',
+                     'bgp_peers': 'bgp_peer',
                      }
 
     @APIParamsCall
@@ -1347,6 +1357,30 @@ class Client(ClientBase):
                          body=body)
 
     @APIParamsCall
+    def list_dragents_hosting_bgp_speaker(self, bgp_speaker, **_params):
+        """Fetches a list of Dynamic Routing agents hosting a BGP speaker."""
+        return self.get((self.bgp_speaker_path + self.BGP_DRAGENTS)
+                        % bgp_speaker, params=_params)
+
+    @APIParamsCall
+    def add_bgp_speaker_to_dragent(self, bgp_dragent, body):
+        """Adds a BGP speaker to Dynamic Routing agent."""
+        return self.post((self.agent_path + self.BGP_DRINSTANCES)
+                         % bgp_dragent, body=body)
+
+    @APIParamsCall
+    def remove_bgp_speaker_from_dragent(self, bgp_dragent, bgpspeaker_id):
+        """Removes a BGP speaker from Dynamic Routing agent."""
+        return self.delete((self.agent_path + self.BGP_DRINSTANCES + "/%s")
+                           % (bgp_dragent, bgpspeaker_id))
+
+    @APIParamsCall
+    def list_bgp_speaker_on_dragent(self, bgp_dragent, **_params):
+        """Fetches a list of BGP speakers hosted by Dynamic Routing agent."""
+        return self.get((self.agent_path + self.BGP_DRINSTANCES)
+                        % bgp_dragent, params=_params)
+
+    @APIParamsCall
     def list_firewall_rules(self, retrieve_all=True, **_params):
         """Fetches a list of all firewall rules for a tenant."""
         # Pass filters in "params" argument to do_request
@@ -1700,6 +1734,89 @@ class Client(ClientBase):
         return self.get(
             self.auto_allocated_topology_path % tenant_id,
             params=_params)
+
+    @APIParamsCall
+    def list_bgp_speakers(self, retrieve_all=True, **_params):
+        """Fetches a list of all BGP speakers for a tenant."""
+        return self.list('bgp_speakers', self.bgp_speakers_path, retrieve_all,
+                         **_params)
+
+    @APIParamsCall
+    def show_bgp_speaker(self, bgp_speaker_id, **_params):
+        """Fetches information of a certain BGP speaker."""
+        return self.get(self.bgp_speaker_path % (bgp_speaker_id),
+                        params=_params)
+
+    @APIParamsCall
+    def create_bgp_speaker(self, body=None):
+        """Creates a new BGP speaker."""
+        return self.post(self.bgp_speakers_path, body=body)
+
+    @APIParamsCall
+    def update_bgp_speaker(self, bgp_speaker_id, body=None):
+        """Update a BGP speaker."""
+        return self.put(self.bgp_speaker_path % bgp_speaker_id, body=body)
+
+    @APIParamsCall
+    def delete_bgp_speaker(self, speaker_id):
+        """Deletes the specified BGP speaker."""
+        return self.delete(self.bgp_speaker_path % (speaker_id))
+
+    @APIParamsCall
+    def add_peer_to_bgp_speaker(self, speaker_id, body=None):
+        """Adds a peer to BGP speaker."""
+        return self.put((self.bgp_speaker_path % speaker_id) +
+                        "/add_bgp_peer", body=body)
+
+    @APIParamsCall
+    def remove_peer_from_bgp_speaker(self, speaker_id, body=None):
+        """Removes a peer from BGP speaker."""
+        return self.put((self.bgp_speaker_path % speaker_id) +
+                        "/remove_bgp_peer", body=body)
+
+    @APIParamsCall
+    def add_network_to_bgp_speaker(self, speaker_id, body=None):
+        """Adds a network to BGP speaker."""
+        return self.put((self.bgp_speaker_path % speaker_id) +
+                        "/add_gateway_network", body=body)
+
+    @APIParamsCall
+    def remove_network_from_bgp_speaker(self, speaker_id, body=None):
+        """Removes a network from BGP speaker."""
+        return self.put((self.bgp_speaker_path % speaker_id) +
+                        "/remove_gateway_network", body=body)
+
+    @APIParamsCall
+    def list_route_advertised_from_bgp_speaker(self, speaker_id, **_params):
+        """Fetches a list of all routes advertised by BGP speaker."""
+        return self.get((self.bgp_speaker_path % speaker_id) +
+                        "/get_advertised_routes", params=_params)
+
+    @APIParamsCall
+    def list_bgp_peers(self, **_params):
+        """Fetches a list of all BGP peers."""
+        return self.get(self.bgp_peers_path, params=_params)
+
+    @APIParamsCall
+    def show_bgp_peer(self, peer_id, **_params):
+        """Fetches information of a certain BGP peer."""
+        return self.get(self.bgp_peer_path % peer_id,
+                        params=_params)
+
+    @APIParamsCall
+    def create_bgp_peer(self, body=None):
+        """Create a new BGP peer."""
+        return self.post(self.bgp_peers_path, body=body)
+
+    @APIParamsCall
+    def update_bgp_peer(self, bgp_peer_id, body=None):
+        """Update a BGP peer."""
+        return self.put(self.bgp_peer_path % bgp_peer_id, body=body)
+
+    @APIParamsCall
+    def delete_bgp_peer(self, peer_id):
+        """Deletes the specified BGP peer."""
+        return self.delete(self.bgp_peer_path % peer_id)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
