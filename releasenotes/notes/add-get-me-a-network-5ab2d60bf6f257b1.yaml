@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    CLI support for the "get-me-a-network" feature, which simplifies
+    the process for launching an instance with basic network
+    connectivity.
+
+    * The ``auto-allocated-topology-show`` command provides the
+      network of the automatically allocated topology for a tenant.
