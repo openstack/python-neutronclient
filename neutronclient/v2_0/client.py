@@ -451,27 +451,27 @@ class Client(ClientBase):
 
     @APIParamsCall
     def list_ext(self, collection, path, retrieve_all, **_params):
-        """Client extension hook for lists."""
+        """Client extension hook for list."""
         return self.list(collection, path, retrieve_all, **_params)
 
     @APIParamsCall
     def show_ext(self, path, id, **_params):
-        """Client extension hook for shows."""
+        """Client extension hook for show."""
         return self.get(path % id, params=_params)
 
     @APIParamsCall
     def create_ext(self, path, body=None):
-        """Client extension hook for creates."""
+        """Client extension hook for create."""
         return self.post(path, body=body)
 
     @APIParamsCall
     def update_ext(self, path, id, body=None):
-        """Client extension hook for updates."""
+        """Client extension hook for update."""
         return self.put(path % id, body=body)
 
     @APIParamsCall
     def delete_ext(self, path, id):
-        """Client extension hook for deletes."""
+        """Client extension hook for delete."""
         return self.delete(path % id)
 
     @APIParamsCall
@@ -501,24 +501,24 @@ class Client(ClientBase):
 
     @APIParamsCall
     def list_extensions(self, **_params):
-        """Fetch a list of all exts on server side."""
+        """Fetch a list of all extensions on server side."""
         return self.get(self.extensions_path, params=_params)
 
     @APIParamsCall
     def show_extension(self, ext_alias, **_params):
-        """Fetch a list of all exts on server side."""
+        """Fetches information of a certain extension."""
         return self.get(self.extension_path % ext_alias, params=_params)
 
     @APIParamsCall
     def list_ports(self, retrieve_all=True, **_params):
-        """Fetches a list of all networks for a tenant."""
+        """Fetches a list of all ports for a tenant."""
         # Pass filters in "params" argument to do_request
         return self.list('ports', self.ports_path, retrieve_all,
                          **_params)
 
     @APIParamsCall
     def show_port(self, port, **_params):
-        """Fetches information of a certain network."""
+        """Fetches information of a certain port."""
         return self.get(self.port_path % (port), params=_params)
 
     @APIParamsCall
@@ -565,7 +565,7 @@ class Client(ClientBase):
 
     @APIParamsCall
     def list_subnets(self, retrieve_all=True, **_params):
-        """Fetches a list of all networks for a tenant."""
+        """Fetches a list of all subnets for a tenant."""
         return self.list('subnets', self.subnets_path, retrieve_all,
                          **_params)
 
@@ -1419,7 +1419,7 @@ class Client(ClientBase):
 
     @APIParamsCall
     def list_firewalls(self, retrieve_all=True, **_params):
-        """Fetches a list of all firewals for a tenant."""
+        """Fetches a list of all firewalls for a tenant."""
         # Pass filters in "params" argument to do_request
 
         return self.list('firewalls', self.firewalls_path, retrieve_all,
