@@ -118,9 +118,17 @@ def find_resource_by_name_or_id(client, resource, name_or_id,
         return find_resource_by_id(client, resource, name_or_id,
                                    cmd_resource, parent_id, fields)
     except exceptions.NotFound:
-        return _find_resource_by_name(client, resource, name_or_id,
-                                      project_id, cmd_resource, parent_id,
-                                      fields)
+        try:
+            return _find_resource_by_name(client, resource, name_or_id,
+                                          project_id, cmd_resource, parent_id,
+                                          fields)
+        except exceptions.NotFound:
+            not_found_message = (_("Unable to find %(resource)s with name "
+                                   "or id '%(name_or_id)s'") %
+                                 {'resource': resource,
+                                  'name_or_id': name_or_id})
+            raise exceptions.NotFound(
+                message=not_found_message)
 
 
 def find_resourceid_by_name_or_id(client, resource, name_or_id,
