@@ -18,6 +18,7 @@ from __future__ import print_function
 
 import abc
 import argparse
+import functools
 import logging
 import re
 
@@ -603,6 +604,37 @@ class ListCommand(NeutronCommand, lister.Lister):
     unknown_parts_flag = True
     pagination_support = False
     sorting_support = False
+    resource_plural = None
+
+    # A list to define arguments for filtering by attribute value
+    # CLI arguments are shown in the order of this list.
+    # Each element must be either of a string of an attribute name
+    # or a dict of a full attribute definitions whose format is:
+    # {'name': attribute name, (mandatory)
+    #  'help': help message for CLI (mandatory)
+    #  'boolean': boolean parameter or not. (Default: False) (optional)
+    #  'argparse_kwargs': a dict of parameters passed to
+    #                     argparse add_argument()
+    #                     (Default: {}) (optional)
+    # }
+    # For more details, see ListNetworks.filter_attrs.
+    filter_attrs = []
+
+    default_attr_defs = {
+        'name': {
+            'help': _("Filter %s according to their name."),
+            'boolean': False,
+        },
+        'tenant_id': {
+            'help': _('Filter %s belonging to the given tenant.'),
+            'boolean': False,
+        },
+        'admin_state_up': {
+            'help': _('Filter and list the %s whose adminstrative '
+                      'state is active'),
+            'boolean': True,
+        },
+    }
 
     def get_parser(self, prog_name):
         parser = super(ListCommand, self).get_parser(prog_name)
@@ -612,7 +644,35 @@ class ListCommand(NeutronCommand, lister.Lister):
         if self.sorting_support:
             add_sorting_argument(parser)
         self.add_known_arguments(parser)
+        self.add_filtering_arguments(parser)
         return parser
+
+    def add_filtering_arguments(self, parser):
+        if not self.filter_attrs:
+            return
+
+        group_parser = parser.add_argument_group('filtering arguments')
+        collection = self.resource_plural or '%ss' % self.resource
+        for attr in self.filter_attrs:
+            if isinstance(attr, str):
+                # Use detail defined in default_attr_defs
+                attr_name = attr
+                attr_defs = self.default_attr_defs[attr]
+            else:
+                attr_name = attr['name']
+                attr_defs = attr
+            option_name = '--%s' % attr_name.replace('_', '-')
+            params = attr_defs.get('argparse_kwargs', {})
+            try:
+                help_msg = attr_defs['help'] % collection
+            except TypeError:
+                help_msg = attr_defs['help']
+            if attr_defs.get('boolean', False):
+                add_arg_func = functools.partial(utils.add_boolean_argument,
+                                                 group_parser)
+            else:
+                add_arg_func = group_parser.add_argument
+            add_arg_func(option_name, help=help_msg, **params)
 
     def args2search_opts(self, parsed_args):
         search_opts = {}
@@ -621,6 +681,12 @@ class ListCommand(NeutronCommand, lister.Lister):
             search_opts.update({'fields': fields})
         if parsed_args.show_details:
             search_opts.update({'verbose': 'True'})
+        filter_attrs = [field if isinstance(field, str) else field['name']
+                        for field in self.filter_attrs]
+        for attr in filter_attrs:
+            val = getattr(parsed_args, attr, None)
+            if val:
+                search_opts[attr] = val
         return search_opts
 
     def call_server(self, neutron_client, search_opts, parsed_args):

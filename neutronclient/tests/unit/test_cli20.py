@@ -557,6 +557,81 @@ class CLITestV20Base(base.BaseTestCase):
         self.assertIn(myid, _str)
 
 
+class TestListCommand(neutronV2_0.ListCommand):
+    resource = 'test_resource'
+    filter_attrs = [
+        'name',
+        'admin_state_up',
+        {'name': 'foo', 'help': 'non-boolean attribute foo'},
+        {'name': 'bar', 'help': 'boolean attribute bar',
+         'boolean': True},
+        {'name': 'baz', 'help': 'integer attribute baz',
+         'argparse_kwargs': {'choices': ['baz1', 'baz2']}},
+    ]
+
+
+class ListCommandTestCase(CLITestV20Base):
+
+    def setUp(self):
+        super(ListCommandTestCase, self).setUp()
+        self.client.extend_list('test_resources', '/test_resources', None)
+        setattr(self.client, 'test_resources_path', '/test_resources')
+
+    def _test_list_resources_filter_params(self, base_args='', query=''):
+        resources = 'test_resources'
+        cmd = TestListCommand(MyApp(sys.stdout), None)
+        self._test_list_resources(resources, cmd,
+                                  base_args=base_args.split(),
+                                  query=query)
+
+    def _test_list_resources_with_arg_error(self, base_args=''):
+        self.addCleanup(self.mox.UnsetStubs)
+        resources = 'test_resources'
+        cmd = TestListCommand(MyApp(sys.stdout), None)
+        # argparse parse error leads to SystemExit
+        self.assertRaises(SystemExit,
+                          self._test_list_resources,
+                          resources, cmd,
+                          base_args=base_args.split())
+
+    def test_list_resources_without_filter(self):
+        self._test_list_resources_filter_params()
+
+    def test_list_resources_use_default_filter(self):
+        self._test_list_resources_filter_params(
+            base_args='--name val1 --admin-state-up False',
+            query='name=val1&admin_state_up=False')
+
+    def test_list_resources_use_custom_filter(self):
+        self._test_list_resources_filter_params(
+            base_args='--foo FOO --bar True',
+            query='foo=FOO&bar=True')
+
+    def test_list_resources_boolean_check_default_filter(self):
+        self._test_list_resources_filter_params(
+            base_args='--admin-state-up True', query='admin_state_up=True')
+        self._test_list_resources_filter_params(
+            base_args='--admin-state-up False', query='admin_state_up=False')
+        self._test_list_resources_with_arg_error(
+            base_args='--admin-state-up non-true-false')
+
+    def test_list_resources_boolean_check_custom_filter(self):
+        self._test_list_resources_filter_params(
+            base_args='--bar True', query='bar=True')
+        self._test_list_resources_filter_params(
+            base_args='--bar False', query='bar=False')
+        self._test_list_resources_with_arg_error(
+            base_args='--bar non-true-false')
+
+    def test_list_resources_argparse_kwargs(self):
+        self._test_list_resources_filter_params(
+            base_args='--baz baz1', query='baz=baz1')
+        self._test_list_resources_filter_params(
+            base_args='--baz baz2', query='baz=baz2')
+        self._test_list_resources_with_arg_error(
+            base_args='--bar non-choice')
+
+
 class ClientV2TestJson(CLITestV20Base):
     def test_do_request_unicode(self):
         self.mox.StubOutWithMock(self.client.httpclient, "request")

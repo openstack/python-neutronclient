@@ -196,13 +196,15 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
 
     def _test_list_networks(self, cmd, detail=False, tags=(),
                             fields_1=(), fields_2=(), page_size=None,
-                            sort_key=(), sort_dir=()):
+                            sort_key=(), sort_dir=(), base_args=None,
+                            query=''):
         resources = "networks"
         self.mox.StubOutWithMock(network.ListNetwork, "extend_list")
         network.ListNetwork.extend_list(mox.IsA(list), mox.IgnoreArg())
         self._test_list_resources(resources, cmd, detail, tags,
                                   fields_1, fields_2, page_size=page_size,
-                                  sort_key=sort_key, sort_dir=sort_dir)
+                                  sort_key=sort_key, sort_dir=sort_dir,
+                                  base_args=base_args, query=query)
 
     def test_list_nets_pagination(self):
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
@@ -611,3 +613,9 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                         'X-Auth-Token', test_cli20.TOKEN)).AndReturn(response)
 
         self._test_extend_list(mox_calls)
+
+    def test_list_shared_networks(self):
+        # list nets : --shared False
+        cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_networks(cmd, base_args='--shared False'.split(),
+                                 query='shared=False')
