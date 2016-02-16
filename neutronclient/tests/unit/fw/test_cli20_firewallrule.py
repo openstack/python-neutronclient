@@ -193,14 +193,53 @@ class CLITestV20FirewallRuleJSON(test_cli20.CLITestV20Base):
                                    ['myid', '--name', 'newname'],
                                    {'name': 'newname', })
 
-    def test_update_firewall_rule_protocol(self):
         # firewall-rule-update myid --protocol any.
-        resource = 'firewall_rule'
-        cmd = firewallrule.UpdateFirewallRule(test_cli20.MyApp(sys.stdout),
-                                              None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--protocol', 'any'],
                                    {'protocol': None, })
+
+        # firewall-rule-update myid --description any
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--description', 'any'],
+                                   {'description': 'any', })
+
+        # firewall-rule-update myid --source_ip_address 192.192.192.192
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--source_ip_address',
+                                    '192.192.192.192'],
+                                   {'source_ip_address': '192.192.192.192', })
+
+        # firewall-rule-update myid --source_port 32767
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--source_port', '32767'],
+                                   {'source_port': '32767', })
+
+        # firewall-rule-update myid --destination_ip_address 0.1.0.1
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--destination_ip_address',
+                                    '0.1.0.1'],
+                                   {'destination_ip_address': '0.1.0.1', })
+
+        # firewall-rule-update myid --destination_port 65432
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--destination_port',
+                                    '65432'],
+                                   {'destination_port': '65432', })
+
+        # firewall-rule-update myid --enabled  False
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--enabled', 'False'],
+                                   {'enabled': 'False', })
+
+        # firewall-rule-update myid --action reject
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--action', 'reject'],
+                                   {'action': 'reject', })
+
+        # firewall-rule-update myid --shared false
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--shared', 'false'],
+                                   {'shared': 'false', })
 
     def test_delete_firewall_rule(self):
         # firewall-rule-delete my-id.

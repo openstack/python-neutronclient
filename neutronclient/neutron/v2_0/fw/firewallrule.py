@@ -21,6 +21,62 @@ from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronv20
 
 
+def _add_common_args(parser, is_create=True):
+    """If is_create is True, protocol and action become mandatory arguments.
+
+    CreateCommand = is_create : True
+    UpdateCommand = is_create : False
+    """
+    parser.add_argument(
+        '--name',
+        help=_('Name for the firewall rule.'))
+    parser.add_argument(
+        '--description',
+        help=_('Description for the firewall rule.'))
+    parser.add_argument(
+        '--source-ip-address',
+        help=_('Source IP address or subnet.'))
+    parser.add_argument(
+        '--destination-ip-address',
+        help=_('Destination IP address or subnet.'))
+    parser.add_argument(
+        '--source-port',
+        help=_('Source port (integer in [1, 65535] or range in a:b).'))
+    parser.add_argument(
+        '--destination-port',
+        help=_('Destination port (integer in [1, 65535] or range in '
+               'a:b).'))
+    utils.add_boolean_argument(
+        parser, '--enabled', dest='enabled',
+        help=_('Whether to enable or disable this rule.'))
+    parser.add_argument(
+        '--protocol', choices=['tcp', 'udp', 'icmp', 'any'],
+        required=is_create,
+        type=utils.convert_to_lowercase,
+        help=_('Protocol for the firewall rule.'))
+    parser.add_argument(
+        '--action',
+        required=is_create,
+        type=utils.convert_to_lowercase,
+        choices=['allow', 'deny', 'reject'],
+        help=_('Action for the firewall rule.'))
+
+
+def common_args2body(parsed_args):
+    body = {}
+    neutronv20.update_dict(parsed_args, body,
+                           ['name', 'description', 'shared', 'tenant_id',
+                            'source_ip_address', 'destination_ip_address',
+                            'source_port', 'destination_port', 'action',
+                            'enabled', 'ip_version'])
+    protocol = parsed_args.protocol
+    if protocol:
+        if protocol == 'any':
+            protocol = None
+        body['protocol'] = protocol
+    return body
+
+
 class ListFirewallRule(neutronv20.ListCommand):
     """List firewall rules that belong to a given tenant."""
 
@@ -70,62 +126,18 @@ class CreateFirewallRule(neutronv20.CreateCommand):
 
     def add_known_arguments(self, parser):
         parser.add_argument(
-            '--name',
-            help=_('Name for the firewall rule.'))
-        parser.add_argument(
-            '--description',
-            help=_('Description for the firewall rule.'))
-        parser.add_argument(
             '--shared',
-            dest='shared',
             action='store_true',
-            help=_('Set shared to True (default is False).'),
+            help=_('Set shared flag for the firewall rule.'),
             default=argparse.SUPPRESS)
+        _add_common_args(parser)
         parser.add_argument(
             '--ip-version',
             type=int, choices=[4, 6], default=4,
             help=_('IP version for the firewall rule (default is 4).'))
-        parser.add_argument(
-            '--source-ip-address',
-            help=_('Source IP address or subnet.'))
-        parser.add_argument(
-            '--destination-ip-address',
-            help=_('Destination IP address or subnet.'))
-        parser.add_argument(
-            '--source-port',
-            help=_('Source port (integer in [1, 65535] or range in a:b).'))
-        parser.add_argument(
-            '--destination-port',
-            help=_('Destination port (integer in [1, 65535] or range in '
-                   'a:b).'))
-        utils.add_boolean_argument(
-            parser, '--enabled', dest='enabled',
-            help=_('Whether to enable or disable this rule.'))
-        parser.add_argument(
-            '--protocol', choices=['tcp', 'udp', 'icmp', 'any'],
-            type=utils.convert_to_lowercase,
-            required=True,
-            help=_('Protocol for the firewall rule.'))
-        parser.add_argument(
-            '--action',
-            required=True,
-            type=utils.convert_to_lowercase,
-            choices=['allow', 'deny', 'reject'],
-            help=_('Action for the firewall rule.'))
 
     def args2body(self, parsed_args):
-        body = {}
-        neutronv20.update_dict(parsed_args, body,
-                               ['name', 'description', 'shared',
-                                'source_ip_address', 'destination_ip_address',
-                                'source_port', 'destination_port',
-                                'action', 'enabled', 'tenant_id',
-                                'ip_version'])
-        protocol = parsed_args.protocol
-        if protocol == 'any':
-            protocol = None
-        body['protocol'] = protocol
-        return {self.resource: body}
+        return {self.resource: common_args2body(parsed_args)}
 
 
 class UpdateFirewallRule(neutronv20.UpdateCommand):
@@ -134,22 +146,20 @@ class UpdateFirewallRule(neutronv20.UpdateCommand):
     resource = 'firewall_rule'
 
     def add_known_arguments(self, parser):
+        utils.add_boolean_argument(
+            parser,
+            '--shared',
+            dest='shared',
+            help=_('Update the shared flag for the firewall rule.'),
+            default=argparse.SUPPRESS)
         parser.add_argument(
-            '--protocol', choices=['tcp', 'udp', 'icmp', 'any'],
-            required=False,
-            type=utils.convert_to_lowercase,
-            help=_('Protocol for the firewall rule.'))
-        # TODO(reedip) : Need to add the option for action once
-        # action also comes into Update Firewall Rule
+            '--ip-version',
+            type=int, choices=[4, 6],
+            help=_('Update IP version for the firewall rule.'))
+        _add_common_args(parser, is_create=False)
 
     def args2body(self, parsed_args):
-        body = {}
-        protocol = parsed_args.protocol
-        if protocol:
-            if protocol == 'any':
-                protocol = None
-            body['protocol'] = protocol
-        return {self.resource: body}
+        return {self.resource: common_args2body(parsed_args)}
 
 
 class DeleteFirewallRule(neutronv20.DeleteCommand):
