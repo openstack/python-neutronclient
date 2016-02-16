@@ -160,3 +160,11 @@ class CLITestV20FirewallJSON(test_cli20.CLITestV20Base):
         my_id = 'my-id'
         args = [my_id]
         self._test_delete_resource(resource, cmd, my_id, args)
+
+    def test_update_firewall_admin_state(self):
+        # firewall-update myid --admin-state-up True.
+        resource = 'firewall'
+        cmd = firewall.UpdateFirewall(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--admin-state-up', 'True'],
+                                   {'admin_state_up': 'True'})
