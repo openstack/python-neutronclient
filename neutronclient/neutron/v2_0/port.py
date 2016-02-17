@@ -107,7 +107,7 @@ class ListRouterPort(neutronV20.ListCommand):
     def get_parser(self, prog_name):
         parser = super(ListRouterPort, self).get_parser(prog_name)
         parser.add_argument(
-            'id', metavar='router',
+            'id', metavar='ROUTER',
             help=_('ID or name of router to look up.'))
         return parser
 
