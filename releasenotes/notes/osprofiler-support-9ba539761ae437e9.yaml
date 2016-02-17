@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Add osprofiler support to the neutronclient python binding.
+    If osprofiler is initiated, neutronclient sends a special HTTP
+    header that contains trace info.
