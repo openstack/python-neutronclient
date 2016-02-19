@@ -648,15 +648,11 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         # Update sbunet: --enable-dhcp and --disable-dhcp.
         resource = 'subnet'
         cmd = subnet.UpdateSubnet(test_cli20.MyApp(sys.stdout), None)
-        try:
-            self._test_update_resource(resource, cmd, 'myid',
-                                       ['myid', '--name', 'myname',
-                                        '--enable-dhcp', '--disable-dhcp'],
-                                       {'name': 'myname', }
-                                       )
-        except exceptions.CommandError:
-            return
-        self.fail('No exception for --enable-dhcp --disable-dhcp option')
+        self.assertRaises(exceptions.CommandError,
+                          self._test_update_resource,
+                          resource, cmd, 'myid',
+                          ['myid', '--name', 'myname', '--enable-dhcp',
+                           '--disable-dhcp'], {'name': 'myname', })
 
     def test_show_subnet(self):
         # Show subnet: --fields id --fields name myid.

@@ -120,11 +120,10 @@ class CLITestNameorID(testtools.TestCase):
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
         ).AndReturn((test_cli20.MyResp(200), resstr))
         self.mox.ReplayAll()
-        try:
-            neutronV20.find_resourceid_by_name_or_id(
-                self.client, 'network', name)
-        except exceptions.NeutronClientNoUniqueMatch as ex:
-            self.assertIn('Multiple', ex.message)
+        exception = self.assertRaises(exceptions.NeutronClientNoUniqueMatch,
+                                      neutronV20.find_resourceid_by_name_or_id,
+                                      self.client, 'network', name)
+        self.assertIn('Multiple', exception.message)
 
     def test_get_id_from_name_notfound(self):
         name = 'myname'
@@ -141,12 +140,11 @@ class CLITestNameorID(testtools.TestCase):
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
         ).AndReturn((test_cli20.MyResp(200), resstr))
         self.mox.ReplayAll()
-        try:
-            neutronV20.find_resourceid_by_name_or_id(
-                self.client, 'network', name)
-        except exceptions.NotFound as ex:
-            self.assertIn('Unable to find', ex.message)
-            self.assertEqual(404, ex.status_code)
+        exception = self.assertRaises(exceptions.NotFound,
+                                      neutronV20.find_resourceid_by_name_or_id,
+                                      self.client, 'network', name)
+        self.assertIn('Unable to find', exception.message)
+        self.assertEqual(404, exception.status_code)
 
     def test_get_id_from_name_multiple_with_project(self):
         name = 'web_server'
@@ -175,9 +173,7 @@ class CLITestNameorID(testtools.TestCase):
     def test_get_id_from_name_multiple_with_project_not_found(self):
         name = 'web_server'
         project = str(uuid.uuid4())
-        reses = {'security_groups':
-                 [{'id': str(uuid.uuid4()), 'tenant_id': str(uuid.uuid4())}]}
-        resstr = self.client.serialize(reses)
+        resstr_notfound = self.client.serialize({'security_groups': []})
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         path = getattr(self.client, "security_groups_path")
         self.client.httpclient.request(
@@ -187,12 +183,10 @@ class CLITestNameorID(testtools.TestCase):
             'GET',
             body=None,
             headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
-        ).AndReturn((test_cli20.MyResp(200), resstr))
+        ).AndReturn((test_cli20.MyResp(200), resstr_notfound))
         self.mox.ReplayAll()
-
-        try:
-            neutronV20.find_resourceid_by_name_or_id(
-                self.client, 'security_group', name, project)
-        except exceptions.NotFound as ex:
-            self.assertIn('Unable to find', ex.message)
-            self.assertEqual(404, ex.status_code)
+        exc = self.assertRaises(exceptions.NotFound,
+                                neutronV20.find_resourceid_by_name_or_id,
+                                self.client, 'security_group', name, project)
+        self.assertIn('Unable to find', exc.message)
+        self.assertEqual(404, exc.status_code)

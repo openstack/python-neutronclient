@@ -695,13 +695,10 @@ class ClientV2TestJson(CLITestV20Base):
     def test_do_request_with_long_uri_exception(self):
         long_string = 'x' * 8200                  # 8200 > MAX_URI_LEN:8192
         params = {'id': long_string}
-
-        try:
-            self.client.do_request('GET', '/test', body='', params=params)
-        except exceptions.RequestURITooLong as cm:
-            self.assertNotEqual(0, cm.excess)
-        else:
-            self.fail('Expected exception NOT raised')
+        exception = self.assertRaises(exceptions.RequestURITooLong,
+                                      self.client.do_request,
+                                      'GET', '/test', body='', params=params)
+        self.assertNotEqual(0, exception.excess)
 
     def test_do_request_request_ids(self):
         self.mox.StubOutWithMock(self.client.httpclient, "request")
