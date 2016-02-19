@@ -188,6 +188,10 @@ class CreateSubnet(neutronV20.CreateCommand):
             help=_('ID or name of subnetpool from which this subnet '
                    'will obtain a CIDR.'))
         parser.add_argument(
+            '--use-default-subnetpool',
+            action='store_true',
+            help=_('Use default subnetpool for ip_version, if it exists.'))
+        parser.add_argument(
             '--prefixlen', metavar='PREFIX_LENGTH',
             help=_('Prefix length for subnet allocation from subnetpool.'))
 
@@ -199,6 +203,8 @@ class CreateSubnet(neutronV20.CreateCommand):
         if parsed_args.prefixlen:
             body['prefixlen'] = parsed_args.prefixlen
         ip_version = parsed_args.ip_version
+        if parsed_args.use_default_subnetpool:
+            body['use_default_subnetpool'] = True
         if parsed_args.subnetpool:
             if parsed_args.subnetpool == 'None':
                 _subnetpool_id = None
