@@ -630,7 +630,7 @@ class ListCommand(NeutronCommand, lister.Lister):
             'boolean': False,
         },
         'admin_state_up': {
-            'help': _('Filter and list the %s whose adminstrative '
+            'help': _('Filter and list the %s whose administrative '
                       'state is active'),
             'boolean': True,
         },
