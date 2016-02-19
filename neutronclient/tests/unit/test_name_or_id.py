@@ -144,7 +144,7 @@ class CLITestNameorID(testtools.TestCase):
         try:
             neutronV20.find_resourceid_by_name_or_id(
                 self.client, 'network', name)
-        except exceptions.NeutronClientException as ex:
+        except exceptions.NotFound as ex:
             self.assertIn('Unable to find', ex.message)
             self.assertEqual(404, ex.status_code)
 
@@ -193,6 +193,6 @@ class CLITestNameorID(testtools.TestCase):
         try:
             neutronV20.find_resourceid_by_name_or_id(
                 self.client, 'security_group', name, project)
-        except exceptions.NeutronClientException as ex:
+        except exceptions.NotFound as ex:
             self.assertIn('Unable to find', ex.message)
             self.assertEqual(404, ex.status_code)

@@ -69,9 +69,8 @@ def find_resource_by_id(client, resource, resource_id, cmd_resource=None,
     not_found_message = (_("Unable to find %(resource)s with id "
                            "'%(id)s'") %
                          {'resource': resource, 'id': resource_id})
-    # 404 is used to simulate server side behavior
-    raise exceptions.NeutronClientException(
-        message=not_found_message, status_code=404)
+    # 404 is raised by exceptions.NotFound to simulate serverside behavior
+    raise exceptions.NotFound(message=not_found_message)
 
 
 def find_resourceid_by_id(client, resource, resource_id, cmd_resource=None,
@@ -106,9 +105,8 @@ def _find_resource_by_name(client, resource, name, project_id=None,
         not_found_message = (_("Unable to find %(resource)s with name "
                                "'%(name)s'") %
                              {'resource': resource, 'name': name})
-        # 404 is used to simulate server side behavior
-        raise exceptions.NeutronClientException(
-            message=not_found_message, status_code=404)
+        # 404 is raised by exceptions.NotFound to simulate serverside behavior
+        raise exceptions.NotFound(message=not_found_message)
     else:
         return info[0]
 
@@ -119,7 +117,7 @@ def find_resource_by_name_or_id(client, resource, name_or_id,
     try:
         return find_resource_by_id(client, resource, name_or_id,
                                    cmd_resource, parent_id, fields)
-    except exceptions.NeutronClientException:
+    except exceptions.NotFound:
         return _find_resource_by_name(client, resource, name_or_id,
                                       project_id, cmd_resource, parent_id,
                                       fields)
