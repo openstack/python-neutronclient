@@ -163,6 +163,19 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_network_with_dns_domain(self):
+        # Create net: --dns-domain my-domain.org.
+        resource = 'network'
+        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        dns_domain_name = 'my-domain.org.'
+        args = [name, '--dns-domain', dns_domain_name]
+        position_names = ['name', 'dns_domain']
+        position_values = [name, dns_domain_name]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_list_nets_empty_with_column(self):
         resources = "networks"
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
@@ -527,6 +540,22 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--no-qos-policy'],
                                    {'qos_policy_id': None, })
+
+    def test_update_network_with_dns_domain(self):
+        # Update net: myid --dns-domain my-domain.org.
+        resource = 'network'
+        cmd = network.UpdateNetwork(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--dns-domain', 'my-domain.org.'],
+                                   {'dns_domain': 'my-domain.org.', })
+
+    def test_update_network_with_no_dns_domain(self):
+        # Update net: myid --no-dns-domain
+        resource = 'network'
+        cmd = network.UpdateNetwork(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--no-dns-domain'],
+                                   {'dns_domain': "", })
 
     def test_show_network(self):
         # Show net: --fields id --fields name myid.

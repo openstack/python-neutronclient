@@ -117,6 +117,21 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_floatingip_with_dns_name_and_dns_domain(self):
+        # Create floatingip: fip1 with dns name and dns domain.
+        resource = 'floatingip'
+        cmd = fip.CreateFloatingIP(test_cli20.MyApp(sys.stdout), None)
+        name = 'fip1'
+        myid = 'myid'
+        dns_name_name = 'my-floatingip'
+        dns_domain_name = 'my-domain.org.'
+        args = [name, '--dns-name', dns_name_name, '--dns-domain',
+                dns_domain_name]
+        position_names = ['floating_network_id', 'dns_name', 'dns_domain']
+        position_values = [name, dns_name_name, dns_domain_name]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_list_floatingips(self):
         # list floatingips: -D.
         resources = 'floatingips'
