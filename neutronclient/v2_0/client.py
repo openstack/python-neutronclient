@@ -185,7 +185,7 @@ class ClientBase(object):
         # Add format and tenant_id
         action += ".%s" % self.format
         action = self.action_prefix + action
-        if type(params) is dict and params:
+        if isinstance(params, dict) and params:
             params = utils.safe_encode_dict(params)
             action += '?' + urlparse.urlencode(params, doseq=1)
 
@@ -216,7 +216,7 @@ class ClientBase(object):
         """
         if data is None:
             return None
-        elif type(data) is dict:
+        elif isinstance(data, dict):
             return serializer.Serializer().serialize(data)
         else:
             raise Exception(_("Unable to serialize object of type = '%s'") %
