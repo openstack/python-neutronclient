@@ -202,9 +202,9 @@ def _process_previous_argument(current_arg, _value_number, current_type_str,
                                values_specs):
     if current_arg is not None:
         if _value_number == 0 and (current_type_str or _list_flag):
-                # This kind of argument should have value
-                raise exceptions.CommandError(
-                    _("Invalid values_specs %s") % ' '.join(values_specs))
+            # This kind of argument should have value
+            raise exceptions.CommandError(
+                _("Invalid values_specs %s") % ' '.join(values_specs))
         if _value_number > 1 or _list_flag or current_type_str == 'list':
             current_arg.update({'nargs': '+'})
         elif _value_number == 0:

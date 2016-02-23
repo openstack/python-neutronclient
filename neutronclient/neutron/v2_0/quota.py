@@ -89,7 +89,7 @@ class ListQuota(neutronV20.NeutronCommand, lister.Lister):
             info = data[collection]
         _columns = len(info) > 0 and sorted(info[0].keys()) or []
         return (_columns, (utils.get_item_properties(s, _columns)
-                for s in info))
+                           for s in info))
 
 
 class ShowQuota(neutronV20.NeutronCommand, show.ShowOne):
