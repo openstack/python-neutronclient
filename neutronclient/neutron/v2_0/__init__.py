@@ -476,8 +476,9 @@ class CreateCommand(NeutronCommand, show.ShowOne):
         self.format_output_data(data)
         info = self.resource in data and data[self.resource] or None
         if info:
-            print(_('Created a new %s:') % self.resource,
-                  file=self.app.stdout)
+            if parsed_args.formatter == 'table':
+                print(_('Created a new %s:') % self.resource,
+                      file=self.app.stdout)
         else:
             info = {'': ''}
         return zip(*sorted(six.iteritems(info)))
