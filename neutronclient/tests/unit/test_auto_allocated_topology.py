@@ -39,3 +39,17 @@ class TestAutoAllocatedTopologyJSON(test_cli20.CLITestV20Base):
         cmd = aat.ShowAutoAllocatedTopology(test_cli20.MyApp(sys.stdout), None)
         args = []
         self._test_show_resource(resource, cmd, "None", args)
+
+    def test_show_auto_allocated_topology_dry_run_as_tenant(self):
+        resource = 'auto_allocated_topology'
+        cmd = aat.ShowAutoAllocatedTopology(test_cli20.MyApp(sys.stdout), None)
+        args = ['--dry-run']
+        self._test_show_resource(resource, cmd, "None", args,
+                                 fields=('dry-run',))
+
+    def test_show_auto_allocated_topology_dry_run_as_admin(self):
+        resource = 'auto_allocated_topology'
+        cmd = aat.ShowAutoAllocatedTopology(test_cli20.MyApp(sys.stdout), None)
+        args = ['--dry-run', 'some-tenant']
+        self._test_show_resource(resource, cmd, "some-tenant", args,
+                                 fields=('dry-run',))
