@@ -22,6 +22,7 @@ from neutronclient._i18n import _
 from neutronclient.common import exceptions
 from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
+from neutronclient.neutron.v2_0 import dns
 from neutronclient.neutron.v2_0.qos import policy as qos_policy
 
 
@@ -263,6 +264,7 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
         parser.add_argument(
             'network_id', metavar='NETWORK',
             help=_('Network ID or name this port belongs to.'))
+        dns.add_dns_argument_create(parser, self.resource, 'name')
 
     def args2body(self, parsed_args):
         client = self.get_client()
@@ -283,6 +285,7 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
         self.args2body_extradhcpopt(parsed_args, body)
         self.args2body_qos_policy(parsed_args, body)
         self.args2body_allowedaddresspairs(parsed_args, body)
+        dns.args2body_dns_create(parsed_args, body, 'name')
 
         return {'port': body}
 
@@ -314,6 +317,7 @@ class UpdatePort(neutronV20.UpdateCommand, UpdatePortSecGroupMixin,
         self.add_arguments_extradhcpopt(parser)
         self.add_arguments_qos_policy(parser)
         self.add_arguments_allowedaddresspairs(parser)
+        dns.add_dns_argument_update(parser, self.resource, 'name')
 
     def args2body(self, parsed_args):
         body = {}
@@ -326,5 +330,6 @@ class UpdatePort(neutronV20.UpdateCommand, UpdatePortSecGroupMixin,
         self.args2body_extradhcpopt(parsed_args, body)
         self.args2body_qos_policy(parsed_args, body)
         self.args2body_allowedaddresspairs(parsed_args, body)
+        dns.args2body_dns_update(parsed_args, body, 'name')
 
         return {'port': body}
