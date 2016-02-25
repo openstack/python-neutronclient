@@ -69,8 +69,6 @@ from neutronclient.neutron.v2_0.lb import vip as lb_vip
 from neutronclient.neutron.v2_0 import metering
 from neutronclient.neutron.v2_0 import network
 from neutronclient.neutron.v2_0 import network_ip_availability
-from neutronclient.neutron.v2_0.nsx import networkgateway
-from neutronclient.neutron.v2_0.nsx import qos_queue
 from neutronclient.neutron.v2_0 import port
 from neutronclient.neutron.v2_0 import purge
 from neutronclient.neutron.v2_0.qos import bandwidth_limit_rule
@@ -274,26 +272,10 @@ COMMAND_V2 = {
     'lb-healthmonitor-disassociate': (
         lb_healthmonitor.DisassociateHealthMonitor
     ),
-    'queue-create': qos_queue.CreateQoSQueue,
-    'queue-delete': qos_queue.DeleteQoSQueue,
-    'queue-show': qos_queue.ShowQoSQueue,
-    'queue-list': qos_queue.ListQoSQueue,
     'agent-list': agent.ListAgent,
     'agent-show': agent.ShowAgent,
     'agent-delete': agent.DeleteAgent,
     'agent-update': agent.UpdateAgent,
-    'net-gateway-create': networkgateway.CreateNetworkGateway,
-    'net-gateway-update': networkgateway.UpdateNetworkGateway,
-    'net-gateway-delete': networkgateway.DeleteNetworkGateway,
-    'net-gateway-show': networkgateway.ShowNetworkGateway,
-    'net-gateway-list': networkgateway.ListNetworkGateway,
-    'net-gateway-connect': networkgateway.ConnectNetworkGateway,
-    'net-gateway-disconnect': networkgateway.DisconnectNetworkGateway,
-    'gateway-device-create': networkgateway.CreateGatewayDevice,
-    'gateway-device-update': networkgateway.UpdateGatewayDevice,
-    'gateway-device-delete': networkgateway.DeleteGatewayDevice,
-    'gateway-device-show': networkgateway.ShowGatewayDevice,
-    'gateway-device-list': networkgateway.ListGatewayDevice,
     'dhcp-agent-network-add': agentscheduler.AddNetworkToDhcpAgent,
     'dhcp-agent-network-remove': agentscheduler.RemoveNetworkFromDhcpAgent,
     'net-list-on-dhcp-agent': agentscheduler.ListNetworksOnDhcpAgent,

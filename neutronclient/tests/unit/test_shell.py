@@ -135,9 +135,7 @@ class ShellTest(testtools.TestCase):
         # just check we have some output
         required = [
             '.*--tenant_id',
-            '.*--client-certificate',
             '.*help',
-            '.*gateway-device-create',
             '.*--dns-nameserver']
         help_text, stderr = self.shell('neutron bash-completion')
         self.assertFalse(stderr)
