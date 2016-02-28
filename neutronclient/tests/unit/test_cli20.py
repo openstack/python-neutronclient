@@ -713,6 +713,8 @@ class CLITestV20ExceptionHandler(CLITestV20Base):
                               client.exception_handler_v20,
                               status_code, error_content)
         self.assertEqual(status_code, e.status_code)
+        self.assertEqual(expected_exception.__name__,
+                         e.__class__.__name__)
 
         if expected_msg is None:
             if error_detail:
@@ -780,32 +782,36 @@ class CLITestV20ExceptionHandler(CLITestV20Base):
             'UnknownError', error_msg, error_detail)
 
     def test_exception_handler_v20_bad_neutron_error(self):
-        error_content = {'NeutronError': {'unknown_key': 'UNKNOWN'}}
-        self._test_exception_handler_v20(
-            exceptions.NeutronClientException, 500,
-            expected_msg={'unknown_key': 'UNKNOWN'},
-            error_content=error_content)
+        for status_code, client_exc in exceptions.HTTP_EXCEPTION_MAP.items():
+            error_content = {'NeutronError': {'unknown_key': 'UNKNOWN'}}
+            self._test_exception_handler_v20(
+                client_exc, status_code,
+                expected_msg="{'unknown_key': 'UNKNOWN'}",
+                error_content=error_content)
 
     def test_exception_handler_v20_error_dict_contains_message(self):
         error_content = {'message': 'This is an error message'}
-        self._test_exception_handler_v20(
-            exceptions.NeutronClientException, 500,
-            expected_msg='This is an error message',
-            error_content=error_content)
+        for status_code, client_exc in exceptions.HTTP_EXCEPTION_MAP.items():
+            self._test_exception_handler_v20(
+                client_exc, status_code,
+                expected_msg='This is an error message',
+                error_content=error_content)
 
     def test_exception_handler_v20_error_dict_not_contain_message(self):
+        # 599 is not contained in HTTP_EXCEPTION_MAP.
         error_content = {'error': 'This is an error message'}
-        expected_msg = '%s-%s' % (500, error_content)
+        expected_msg = '%s-%s' % (599, error_content)
         self._test_exception_handler_v20(
-            exceptions.NeutronClientException, 500,
+            exceptions.NeutronClientException, 599,
             expected_msg=expected_msg,
             error_content=error_content)
 
     def test_exception_handler_v20_default_fallback(self):
+        # 599 is not contained in HTTP_EXCEPTION_MAP.
         error_content = 'This is an error message'
-        expected_msg = '%s-%s' % (500, error_content)
+        expected_msg = '%s-%s' % (599, error_content)
         self._test_exception_handler_v20(
-            exceptions.NeutronClientException, 500,
+            exceptions.NeutronClientException, 599,
             expected_msg=expected_msg,
             error_content=error_content)
 
