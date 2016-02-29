@@ -45,6 +45,9 @@ from neutronclient.neutron.v2_0 import agent
 from neutronclient.neutron.v2_0 import agentscheduler
 from neutronclient.neutron.v2_0 import auto_allocated_topology
 from neutronclient.neutron.v2_0 import availability_zone
+from neutronclient.neutron.v2_0.bgp import dragentscheduler as bgp_drsched
+from neutronclient.neutron.v2_0.bgp import peer as bgp_peer
+from neutronclient.neutron.v2_0.bgp import speaker as bgp_speaker
 from neutronclient.neutron.v2_0 import extension
 from neutronclient.neutron.v2_0.flavor import flavor
 from neutronclient.neutron.v2_0.flavor import flavor_profile
@@ -395,6 +398,35 @@ COMMAND_V2 = {
     'availability-zone-list': availability_zone.ListAvailabilityZone,
     'auto-allocated-topology-show': (
         auto_allocated_topology.ShowAutoAllocatedTopology),
+    'bgp-dragent-speaker-add': (
+        bgp_drsched.AddBGPSpeakerToDRAgent
+    ),
+    'bgp-dragent-speaker-remove': (
+        bgp_drsched.RemoveBGPSpeakerFromDRAgent
+    ),
+    'bgp-speaker-list-on-dragent': (
+        bgp_drsched.ListBGPSpeakersOnDRAgent
+    ),
+    'bgp-dragent-list-hosting-speaker': (
+        bgp_drsched.ListDRAgentsHostingBGPSpeaker
+    ),
+    'bgp-speaker-list': bgp_speaker.ListSpeakers,
+    'bgp-speaker-advertiseroute-list': (
+        bgp_speaker.ListRoutesAdvertisedBySpeaker
+    ),
+    'bgp-speaker-show': bgp_speaker.ShowSpeaker,
+    'bgp-speaker-create': bgp_speaker.CreateSpeaker,
+    'bgp-speaker-update': bgp_speaker.UpdateSpeaker,
+    'bgp-speaker-delete': bgp_speaker.DeleteSpeaker,
+    'bgp-speaker-peer-add': bgp_speaker.AddPeerToSpeaker,
+    'bgp-speaker-peer-remove': bgp_speaker.RemovePeerFromSpeaker,
+    'bgp-speaker-network-add': bgp_speaker.AddNetworkToSpeaker,
+    'bgp-speaker-network-remove': bgp_speaker.RemoveNetworkFromSpeaker,
+    'bgp-peer-list': bgp_peer.ListPeers,
+    'bgp-peer-show': bgp_peer.ShowPeer,
+    'bgp-peer-create': bgp_peer.CreatePeer,
+    'bgp-peer-update': bgp_peer.UpdatePeer,
+    'bgp-peer-delete': bgp_peer.DeletePeer,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}
