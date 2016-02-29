@@ -64,6 +64,8 @@ class CreatePool(neutronV20.CreateCommand):
         parser.add_argument(
             '--session-persistence',
             metavar='type=TYPE[,cookie_name=COOKIE_NAME]',
+            type=utils.str2dict_type(required_keys=['type'],
+                                     optional_keys=['cookie_name']),
             help=_('The type of session persistence to use and associated '
                    'cookie name'))
         parser.add_argument(
@@ -86,9 +88,6 @@ class CreatePool(neutronV20.CreateCommand):
             help=_('Protocol for balancing.'))
 
     def args2body(self, parsed_args):
-        if parsed_args.session_persistence:
-            parsed_args.session_persistence = utils.str2dict(
-                parsed_args.session_persistence)
         _listener_id = neutronV20.find_resourceid_by_name_or_id(
             self.get_client(), 'listener', parsed_args.listener)
         body = {'admin_state_up': parsed_args.admin_state,

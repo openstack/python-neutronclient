@@ -47,6 +47,7 @@ def _add_updatable_args(parser):
     parser.add_argument(
         '--fixed-ip', metavar='subnet_id=SUBNET,ip_address=IP_ADDR',
         action='append',
+        type=utils.str2dict_type(optional_keys=['subnet_id', 'ip_address']),
         help=_('Desired IP and/or subnet for this port: '
                'subnet_id=<name_or_id>,ip_address=<ip>. '
                'You can repeat this option.'))
@@ -74,13 +75,12 @@ def _updatable_args2body(parsed_args, body, client):
     ips = []
     if parsed_args.fixed_ip:
         for ip_spec in parsed_args.fixed_ip:
-            ip_dict = utils.str2dict(ip_spec)
-            if 'subnet_id' in ip_dict:
-                subnet_name_id = ip_dict['subnet_id']
+            if 'subnet_id' in ip_spec:
+                subnet_name_id = ip_spec['subnet_id']
                 _subnet_id = neutronV20.find_resourceid_by_name_or_id(
                     client, 'subnet', subnet_name_id)
-                ip_dict['subnet_id'] = _subnet_id
-            ips.append(ip_dict)
+                ip_spec['subnet_id'] = _subnet_id
+            ips.append(ip_spec)
     if ips:
         body['fixed_ips'] = ips
 
@@ -159,6 +159,9 @@ class UpdateExtraDhcpOptMixin(object):
             default=[],
             action='append',
             dest='extra_dhcp_opts',
+            type=utils.str2dict_type(
+                required_keys=['opt_name'],
+                optional_keys=['opt_value', 'ip_version']),
             help=_('Extra dhcp options to be assigned to this port: '
                    'opt_name=<dhcp_option_name>,opt_value=<value>,'
                    'ip_version={4,6}. You can repeat this option.'))
@@ -175,7 +178,7 @@ class UpdateExtraDhcpOptMixin(object):
                             "ip_version={4,6}. "
                             "You can repeat this option.")
             for opt in parsed_args.extra_dhcp_opts:
-                opt_ele.update(utils.str2dict(opt))
+                opt_ele.update(opt)
                 if ('opt_name' in opt_ele and
                         ('opt_value' in opt_ele or 'ip_version' in opt_ele)):
                     if opt_ele.get('opt_value') == 'null':
@@ -200,7 +203,9 @@ class UpdatePortAllowedAddressPair(object):
             default=[],
             action='append',
             dest='allowed_address_pairs',
-            type=utils.str2dict,
+            type=utils.str2dict_type(
+                required_keys=['ip_address'],
+                optional_keys=['mac_address']),
             help=_('Allowed address pair associated with the port.'
                    'You can repeat this option.'))
         group_aap.add_argument(

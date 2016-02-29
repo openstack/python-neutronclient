@@ -18,6 +18,7 @@
 """Utilities and helper functions."""
 
 import argparse
+import functools
 import logging
 import netaddr
 import os
@@ -108,10 +109,21 @@ def str2bool(strbool):
     return strbool.lower() == 'true'
 
 
-def str2dict(strdict):
+def str2dict(strdict, required_keys=None, optional_keys=None):
     """Convert key1=value1,key2=value2,... string into dictionary.
 
-    :param strdict: key1=value1,key2=value2
+    :param strdict: string in the form of key1=value1,key2=value2
+    :param required_keys: list of required keys. All keys in this list must be
+                       specified. Otherwise ArgumentTypeError will be raised.
+                       If this parameter is unspecified, no required key check
+                       will be done.
+    :param optional_keys: list of optional keys.
+                       This parameter is used for valid key check.
+                       When at least one of required_keys and optional_keys,
+                       a key must be a member of either of required_keys or
+                       optional_keys. Otherwise, ArgumentTypeError will be
+                       raised. When both required_keys and optional_keys are
+                       unspecified, no valid key check will be done.
     """
     result = {}
     if strdict:
@@ -121,7 +133,27 @@ def str2dict(strdict):
                 msg = _("invalid key-value '%s', expected format: key=value")
                 raise argparse.ArgumentTypeError(msg % kv)
             result[key] = value
+    valid_keys = set(required_keys or []) | set(optional_keys or [])
+    if valid_keys:
+        invalid_keys = [k for k in result if k not in valid_keys]
+        if invalid_keys:
+            msg = _("Invalid key(s) '%(invalid_keys)s' specified. "
+                    "Valid key(s): '%(valid_keys)s'.")
+            raise argparse.ArgumentTypeError(
+                msg % {'invalid_keys': ', '.join(sorted(invalid_keys)),
+                       'valid_keys': ', '.join(sorted(valid_keys))})
+    if required_keys:
+        not_found_keys = [k for k in required_keys if k not in result]
+        if not_found_keys:
+            msg = _("Required key(s) '%s' not specified.")
+            raise argparse.ArgumentTypeError(msg % ', '.join(not_found_keys))
     return result
+
+
+def str2dict_type(optional_keys=None, required_keys=None):
+    return functools.partial(str2dict,
+                             optional_keys=optional_keys,
+                             required_keys=required_keys)
 
 
 def http_log_req(_logger, args, kwargs):

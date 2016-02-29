@@ -62,16 +62,19 @@ def add_updatable_arguments(parser):
         help=_('No distribution of gateway.'))
     parser.add_argument(
         '--allocation-pool', metavar='start=IP_ADDR,end=IP_ADDR',
-        action='append', dest='allocation_pools', type=utils.str2dict,
+        action='append', dest='allocation_pools',
+        type=utils.str2dict_type(required_keys=['start', 'end']),
         help=_('Allocation pool IP addresses for this subnet '
                '(This option can be repeated).'))
     parser.add_argument(
         '--allocation_pool',
-        action='append', dest='allocation_pools', type=utils.str2dict,
+        action='append', dest='allocation_pools',
+        type=utils.str2dict_type(required_keys=['start', 'end']),
         help=argparse.SUPPRESS)
     parser.add_argument(
         '--host-route', metavar='destination=CIDR,nexthop=IP_ADDR',
-        action='append', dest='host_routes', type=utils.str2dict,
+        action='append', dest='host_routes',
+        type=utils.str2dict_type(required_keys=['destination', 'nexthop']),
         help=_('Additional route (This option can be repeated).'))
     parser.add_argument(
         '--dns-nameserver', metavar='DNS_NAMESERVER',

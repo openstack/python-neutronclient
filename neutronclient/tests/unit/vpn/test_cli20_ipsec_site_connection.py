@@ -180,7 +180,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, None, my_id, args,
                                    position_names, position_values)
 
-    def _test_create_failure(self, additional_args=None):
+    def _test_create_failure(self, additional_args=None, expected_exc=None):
         # Helper to test failure of IPSec site-to-site creation failure.
         resource = 'ipsec_site_connection'
         cmd = ipsec_site_connection.CreateIPsecSiteConnection(
@@ -215,7 +215,9 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
         position_values = [tenant_id, admin_state, peer_address, peer_id, psk,
                            mtu, initiator, None, None, vpnservice_id,
                            ikepolicy_id, ipsecpolicy_id]
-        self.assertRaises(exceptions.CommandError,
+        if not expected_exc:
+            expected_exc = exceptions.CommandError
+        self.assertRaises(expected_exc,
                           self._test_create_resource,
                           resource, cmd, None, my_id, args,
                           position_names, position_values)
@@ -227,7 +229,7 @@ class CLITestV20IPsecSiteConnectionJSON(test_cli20.CLITestV20Base):
 
     def test_fail_create_with_invalid_dpd_keys(self):
         bad_dpd_key = ['--dpd', 'act=restart,interval=30,time=120']
-        self._test_create_failure(bad_dpd_key)
+        self._test_create_failure(bad_dpd_key, SystemExit)
 
     def test_fail_create_with_invalid_dpd_values(self):
         bad_dpd_values = ['--dpd', 'action=hold,interval=30,timeout=-1']
