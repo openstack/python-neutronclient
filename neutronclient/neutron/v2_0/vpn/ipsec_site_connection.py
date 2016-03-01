@@ -96,7 +96,7 @@ class IPsecSiteConnectionMixin(object):
         parser.add_argument(
             '--mtu',
             default='1500' if is_create else argparse.SUPPRESS,
-            help=_('MTU size for the connection, default:1500'))
+            help=_('MTU size for the connection, default:1500.'))
         parser.add_argument(
             '--initiator',
             default='bi-directional' if is_create else argparse.SUPPRESS,

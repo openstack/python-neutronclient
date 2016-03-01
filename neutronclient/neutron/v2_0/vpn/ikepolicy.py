@@ -28,27 +28,31 @@ def add_common_args(parser, is_create=True):
         help=_('Description of the IKE policy.'))
     parser.add_argument(
         '--auth-algorithm',
+        type=utils.convert_to_lowercase,
         default='sha1' if is_create else argparse.SUPPRESS,
-        help=_('Authentication algorithm in lowercase. '
-               'Default:sha1'))
+        help=_('Authentication algorithm, default:sha1.'))
     parser.add_argument(
         '--encryption-algorithm',
         default='aes-128' if is_create else argparse.SUPPRESS,
-        help=_('Encryption algorithm in lowercase, default:aes-128'))
+        type=utils.convert_to_lowercase,
+        help=_('Encryption algorithm, default:aes-128.'))
     parser.add_argument(
         '--phase1-negotiation-mode',
         default='main' if is_create else argparse.SUPPRESS,
         choices=['main'],
-        help=_('IKE Phase1 negotiation mode in lowercase, default:main'))
+        type=utils.convert_to_lowercase,
+        help=_('IKE Phase1 negotiation mode, default:main.'))
     parser.add_argument(
         '--ike-version',
         default='v1' if is_create else argparse.SUPPRESS,
         choices=['v1', 'v2'],
-        help=_('IKE version in lowercase, default:v1'))
+        type=utils.convert_to_lowercase,
+        help=_('IKE version for the policy, default:v1.'))
     parser.add_argument(
         '--pfs',
         default='group5' if is_create else argparse.SUPPRESS,
-        help=_('Perfect Forward Secrecy in lowercase, default:group5'))
+        type=utils.convert_to_lowercase,
+        help=_('Perfect Forward Secrecy, default:group5.'))
     parser.add_argument(
         '--lifetime',
         metavar="units=UNITS,value=VALUE",
@@ -109,7 +113,7 @@ class UpdateIKEPolicy(neutronv20.UpdateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             '--name',
-            help=_('Updated Name of the IKE policy.'))
+            help=_('Updated name of the IKE policy.'))
         add_common_args(parser, is_create=False)
 
     def args2body(self, parsed_args):
