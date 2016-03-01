@@ -1,0 +1,16 @@
+---
+features:
+  - |
+    CLI support for tag.
+
+    * The ``tag-add`` command sets a tag on the network resource. It also
+      includes ``--resource-type``, ``--resource`` and ``--tag`` options.
+    * The ``tag-replace`` command replaces tags on the network resource. It
+      also includes ``--resource-type``, ``--resource`` and ``--tag``
+      options. More than one ``--tag`` options can be set.
+    * The ``tag-remove`` command removes tags on the network resource. It also
+      includes ``--resource-type``, ``--resource``, ``--tag`` and ``--all``
+      options. The ``--all`` option allow to remove all tags on the network
+      resource.
+    * The ``net-list`` command includes ``--tags``, ``--tags-any``,
+      ``--not-tags`` and ``--not-tags-any`` options.
