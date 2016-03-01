@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    CLI support for Layer 7 content policies and rules.
+
+    * L7 policies can be defined for listeners along
+      with the ability to set L7 policy order.
+    * Multiple rules can be created for an L7 policy.

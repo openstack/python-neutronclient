@@ -59,6 +59,8 @@ from neutronclient.neutron.v2_0.lb import healthmonitor as lb_healthmonitor
 from neutronclient.neutron.v2_0.lb import member as lb_member
 from neutronclient.neutron.v2_0.lb import pool as lb_pool
 from neutronclient.neutron.v2_0.lb.v2 import healthmonitor as lbaas_healthmon
+from neutronclient.neutron.v2_0.lb.v2 import l7policy as lbaas_l7policy
+from neutronclient.neutron.v2_0.lb.v2 import l7rule as lbaas_l7rule
 from neutronclient.neutron.v2_0.lb.v2 import listener as lbaas_listener
 from neutronclient.neutron.v2_0.lb.v2 import loadbalancer as lbaas_loadbalancer
 from neutronclient.neutron.v2_0.lb.v2 import member as lbaas_member
@@ -217,6 +219,16 @@ COMMAND_V2 = {
     'lbaas-listener-create': lbaas_listener.CreateListener,
     'lbaas-listener-update': lbaas_listener.UpdateListener,
     'lbaas-listener-delete': lbaas_listener.DeleteListener,
+    'lbaas-l7policy-list': lbaas_l7policy.ListL7Policy,
+    'lbaas-l7policy-show': lbaas_l7policy.ShowL7Policy,
+    'lbaas-l7policy-create': lbaas_l7policy.CreateL7Policy,
+    'lbaas-l7policy-update': lbaas_l7policy.UpdateL7Policy,
+    'lbaas-l7policy-delete': lbaas_l7policy.DeleteL7Policy,
+    'lbaas-l7rule-list': lbaas_l7rule.ListL7Rule,
+    'lbaas-l7rule-show': lbaas_l7rule.ShowL7Rule,
+    'lbaas-l7rule-create': lbaas_l7rule.CreateL7Rule,
+    'lbaas-l7rule-update': lbaas_l7rule.UpdateL7Rule,
+    'lbaas-l7rule-delete': lbaas_l7rule.DeleteL7Rule,
     'lbaas-pool-list': lbaas_pool.ListPool,
     'lbaas-pool-show': lbaas_pool.ShowPool,
     'lbaas-pool-create': lbaas_pool.CreatePool,
