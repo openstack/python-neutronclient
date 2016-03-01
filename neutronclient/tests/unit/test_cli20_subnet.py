@@ -290,6 +290,25 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values,
                                    tenant_id='tenantid')
 
+    def test_create_subnet_with_use_default_subnetpool(self):
+        # Create subnet: --tenant-id tenantid --use-default-subnetpool \
+        #     netid cidr.
+        resource = 'subnet'
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = 'prefixvalue'
+        args = ['--tenant_id', 'tenantid',
+                '--use-default-subnetpool',
+                netid, cidr]
+        position_names = ['ip_version', 'use_default_subnetpool', 'network_id',
+                          'cidr']
+        position_values = [4, True, netid, cidr]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   tenant_id='tenantid')
+
     def test_create_subnet_with_disable_dhcp(self):
         # Create subnet: --tenant-id tenantid --disable-dhcp netid cidr.
         resource = 'subnet'
