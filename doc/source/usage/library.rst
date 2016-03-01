@@ -59,3 +59,13 @@ and a service endpoint URL directly.
     >>> from neutronclient.v2_0 import client
     >>> neutron = client.Client(endpoint_url='http://192.168.206.130:9696/',
     ...                         token='d3f9226f27774f338019aa2611112ef6')
+
+You can get ``X-Openstack-Request-Id`` as ``request_ids`` from the result.
+
+.. code-block:: python
+
+    >>> network = {'name': 'mynetwork', 'admin_state_up': True}
+    >>> neutron.create_network({'network':network})
+    >>> networks = neutron.list_networks(name='mynetwork')
+    >>> print networks.request_ids
+    ['req-978a0160-7ab0-44f0-8a93-08e9a4e785fa']

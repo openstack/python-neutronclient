@@ -22,6 +22,7 @@ import time
 
 import requests
 import six.moves.urllib.parse as urlparse
+from six import string_types
 
 from neutronclient._i18n import _
 from neutronclient import client
@@ -44,6 +45,7 @@ def exception_handler_v20(status_code, error_content):
     :param error_content: deserialized body of error response
     """
     error_dict = None
+    request_ids = error_content.request_ids
     if isinstance(error_content, dict):
         error_dict = error_content.get('NeutronError')
     # Find real error type
@@ -78,7 +80,8 @@ def exception_handler_v20(status_code, error_content):
         client_exc = exceptions.NeutronClientException
 
     raise client_exc(message=error_message,
-                     status_code=status_code)
+                     status_code=status_code,
+                     request_ids=request_ids)
 
 
 class APIParamsCall(object):
@@ -95,6 +98,99 @@ class APIParamsCall(object):
             instance.format = _format
             return ret
         return with_params
+
+
+class _RequestIdMixin(object):
+    """Wrapper class to expose x-openstack-request-id to the caller."""
+    def _request_ids_setup(self):
+        self._request_ids = []
+
+    @property
+    def request_ids(self):
+        return self._request_ids
+
+    def _append_request_ids(self, resp):
+        """Add request_ids as an attribute to the object
+
+        :param resp: Response object or list of Response objects
+        """
+        if isinstance(resp, list):
+            # Add list of request_ids if response is of type list.
+            for resp_obj in resp:
+                self._append_request_id(resp_obj)
+        elif resp is not None:
+            # Add request_ids if response contains single object.
+            self._append_request_id(resp)
+
+    def _append_request_id(self, resp):
+        if isinstance(resp, requests.Response):
+            # Extract 'x-openstack-request-id' from headers if
+            # response is a Response object.
+            request_id = resp.headers.get('x-openstack-request-id')
+        else:
+            # If resp is of type string.
+            request_id = resp
+        if request_id:
+            self._request_ids.append(request_id)
+
+
+class _DictWithMeta(dict, _RequestIdMixin):
+    def __init__(self, values, resp):
+        super(_DictWithMeta, self).__init__(values)
+        self._request_ids_setup()
+        self._append_request_ids(resp)
+
+
+class _TupleWithMeta(tuple, _RequestIdMixin):
+    def __new__(cls, values, resp):
+        return super(_TupleWithMeta, cls).__new__(cls, values)
+
+    def __init__(self, values, resp):
+        self._request_ids_setup()
+        self._append_request_ids(resp)
+
+
+class _StrWithMeta(str, _RequestIdMixin):
+    def __new__(cls, value, resp):
+        return super(_StrWithMeta, cls).__new__(cls, value)
+
+    def __init__(self, values, resp):
+        self._request_ids_setup()
+        self._append_request_ids(resp)
+
+
+class _GeneratorWithMeta(_RequestIdMixin):
+    def __init__(self, paginate_func, collection, path, **params):
+        self.paginate_func = paginate_func
+        self.collection = collection
+        self.path = path
+        self.params = params
+        self.generator = None
+        self._request_ids_setup()
+
+    def _paginate(self):
+        for r in self.paginate_func(
+                self.collection, self.path, **self.params):
+            yield r, r.request_ids
+
+    def __iter__(self):
+        return self
+
+    # Python 3 compatibility
+    def __next__(self):
+        return self.next()
+
+    def next(self):
+        if not self.generator:
+            self.generator = self._paginate()
+
+        try:
+            obj, req_id = next(self.generator)
+            self._append_request_ids(req_id)
+        except StopIteration:
+            raise StopIteration()
+
+        return obj
 
 
 class ClientBase(object):
@@ -162,7 +258,7 @@ class ClientBase(object):
         self.action_prefix = "/v%s" % (self.version)
         self.retry_interval = 1
 
-    def _handle_fault_response(self, status_code, response_body):
+    def _handle_fault_response(self, status_code, response_body, resp):
         # Create exception with HTTP status code and message
         _logger.debug("Error message: %s", response_body)
         # Add deserialized error message to exception arguments
@@ -172,8 +268,9 @@ class ClientBase(object):
             # If unable to deserialized body it is probably not a
             # Neutron error
             des_error_body = {'message': response_body}
+        error_body = self._convert_into_with_meta(des_error_body, resp)
         # Raise the appropriate exception
-        exception_handler_v20(status_code, des_error_body)
+        exception_handler_v20(status_code, error_body)
 
     def do_request(self, method, action, body=None, headers=None, params=None):
         # Add format and tenant_id
@@ -193,11 +290,12 @@ class ClientBase(object):
                            requests.codes.created,
                            requests.codes.accepted,
                            requests.codes.no_content):
-            return self.deserialize(replybody, status_code)
+            data = self.deserialize(replybody, status_code)
+            return self._convert_into_with_meta(data, resp)
         else:
             if not replybody:
                 replybody = resp.reason
-            self._handle_fault_response(status_code, replybody)
+            self._handle_fault_response(status_code, replybody, resp)
 
     def get_auth_info(self):
         return self.httpclient.get_auth_info()
@@ -271,11 +369,14 @@ class ClientBase(object):
     def list(self, collection, path, retrieve_all=True, **params):
         if retrieve_all:
             res = []
+            request_ids = []
             for r in self._pagination(collection, path, **params):
                 res.extend(r[collection])
-            return {collection: res}
+                request_ids.extend(r.request_ids)
+            return _DictWithMeta({collection: res}, request_ids)
         else:
-            return self._pagination(collection, path, **params)
+            return _GeneratorWithMeta(self._pagination, collection,
+                                      path, **params)
 
     def _pagination(self, collection, path, **params):
         if params.get('page_reverse', False):
@@ -296,6 +397,15 @@ class ClientBase(object):
                         break
             except KeyError:
                 break
+
+    def _convert_into_with_meta(self, item, resp):
+        if item:
+            if isinstance(item, dict):
+                return _DictWithMeta(item, resp)
+            elif isinstance(item, string_types):
+                return _StrWithMeta(item, resp)
+        else:
+            return _TupleWithMeta((), resp)
 
 
 class Client(ClientBase):
