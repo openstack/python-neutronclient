@@ -60,6 +60,27 @@ class ListNetwork(neutronV20.ListCommand):
         {'name': 'router:external',
          'help': _('Filter and list the networks which are external.'),
          'boolean': True},
+        {'name': 'tags',
+         'help': _("Filter and list %s which has all given tags. "
+                   "Multiple tags can be set like --tags <tag[,tag...]>"),
+         'boolean': False,
+         'argparse_kwargs': {'metavar': 'TAG'}},
+        {'name': 'tags_any',
+         'help': _("Filter and list %s which has any given tags. "
+                   "Multiple tags can be set like --tags-any <tag[,tag...]>"),
+         'boolean': False,
+         'argparse_kwargs': {'metavar': 'TAG'}},
+        {'name': 'not_tags',
+         'help': _("Filter and list %s which does not have all given tags. "
+                   "Multiple tags can be set like --not-tags <tag[,tag...]>"),
+         'boolean': False,
+         'argparse_kwargs': {'metavar': 'TAG'}},
+        {'name': 'not_tags_any',
+         'help': _("Filter and list %s which does not have any given tags. "
+                   "Multiple tags can be set like --not-tags-any "
+                   "<tag[,tag...]>"),
+         'boolean': False,
+         'argparse_kwargs': {'metavar': 'TAG'}},
     ]
 
     def extend_list(self, data, parsed_args):

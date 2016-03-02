@@ -528,6 +528,8 @@ class Client(ClientBase):
     bgp_peer_path = "/bgp-peers/%s"
     network_ip_availabilities_path = '/network-ip-availabilities'
     network_ip_availability_path = '/network-ip-availabilities/%s'
+    tags_path = "/%s/%s/tags"
+    tag_path = "/%s/%s/tags/%s"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -2001,6 +2003,26 @@ class Client(ClientBase):
         """Fetches IP availability information for a specified network"""
         return self.get(self.network_ip_availability_path % (network),
                         params=_params)
+
+    @APIParamsCall
+    def add_tag(self, resource_type, resource_id, tag, **_params):
+        """Add a tag on the resource."""
+        return self.put(self.tag_path % (resource_type, resource_id, tag))
+
+    @APIParamsCall
+    def replace_tag(self, resource_type, resource_id, body, **_params):
+        """Replace tags on the resource."""
+        return self.put(self.tags_path % (resource_type, resource_id), body)
+
+    @APIParamsCall
+    def remove_tag(self, resource_type, resource_id, tag, **_params):
+        """Remove a tag on the resource."""
+        return self.delete(self.tag_path % (resource_type, resource_id, tag))
+
+    @APIParamsCall
+    def remove_tag_all(self, resource_type, resource_id, **_params):
+        """Remove all tags on the resource."""
+        return self.delete(self.tags_path % (resource_type, resource_id))
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""

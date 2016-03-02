@@ -83,6 +83,7 @@ from neutronclient.neutron.v2_0 import securitygroup
 from neutronclient.neutron.v2_0 import servicetype
 from neutronclient.neutron.v2_0 import subnet
 from neutronclient.neutron.v2_0 import subnetpool
+from neutronclient.neutron.v2_0 import tag
 from neutronclient.neutron.v2_0.vpn import endpoint_group
 from neutronclient.neutron.v2_0.vpn import ikepolicy
 from neutronclient.neutron.v2_0.vpn import ipsec_site_connection
@@ -444,6 +445,9 @@ COMMAND_V2 = {
     'bgp-peer-delete': bgp_peer.DeletePeer,
     'net-ip-availability-list': network_ip_availability.ListIpAvailability,
     'net-ip-availability-show': network_ip_availability.ShowIpAvailability,
+    'tag-add': tag.AddTag,
+    'tag-replace': tag.ReplaceTag,
+    'tag-remove': tag.RemoveTag,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}

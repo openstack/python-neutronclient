@@ -36,6 +36,7 @@ HEX_ELEM = '[0-9A-Fa-f]'
 UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
                          HEX_ELEM + '{4}', HEX_ELEM + '{4}',
                          HEX_ELEM + '{12}'])
+HYPHEN_OPTS = ['tags_any', 'not_tags', 'not_tags_any']
 
 
 def _get_resource_plural(resource, client):
@@ -691,6 +692,8 @@ class ListCommand(NeutronCommand, lister.Lister):
                         for field in self.filter_attrs]
         for attr in filter_attrs:
             val = getattr(parsed_args, attr, None)
+            if attr in HYPHEN_OPTS:
+                attr = attr.replace('_', '-')
             if val:
                 search_opts[attr] = val
         return search_opts
