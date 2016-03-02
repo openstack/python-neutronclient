@@ -161,7 +161,7 @@ class RouterInterfaceCommand(neutronV20.NeutronCommand):
                    'subnet.'))
         return parser
 
-    def run(self, parsed_args):
+    def take_action(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
 
@@ -236,7 +236,7 @@ class SetGatewayRouter(neutronV20.NeutronCommand):
                    'You can repeat this option.'))
         return parser
 
-    def run(self, parsed_args):
+    def take_action(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
         _router_id = neutronV20.find_resourceid_by_name_or_id(
@@ -273,7 +273,7 @@ class RemoveGatewayRouter(neutronV20.NeutronCommand):
             help=_('ID or name of the router.'))
         return parser
 
-    def run(self, parsed_args):
+    def take_action(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
         _router_id = neutronV20.find_resourceid_by_name_or_id(

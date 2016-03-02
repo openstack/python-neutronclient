@@ -118,7 +118,7 @@ class AssociateFlavor(neutronV20.NeutronCommand):
                    'flavor.'))
         return parser
 
-    def run(self, parsed_args):
+    def take_action(self, parsed_args):
         neutron_client = self.get_client()
         flavor_id = neutronV20.find_resourceid_by_name_or_id(
             neutron_client, 'flavor', parsed_args.flavor)
@@ -151,7 +151,7 @@ class DisassociateFlavor(neutronV20.NeutronCommand):
                    'flavor.'))
         return parser
 
-    def run(self, parsed_args):
+    def take_action(self, parsed_args):
         neutron_client = self.get_client()
         flavor_id = neutronV20.find_resourceid_by_name_or_id(
             neutron_client, 'flavor', parsed_args.flavor)

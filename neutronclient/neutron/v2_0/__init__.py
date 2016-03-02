@@ -398,12 +398,6 @@ class NeutronCommand(command.Command):
     shadow_resource = None
     parent_id = None
 
-    # TODO(amotoki): Remove take_action here. It should be an abstract method
-    # as cliff.command.Command does. To do this, we need to avoid overriding
-    # run() directly.
-    def take_action(self, parsed_args):
-        return self.get_data(parsed_args)
-
     @property
     def cmd_resource(self):
         if self.shadow_resource:
@@ -518,7 +512,7 @@ class UpdateCommand(NeutronCommand):
         self.add_known_arguments(parser)
         return parser
 
-    def run(self, parsed_args):
+    def take_action(self, parsed_args):
         self.log.debug('run(%s)', parsed_args)
         self.set_extra_attrs(parsed_args)
         neutron_client = self.get_client()
@@ -575,7 +569,7 @@ class DeleteCommand(NeutronCommand):
         self.add_known_arguments(parser)
         return parser
 
-    def run(self, parsed_args):
+    def take_action(self, parsed_args):
         self.log.debug('run(%s)', parsed_args)
         self.set_extra_attrs(parsed_args)
         neutron_client = self.get_client()

@@ -125,7 +125,7 @@ class Purge(neutronV20.NeutronCommand):
             help=_('ID of Tenant owning the resources to be deleted.'))
         return parser
 
-    def run(self, parsed_args):
+    def take_action(self, parsed_args):
         neutron_client = self.get_client()
 
         self.any_failures = False

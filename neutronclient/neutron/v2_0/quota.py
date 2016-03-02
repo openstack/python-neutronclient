@@ -52,7 +52,7 @@ class DeleteQuota(neutronV20.NeutronCommand):
             help=argparse.SUPPRESS, nargs='?')
         return parser
 
-    def run(self, parsed_args):
+    def take_action(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
         tenant_id = get_tenant_id(parsed_args, neutron_client)
