@@ -1,7 +1,0 @@
----
-features:
-  - |
-    CLI support for token-endpoint authentication.
-
-    * Allows for authentication via ``--os-token`` and ``--os-url`` options
-      or the ``OS_TOKEN`` and ``OS_URL`` environment variables, respectively

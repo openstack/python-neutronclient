@@ -1,0 +1,6 @@
+---
+fixes:
+  - Fix `bug 1450414 <https://bugs.launchpad.net/python-neutronclient/+bug/1450414>`_
+    that authentication with via ``--os-token`` and ``--os-url`` options
+    (or corresponding environment variables) does not work
+    after keystone v3 API support.
