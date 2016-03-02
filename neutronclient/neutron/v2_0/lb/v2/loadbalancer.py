@@ -102,7 +102,6 @@ class RetrieveLoadBalancerStats(neutronV20.ShowCommand):
     resource = 'loadbalancer'
 
     def take_action(self, parsed_args):
-        self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
         neutron_client.format = parsed_args.request_format
         loadbalancer_id = neutronV20.find_resourceid_by_name_or_id(

@@ -235,7 +235,6 @@ class ConnectNetworkGateway(NetworkGatewayInterfaceCommand):
     """Add an internal network interface to a router."""
 
     def take_action(self, parsed_args):
-        self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
         (gateway_id, network_id) = self.retrieve_ids(neutron_client,
                                                      parsed_args)
@@ -253,7 +252,6 @@ class DisconnectNetworkGateway(NetworkGatewayInterfaceCommand):
     """Remove a network from a network gateway."""
 
     def take_action(self, parsed_args):
-        self.log.debug('run(%s)' % parsed_args)
         neutron_client = self.get_client()
         (gateway_id, network_id) = self.retrieve_ids(neutron_client,
                                                      parsed_args)
