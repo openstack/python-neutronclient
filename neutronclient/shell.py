@@ -71,6 +71,7 @@ from neutronclient.neutron.v2_0 import network
 from neutronclient.neutron.v2_0.nsx import networkgateway
 from neutronclient.neutron.v2_0.nsx import qos_queue
 from neutronclient.neutron.v2_0 import port
+from neutronclient.neutron.v2_0 import purge
 from neutronclient.neutron.v2_0.qos import bandwidth_limit_rule
 from neutronclient.neutron.v2_0.qos import policy as qos_policy
 from neutronclient.neutron.v2_0.qos import rule as qos_rule
@@ -176,6 +177,7 @@ COMMAND_V2 = {
     'port-create': port.CreatePort,
     'port-delete': port.DeletePort,
     'port-update': port.UpdatePort,
+    'purge': purge.Purge,
     'quota-list': quota.ListQuota,
     'quota-show': quota.ShowQuota,
     'quota-delete': quota.DeleteQuota,

@@ -1,0 +1,16 @@
+---
+features:
+  - |
+    New command 'neutron purge <tenant_id>' will delete all
+    supported resources owned by the given tenant, provided
+    that the user has sufficient authorization and the
+    resources in question are not shared, in use, or
+    otherwise undeletable.
+
+    Supported resources are:
+    * Networks
+    * Subnets
+    * Routers
+    * Ports
+    * Floating IPs
+    * Security Groups
