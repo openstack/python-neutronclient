@@ -68,6 +68,7 @@ from neutronclient.neutron.v2_0.lb.v2 import pool as lbaas_pool
 from neutronclient.neutron.v2_0.lb import vip as lb_vip
 from neutronclient.neutron.v2_0 import metering
 from neutronclient.neutron.v2_0 import network
+from neutronclient.neutron.v2_0 import network_ip_availability
 from neutronclient.neutron.v2_0.nsx import networkgateway
 from neutronclient.neutron.v2_0.nsx import qos_queue
 from neutronclient.neutron.v2_0 import port
@@ -441,6 +442,8 @@ COMMAND_V2 = {
     'bgp-peer-create': bgp_peer.CreatePeer,
     'bgp-peer-update': bgp_peer.UpdatePeer,
     'bgp-peer-delete': bgp_peer.DeletePeer,
+    'net-ip-availability-list': network_ip_availability.ListIpAvailability,
+    'net-ip-availability-show': network_ip_availability.ShowIpAvailability,
 }
 
 COMMANDS = {'2.0': COMMAND_V2}

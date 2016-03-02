@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    CLI support for network IP availability
+
+    * The ``net-ip-availability-list`` command provides a list of IP
+      usage statistics for all networks.
+    * The ``net-ip-availability-show`` command provides IP usage stats
+      for a specific network.
