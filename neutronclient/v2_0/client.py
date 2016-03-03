@@ -1902,11 +1902,15 @@ class Client(ClientBase):
                          retrieve_all, **_params)
 
     @APIParamsCall
-    def show_auto_allocated_topology(self, tenant_id, **_params):
+    def get_auto_allocated_topology(self, tenant_id, **_params):
         """Fetch information about a tenant's auto-allocated topology."""
         return self.get(
             self.auto_allocated_topology_path % tenant_id,
             params=_params)
+
+    def validate_auto_allocated_topology_requirements(self, tenant_id):
+        """Validate requirements for getting an auto-allocated topology."""
+        return self.get_auto_allocated_topology(tenant_id, fields=['dry-run'])
 
     @APIParamsCall
     def list_bgp_speakers(self, retrieve_all=True, **_params):
