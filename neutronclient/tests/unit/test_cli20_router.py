@@ -28,11 +28,12 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
         cmd = router.CreateRouter(test_cli20.MyApp(sys.stdout), None)
         name = 'router1'
         myid = 'myid'
-        args = [name, ]
+        args = [name, '--description', 'rooter']
         position_names = ['name', ]
         position_values = [name, ]
         self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values)
+                                   position_names, position_values,
+                                   description='rooter')
 
     def test_create_router_tenant(self):
         # Create router: --tenant_id tenantid myname.
@@ -163,9 +164,9 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
         resource = 'router'
         cmd = router.UpdateRouter(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
-                                   ['myid', '--name', 'myname'],
-                                   {'name': 'myname'}
-                                   )
+                                   ['myid', '--name', 'myname',
+                                    '--description', ':D'],
+                                   {'name': 'myname', 'description': ':D'})
 
     def test_update_router_admin_state(self):
         # Update router: myid --admin-state-up <True|False>.

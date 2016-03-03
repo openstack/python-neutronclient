@@ -184,6 +184,9 @@ class CreateNetwork(neutronV20.CreateCommand, qos_policy.CreateQosPolicyMixin):
         parser.add_argument(
             'name', metavar='NAME',
             help=_('Name of network to create.'))
+        parser.add_argument(
+            '--description',
+            help=_('Description of network.'))
 
         self.add_arguments_qos_policy(parser)
         availability_zone.add_az_hint_argument(parser, self.resource)
@@ -197,7 +200,8 @@ class CreateNetwork(neutronV20.CreateCommand, qos_policy.CreateQosPolicyMixin):
                                 'vlan_transparent',
                                 'provider:network_type',
                                 'provider:physical_network',
-                                'provider:segmentation_id'])
+                                'provider:segmentation_id',
+                                'description'])
 
         self.args2body_qos_policy(parsed_args, body)
         availability_zone.args2body_az_hint(parsed_args, body)

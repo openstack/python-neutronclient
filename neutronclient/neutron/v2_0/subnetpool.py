@@ -28,6 +28,9 @@ def _format_prefixes(subnetpool):
 
 def add_updatable_arguments(parser):
     parser.add_argument(
+        '--description',
+        help=_('Description of subnetpool.'))
+    parser.add_argument(
         '--min-prefixlen', type=int,
         help=_('Subnetpool minimum prefix length.'))
     parser.add_argument(
@@ -49,7 +52,8 @@ def add_updatable_arguments(parser):
 def updatable_args2body(parsed_args, body, for_create=True):
     neutronV20.update_dict(parsed_args, body,
                            ['name', 'prefixes', 'default_prefixlen',
-                            'min_prefixlen', 'max_prefixlen', 'is_default'])
+                            'min_prefixlen', 'max_prefixlen', 'is_default',
+                            'description'])
 
 
 class ListSubnetPool(neutronV20.ListCommand):

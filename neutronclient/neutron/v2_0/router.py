@@ -68,6 +68,9 @@ class CreateRouter(neutronV20.CreateCommand):
         parser.add_argument(
             'name', metavar='NAME',
             help=_('Name of router to create.'))
+        parser.add_argument(
+            '--description',
+            help=_('Description of router.'))
         utils.add_boolean_argument(
             parser, '--distributed', dest='distributed',
             help=_('Create a distributed router.'))
@@ -80,7 +83,8 @@ class CreateRouter(neutronV20.CreateCommand):
     def args2body(self, parsed_args):
         body = {'admin_state_up': parsed_args.admin_state}
         neutronV20.update_dict(parsed_args, body,
-                               ['name', 'tenant_id', 'distributed', 'ha'])
+                               ['name', 'tenant_id', 'distributed', 'ha',
+                                'description'])
         availability_zone.args2body_az_hint(parsed_args, body)
         return {self.resource: body}
 
@@ -100,6 +104,9 @@ class UpdateRouter(neutronV20.UpdateCommand):
         parser.add_argument(
             '--name',
             help=_('Name of this router.'))
+        parser.add_argument(
+            '--description',
+            help=_('Description of router.'))
         utils.add_boolean_argument(
             parser, '--admin-state-up', dest='admin_state',
             help=_('Specify the administrative state of the router'
@@ -128,7 +135,7 @@ class UpdateRouter(neutronV20.UpdateCommand):
         if hasattr(parsed_args, 'admin_state'):
             body['admin_state_up'] = parsed_args.admin_state
         neutronV20.update_dict(parsed_args, body,
-                               ['name', 'distributed'])
+                               ['name', 'distributed', 'description'])
         if parsed_args.no_routes:
             body['routes'] = None
         elif parsed_args.routes:

@@ -30,11 +30,12 @@ class CLITestV20FloatingIpsJSON(test_cli20.CLITestV20Base):
         cmd = fip.CreateFloatingIP(test_cli20.MyApp(sys.stdout), None)
         name = 'fip1'
         myid = 'myid'
-        args = [name]
+        args = [name, '--description', 'floats like a butterfly']
         position_names = ['floating_network_id']
         position_values = [name]
         self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values)
+                                   position_names, position_values,
+                                   description='floats like a butterfly')
 
     def test_create_floatingip_and_port(self):
         # Create floatingip: fip1.

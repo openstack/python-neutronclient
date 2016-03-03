@@ -50,6 +50,9 @@ class CreateFloatingIP(neutronV20.CreateCommand):
             'floating_network_id', metavar='FLOATING_NETWORK',
             help=_('Network name or ID to allocate floating IP from.'))
         parser.add_argument(
+            '--description',
+            help=_('Description of the floating IP.'))
+        parser.add_argument(
             '--port-id',
             help=_('ID of the port to be associated with the floating IP.'))
         parser.add_argument(
@@ -78,7 +81,7 @@ class CreateFloatingIP(neutronV20.CreateCommand):
         body = {'floating_network_id': _network_id}
         neutronV20.update_dict(parsed_args, body,
                                ['port_id', 'tenant_id',
-                                'fixed_ip_address',
+                                'fixed_ip_address', 'description',
                                 'floating_ip_address', 'subnet_id'])
         dns.args2body_dns_create(parsed_args, body, 'domain')
         dns.args2body_dns_create(parsed_args, body, 'name')
