@@ -70,7 +70,8 @@ class NeutronClientException(NeutronException):
         if self.request_ids:
             req_ids_msg = self.req_ids_msg % self.request_ids
             if message:
-                message += '\n' + req_ids_msg
+                message = _('%(msg)s\n%(id)s') % {'msg': message,
+                                                  'id': req_ids_msg}
             else:
                 message = req_ids_msg
         super(NeutronClientException, self).__init__(message, **kwargs)
