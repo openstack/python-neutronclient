@@ -1,0 +1,5 @@
+---
+critical:
+  - Fix a critical bug that when lazy translation is enabled
+    NeutronClientException raises a TypeError
+    (`bug 1552760 <https://bugs.launchpad.net/heat/+bug/1552760>`_).
