@@ -11,3 +11,4 @@ Past release notes
    :maxdepth: 1
 
    old_relnotes
+    mitaka
