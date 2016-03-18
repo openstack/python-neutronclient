@@ -48,6 +48,11 @@ class QosRuleMixin(object):
         self.parent_id = qos_policy.get_qos_policy_id(self.get_client(),
                                                       parsed_args.policy)
 
+    def args2body(self, parsed_args):
+        body = {}
+        update_policy_args2body(parsed_args, body)
+        return {'qos_rule': body}
+
 
 class ListQoSRuleTypes(neutronv20.ListCommand):
     """List available qos rule types."""

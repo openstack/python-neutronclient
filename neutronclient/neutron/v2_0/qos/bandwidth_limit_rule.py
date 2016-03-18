@@ -56,7 +56,7 @@ class CreateQoSBandwidthLimitRule(qos_rule.QosRuleMixin,
     def args2body(self, parsed_args):
         body = {}
         update_bandwidth_limit_args2body(parsed_args, body)
-        return {'bandwidth_limit_rule': body}
+        return {self.resource: body}
 
 
 class ListQoSBandwidthLimitRules(qos_rule.QosRuleMixin,
@@ -64,15 +64,9 @@ class ListQoSBandwidthLimitRules(qos_rule.QosRuleMixin,
     """List all qos bandwidth limit rules belonging to the specified policy."""
 
     resource = BANDWIDTH_LIMIT_RULE_RESOURCE
-
     _formatters = {}
     pagination_support = True
     sorting_support = True
-
-    def args2body(self, parsed_args):
-        body = {}
-        qos_rule.update_policy_args2body(parsed_args, body)
-        return {'qos_rule': body}
 
 
 class ShowQoSBandwidthLimitRule(qos_rule.QosRuleMixin, neutronv20.ShowCommand):
@@ -96,7 +90,7 @@ class UpdateQoSBandwidthLimitRule(qos_rule.QosRuleMixin,
     def args2body(self, parsed_args):
         body = {}
         update_bandwidth_limit_args2body(parsed_args, body)
-        return {'bandwidth_limit_rule': body}
+        return {self.resource: body}
 
 
 class DeleteQoSBandwidthLimitRule(qos_rule.QosRuleMixin,

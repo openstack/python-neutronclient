@@ -74,6 +74,7 @@ from neutronclient.neutron.v2_0.nsx import qos_queue
 from neutronclient.neutron.v2_0 import port
 from neutronclient.neutron.v2_0 import purge
 from neutronclient.neutron.v2_0.qos import bandwidth_limit_rule
+from neutronclient.neutron.v2_0.qos import dscp_marking_rule
 from neutronclient.neutron.v2_0.qos import policy as qos_policy
 from neutronclient.neutron.v2_0.qos import rule as qos_rule
 from neutronclient.neutron.v2_0 import quota
@@ -397,6 +398,21 @@ COMMAND_V2 = {
     ),
     'qos-bandwidth-limit-rule-delete': (
         bandwidth_limit_rule.DeleteQoSBandwidthLimitRule
+    ),
+    'qos-dscp-marking-rule-create': (
+        dscp_marking_rule.CreateQoSDscpMarkingRule
+    ),
+    'qos-dscp-marking-rule-show': (
+        dscp_marking_rule.ShowQoSDscpMarkingRule
+    ),
+    'qos-dscp-marking-rule-list': (
+        dscp_marking_rule.ListQoSDscpMarkingRules
+    ),
+    'qos-dscp-marking-rule-update': (
+        dscp_marking_rule.UpdateQoSDscpMarkingRule
+    ),
+    'qos-dscp-marking-rule-delete': (
+        dscp_marking_rule.DeleteQoSDscpMarkingRule
     ),
     'qos-available-rule-types': qos_rule.ListQoSRuleTypes,
     'flavor-list': flavor.ListFlavor,
