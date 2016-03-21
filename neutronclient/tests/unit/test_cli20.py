@@ -699,7 +699,7 @@ class ClientV2TestJson(CLITestV20Base):
         try:
             self.client.do_request('GET', '/test', body='', params=params)
         except exceptions.RequestURITooLong as cm:
-            self.assertNotEqual(cm.excess, 0)
+            self.assertNotEqual(0, cm.excess)
         else:
             self.fail('Expected exception NOT raised')
 
