@@ -82,13 +82,13 @@ Transition Steps
    is enabled, then the nova client's Python library will continue to
    be used. See the following OSC bugs:
 
-   * `Floating IP CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519502>`_
+   * **In Progress** `Floating IP CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519502>`_
 
-   * `Port CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519909>`_
+   * **In Progress** `Port CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519909>`_
 
-   * `Security Group CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519511>`_
+   * **Done** `Security Group CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519511>`_
 
-   * `Security Group Rule CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519512>`_
+   * **In Progress** `Security Group Rule CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519512>`_
 
 6. **In Progress:** OSC continues enhancing its networking support.
    At this point and when applicable, enhancements to the ``neutron``
@@ -122,8 +122,8 @@ Transition Steps
 Developer Guide
 ---------------
 The ``neutron`` CLI version 4.x, without extensions, supports over 200
-commands while the ``openstack`` CLI version 2.1.0 supports about 30
-networking commands. Of the 30 commands, many do not have all of the options
+commands while the ``openstack`` CLI version 2.2.0 supports about 35
+networking commands. Of the 35 commands, many do not have all of the options
 or arguments of their ``neutron`` CLI equivalent. With this large functional
 gap, a couple critical questions for developers during this transition are "Which
 CLI do I change?" and "Where does my CLI belong?" The answer depends on the
@@ -205,8 +205,8 @@ you can optionally propose an
 which documents the new command interface before proceeding with the implementation.
 
 Users of the neutron client's command extensions must adopt the
-`OSC plugin system <http://docs.openstack.org/developer/python-openstackclient/plugins.html>`_
-for this transition. Such users will maintain their OSC plugin within their
+`OSC plugin <https://github.com/openstack/python-openstackclient/blob/master/doc/source/plugins.rst>`_
+system for this transition. Such users will maintain their OSC plugin within their
 own project and should follow the guidance in the table above to determine
 which command to change.
 
@@ -215,17 +215,17 @@ Developer References
 
 * See `OSC neutron support etherpad <https://etherpad.openstack.org/p/osc-neutron-support>`_
   to determine if an ``openstack`` command is in progress.
-* See `OSC command list <http://docs.openstack.org/developer/python-openstackclient/command-list.html>`_
+* See `OSC command list <https://github.com/openstack/python-openstackclient/tree/master/doc/source/command-objects>`_
   to determine if an ``openstack`` command exists.
 * See `OSC command spec list <https://github.com/openstack/python-openstackclient/tree/master/doc/source/specs/command-objects>`_
   to determine if an ``openstack`` command spec exists.
 * See `OSC plugin command list <http://docs.openstack.org/developer/python-openstackclient/plugin-commands.html>`_
   to determine if an ``openstack`` plugin command exists.
-* See `OSC command structure <http://docs.openstack.org/developer/python-openstackclient/commands.html>`_
+* See `OSC command structure <https://github.com/openstack/python-openstackclient/blob/master/doc/source/commands.rst>`_
   to determine the current ``openstack`` command objects, plugin objects and actions.
-* See `OSC human interface guide <http://docs.openstack.org/developer/python-openstackclient/humaninterfaceguide.html>`_
+* See `OSC human interface guide <https://github.com/openstack/python-openstackclient/blob/master/doc/source/humaninterfaceguide.rst>`_
   for guidance on creating new OSC command interfaces.
-* See `OSC plugin <http://docs.openstack.org/developer/python-openstackclient/plugins.html>`_
+* See `OSC plugin <https://github.com/openstack/python-openstackclient/blob/master/doc/source/plugins.rst>`_
   for information on the OSC plugin system to be used for ``neutron`` CLI extensions.
 * Create an OSC blueprint: https://blueprints.launchpad.net/python-openstackclient/
 * Report an OSC bug: https://bugs.launchpad.net/python-openstackclient/+filebug
