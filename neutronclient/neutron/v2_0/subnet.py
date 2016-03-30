@@ -52,6 +52,9 @@ def add_updatable_arguments(parser):
     parser.add_argument(
         '--name',
         help=_('Name of this subnet.'))
+    parser.add_argument(
+        '--description',
+        help=_('Description of this subnet.'))
     gateway_sg = parser.add_mutually_exclusive_group()
     gateway_sg.add_argument(
         '--gateway', metavar='GATEWAY_IP',
@@ -112,7 +115,8 @@ def updatable_args2body(parsed_args, body, for_create=True, ip_version=None):
 
     neutronV20.update_dict(parsed_args, body,
                            ['name', 'allocation_pools',
-                            'host_routes', 'dns_nameservers'])
+                            'host_routes', 'dns_nameservers',
+                            'description'])
     if parsed_args.no_gateway:
         body['gateway_ip'] = None
     elif parsed_args.gateway:

@@ -41,11 +41,12 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
         prefix2 = '12.11.13.0/24'
         args = [name, '--min-prefixlen', str(min_prefixlen),
                 '--pool-prefix', prefix1, '--pool-prefix', prefix2,
-                '--shared']
+                '--shared', '--description', 'public pool']
         position_names = ['name', 'min_prefixlen', 'prefixes', 'shared']
         position_values = [name, min_prefixlen, [prefix1, prefix2], True]
         self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values)
+                                   position_names, position_values,
+                                   description='public pool')
 
     def test_create_subnetpool_not_shared(self):
         # Create subnetpool: myname.
@@ -153,9 +154,9 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
         resource = 'subnetpool'
         cmd = subnetpool.UpdateSubnetPool(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
-                                   ['myid', '--name', 'myname'],
-                                   {'name': 'myname'}
-                                   )
+                                   ['myid', '--name', 'myname',
+                                    '--description', ':)'],
+                                   {'name': 'myname', 'description': ':)'})
 
     def test_update_subnetpool_with_address_scope(self):
         # Update subnetpool: myid --address-scope newscope.

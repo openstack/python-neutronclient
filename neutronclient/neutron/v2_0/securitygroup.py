@@ -306,6 +306,9 @@ class CreateSecurityGroupRule(neutronV20.CreateCommand):
 
     def add_known_arguments(self, parser):
         parser.add_argument(
+            '--description',
+            help=_('Description of security group rule.'))
+        parser.add_argument(
             'security_group_id', metavar='SECURITY_GROUP',
             help=_('Security group name or ID to add rule.'))
         parser.add_argument(
@@ -354,7 +357,8 @@ class CreateSecurityGroupRule(neutronV20.CreateCommand):
                 generate_default_ethertype(parsed_args.protocol)}
         neutronV20.update_dict(parsed_args, body,
                                ['protocol', 'port_range_min', 'port_range_max',
-                                'remote_ip_prefix', 'tenant_id'])
+                                'remote_ip_prefix', 'tenant_id',
+                                'description'])
         if parsed_args.remote_group_id:
             _remote_group_id = neutronV20.find_resourceid_by_name_or_id(
                 self.get_client(), 'security_group',

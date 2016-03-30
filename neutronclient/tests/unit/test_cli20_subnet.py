@@ -40,11 +40,12 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         netid = 'netid'
         cidr = '10.10.10.0/24'
         gateway = 'gatewayvalue'
-        args = ['--gateway', gateway, netid, cidr]
+        args = ['--gateway', gateway, netid, cidr, '--description', 'cave']
         position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
         position_values = [4, netid, cidr, gateway]
         self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values)
+                                   position_names, position_values,
+                                   description='cave')
 
     def test_create_subnet_network_cidr_seperated(self):
         # For positional value, network_id and cidr can be separated.
@@ -627,9 +628,10 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         cmd = subnet.UpdateSubnet(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'myname',
+                                    '--description', 'cavern',
                                     '--tags', 'a', 'b'],
-                                   {'name': 'myname', 'tags': ['a', 'b'], }
-                                   )
+                                   {'name': 'myname', 'tags': ['a', 'b'],
+                                    'description': 'cavern'})
 
     def test_update_subnet_allocation_pools(self):
         # Update subnet: myid --name myname --tags a b.

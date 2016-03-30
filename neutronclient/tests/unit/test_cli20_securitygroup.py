@@ -164,7 +164,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                 direction, '--ethertype', ethertype, '--protocol', protocol,
                 '--port_range_min', port_range_min, '--port_range_max',
                 port_range_max, '--remote_group_id', remote_group_id,
-                security_group_id]
+                security_group_id, '--description', 'PCI policy 1421912']
         position_names = ['remote_ip_prefix', 'direction', 'ethertype',
                           'protocol', 'port_range_min', 'port_range_max',
                           'remote_group_id', 'security_group_id']
@@ -172,7 +172,8 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                            port_range_min, port_range_max, remote_group_id,
                            security_group_id]
         self._test_create_resource(resource, cmd, None, myid, args,
-                                   position_names, position_values)
+                                   position_names, position_values,
+                                   description='PCI policy 1421912')
 
     def test_create_security_group_rule_with_integer_protocol_value(self):
         resource = 'security_group_rule'

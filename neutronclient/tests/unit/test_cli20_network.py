@@ -53,6 +53,19 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_network_description(self):
+        # Create net: --tenant_id tenantid myname.
+        resource = 'network'
+        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        args = ['--description', 'Nice network', name]
+        position_names = ['name', ]
+        position_values = [name, ]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   description='Nice network')
+
     def test_create_network_tenant(self):
         # Create net: --tenant_id tenantid myname.
         resource = 'network'
@@ -510,9 +523,11 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         cmd = network.UpdateNetwork(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'myname',
-                                    '--tags', 'a', 'b'],
-                                   {'name': 'myname', 'tags': ['a', 'b'], }
-                                   )
+                                    '--tags', 'a', 'b', '--description',
+                                    'This network takes the scenic route'],
+                                   {'name': 'myname', 'tags': ['a', 'b'],
+                                    'description': 'This network takes the '
+                                                   'scenic route'})
 
     def test_update_network_with_unicode(self):
         # Update net: myid --name u'\u7f51\u7edc' --tags a b.

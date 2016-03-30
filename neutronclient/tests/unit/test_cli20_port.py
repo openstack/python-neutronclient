@@ -35,12 +35,13 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         name = 'myname'
         myid = 'myid'
         netid = 'netid'
-        args = [netid]
+        args = [netid, '--description', 'DESC']
         position_names = ['network_id']
         position_values = []
         position_values.extend([netid])
         self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values)
+                                   position_names, position_values,
+                                   description='DESC')
 
     def test_create_port_extra_dhcp_opts_args(self):
         # Create port: netid --extra_dhcp_opt.
@@ -555,9 +556,11 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'myname',
                                     '--admin-state-up', 'False',
+                                    '--description', 'garbage',
                                     '--tags', 'a', 'b'],
                                    {'name': 'myname',
                                     'admin_state_up': 'False',
+                                    'description': 'garbage',
                                     'tags': ['a', 'b'], })
 
     def test_update_port_secgroup(self):

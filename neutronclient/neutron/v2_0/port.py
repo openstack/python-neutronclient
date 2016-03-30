@@ -45,6 +45,9 @@ def _add_updatable_args(parser):
         '--name',
         help=_('Name of this port.'))
     parser.add_argument(
+        '--description',
+        help=_('Description of this port.'))
+    parser.add_argument(
         '--fixed-ip', metavar='subnet_id=SUBNET,ip_address=IP_ADDR',
         action='append',
         type=utils.str2dict_type(optional_keys=['subnet_id', 'ip_address']),
@@ -71,7 +74,8 @@ def _add_updatable_args(parser):
 
 def _updatable_args2body(parsed_args, body, client):
     neutronV20.update_dict(parsed_args, body,
-                           ['device_id', 'device_owner', 'name'])
+                           ['device_id', 'device_owner', 'name',
+                            'description'])
     ips = []
     if parsed_args.fixed_ip:
         for ip_spec in parsed_args.fixed_ip:
