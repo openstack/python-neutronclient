@@ -19,6 +19,7 @@
 
 import argparse
 import functools
+import hashlib
 import logging
 import netaddr
 import os
@@ -29,6 +30,8 @@ import six
 
 from neutronclient._i18n import _
 from neutronclient.common import exceptions
+
+SENSITIVE_HEADERS = ('X-Auth-Token',)
 
 
 def env(*vars, **kwargs):
@@ -167,8 +170,13 @@ def http_log_req(_logger, args, kwargs):
         else:
             string_parts.append(' %s' % element)
 
-    for element in kwargs['headers']:
-        header = ' -H "%s: %s"' % (element, kwargs['headers'][element])
+    for (key, value) in six.iteritems(kwargs['headers']):
+        if key in SENSITIVE_HEADERS:
+            v = value.encode('utf-8')
+            h = hashlib.sha1(v)
+            d = h.hexdigest()
+            value = "{SHA1}%s" % d
+        header = ' -H "%s: %s"' % (key, value)
         string_parts.append(header)
 
     if 'body' in kwargs and kwargs['body']:
