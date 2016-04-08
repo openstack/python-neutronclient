@@ -62,7 +62,7 @@ def add_updatable_arguments(parser):
     gateway_sg.add_argument(
         '--no-gateway',
         action='store_true',
-        help=_('No distribution of gateway.'))
+        help=_('Do not configure a gateway for this subnet.'))
     parser.add_argument(
         '--allocation-pool', metavar='start=IP_ADDR,end=IP_ADDR',
         action='append', dest='allocation_pools',
