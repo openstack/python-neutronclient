@@ -119,6 +119,19 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_subnetpool_no_poolprefix(self):
+        # Should raise an error because --pool-prefix is required
+        resource = 'subnetpool'
+        cmd = subnetpool.CreateSubnetPool(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        args = [name]
+        position_names = ['name']
+        position_values = [name]
+        self.assertRaises(SystemExit, self._test_create_resource, resource,
+                          cmd, name, myid, args, position_names,
+                          position_values)
+
     def test_list_subnetpool_pagination(self):
         cmd = subnetpool.ListSubnetPool(test_cli20.MyApp(sys.stdout), None)
         self.mox.StubOutWithMock(subnetpool.ListSubnetPool, "extend_list")
