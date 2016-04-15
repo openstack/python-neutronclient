@@ -307,7 +307,8 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                 self.client.httpclient._check_uri_length(
                     mox.IgnoreArg()).AndReturn(None)
                 self.client.httpclient.request(
-                    test_cli20.end_url(path, item['filter']),
+                    test_cli20.MyUrlComparator(
+                        test_cli20.end_url(path, item['filter']), self.client),
                     'GET',
                     body=None,
                     headers=mox.ContainsKeyValue(
