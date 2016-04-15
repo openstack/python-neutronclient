@@ -154,16 +154,16 @@ only with feature requests only being made to the ``openstack`` CLI.
 +---------------------------+-------------------+-------------------------------------------------+
 | Networking Commands       | OSC Plugin        | OpenStack Project for ``openstack`` Commands    |
 +===========================+===================+=================================================+
-| Core (Stable)             | No                | python-openstackclient                          |
+| Core                      | No                | python-openstackclient                          |
 +---------------------------+-------------------+-------------------------------------------------+
-| Core (New/Experimental)   | Yes               | python-neutronclient                            |
-|                           |                   | (with possible move to python-openstackclient)  |
+| LBaaS v2                  | Yes               | python-neutronclient                            |
+|                           |                   | (under ``neutronclient/osc/v2/lbaas``)          |
 +---------------------------+-------------------+-------------------------------------------------+
-| LBaaS v2                  | Yes               | neutron-lbaas                                   |
+| VPNaaS v2                 | Yes               | python-neutronclient                            |
+|                           |                   | (under ``neutronclient/osc/v2/vpnaas``)         |
 +---------------------------+-------------------+-------------------------------------------------+
-| VPNaaS v2                 | Yes               | neutron-vpnaas                                  |
-+---------------------------+-------------------+-------------------------------------------------+
-| FWaaS v2                  | Yes               | neutron-fwaas                                   |
+| FWaaS v2                  | Yes               | python-neutronclient                            |
+|                           |                   | (under ``neutronclient/osc/v2/fwaas``)          |
 +---------------------------+-------------------+-------------------------------------------------+
 | LBaaS v1                  | N/A               | None (deprecated)                               |
 +---------------------------+-------------------+-------------------------------------------------+
@@ -173,21 +173,14 @@ only with feature requests only being made to the ``openstack`` CLI.
 +---------------------------+-------------------+-------------------------------------------------+
 
 
-The following network resources are part of the "Core (Stable)" group:
+**Important:** The actual name of the command object and/or action in OSC may differ
+from those used by neutron in order to follow the OSC command structure and to avoid
+name conflicts. Developers should get new command objects and actions approved by
+the OSC team before proceeding with the implementation.
 
-- availability zone
-- extension
-- floating ip
-- network
-- port
-- quota
-- rbac
-- router
-- security group
-- security group rule
-- subnet
-- subnet pool
-
+The "Core" group includes network resources that provide ``neutron`` project features
+(i.e. not advanced service or other features).  Examples in the "Core" group include:
+network, subnet, port, etc.
 
 When adding or updating an ``openstack`` networking command to
 python-openstackclient, changes may first be required to the
