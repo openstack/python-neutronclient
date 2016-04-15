@@ -129,16 +129,39 @@ class CLITestV20LbHealthMonitorJSON(test_cli20.CLITestV20Base):
                                  args, ['id', 'name'],
                                  cmd_resource=cmd_resource)
 
-    def test_update_healthmonitor(self):
-        # lbaas-healthmonitor-update myid --name newname.
+    def _test_update_hm(self, args, expected_values):
         resource = 'healthmonitor'
         cmd_resource = 'lbaas_healthmonitor'
+        my_id = 'myid'
         cmd = healthmonitor.UpdateHealthMonitor(test_cli20.MyApp(sys.stdout),
                                                 None)
-        self._test_update_resource(resource, cmd, 'myid',
-                                   ['myid', '--name', 'newname'],
-                                   {'name': 'newname', },
+        args.insert(0, my_id)
+        self._test_update_resource(resource, cmd, my_id,
+                                   args,
+                                   expected_values,
                                    cmd_resource=cmd_resource)
+
+    def test_update_healthmonitor(self):
+        # lbaas-healthmonitor-update myid --name newname.
+        self._test_update_hm(['--name', 'newname'], {'name': 'newname', })
+        # lbaas-healthmonitor-update myid --delay 10.
+        self._test_update_hm(['--delay', '10'], {'delay': '10'})
+        # lbaas-healthmonitor-update myid --timeout 5.
+        self._test_update_hm(['--timeout', '5'], {'timeout': '5', })
+        # lbaas-healthmonitor-update myid --delay 10.
+        self._test_update_hm(['--http-method', 'OPTIONS'],
+                             {'http_method': 'OPTIONS'})
+        # lbaas-healthmonitor-update myid --url-path /test/string .
+        self._test_update_hm(['--url-path', '/test/string'],
+                             {'url_path': '/test/string', })
+        # lbaas-healthmonitor-update myid --max-retries 5
+        self._test_update_hm(['--max-retries', '5'], {'max_retries': '5'})
+        # lbaas-healthmonitor-update myid --expected-codes 201
+        self._test_update_hm(['--expected-codes', '201'],
+                             {'expected_codes': '201'})
+        # lbaas-healthmonitor-update myid --admin-state-up False
+        self._test_update_hm(['--admin-state-up', 'False'],
+                             {'admin_state_up': 'False'})
 
     def test_delete_healthmonitor(self):
         # lbaas-healthmonitor-delete my-id.

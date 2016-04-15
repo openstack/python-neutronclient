@@ -159,15 +159,29 @@ class CLITestV20LbListenerJSON(test_cli20.CLITestV20Base):
                                  args, ['id', 'name'],
                                  cmd_resource=cmd_resource)
 
-    def test_update_listener(self):
-        # lbaas-listener-update myid --name newname.
+    def _test_update_listener(self, args, expected_values):
         resource = 'listener'
         cmd_resource = 'lbaas_listener'
+        my_id = 'myid'
+        args.insert(0, my_id)
         cmd = listener.UpdateListener(test_cli20.MyApp(sys.stdout), None)
-        self._test_update_resource(resource, cmd, 'myid',
-                                   ['myid', '--name', 'newname'],
-                                   {'name': 'newname', },
+        self._test_update_resource(resource, cmd, my_id,
+                                   args, expected_values,
                                    cmd_resource=cmd_resource)
+
+    def test_update_listener(self):
+        # lbaas-listener-update myid --name newname.
+        self._test_update_listener(['--name', 'newname'],
+                                   {'name': 'newname', })
+        # lbaas-listener-update myid --description check.
+        self._test_update_listener(['--description', 'check'],
+                                   {'description': 'check', })
+        # lbaas-listener-update myid --connection-limit -1
+        self._test_update_listener(['--connection-limit', '-1'],
+                                   {'connection_limit': -1, })
+        # lbaas-listener-update myid --admin-state-up False.
+        self._test_update_listener(['--admin-state-up', 'False'],
+                                   {'admin_state_up': 'False', })
 
     def test_delete_listener(self):
         # lbaas-listener-delete my-id.

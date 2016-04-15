@@ -112,15 +112,25 @@ class CLITestV20LbLoadBalancerJSON(test_cli20.CLITestV20Base):
                                  args, ['id', 'name'],
                                  cmd_resource=cmd_resource)
 
-    def test_update_loadbalancer(self):
-        # lbaas-loadbalancer-loadbalancer-update myid --name newname.
+    def _test_update_lb(self, args, expected_values):
         resource = 'loadbalancer'
         cmd_resource = 'lbaas_loadbalancer'
+        my_id = 'myid'
+        args.insert(0, my_id)
         cmd = lb.UpdateLoadBalancer(test_cli20.MyApp(sys.stdout), None)
-        self._test_update_resource(resource, cmd, 'myid',
-                                   ['myid', '--name', 'newname'],
-                                   {'name': 'newname', },
+        self._test_update_resource(resource, cmd, my_id,
+                                   args, expected_values,
                                    cmd_resource=cmd_resource)
+
+    def test_update_loadbalancer(self):
+        # lbaas-loadbalancer-update myid --name newname.
+        self._test_update_lb(['--name', 'newname'], {'name': 'newname', })
+        # lbaas-loadbalancer-update myid --description check.
+        self._test_update_lb(['--description', 'check'],
+                             {'description': 'check', })
+        # lbaas-loadbalancer-update myid --admin-state-up False.
+        self._test_update_lb(['--admin-state-up', 'False'],
+                             {'admin_state_up': 'False', })
 
     def test_delete_loadbalancer(self):
         # lbaas-loadbalancer-loadbalancer-delete my-id.

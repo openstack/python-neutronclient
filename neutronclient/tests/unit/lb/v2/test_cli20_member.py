@@ -61,7 +61,7 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
                           'subnet_id', 'weight', 'name']
         position_values = [False, address, protocol_port,
                            subnet_id, weight, name]
-        self._test_create_resource(resource, cmd, '', my_id, args,
+        self._test_create_resource(resource, cmd, name, my_id, args,
                                    position_names, position_values,
                                    cmd_resource=cmd_resource,
                                    parent_id=pool_id)
@@ -143,6 +143,18 @@ class CLITestV20LbMemberJSON(test_cli20.CLITestV20Base):
         cmd = member.UpdateMember(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, my_id, args,
                                    {'name': 'newname', },
+                                   cmd_resource=cmd_resource,
+                                   parent_id=pool_id)
+        # lbaas-member-update myid --weight 100.
+        args = [my_id, pool_id, '--weight', '100']
+        self._test_update_resource(resource, cmd, my_id, args,
+                                   {'weight': '100', },
+                                   cmd_resource=cmd_resource,
+                                   parent_id=pool_id)
+        # lbaas-member-update myid --admin-state-up False
+        args = [my_id, pool_id, '--admin-state-up', 'False']
+        self._test_update_resource(resource, cmd, my_id, args,
+                                   {'admin_state_up': 'False', },
                                    cmd_resource=cmd_resource,
                                    parent_id=pool_id)
 

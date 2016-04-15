@@ -157,13 +157,27 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                                  cmd_resource=cmd_resource)
 
     def test_update_pool(self):
-        # lbaas-pool-update myid --name newname.
+        # lbaas-pool-update myid --name newname --description SuperPool
+        # --lb-algorithm SOURCE_IP --admin-state-up
+        # --session-persistence type=dict,type=HTTP_COOKIE,cookie_name=pie
+
         resource = 'pool'
         cmd_resource = 'lbaas_pool'
         cmd = pool.UpdatePool(test_cli20.MyApp(sys.stdout), None)
-        self._test_update_resource(resource, cmd, 'myid',
-                                   ['myid', '--name', 'newname'],
-                                   {'name': 'newname', },
+        args = ['myid', '--name', 'newname',
+                '--description', 'SuperPool', '--lb-algorithm', "SOURCE_IP",
+                '--admin-state-up', 'True',
+                '--session-persistence', 'type=dict,'
+                'type=HTTP_COOKIE,cookie_name=pie']
+        body = {'name': 'newname',
+                "description": "SuperPool",
+                "lb_algorithm": "SOURCE_IP",
+                "admin_state_up": 'True',
+                'session_persistence': {
+                    'type': 'HTTP_COOKIE',
+                    'cookie_name': 'pie',
+                }, }
+        self._test_update_resource(resource, cmd, 'myid', args, body,
                                    cmd_resource=cmd_resource)
 
     def test_delete_pool(self):

@@ -15,8 +15,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
+import argparse
 
 from neutronclient._i18n import _
+from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
 
 
@@ -35,6 +37,20 @@ class LbaasMemberMixin(object):
         parser.add_argument(
             'pool', metavar='POOL',
             help=_('ID or name of the pool that this member belongs to.'))
+
+
+def _add_common_args(parser):
+        parser.add_argument(
+            '--name',
+            help=_('Name of the member.'))
+        parser.add_argument(
+            '--weight',
+            help=_('Weight of member in the pool (default:1, [0..256]).'))
+
+
+def _parse_common_args(body, parsed_args):
+        neutronV20.update_dict(parsed_args, body,
+                               ['weight', 'name'])
 
 
 class ListMember(LbaasMemberMixin, neutronV20.ListCommand):
@@ -69,16 +85,11 @@ class CreateMember(neutronV20.CreateCommand):
     shadow_resource = 'lbaas_member'
 
     def add_known_arguments(self, parser):
+        _add_common_args(parser)
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help=_('Set admin state up to false'))
-        parser.add_argument(
-            '--weight',
-            help=_('Weight of member in the pool (default:1, [0..256]).'))
-        parser.add_argument(
-            '--name',
-            help=_('Name of the member to be created.'))
+            help=_('Set admin state up to false.'))
         parser.add_argument(
             '--subnet',
             required=True,
@@ -105,7 +116,8 @@ class CreateMember(neutronV20.CreateCommand):
                 'protocol_port': parsed_args.protocol_port,
                 'address': parsed_args.address}
         neutronV20.update_dict(parsed_args, body,
-                               ['weight', 'subnet_id', 'tenant_id', 'name'])
+                               ['subnet_id', 'tenant_id'])
+        _parse_common_args(body, parsed_args)
         return {self.resource: body}
 
 
@@ -119,22 +131,25 @@ class UpdateMember(neutronV20.UpdateCommand):
         parser.add_argument(
             '--admin-state-down',
             dest='admin_state', action='store_false',
-            help=_('Set admin state up to false'))
-        parser.add_argument(
-            '--weight',
-            help=_('Weight of member in the pool (default:1, [0..256])'))
+            default=argparse.SUPPRESS,
+            help=_('[DEPRECATED in Mitaka] Set admin state up to false.'))
         parser.add_argument(
             'pool', metavar='POOL',
-            help=_('ID or name of the pool that this member belongs to'))
-        parser.add_argument(
-            '--name',
-            help=_('Updated name of the member.'))
+            help=_('ID or name of the pool that this member belongs to.'))
+        utils.add_boolean_argument(
+            parser, '--admin-state-up',
+            dest='admin_state',
+            help=_('Update the administrative state of '
+                   'the member (True meaning "Up").'))
+        # ToDo(reedip): After Mitaka, remove admin-state-down
+        _add_common_args(parser)
 
     def args2body(self, parsed_args):
         self.parent_id = _get_pool_id(self.get_client(), parsed_args.pool)
         body = {}
-        neutronV20.update_dict(parsed_args, body,
-                               ['admin_state_up', 'weight', 'name'])
+        if hasattr(parsed_args, 'admin_state'):
+            body['admin_state_up'] = parsed_args.admin_state
+        _parse_common_args(body, parsed_args)
         return {self.resource: body}
 
 
