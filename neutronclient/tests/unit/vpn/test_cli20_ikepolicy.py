@@ -25,13 +25,14 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
 
     non_admin_status_resources = ['ikepolicy']
 
-    def test_create_ikepolicy_all_params(self):
+    def _test_create_ikepolicy_all_params(self, auth='sha1',
+                                          expected_exc=None):
         # vpn-ikepolicy-create all params.
         resource = 'ikepolicy'
         cmd = ikepolicy.CreateIKEPolicy(test_cli20.MyApp(sys.stdout), None)
         name = 'ikepolicy1'
         description = 'my-ike-policy'
-        auth_algorithm = 'sha1'
+        auth_algorithm = auth
         encryption_algorithm = 'aes-256'
         ike_version = 'v1'
         phase1_negotiation_mode = 'main'
@@ -67,9 +68,27 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
             },
         }
 
-        self._test_create_resource(resource, cmd, name, my_id, args,
-                                   position_names, position_values,
-                                   extra_body=extra_body)
+        if not expected_exc:
+            self._test_create_resource(resource, cmd, name, my_id, args,
+                                       position_names, position_values,
+                                       extra_body=extra_body)
+        else:
+            self.assertRaises(
+                expected_exc,
+                self._test_create_resource,
+                resource, cmd, name, my_id, args,
+                position_names, position_values,
+                extra_body=extra_body)
+
+    def test_create_ikepolicy_all_params(self):
+        self._test_create_ikepolicy_all_params()
+
+    def test_create_ikepolicy_auth_sha256(self):
+        self._test_create_ikepolicy_all_params(auth='sha256')
+
+    def test_create_ikepolicy_invalid_auth(self):
+        self._test_create_ikepolicy_all_params(auth='xyz',
+                                               expected_exc=SystemExit)
 
     def test_create_ikepolicy_with_limited_params(self):
         # vpn-ikepolicy-create with limited params.

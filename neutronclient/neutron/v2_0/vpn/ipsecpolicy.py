@@ -53,7 +53,7 @@ class CreateIPsecPolicy(neutronv20.CreateCommand):
             help=_('Transform protocol in lowercase, default:esp'))
         parser.add_argument(
             '--auth-algorithm',
-            default='sha1', choices=['sha1'],
+            default='sha1', choices=['sha1', 'sha256'],
             help=_('Authentication algorithm in lowercase, default:sha1'))
         parser.add_argument(
             '--encryption-algorithm',

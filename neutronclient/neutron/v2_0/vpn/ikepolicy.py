@@ -49,7 +49,7 @@ class CreateIKEPolicy(neutronv20.CreateCommand):
             help=_('Description of the IKE policy'))
         parser.add_argument(
             '--auth-algorithm',
-            default='sha1', choices=['sha1'],
+            default='sha1', choices=['sha1', 'sha256'],
             help=_('Authentication algorithm in lowercase. '
                    'Default:sha1'))
         parser.add_argument(
