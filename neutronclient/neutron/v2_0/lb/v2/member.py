@@ -15,8 +15,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-import argparse
-
 from neutronclient._i18n import _
 from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
@@ -129,26 +127,19 @@ class UpdateMember(neutronV20.UpdateCommand):
 
     def add_known_arguments(self, parser):
         parser.add_argument(
-            '--admin-state-down',
-            dest='admin_state', action='store_false',
-            default=argparse.SUPPRESS,
-            help=_('[DEPRECATED in Mitaka] Set admin state up to false.'))
-        parser.add_argument(
             'pool', metavar='POOL',
             help=_('ID or name of the pool that this member belongs to.'))
         utils.add_boolean_argument(
             parser, '--admin-state-up',
-            dest='admin_state',
             help=_('Update the administrative state of '
                    'the member (True meaning "Up").'))
-        # ToDo(reedip): After Mitaka, remove admin-state-down
         _add_common_args(parser)
 
     def args2body(self, parsed_args):
         self.parent_id = _get_pool_id(self.get_client(), parsed_args.pool)
         body = {}
-        if hasattr(parsed_args, 'admin_state'):
-            body['admin_state_up'] = parsed_args.admin_state
+        if hasattr(parsed_args, "admin_state_up"):
+            body['admin_state_up'] = parsed_args.admin_state_up
         _parse_common_args(body, parsed_args)
         return {self.resource: body}
 

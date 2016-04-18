@@ -1,0 +1,4 @@
+---
+deprecations:
+  - |
+    "admin-state-down" option was deprecated in Mitaka and has been removed in Newton.
