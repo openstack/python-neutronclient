@@ -20,6 +20,7 @@ from neutronclient.neutron import v2_0 as neutronV20
 
 
 class Purge(neutronV20.NeutronCommand):
+    """Delete all resources that belong to a given tenant."""
 
     def _pluralize(self, string):
         return string + 's'
