@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    CLI support to display the default quota reserved for a tenant.
+
+    * The ``quota-default-show`` command outputs the default quota
+      of resources for a given tenant.
