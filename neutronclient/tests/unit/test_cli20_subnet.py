@@ -77,6 +77,23 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_subnet_with_segment(self):
+        # Create subnet: --segment segment netid cidr.
+        resource = 'subnet'
+        cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        cidr = '10.10.10.0/24'
+        segment = 'segment'
+        args = ['--segment', segment, netid, cidr,
+                '--description', 'cave']
+        position_names = ['ip_version', 'network_id', 'cidr', 'segment_id']
+        position_values = [4, netid, cidr, segment]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   description='cave')
+
     def test_create_subnet_with_bad_gateway_option(self):
         # Create sbunet: --no-gateway netid cidr.
         resource = 'subnet'
