@@ -116,6 +116,8 @@ class PurgeNeutronClientCLITest(base.ClientTestBase):
     def _verify_deletion(self, resources, resource_type):
         purged = True
         no_purge_purged = True
+        router_interface_owners = ['network:router_interface',
+                                   'network:router_interface_distributed']
         for row in resources:
             if resource_type == 'port' and row.get('id', None):
                 port = self.parser.listing(self.neutron('port-show',
@@ -123,7 +125,7 @@ class PurgeNeutronClientCLITest(base.ClientTestBase):
                 port_dict = {}
                 for row in port:
                     port_dict[row['Field']] = row['Value']
-                if port_dict['device_owner'] == 'network:router_interface':
+                if port_dict['device_owner'] in router_interface_owners:
                     if port_dict['tenant_id'] == 'purge-tenant':
                         purged = False
                     elif port_dict['tenant_id'] == 'no-purge-tenant':
