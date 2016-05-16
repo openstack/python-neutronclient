@@ -210,7 +210,7 @@ class UpdatePortAllowedAddressPair(object):
             type=utils.str2dict_type(
                 required_keys=['ip_address'],
                 optional_keys=['mac_address']),
-            help=_('Allowed address pair associated with the port.'
+            help=_('Allowed address pair associated with the port. '
                    'You can repeat this option.'))
         group_aap.add_argument(
             '--no-allowed-address-pairs',
