@@ -182,9 +182,6 @@ class CLITestV20Base(base.BaseTestCase):
                          cmd_resource=None, parent_id=None):
         return name_or_id
 
-    def _get_attr_metadata(self):
-        return self.metadata
-
     def setUp(self, plurals=None):
         """Prepare the test environment."""
         super(CLITestV20Base, self).setUp()
@@ -202,9 +199,6 @@ class CLITestV20Base(base.BaseTestCase):
         self.useFixture(fixtures.MonkeyPatch(
             'neutronclient.neutron.v2_0.find_resourceid_by_id',
             self._find_resourceid))
-        self.useFixture(fixtures.MonkeyPatch(
-            'neutronclient.v2_0.client.Client.get_attr_metadata',
-            self._get_attr_metadata))
         self.client = client.Client(token=TOKEN, endpoint_url=self.endurl)
         self.client.format = self.format
 
