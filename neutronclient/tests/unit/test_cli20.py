@@ -19,7 +19,7 @@ import copy
 import itertools
 import sys
 
-import fixtures
+import mock
 from mox3 import mox
 from oslo_utils import encodeutils
 from oslotest import base
@@ -208,16 +208,16 @@ class CLITestV20Base(base.BaseTestCase):
         self.mox = mox.Mox()
         self.endurl = ENDURL
         self.fake_stdout = FakeStdout()
-        self.useFixture(fixtures.MonkeyPatch('sys.stdout', self.fake_stdout))
-        self.useFixture(fixtures.MonkeyPatch(
-            'neutronclient.neutron.v2_0.find_resourceid_by_name_or_id',
-            self._find_resourceid))
-        self.useFixture(fixtures.MonkeyPatch(
-            'neutronclient.neutron.v2_0.find_resourceid_by_id',
-            self._find_resourceid))
-        self.useFixture(fixtures.MonkeyPatch(
-            'neutronclient.v2_0.client.Client.get_attr_metadata',
-            self._get_attr_metadata))
+
+        self.addCleanup(mock.patch.stopall)
+        mock.patch('sys.stdout', new=self.fake_stdout).start()
+        mock.patch('neutronclient.neutron.v2_0.find_resourceid_by_name_or_id',
+                   new=self._find_resourceid).start()
+        mock.patch('neutronclient.neutron.v2_0.find_resourceid_by_id',
+                   new=self._find_resourceid).start()
+        mock.patch('neutronclient.v2_0.client.Client.get_attr_metadata',
+                   new=self._get_attr_metadata).start()
+
         self.client = client.Client(token=TOKEN, endpoint_url=self.endurl)
 
     def register_non_admin_status_resource(self, resource_name):
