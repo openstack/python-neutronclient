@@ -34,15 +34,9 @@ class CLITestV20ExtensionJSON(test_cli20.CLITestV20Base):
         self._mock_extension_loading()
         super(CLITestV20ExtensionJSON, self).setUp(plurals={'tags': 'tag'})
 
-    def _create_patch(self, name, func=None):
-        patcher = mock.patch(name)
-        thing = patcher.start()
-        self.addCleanup(patcher.stop)
-        return thing
-
     def _mock_extension_loading(self):
         ext_pkg = 'neutronclient.common.extension'
-        contrib = self._create_patch(ext_pkg + '._discover_via_entry_points')
+        contrib = mock.patch(ext_pkg + '._discover_via_entry_points').start()
         contrib.return_value = [("_fox_sockets", fox_sockets)]
         return contrib
 
@@ -134,15 +128,9 @@ class CLITestV20ExtensionJSONAlternatePlurals(test_cli20.CLITestV20Base):
         self._mock_extension_loading()
         super(CLITestV20ExtensionJSONAlternatePlurals, self).setUp()
 
-    def _create_patch(self, name, func=None):
-        patcher = mock.patch(name)
-        thing = patcher.start()
-        self.addCleanup(patcher.stop)
-        return thing
-
     def _mock_extension_loading(self):
         ext_pkg = 'neutronclient.common.extension'
-        contrib = self._create_patch(ext_pkg + '._discover_via_entry_points')
+        contrib = mock.patch(ext_pkg + '._discover_via_entry_points').start()
         ip_address = mock.MagicMock()
         ip_address.IPAddress = self.IPAddress
         ip_address.IPAddressesList = self.IPAddressesList
@@ -193,15 +181,9 @@ class CLITestV20ExtensionJSONChildResource(test_cli20.CLITestV20Base):
         self._mock_extension_loading()
         super(CLITestV20ExtensionJSONChildResource, self).setUp()
 
-    def _create_patch(self, name, func=None):
-        patcher = mock.patch(name)
-        thing = patcher.start()
-        self.addCleanup(patcher.stop)
-        return thing
-
     def _mock_extension_loading(self):
         ext_pkg = 'neutronclient.common.extension'
-        contrib = self._create_patch(ext_pkg + '._discover_via_entry_points')
+        contrib = mock.patch(ext_pkg + '._discover_via_entry_points').start()
         child = mock.MagicMock()
         child.Child = self.Child
         child.ChildrenList = self.ChildrenList
