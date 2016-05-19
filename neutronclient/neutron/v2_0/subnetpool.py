@@ -18,6 +18,13 @@ from neutronclient.i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
 
 
+def _format_prefixes(subnetpool):
+    try:
+        return '\n'.join(pool for pool in subnetpool['prefixes'])
+    except (TypeError, KeyError):
+        return subnetpool['prefixes']
+
+
 def add_updatable_arguments(parser):
     parser.add_argument(
         '--min-prefixlen', type=int,
@@ -43,6 +50,7 @@ def updatable_args2body(parsed_args, body, for_create=True):
 class ListSubnetPool(neutronV20.ListCommand):
     """List subnetpools that belong to a given tenant."""
 
+    _formatters = {'prefixes': _format_prefixes, }
     resource = 'subnetpool'
     list_columns = ['id', 'name', 'prefixes',
                     'default_prefixlen', 'address_scope_id']
