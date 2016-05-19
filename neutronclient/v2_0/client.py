@@ -1685,7 +1685,7 @@ class Client(ClientBase):
 
     @APIParamsCall
     def show_bandwidth_limit_rule(self, rule, policy, body=None):
-        """Creates a new bandwidth limit rule."""
+        """Fetches information of a certain bandwidth limit rule."""
         return self.get(self.qos_bandwidth_limit_rule_path %
                         (policy, rule), body=body)
 
