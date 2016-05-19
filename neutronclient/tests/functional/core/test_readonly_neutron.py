@@ -12,7 +12,7 @@
 
 import re
 
-from tempest_lib import exceptions
+from tempest.lib import exceptions
 
 from neutronclient.tests.functional import base
 

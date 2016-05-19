@@ -14,7 +14,7 @@ import uuid
 
 from keystoneauth1 import plugin as ksa_plugin
 from keystoneauth1 import session
-from tempest_lib import base
+from tempest.lib import base
 import testtools
 
 from neutronclient.common import exceptions
