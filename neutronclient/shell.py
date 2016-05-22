@@ -622,10 +622,10 @@ class NeutronShell(app.App):
             '--os-project-name',
             metavar='<auth-project-name>',
             default=utils.env('OS_PROJECT_NAME'),
-            help='Another way to specify tenant name. '
-                 'This option is mutually exclusive with '
-                 ' --os-tenant-name. '
-                 'Defaults to env[OS_PROJECT_NAME].')
+            help=_('Another way to specify tenant name. '
+                   'This option is mutually exclusive with '
+                   ' --os-tenant-name. '
+                   'Defaults to env[OS_PROJECT_NAME].'))
 
         parser.add_argument(
             '--os_tenant_name',
@@ -641,10 +641,10 @@ class NeutronShell(app.App):
             '--os-project-id',
             metavar='<auth-project-id>',
             default=utils.env('OS_PROJECT_ID'),
-            help='Another way to specify tenant ID. '
-            'This option is mutually exclusive with '
-            ' --os-tenant-id. '
-            'Defaults to env[OS_PROJECT_ID].')
+            help=_('Another way to specify tenant ID. '
+                   'This option is mutually exclusive with '
+                   ' --os-tenant-id. '
+                   'Defaults to env[OS_PROJECT_ID].'))
 
         parser.add_argument(
             '--os-username', metavar='<auth-username>',
@@ -667,8 +667,8 @@ class NeutronShell(app.App):
             '--os-user-domain-id',
             metavar='<auth-user-domain-id>',
             default=utils.env('OS_USER_DOMAIN_ID'),
-            help='OpenStack user domain ID. '
-            'Defaults to env[OS_USER_DOMAIN_ID].')
+            help=_('OpenStack user domain ID. '
+                   'Defaults to env[OS_USER_DOMAIN_ID].'))
 
         parser.add_argument(
             '--os_user_domain_id',
@@ -678,8 +678,8 @@ class NeutronShell(app.App):
             '--os-user-domain-name',
             metavar='<auth-user-domain-name>',
             default=utils.env('OS_USER_DOMAIN_NAME'),
-            help='OpenStack user domain name. '
-                 'Defaults to env[OS_USER_DOMAIN_NAME].')
+            help=_('OpenStack user domain name. '
+                   'Defaults to env[OS_USER_DOMAIN_NAME].'))
 
         parser.add_argument(
             '--os_user_domain_name',
@@ -697,13 +697,13 @@ class NeutronShell(app.App):
             '--os-project-domain-id',
             metavar='<auth-project-domain-id>',
             default=utils.env('OS_PROJECT_DOMAIN_ID'),
-            help='Defaults to env[OS_PROJECT_DOMAIN_ID].')
+            help=_('Defaults to env[OS_PROJECT_DOMAIN_ID].'))
 
         parser.add_argument(
             '--os-project-domain-name',
             metavar='<auth-project-domain-name>',
             default=utils.env('OS_PROJECT_DOMAIN_NAME'),
-            help='Defaults to env[OS_PROJECT_DOMAIN_NAME].')
+            help=_('Defaults to env[OS_PROJECT_DOMAIN_NAME].'))
 
         parser.add_argument(
             '--os-cert',
@@ -987,7 +987,7 @@ def main(argv=sys.argv[1:]):
         return NeutronShell(NEUTRON_API_VERSION).run(
             list(map(encodeutils.safe_decode, argv)))
     except KeyboardInterrupt:
-        print("... terminating neutron client", file=sys.stderr)
+        print(_("... terminating neutron client"), file=sys.stderr)
         return 130
     except exc.NeutronClientException:
         return 1
