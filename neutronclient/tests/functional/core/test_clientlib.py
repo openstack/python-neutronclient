@@ -36,8 +36,7 @@ class LibraryTestBase(base.BaseTestCase):
 
 class Libv2HTTPClientTestBase(LibraryTestBase):
 
-    def _get_client(self):
-
+    def _setup_creds(self):
         creds = func_base.credentials()
         cloud_config = func_base.get_cloud_config()
 
@@ -52,10 +51,26 @@ class Libv2HTTPClientTestBase(LibraryTestBase):
         # whether v3 also exists or is configured
         v2_auth_url = keystone_auth.get_endpoint(
             ks_session, interface=ksa_plugin.AUTH_INTERFACE, version=(2, 0))
+        return v2_auth_url, creds
 
+
+class Libv2HTTPClientTenantTestBase(Libv2HTTPClientTestBase):
+
+    def _get_client(self):
+        v2_auth_url, creds = self._setup_creds()
         return v2_client.Client(username=creds['username'],
                                 password=creds['password'],
                                 tenant_name=creds['project_name'],
+                                auth_url=v2_auth_url)
+
+
+class Libv2HTTPClientProjectTestBase(Libv2HTTPClientTestBase):
+
+    def _get_client(self):
+        v2_auth_url, creds = self._setup_creds()
+        return v2_client.Client(username=creds['username'],
+                                password=creds['password'],
+                                project_name=creds['project_name'],
                                 auth_url=v2_auth_url)
 
 
@@ -92,7 +107,13 @@ class LibraryTestCase(object):
             self.client.show_network(net_id)
 
 
-class LibraryHTTPClientTest(LibraryTestCase, Libv2HTTPClientTestBase):
+class LibraryHTTPClientTenantTest(LibraryTestCase,
+                                  Libv2HTTPClientTenantTestBase):
+    pass
+
+
+class LibraryHTTPClientProjectTest(LibraryTestCase,
+                                   Libv2HTTPClientProjectTestBase):
     pass
 
 

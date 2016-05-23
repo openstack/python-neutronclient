@@ -33,11 +33,11 @@ First create a client instance.
     >>> from neutronclient.v2_0 import client
     >>> username='adminUser'
     >>> password='secretword'
-    >>> tenant_name='openstackDemo'
+    >>> project_name='openstackDemo'
     >>> auth_url='http://192.168.206.130:5000/v2.0'
     >>> neutron = client.Client(username=username,
     ...                         password=password,
-    ...                         tenant_name=tenant_name,
+    ...                         project_name=project_name,
     ...                         auth_url=auth_url)
 
 Now you can call various methods on the client instance.

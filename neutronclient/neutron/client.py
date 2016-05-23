@@ -35,7 +35,7 @@ def make_client(instance):
     url = instance._url
     url = url.rstrip("/")
     client = neutron_client(username=instance._username,
-                            tenant_name=instance._tenant_name,
+                            project_name=instance._project_name,
                             password=instance._password,
                             region_name=instance._region_name,
                             auth_url=instance._auth_url,

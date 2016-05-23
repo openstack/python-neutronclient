@@ -21,6 +21,7 @@ except ImportError:
 import logging
 import os
 
+import debtcollector.renames
 from keystoneauth1 import access
 from keystoneauth1 import adapter
 import requests
@@ -49,8 +50,12 @@ class HTTPClient(object):
     USER_AGENT = 'python-neutronclient'
     CONTENT_TYPE = 'application/json'
 
+    @debtcollector.renames.renamed_kwarg(
+        'tenant_id', 'project_id', replace=True)
+    @debtcollector.renames.renamed_kwarg(
+        'tenant_name', 'project_name', replace=True)
     def __init__(self, username=None, user_id=None,
-                 tenant_name=None, tenant_id=None,
+                 project_name=None, project_id=None,
                  password=None, auth_url=None,
                  token=None, region_name=None, timeout=None,
                  endpoint_url=None, insecure=False,
@@ -61,8 +66,8 @@ class HTTPClient(object):
 
         self.username = username
         self.user_id = user_id
-        self.tenant_name = tenant_name
-        self.tenant_id = tenant_id
+        self.project_name = project_name
+        self.project_id = project_id
         self.password = password
         self.auth_url = auth_url.rstrip('/') if auth_url else None
         self.service_type = service_type
@@ -199,12 +204,12 @@ class HTTPClient(object):
             creds = {'username': self.username,
                      'password': self.password}
 
-        if self.tenant_id:
+        if self.project_id:
             body = {'auth': {'passwordCredentials': creds,
-                             'tenantId': self.tenant_id, }, }
+                             'tenantId': self.project_id, }, }
         else:
             body = {'auth': {'passwordCredentials': creds,
-                             'tenantName': self.tenant_name, }, }
+                             'tenantName': self.project_name, }, }
 
         if self.auth_url is None:
             raise exceptions.NoAuthURLProvided()
@@ -344,10 +349,13 @@ class SessionClient(adapter.Adapter):
 
 # FIXME(bklei): Should refactor this to use kwargs and only
 # explicitly list arguments that are not None.
+@debtcollector.renames.renamed_kwarg('tenant_id', 'project_id', replace=True)
+@debtcollector.renames.renamed_kwarg(
+    'tenant_name', 'project_name', replace=True)
 def construct_http_client(username=None,
                           user_id=None,
-                          tenant_name=None,
-                          tenant_id=None,
+                          project_name=None,
+                          project_id=None,
                           password=None,
                           auth_url=None,
                           token=None,
@@ -376,8 +384,8 @@ def construct_http_client(username=None,
         # refactor to use kwargs.
         return HTTPClient(username=username,
                           password=password,
-                          tenant_id=tenant_id,
-                          tenant_name=tenant_name,
+                          project_id=project_id,
+                          project_name=project_name,
                           user_id=user_id,
                           auth_url=auth_url,
                           token=token,

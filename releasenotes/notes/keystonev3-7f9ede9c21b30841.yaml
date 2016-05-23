@@ -1,0 +1,7 @@
+---
+deprecations:
+  - |
+    Keystone v3 support for CLI
+
+    * Using 'tenant_id' and 'tenant_name' arguments in API bindings is
+      deprecated. Use 'project_id' and 'project_name' arguments instead.

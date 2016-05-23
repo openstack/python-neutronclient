@@ -19,6 +19,8 @@
 
 import logging
 
+import debtcollector.renames
+
 from neutronclient import client
 from neutronclient.neutron import client as neutron_client
 
@@ -47,11 +49,15 @@ class ClientManager(object):
     # in stable versions)
     quantum = neutron
 
+    @debtcollector.renames.renamed_kwarg(
+        'tenant_id', 'project_id', replace=True)
+    @debtcollector.renames.renamed_kwarg(
+        'tenant_name', 'project_name', replace=True)
     def __init__(self, token=None, url=None,
                  auth_url=None,
                  endpoint_type=None,
-                 tenant_name=None,
-                 tenant_id=None,
+                 project_name=None,
+                 project_id=None,
                  username=None,
                  user_id=None,
                  password=None,
@@ -75,8 +81,8 @@ class ClientManager(object):
         self._service_type = service_type
         self._service_name = service_name
         self._endpoint_type = endpoint_type
-        self._tenant_name = tenant_name
-        self._tenant_id = tenant_id
+        self._project_name = project_name
+        self._project_id = project_id
         self._username = username
         self._user_id = user_id
         self._password = password
@@ -99,8 +105,8 @@ class ClientManager(object):
             httpclient = client.construct_http_client(
                 username=self._username,
                 user_id=self._user_id,
-                tenant_name=self._tenant_name,
-                tenant_id=self._tenant_id,
+                project_name=self._project_name,
+                project_id=self._project_id,
                 password=self._password,
                 region_name=self._region_name,
                 auth_url=self._auth_url,
