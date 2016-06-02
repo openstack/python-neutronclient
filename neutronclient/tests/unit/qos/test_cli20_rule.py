@@ -22,7 +22,9 @@ from neutronclient.tests.unit import test_cli20
 
 class CLITestV20QoSRuleJSON(test_cli20.CLITestV20Base):
 
-    non_admin_status_resources = ['bandwidth_limit_rule', 'dscp_marking_rule']
+    non_admin_status_resources = ['bandwidth_limit_rule',
+                                  'dscp_marking_rule',
+                                  'minimum_bandwidth_rule']
 
     def setUp(self):
         super(CLITestV20QoSRuleJSON, self).setUp()
@@ -32,7 +34,8 @@ class CLITestV20QoSRuleJSON(test_cli20.CLITestV20Base):
         resources = 'rule_types'
         cmd_resources = 'qos_rule_types'
         response_contents = [{'type': 'bandwidth_limit',
-                              'type': 'dscp_marking'}]
+                              'type': 'dscp_marking',
+                              'type': 'minimum_bandwidth'}]
 
         cmd = qos_rule.ListQoSRuleTypes(test_cli20.MyApp(sys.stdout),
                                         None)
