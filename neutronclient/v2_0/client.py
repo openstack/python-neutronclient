@@ -1117,11 +1117,11 @@ class Client(ClientBase):
                         params=_params)
 
     def create_lbaas_member(self, lbaas_pool, body=None):
-        """Creates an lbaas_member."""
+        """Creates a lbaas_member."""
         return self.post(self.lbaas_members_path % lbaas_pool, body=body)
 
     def update_lbaas_member(self, lbaas_member, lbaas_pool, body=None):
-        """Updates a lbaas_healthmonitor."""
+        """Updates a lbaas_member."""
         return self.put(self.lbaas_member_path % (lbaas_pool, lbaas_member),
                         body=body)
 
