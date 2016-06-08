@@ -131,7 +131,7 @@ class CLITestV20QoSBandwidthLimitRuleJSON(test_cli20.CLITestV20Base):
         cmd = bw_rule.ShowQoSBandwidthLimitRule(test_cli20.MyApp(sys.stdout),
                                                 None)
         policy_id = 'policy_id'
-        args = [self.test_id, policy_id]
+        args = ['--fields', 'id', self.test_id, policy_id]
         self._test_show_resource(self.res, cmd, self.test_id, args,
-                                 [], cmd_resource=self.cmd_res,
+                                 ['id'], cmd_resource=self.cmd_res,
                                  parent_id=policy_id)
