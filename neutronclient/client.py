@@ -42,12 +42,12 @@ else:
 
 logging.getLogger("requests").setLevel(_requests_log_level)
 MAX_URI_LEN = 8192
+USER_AGENT = 'python-neutronclient'
 
 
 class HTTPClient(object):
     """Handles the REST calls and responses, include authn."""
 
-    USER_AGENT = 'python-neutronclient'
     CONTENT_TYPE = 'application/json'
 
     @debtcollector.renames.renamed_kwarg(
@@ -88,7 +88,7 @@ class HTTPClient(object):
     def _cs_request(self, *args, **kwargs):
         kargs = {}
         kargs.setdefault('headers', kwargs.get('headers', {}))
-        kargs['headers']['User-Agent'] = self.USER_AGENT
+        kargs['headers']['User-Agent'] = USER_AGENT
 
         if 'body' in kwargs:
             kargs['body'] = kwargs['body']
@@ -139,7 +139,7 @@ class HTTPClient(object):
         if body:
             headers.setdefault('Content-Type', content_type)
 
-        headers['User-Agent'] = self.USER_AGENT
+        headers['User-Agent'] = USER_AGENT
 
         resp = requests.request(
             method,
@@ -372,7 +372,7 @@ def construct_http_client(username=None,
                           **kwargs):
 
     if session:
-        kwargs.setdefault('user_agent', 'python-neutronclient')
+        kwargs.setdefault('user_agent', USER_AGENT)
         kwargs.setdefault('interface', endpoint_type)
         return SessionClient(session=session,
                              service_type=service_type,
