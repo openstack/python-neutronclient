@@ -104,6 +104,36 @@ class CLITestV20QoSPolicyJSON(test_cli20.CLITestV20Base):
                                    {'description': 'newdesc', },
                                    cmd_resource=self.cmd_res)
 
+    def test_update_policy_to_shared(self):
+        # policy-update myid --shared
+        cmd = policy.UpdateQoSPolicy(test_cli20.MyApp(sys.stdout),
+                                     None)
+        self._test_update_resource(self.res, cmd, 'myid',
+                                   ['myid', '--shared'],
+                                   {'shared': True, },
+                                   cmd_resource=self.cmd_res)
+
+    def test_update_policy_to_no_shared(self):
+        # policy-update myid --no-shared
+        cmd = policy.UpdateQoSPolicy(test_cli20.MyApp(sys.stdout),
+                                     None)
+        self._test_update_resource(self.res, cmd, 'myid',
+                                   ['myid', '--no-shared'],
+                                   {'shared': False, },
+                                   cmd_resource=self.cmd_res)
+
+    def test_update_policy_to_shared_no_shared_together(self):
+        # policy-update myid --shared --no-shared
+        cmd = policy.UpdateQoSPolicy(test_cli20.MyApp(sys.stdout),
+                                     None)
+        self.assertRaises(
+            SystemExit,
+            self._test_update_resource,
+            self.res, cmd, 'myid',
+            ['myid', '--shared', '--no-shared'], {},
+            cmd_resource=self.cmd_res
+        )
+
     def test_list_policies(self):
         # qos-policy-list.
         cmd = policy.ListQoSPolicy(test_cli20.MyApp(sys.stdout),

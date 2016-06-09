@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    CLI support to set QoS policy as not shared if it was shared before.
+    The ``qos-policy-update`` command include a ``--no-shared`` option.
+    Closes `bug 1590942 <https://bugs.launchpad.net/python-neutronclient/+bug/1590942>`_.
