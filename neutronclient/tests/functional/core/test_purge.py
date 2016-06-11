@@ -15,7 +15,7 @@
 
 from neutronclient.tests.functional import base
 
-from tempest_lib import exceptions
+from tempest.lib import exceptions
 
 
 class PurgeNeutronClientCLITest(base.ClientTestBase):

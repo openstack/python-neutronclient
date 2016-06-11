@@ -13,7 +13,7 @@
 import os
 
 import os_client_config
-from tempest_lib.cli import base
+from tempest.lib.cli import base
 
 
 def credentials(cloud='devstack-admin'):
