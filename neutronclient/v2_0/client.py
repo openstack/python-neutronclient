@@ -1612,10 +1612,10 @@ class Client(ClientBase):
                          self.qos_dscp_marking_rules_path % policy_id,
                          retrieve_all, **_params)
 
-    def show_dscp_marking_rule(self, rule, policy, body=None):
+    def show_dscp_marking_rule(self, rule, policy, **_params):
         """Shows information of a certain DSCP marking rule."""
         return self.get(self.qos_dscp_marking_rule_path %
-                        (policy, rule), body=body)
+                        (policy, rule), params=_params)
 
     def create_dscp_marking_rule(self, policy, body=None):
         """Creates a new DSCP marking rule."""

@@ -85,7 +85,7 @@ class CLITestV20QoSDscpMarkingRuleJSON(test_cli20.CLITestV20Base):
         cmd = dscp_rule.ShowQoSDscpMarkingRule(test_cli20.MyApp(sys.stdout),
                                                None)
         policy_id = 'policy_id'
-        args = [self.test_id, policy_id]
+        args = ['--fields', 'id', self.test_id, policy_id]
         self._test_show_resource(self.dscp_res, cmd, self.test_id, args,
-                                 [], cmd_resource=self.dscp_cmd_res,
+                                 ['id'], cmd_resource=self.dscp_cmd_res,
                                  parent_id=policy_id)
