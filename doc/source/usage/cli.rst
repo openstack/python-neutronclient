@@ -30,9 +30,22 @@ Basic Usage
 -----------
 
 In order to use the CLI, you must provide your OpenStack username, password,
-tenant, and auth endpoint. Use the corresponding configuration options
-(``--os-username``, ``--os-password``, ``--os-tenant-name``, and
+project, domain information for both user and project, and auth endpoint. Use
+the corresponding configuration options (``--os-username``, ``--os-password``,
+``--os-project-name``, ``--os-user-domain-id``, ``os-project-domain-id``, and
 ``--os-auth-url``), but it is easier to set them in environment variables.
+
+.. code-block:: shell
+
+    export OS_USERNAME=user
+    export OS_PASSWORD=pass
+    export OS_PROJECT_NAME=project
+    export OS_USER_DOMAIN_ID=default
+    export OS_PROJECT_DOMAIN_ID=default
+    export OS_AUTH_URL=http://auth.example.com:5000/v3
+
+If you are using Identity v2.0 API (DEPRECATED), you don't need to pass domain
+information.
 
 .. code-block:: shell
 

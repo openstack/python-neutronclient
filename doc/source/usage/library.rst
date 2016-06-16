@@ -26,19 +26,43 @@ neutronclient Python API
 Basic Usage
 -----------
 
-First create a client instance.
+First create a client instance using a keystoneauth Session. For more
+information on this keystoneauth API, see `Using Sessions`_.
+
+.. _Using Sessions: http://docs.openstack.org/developer/keystoneauth/using-sessions.html
 
 .. code-block:: python
 
+    >>> from keystoneauth1 import identity
+    >>> from keystoneauth1 import session
     >>> from neutronclient.v2_0 import client
-    >>> username='adminUser'
-    >>> password='secretword'
-    >>> project_name='openstackDemo'
-    >>> auth_url='http://192.168.206.130:5000/v2.0'
-    >>> neutron = client.Client(username=username,
-    ...                         password=password,
-    ...                         project_name=project_name,
-    ...                         auth_url=auth_url)
+    >>> username='username'
+    >>> password='password'
+    >>> project_name='demo'
+    >>> project_domain_id='default'
+    >>> user_domain_id='default'
+    >>> auth_url='http://auth.example.com:5000/v3'
+    >>> auth = identity.Password(auth_url=auth_url,
+    ...                          username=username,
+    ...                          password=password,
+    ...                          project_name=project_name,
+    ...                          project_domain_id=project_domain_id,
+    ...                          user_domain_id=user_domain_id)
+    >>> sess = session.Session(auth=auth)
+    >>> neutron = client.Client(session=sess)
+
+If you are using Identity v2.0 API (DEPRECATED), create an auth plugin using
+the appropriate parameters and `keystoneauth1.identity` will handle Identity
+API version discovery. Then you can create a Session and a Neutronclient just
+like the previous example.
+
+.. code-block:: python
+
+    >>> auth = identity.Password(auth_url=auth_url,
+    ...                          username=username,
+    ...                          password=password,
+    ...                          project_name=project_name)
+    >>> # create a Session and a Neutronclient
 
 Now you can call various methods on the client instance.
 
