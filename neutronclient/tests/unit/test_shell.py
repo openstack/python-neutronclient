@@ -20,7 +20,7 @@ import re
 import sys
 
 import fixtures
-from mox3 import mox
+import mock
 import six
 import testtools
 from testtools import matchers
@@ -53,7 +53,6 @@ class ShellTest(testtools.TestCase):
     # Patch os.environ to avoid required auth info.
     def setUp(self):
         super(ShellTest, self).setUp()
-        self.mox = mox.Mox()
         for var in self.FAKE_ENV:
             self.useFixture(
                 fixtures.EnvironmentVariable(
@@ -148,17 +147,14 @@ class ShellTest(testtools.TestCase):
         result = neutron_shell.build_option_parser('descr', '2.0')
         self.assertIsInstance(result, argparse.ArgumentParser)
 
-    def test_main_with_unicode(self):
-        self.mox.StubOutClassWithMocks(openstack_shell, 'NeutronShell')
-        qshell_mock = openstack_shell.NeutronShell('2.0')
+    @mock.patch.object(openstack_shell.NeutronShell, 'run')
+    def test_main_with_unicode(self, fake_shell):
         unicode_text = u'\u7f51\u7edc'
         argv = ['net-list', unicode_text, unicode_text]
-        qshell_mock.run([u'net-list', unicode_text,
-                         unicode_text]).AndReturn(0)
-        self.mox.ReplayAll()
+        fake_shell.return_value = 0
         ret = openstack_shell.main(argv=argv)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+        fake_shell.assert_called_once_with([u'net-list', unicode_text,
+                                           unicode_text])
         self.assertEqual(0, ret)
 
     def test_endpoint_option(self):
