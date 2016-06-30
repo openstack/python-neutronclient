@@ -140,7 +140,7 @@ class ShowQuotaDefault(ShowQuotaBase):
 
 
 class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
-    """Define tenant's quotas not to use defaults."""
+    """Update a given tenant's quotas."""
 
     resource = 'quota'
 
