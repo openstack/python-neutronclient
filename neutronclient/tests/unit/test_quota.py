@@ -92,3 +92,11 @@ class CLITestV20Quota(test_cli20.CLITestV20Base):
         self.assertIn('subnet', _str)
         self.assertIn('port', _str)
         self.assertNotIn('subnetpool', _str)
+
+    def test_update_quota_noargs(self):
+        resource = 'quota'
+        cmd = test_quota.UpdateQuota(test_cli20.MyApp(sys.stdout), None)
+        args = [self.test_id]
+        self.assertRaises(exceptions.CommandError, self._test_update_resource,
+                          resource, cmd, self.test_id, args=args,
+                          extrafields=None)

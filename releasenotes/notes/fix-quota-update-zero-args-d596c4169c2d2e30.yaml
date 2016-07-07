@@ -1,0 +1,9 @@
+---
+fixes:
+  - |
+    Fix CLI quota-update to return an error message for no args
+
+    * ``quota-update`` CLI will return an error message
+      ``Must specify a valid resource with new quota value`` if no
+      argument is provided while executing it. If arguments are
+      provided with CLI, no existing behavior is changed.
