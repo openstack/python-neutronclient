@@ -17,15 +17,10 @@
 """Manage access to the clients, including authenticating when needed.
 """
 
-import logging
-
 import debtcollector.renames
 
 from neutronclient import client
 from neutronclient.neutron import client as neutron_client
-
-
-LOG = logging.getLogger(__name__)
 
 
 class ClientCache(object):
