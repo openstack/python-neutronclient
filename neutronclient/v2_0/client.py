@@ -1774,7 +1774,7 @@ class Client(ClientBase):
         return self.delete(self.bgp_peer_path % peer_id)
 
     def list_network_ip_availabilities(self, retrieve_all=True, **_params):
-        """Fetches IP availibility information for all networks"""
+        """Fetches IP availability information for all networks"""
         return self.list('network_ip_availabilities',
                          self.network_ip_availabilities_path,
                          retrieve_all, **_params)
