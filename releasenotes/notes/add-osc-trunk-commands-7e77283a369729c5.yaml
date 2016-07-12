@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    Add ``network trunk create``, ``network trunk list``,
+    ``network trunk set``, ``network trunk unset``, ``network trunk delete``
+    and ``network subport list`` OSC commands for trunk resource along with
+    client bindings.
+    [Blueprint `vlan-aware-vms <https://blueprints.launchpad.net/neutron/+spec/vlan-aware-vms>`_]
