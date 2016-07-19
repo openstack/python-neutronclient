@@ -112,6 +112,13 @@ class _RequestIdMixin(object):
             # Extract 'x-openstack-request-id' from headers if
             # response is a Response object.
             request_id = resp.headers.get('x-openstack-request-id')
+            # log request-id for each api call
+            _logger.debug('%(method)s call to neutron for '
+                          '%(url)s used request id '
+                          '%(response_request_id)s',
+                          {'method': resp.request.method,
+                           'url': resp.url,
+                           'response_request_id': request_id})
         else:
             # If resp is of type string.
             request_id = resp
