@@ -26,7 +26,7 @@ def _format_prefixes(subnetpool):
         return subnetpool['prefixes']
 
 
-def add_updatable_arguments(parser):
+def add_updatable_arguments(parser, for_create=False):
     parser.add_argument(
         '--min-prefixlen', type=int,
         help=_('Subnetpool minimum prefix length.'))
@@ -39,6 +39,7 @@ def add_updatable_arguments(parser):
     parser.add_argument(
         '--pool-prefix',
         action='append', dest='prefixes',
+        required=for_create,
         help=_('Subnetpool prefixes (This option can be repeated).'))
     utils.add_boolean_argument(
         parser, '--is-default',
@@ -46,7 +47,7 @@ def add_updatable_arguments(parser):
                '(True meaning default).'))
 
 
-def updatable_args2body(parsed_args, body, for_create=True):
+def updatable_args2body(parsed_args, body):
     neutronV20.update_dict(parsed_args, body,
                            ['name', 'prefixes', 'default_prefixlen',
                             'min_prefixlen', 'max_prefixlen', 'is_default'])
@@ -75,7 +76,7 @@ class CreateSubnetPool(neutronV20.CreateCommand):
     resource = 'subnetpool'
 
     def add_known_arguments(self, parser):
-        add_updatable_arguments(parser)
+        add_updatable_arguments(parser, for_create=True)
         parser.add_argument(
             '--shared',
             action='store_true',
@@ -135,7 +136,7 @@ class UpdateSubnetPool(neutronV20.UpdateCommand):
 
     def args2body(self, parsed_args):
         body = {}
-        updatable_args2body(parsed_args, body, for_create=False)
+        updatable_args2body(parsed_args, body)
 
         # Parse and update for "address-scope" option/s
         if parsed_args.no_address_scope:
