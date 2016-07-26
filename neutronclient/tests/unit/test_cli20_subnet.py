@@ -402,7 +402,7 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
         position_values = [4, netid, cidr, gateway]
         self.mox.StubOutWithMock(cmd.log, 'warning')
-        cmd.log.warning(mox.IgnoreArg())
+        cmd.log.warning(mox.IgnoreArg(), {'ip': 4, 'cidr': '/32'})
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
         self.mox.VerifyAll()

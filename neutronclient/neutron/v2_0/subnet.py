@@ -237,9 +237,9 @@ class CreateSubnet(neutronV20.CreateCommand):
                 self.log.warning(_("An IPv%(ip)d subnet with a %(cidr)s CIDR "
                                    "will have only one usable IP address so "
                                    "the device attached to it will not have "
-                                   "any IP connectivity.")
-                                 % {"ip": ip_version,
-                                    "cidr": unusable_cidr})
+                                   "any IP connectivity."),
+                                 {"ip": ip_version,
+                                  "cidr": unusable_cidr})
 
         updatable_args2body(parsed_args, body, ip_version=ip_version)
         if parsed_args.tenant_id:
