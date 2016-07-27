@@ -201,6 +201,9 @@ class CreateSubnet(neutronV20.CreateCommand):
         parser.add_argument(
             '--prefixlen', metavar='PREFIX_LENGTH',
             help=_('Prefix length for subnet allocation from subnetpool.'))
+        parser.add_argument(
+            '--segment', metavar='SEGMENT',
+            help=_('ID of segment with which this subnet will be associated.'))
 
     def args2body(self, parsed_args):
         _network_id = neutronV20.find_resourceid_by_name_or_id(
@@ -212,6 +215,9 @@ class CreateSubnet(neutronV20.CreateCommand):
         ip_version = parsed_args.ip_version
         if parsed_args.use_default_subnetpool:
             body['use_default_subnetpool'] = True
+        if parsed_args.segment:
+            body['segment_id'] = neutronV20.find_resourceid_by_name_or_id(
+                self.get_client(), 'segment', parsed_args.segment)
         if parsed_args.subnetpool:
             if parsed_args.subnetpool == 'None':
                 _subnetpool_id = None
