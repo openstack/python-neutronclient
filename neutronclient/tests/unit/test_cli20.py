@@ -250,8 +250,7 @@ class CLITestV20Base(base.BaseTestCase):
             ress[resource].update({'name': name})
         resstr = self.client.serialize(ress)
         # url method body
-        resource_plural = neutronV2_0._get_resource_plural(cmd_resource,
-                                                           self.client)
+        resource_plural = self.client.get_resource_plural(cmd_resource)
         path = getattr(self.client, resource_plural + "_path")
         if parent_id:
             path = path % parent_id

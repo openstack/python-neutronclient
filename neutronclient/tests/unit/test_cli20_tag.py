@@ -15,7 +15,6 @@ import sys
 from mox3 import mox
 
 from neutronclient.common import exceptions
-from neutronclient.neutron import v2_0 as neutronV2_0
 from neutronclient.neutron.v2_0 import network
 from neutronclient.neutron.v2_0 import tag
 from neutronclient import shell
@@ -68,14 +67,12 @@ class CLITestV20Tag(test_cli20.CLITestV20Base):
 
     def _make_tag_path(self, resource, resource_id, tag):
         path = getattr(self.client, "tag_path")
-        resource_plural = neutronV2_0._get_resource_plural(resource,
-                                                           self.client)
+        resource_plural = self.client.get_resource_plural(resource)
         return path % (resource_plural, resource_id, tag)
 
     def _make_tags_path(self, resource, resource_id):
         path = getattr(self.client, "tags_path")
-        resource_plural = neutronV2_0._get_resource_plural(resource,
-                                                           self.client)
+        resource_plural = self.client.get_resource_plural(resource)
         return path % (resource_plural, resource_id)
 
     def test_add_tag(self):

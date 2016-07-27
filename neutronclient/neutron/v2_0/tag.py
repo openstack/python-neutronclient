@@ -20,8 +20,7 @@ TAG_RESOURCES = ['network']
 
 
 def _convert_resource_args(client, parsed_args):
-    resource_type = neutronv20._get_resource_plural(
-        parsed_args.resource_type, client)
+    resource_type = client.get_resource_plural(parsed_args.resource_type)
     resource_id = neutronv20.find_resourceid_by_name_or_id(
         client, parsed_args.resource_type, parsed_args.resource)
     return resource_type, resource_id
