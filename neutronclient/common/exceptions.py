@@ -170,6 +170,10 @@ class MacAddressInUseClient(Conflict):
     pass
 
 
+class HostNotCompatibleWithFixedIpsClient(Conflict):
+    pass
+
+
 class ExternalIpAddressExhaustedClient(BadRequest):
     pass
 
