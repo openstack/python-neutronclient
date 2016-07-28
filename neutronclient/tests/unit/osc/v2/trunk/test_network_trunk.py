@@ -22,6 +22,7 @@ from osc_lib.tests import utils as tests_utils
 from osc_lib import utils
 
 from neutronclient.osc.v2.trunk import network_trunk as trunk
+from neutronclient.osc.v2 import utils as v2_utils
 from neutronclient.tests.unit.osc.v2 import fakes as test_fakes
 from neutronclient.tests.unit.osc.v2.trunk import fakes
 
@@ -47,7 +48,7 @@ class TestCreateNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
 
     def get_data(self):
         return (
-            trunk._format_admin_state(self._trunk['admin_state_up']),
+            v2_utils.format_admin_state(self._trunk['admin_state_up']),
             self._trunk['description'],
             self._trunk['id'],
             self._trunk['name'],
@@ -248,7 +249,7 @@ class TestShowNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         'sub_ports',
     )
     data = (
-        trunk._format_admin_state(_trunk['admin_state_up']),
+        v2_utils.format_admin_state(_trunk['admin_state_up']),
         _trunk['description'],
         _trunk['id'],
         _trunk['name'],
@@ -327,7 +328,7 @@ class TestListNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
             t['port_id'],
             t['description'],
             t['status'],
-            trunk._format_admin_state(t['admin_state_up']),
+            v2_utils.format_admin_state(t['admin_state_up']),
             '2001-01-01 00:00:00',
             '2001-01-01 00:00:00',
         ))
@@ -384,7 +385,7 @@ class TestSetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         'sub_ports',
     )
     data = (
-        trunk._format_admin_state(_trunk['admin_state_up']),
+        v2_utils.format_admin_state(_trunk['admin_state_up']),
         _trunk['id'],
         _trunk['name'],
         _trunk['description'],
@@ -620,7 +621,7 @@ class TestUnsetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         'sub_ports',
     )
     data = (
-        trunk._format_admin_state(_trunk['admin_state_up']),
+        v2_utils.format_admin_state(_trunk['admin_state_up']),
         _trunk['id'],
         _trunk['name'],
         _trunk['port_id'],

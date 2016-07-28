@@ -20,12 +20,11 @@ import logging
 from osc_lib.cli import parseractions
 from osc_lib.command import command
 from osc_lib import exceptions
-from osc_lib import utils
-
-# TODO(abhiraut): Switch to neutronclients identity utils
-from openstackclient.identity import common as identity_common
+from osc_lib import utils as osc_utils
 
 from neutronclient._i18n import _
+from neutronclient.osc import utils as nc_osc_utils
+from neutronclient.osc.v2 import utils as v2_utils
 
 LOG = logging.getLogger(__name__)
 
@@ -75,12 +74,7 @@ class CreateNetworkTrunk(command.ShowOne):
             action='store_true',
             help=_("Disable trunk")
         )
-        parser.add_argument(
-            '--project',
-            metavar='<project>',
-            help=_("Owner's project (name or ID)")
-        )
-        identity_common.add_project_domain_option_to_parser(parser)
+        nc_osc_utils.add_project_owner_option_to_parser(parser)
         return parser
 
     def take_action(self, parsed_args):
@@ -90,8 +84,8 @@ class CreateNetworkTrunk(command.ShowOne):
         body = {TRUNK: attrs}
         obj = client.create_trunk(body)
         columns = _get_columns(obj[TRUNK])
-        data = utils.get_dict_properties(obj[TRUNK], columns,
-                                         formatters=_formatters)
+        data = osc_utils.get_dict_properties(obj[TRUNK], columns,
+                                             formatters=_formatters)
         return columns, data
 
 
@@ -169,7 +163,7 @@ class ListNetworkTrunk(command.Lister):
                 'updated_at'
             )
         return (headers,
-                (utils.get_dict_properties(
+                (osc_utils.get_dict_properties(
                     s, columns,
                     formatters=_formatters,
                 ) for s in data[TRUNKS]))
@@ -254,8 +248,8 @@ class ShowNetworkTrunk(command.ShowOne):
         trunk_id = _get_id(client, parsed_args.trunk, TRUNK)
         obj = client.show_trunk(trunk_id)
         columns = _get_columns(obj[TRUNK])
-        data = utils.get_dict_properties(obj[TRUNK], columns,
-                                         formatters=_formatters)
+        data = osc_utils.get_dict_properties(obj[TRUNK], columns,
+                                             formatters=_formatters)
         return columns, data
 
 
@@ -279,7 +273,7 @@ class ListNetworkSubport(command.Lister):
         headers = ('Port', 'Segmentation Type', 'Segmentation ID')
         columns = ('port_id', 'segmentation_type', 'segmentation_id')
         return (headers,
-                (utils.get_dict_properties(
+                (osc_utils.get_dict_properties(
                     s, columns,
                 ) for s in data[SUB_PORTS]))
 
@@ -311,13 +305,9 @@ class UnsetNetworkTrunk(command.Command):
         client.trunk_remove_subports(trunk_id, attrs)
 
 
-def _format_admin_state(item):
-    return 'UP' if item else 'DOWN'
-
-
 _formatters = {
-    'admin_state_up': _format_admin_state,
-    'sub_ports': utils.format_list_of_dicts,
+    'admin_state_up': v2_utils.format_admin_state,
+    'sub_ports': osc_utils.format_list_of_dicts,
 }
 
 
@@ -346,7 +336,7 @@ def _get_attrs_for_trunk(client_manager, parsed_args):
     # "trunk set" command doesn't support setting project.
     if 'project' in parsed_args and parsed_args.project is not None:
         identity_client = client_manager.identity
-        project_id = identity_common.find_project(
+        project_id = nc_osc_utils.find_project(
             identity_client,
             parsed_args.project,
             parsed_args.project_domain,
