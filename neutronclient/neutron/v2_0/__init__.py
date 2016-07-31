@@ -20,7 +20,6 @@ import abc
 import argparse
 import functools
 import logging
-import re
 
 from cliff import command
 from cliff import lister
@@ -32,104 +31,26 @@ from neutronclient._i18n import _
 from neutronclient.common import exceptions
 from neutronclient.common import utils
 
-HEX_ELEM = '[0-9A-Fa-f]'
-UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
-                         HEX_ELEM + '{4}', HEX_ELEM + '{4}',
-                         HEX_ELEM + '{12}'])
 HYPHEN_OPTS = ['tags_any', 'not_tags', 'not_tags_any']
-
-
-def _get_resource_plural(resource, client):
-    plurals = getattr(client, 'EXTED_PLURALS', [])
-    for k in plurals:
-        if plurals[k] == resource:
-            return k
-    return resource + 's'
 
 
 def find_resource_by_id(client, resource, resource_id, cmd_resource=None,
                         parent_id=None, fields=None):
-    if not cmd_resource:
-        cmd_resource = resource
-    cmd_resource_plural = _get_resource_plural(cmd_resource, client)
-    resource_plural = _get_resource_plural(resource, client)
-    obj_lister = getattr(client, "list_%s" % cmd_resource_plural)
-    # perform search by id only if we are passing a valid UUID
-    match = re.match(UUID_PATTERN, resource_id)
-    collection = resource_plural
-    if match:
-        params = {'id': resource_id}
-        if fields:
-            params['fields'] = fields
-        if parent_id:
-            data = obj_lister(parent_id, **params)
-        else:
-            data = obj_lister(**params)
-        if data and data[collection]:
-            return data[collection][0]
-    not_found_message = (_("Unable to find %(resource)s with id "
-                           "'%(id)s'") %
-                         {'resource': resource, 'id': resource_id})
-    # 404 is raised by exceptions.NotFound to simulate serverside behavior
-    raise exceptions.NotFound(message=not_found_message)
+    return client.find_resource_by_id(resource, resource_id, cmd_resource,
+                                      parent_id, fields)
 
 
 def find_resourceid_by_id(client, resource, resource_id, cmd_resource=None,
                           parent_id=None):
-    info = find_resource_by_id(client, resource, resource_id, cmd_resource,
-                               parent_id, fields='id')
-    return info['id']
-
-
-def _find_resource_by_name(client, resource, name, project_id=None,
-                           cmd_resource=None, parent_id=None, fields=None):
-    if not cmd_resource:
-        cmd_resource = resource
-    cmd_resource_plural = _get_resource_plural(cmd_resource, client)
-    resource_plural = _get_resource_plural(resource, client)
-    obj_lister = getattr(client, "list_%s" % cmd_resource_plural)
-    params = {'name': name}
-    if fields:
-        params['fields'] = fields
-    if project_id:
-        params['tenant_id'] = project_id
-    if parent_id:
-        data = obj_lister(parent_id, **params)
-    else:
-        data = obj_lister(**params)
-    collection = resource_plural
-    info = data[collection]
-    if len(info) > 1:
-        raise exceptions.NeutronClientNoUniqueMatch(resource=resource,
-                                                    name=name)
-    elif len(info) == 0:
-        not_found_message = (_("Unable to find %(resource)s with name "
-                               "'%(name)s'") %
-                             {'resource': resource, 'name': name})
-        # 404 is raised by exceptions.NotFound to simulate serverside behavior
-        raise exceptions.NotFound(message=not_found_message)
-    else:
-        return info[0]
+    return find_resource_by_id(client, resource, resource_id, cmd_resource,
+                               parent_id, fields='id')['id']
 
 
 def find_resource_by_name_or_id(client, resource, name_or_id,
                                 project_id=None, cmd_resource=None,
                                 parent_id=None, fields=None):
-    try:
-        return find_resource_by_id(client, resource, name_or_id,
-                                   cmd_resource, parent_id, fields)
-    except exceptions.NotFound:
-        try:
-            return _find_resource_by_name(client, resource, name_or_id,
-                                          project_id, cmd_resource, parent_id,
-                                          fields)
-        except exceptions.NotFound:
-            not_found_message = (_("Unable to find %(resource)s with name "
-                                   "or id '%(name_or_id)s'") %
-                                 {'resource': resource,
-                                  'name_or_id': name_or_id})
-            raise exceptions.NotFound(
-                message=not_found_message)
+    return client.find_resource(resource, name_or_id, project_id,
+                                cmd_resource, parent_id, fields)
 
 
 def find_resourceid_by_name_or_id(client, resource, name_or_id,
@@ -695,8 +616,7 @@ class ListCommand(NeutronCommand, lister.Lister):
         return search_opts
 
     def call_server(self, neutron_client, search_opts, parsed_args):
-        resource_plural = _get_resource_plural(self.cmd_resource,
-                                               neutron_client)
+        resource_plural = neutron_client.get_resource_plural(self.cmd_resource)
         obj_lister = getattr(neutron_client, "list_%s" % resource_plural)
         if self.parent_id:
             data = obj_lister(self.parent_id, **search_opts)
@@ -729,7 +649,7 @@ class ListCommand(NeutronCommand, lister.Lister):
             if dirs:
                 search_opts.update({'sort_dir': dirs})
         data = self.call_server(neutron_client, search_opts, parsed_args)
-        collection = _get_resource_plural(self.resource, neutron_client)
+        collection = neutron_client.get_resource_plural(self.resource)
         return data.get(collection, [])
 
     def extend_list(self, data, parsed_args):

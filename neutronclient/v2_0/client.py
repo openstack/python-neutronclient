@@ -18,6 +18,7 @@
 import inspect
 import itertools
 import logging
+import re
 import time
 
 import debtcollector.renames
@@ -34,6 +35,11 @@ from neutronclient.common import utils
 
 
 _logger = logging.getLogger(__name__)
+
+HEX_ELEM = '[0-9A-Fa-f]'
+UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
+                         HEX_ELEM + '{4}', HEX_ELEM + '{4}',
+                         HEX_ELEM + '{12}'])
 
 
 def exception_handler_v20(status_code, error_content):
@@ -395,6 +401,88 @@ class ClientBase(object):
                 return _StrWithMeta(item, resp)
         else:
             return _TupleWithMeta((), resp)
+
+    def get_resource_plural(self, resource):
+        for k in self.EXTED_PLURALS:
+            if self.EXTED_PLURALS[k] == resource:
+                return k
+        return resource + 's'
+
+    def _find_resource_by_id(self, resource, resource_id, cmd_resource=None,
+                             parent_id=None, fields=None):
+        if not cmd_resource:
+            cmd_resource = resource
+        cmd_resource_plural = self.get_resource_plural(cmd_resource)
+        resource_plural = self.get_resource_plural(resource)
+        # TODO(amotoki): Use show_%s instead of list_%s
+        obj_lister = getattr(self, "list_%s" % cmd_resource_plural)
+        # perform search by id only if we are passing a valid UUID
+        match = re.match(UUID_PATTERN, resource_id)
+        collection = resource_plural
+        if match:
+            params = {'id': resource_id}
+            if fields:
+                params['fields'] = fields
+            if parent_id:
+                data = obj_lister(parent_id, **params)
+            else:
+                data = obj_lister(**params)
+            if data and data[collection]:
+                return data[collection][0]
+        not_found_message = (_("Unable to find %(resource)s with id "
+                               "'%(id)s'") %
+                             {'resource': resource, 'id': resource_id})
+        # 404 is raised by exceptions.NotFound to simulate serverside behavior
+        raise exceptions.NotFound(message=not_found_message)
+
+    def _find_resource_by_name(self, resource, name, project_id=None,
+                               cmd_resource=None, parent_id=None, fields=None):
+        if not cmd_resource:
+            cmd_resource = resource
+        cmd_resource_plural = self.get_resource_plural(cmd_resource)
+        resource_plural = self.get_resource_plural(resource)
+        obj_lister = getattr(self, "list_%s" % cmd_resource_plural)
+        params = {'name': name}
+        if fields:
+            params['fields'] = fields
+        if project_id:
+            params['tenant_id'] = project_id
+        if parent_id:
+            data = obj_lister(parent_id, **params)
+        else:
+            data = obj_lister(**params)
+        collection = resource_plural
+        info = data[collection]
+        if len(info) > 1:
+            raise exceptions.NeutronClientNoUniqueMatch(resource=resource,
+                                                        name=name)
+        elif len(info) == 0:
+            not_found_message = (_("Unable to find %(resource)s with name "
+                                   "'%(name)s'") %
+                                 {'resource': resource, 'name': name})
+            # 404 is raised by exceptions.NotFound
+            # to simulate serverside behavior
+            raise exceptions.NotFound(message=not_found_message)
+        else:
+            return info[0]
+
+    def find_resource(self, resource, name_or_id, project_id=None,
+                      cmd_resource=None, parent_id=None, fields=None):
+        try:
+            return self._find_resource_by_id(resource, name_or_id,
+                                             cmd_resource, parent_id, fields)
+        except exceptions.NotFound:
+            try:
+                return self._find_resource_by_name(
+                    resource, name_or_id, project_id,
+                    cmd_resource, parent_id, fields)
+            except exceptions.NotFound:
+                not_found_message = (_("Unable to find %(resource)s with name "
+                                       "or id '%(name_or_id)s'") %
+                                     {'resource': resource,
+                                      'name_or_id': name_or_id})
+                raise exceptions.NotFound(
+                    message=not_found_message)
 
 
 class Client(ClientBase):
