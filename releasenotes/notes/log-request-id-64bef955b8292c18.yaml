@@ -1,0 +1,3 @@
+---
+features:
+  - Added support to log 'x-openstack-request-id' for each api call.
