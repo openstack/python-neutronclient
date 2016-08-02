@@ -190,3 +190,38 @@ class CLITestNameorID(testtools.TestCase):
                                 self.client, 'security_group', name, project)
         self.assertIn('Unable to find', exc.message)
         self.assertEqual(404, exc.status_code)
+
+    def _test_get_resource_by_id(self, id_only=False):
+        _id = str(uuid.uuid4())
+        net = {'id': _id, 'name': 'test'}
+        reses = {'networks': [net], }
+        resstr = self.client.serialize(reses)
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        path = getattr(self.client, "networks_path")
+        if id_only:
+            query_params = "fields=id&id=%s" % _id
+        else:
+            query_params = "id=%s" % _id
+        self.client.httpclient.request(
+            test_cli20.MyUrlComparator(
+                test_cli20.end_url(path, query_params),
+                self.client),
+            'GET',
+            body=None,
+            headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
+        ).AndReturn((test_cli20.MyResp(200), resstr))
+        self.mox.ReplayAll()
+        if id_only:
+            returned_id = neutronV20.find_resourceid_by_id(
+                self.client, 'network', _id)
+            self.assertEqual(_id, returned_id)
+        else:
+            result = neutronV20.find_resource_by_id(
+                self.client, 'network', _id)
+            self.assertEqual(net, result)
+
+    def test_get_resource_by_id(self):
+        self._test_get_resource_by_id(id_only=False)
+
+    def test_get_resourceid_by_id(self):
+        self._test_get_resource_by_id(id_only=True)

@@ -415,8 +415,8 @@ class ClientBase(object):
                 return k
         return resource + 's'
 
-    def _find_resource_by_id(self, resource, resource_id, cmd_resource=None,
-                             parent_id=None, fields=None):
+    def find_resource_by_id(self, resource, resource_id, cmd_resource=None,
+                            parent_id=None, fields=None):
         if not cmd_resource:
             cmd_resource = resource
         cmd_resource_plural = self.get_resource_plural(cmd_resource)
@@ -476,8 +476,8 @@ class ClientBase(object):
     def find_resource(self, resource, name_or_id, project_id=None,
                       cmd_resource=None, parent_id=None, fields=None):
         try:
-            return self._find_resource_by_id(resource, name_or_id,
-                                             cmd_resource, parent_id, fields)
+            return self.find_resource_by_id(resource, name_or_id,
+                                            cmd_resource, parent_id, fields)
         except exceptions.NotFound:
             try:
                 return self._find_resource_by_name(
