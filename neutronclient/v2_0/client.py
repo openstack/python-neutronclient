@@ -616,6 +616,11 @@ class Client(ClientBase):
     network_ip_availability_path = '/network-ip-availabilities/%s'
     tags_path = "/%s/%s/tags"
     tag_path = "/%s/%s/tags/%s"
+    trunks_path = "/trunks"
+    trunk_path = "/trunks/%s"
+    subports_path = "/trunks/%s/get_subports"
+    subports_add_path = "/trunks/%s/add_subports"
+    subports_remove_path = "/trunks/%s/remove_subports"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -661,6 +666,7 @@ class Client(ClientBase):
                      'bgp_speakers': 'bgp_speaker',
                      'bgp_peers': 'bgp_peer',
                      'network_ip_availabilities': 'network_ip_availability',
+                     'trunks': 'trunk',
                      }
 
     def list_ext(self, collection, path, retrieve_all, **_params):
@@ -1894,6 +1900,39 @@ class Client(ClientBase):
     def remove_tag_all(self, resource_type, resource_id, **_params):
         """Remove all tags on the resource."""
         return self.delete(self.tags_path % (resource_type, resource_id))
+
+    def create_trunk(self, body=None):
+        """Create a trunk port."""
+        return self.post(self.trunks_path, body=body)
+
+    def update_trunk(self, trunk, body=None):
+        """Update a trunk port."""
+        return self.put(self.trunk_path % trunk, body=body)
+
+    def delete_trunk(self, trunk):
+        """Delete a trunk port."""
+        return self.delete(self.trunk_path % (trunk))
+
+    def list_trunks(self, retrieve_all=True, **_params):
+        """Fetch a list of all trunk ports."""
+        return self.list('trunks', self.trunks_path, retrieve_all,
+                         **_params)
+
+    def show_trunk(self, trunk, **_params):
+        """Fetch information for a certain trunk port."""
+        return self.get(self.trunk_path % (trunk), params=_params)
+
+    def trunk_add_subports(self, trunk, body=None):
+        """Add specified subports to the trunk."""
+        return self.put(self.subports_add_path % (trunk), body=body)
+
+    def trunk_remove_subports(self, trunk, body=None):
+        """Removes specified subports from the trunk."""
+        return self.put(self.subports_remove_path % (trunk), body=body)
+
+    def trunk_get_subports(self, trunk, **_params):
+        """Fetch a list of all subports attached to given trunk."""
+        return self.get(self.subports_path % (trunk), params=_params)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
