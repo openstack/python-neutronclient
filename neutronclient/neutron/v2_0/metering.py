@@ -76,6 +76,7 @@ class ShowMeteringLabelRule(neutronv20.ShowCommand):
     """Show information of a given metering label rule."""
 
     resource = 'metering_label_rule'
+    allow_names = False
 
 
 class CreateMeteringLabelRule(neutronv20.CreateCommand):
@@ -115,3 +116,4 @@ class DeleteMeteringLabelRule(neutronv20.DeleteCommand):
     """Delete a given metering label."""
 
     resource = 'metering_label_rule'
+    allow_names = False
