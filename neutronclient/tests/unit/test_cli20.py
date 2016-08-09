@@ -531,7 +531,8 @@ class CLITestV20Base(base.BaseTestCase):
         self.assertIn(myid, _str)
 
     def _test_update_resource_action(self, resource, cmd, myid, action, args,
-                                     body, retval=None, cmd_resource=None):
+                                     body, expected_code=200, retval=None,
+                                     cmd_resource=None):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
@@ -543,7 +544,8 @@ class CLITestV20Base(base.BaseTestCase):
             end_url(path % path_action, format=self.format), 'PUT',
             body=MyComparator(body, self.client),
             headers=mox.ContainsKeyValue(
-                'X-Auth-Token', TOKEN)).AndReturn((MyResp(204), retval))
+                'X-Auth-Token', TOKEN)).AndReturn((MyResp(expected_code),
+                                                   retval))
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("delete_" + cmd_resource)
         shell.run_command(cmd, cmd_parser, args)

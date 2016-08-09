@@ -210,10 +210,14 @@ class CLITestV20BGPSpeakerJSON(test_cli20.CLITestV20Base):
         body = {'bgp_peer_id': 'peerid'}
         if action == 'add':
             retval = {'bgp_peer': 'peerid'}
+            retval = self.client.serialize(retval)
+            expected_code = 200
         else:
             retval = None
+            expected_code = 204
         self._test_update_resource_action(resource, cmd, 'myid',
-                                          subcmd, args, body, retval)
+                                          subcmd, args, body, expected_code,
+                                          retval)
 
     def test_add_peer_to_bgp_speaker(self):
         # Add peer to BGP speaker: myid peer_id=peerid
@@ -236,10 +240,14 @@ class CLITestV20BGPSpeakerJSON(test_cli20.CLITestV20Base):
         body = {'network_id': 'netid'}
         if action == 'add':
             retval = {'network': 'netid'}
+            retval = self.client.serialize(retval)
+            expected_code = 200
         else:
             retval = None
+            expected_code = 204
         self._test_update_resource_action(resource, cmd, 'myid',
-                                          subcmd, args, body, retval)
+                                          subcmd, args, body, expected_code,
+                                          retval)
 
     def test_add_network_to_bgp_speaker(self):
         # Add peer to BGP speaker: myid network_id=netid

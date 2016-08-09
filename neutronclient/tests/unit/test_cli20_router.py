@@ -290,11 +290,14 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
             body = {'subnet_id': 'subnetid'}
         if action == 'add':
             retval = {'subnet_id': 'subnetid', 'port_id': 'portid'}
+            retval = self.client.serialize(retval)
+            expected_code = 200
         else:
             retval = None
+            expected_code = 204
         self._test_update_resource_action(resource, cmd, 'myid',
                                           subcmd, args,
-                                          body, retval)
+                                          body, expected_code, retval)
 
     def test_add_interface_compat(self):
         # Add interface to router: myid subnetid.
