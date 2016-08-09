@@ -26,8 +26,6 @@ from osc_lib import utils
 from openstackclient.identity import common as identity_common
 
 from neutronclient._i18n import _
-# TODO(abhiraut): Switch to client methods
-from neutronclient.neutron import v2_0 as neutronV20
 
 LOG = logging.getLogger(__name__)
 
@@ -58,7 +56,7 @@ class CreateNetworkTrunk(command.ShowOne):
             action=parseractions.MultiKeyValueAction, dest='add_subports',
             help=_("Subport to add. Subport is of form "
                    "\'port=<name or ID>,segmentation-type=,segmentation-ID=\' "
-                   "(--subport) option can be repeated)")
+                   "(--subport) option can be repeated")
         )
         admin_group = parser.add_mutually_exclusive_group()
         admin_group.add_argument(
@@ -127,12 +125,38 @@ class DeleteNetworkTrunk(command.Command):
 class ListNetworkTrunk(command.Lister):
     """List all network trunks"""
 
+    def get_parser(self, prog_name):
+        parser = super(ListNetworkTrunk, self).get_parser(prog_name)
+        parser.add_argument(
+            '--long',
+            action='store_true',
+            default=False,
+            help=_("List additional fields in output")
+        )
+        return parser
+
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         data = client.list_trunks()
-        # TODO(abhiraut): List more columns using --long
-        headers = ('ID', 'Name', 'Parent Port')
-        columns = ('id', 'name', 'port_id')
+        headers = (
+            'ID',
+            'Name',
+            'Parent Port'
+        )
+        columns = (
+            'id',
+            'name',
+            'port_id'
+        )
+        if parsed_args.long:
+            headers += (
+                'Status',
+                'State',
+            )
+            columns += (
+                'status',
+                'admin_state_up',
+            )
         return (headers,
                 (utils.get_dict_properties(
                     s, columns,
@@ -161,7 +185,7 @@ class SetNetworkTrunk(command.Command):
             action=parseractions.MultiKeyValueAction, dest='set_subports',
             help=_("Subport to add. Subport is of form "
                    "\'port=<name or ID>,segmentation-type=,segmentation-ID=\'"
-                   "(--subport) option can be repeated)")
+                   "(--subport) option can be repeated")
         )
         admin_group = parser.add_mutually_exclusive_group()
         admin_group.add_argument(
@@ -181,11 +205,21 @@ class SetNetworkTrunk(command.Command):
         trunk_id = _get_id(client, parsed_args.trunk, TRUNK)
         attrs = _get_attrs_for_trunk(self.app.client_manager, parsed_args)
         body = {TRUNK: attrs}
-        client.update_trunk(trunk_id, body)
+        try:
+            client.update_trunk(trunk_id, body)
+        except Exception as e:
+            msg = (_("Failed to set trunk '%(t)s': %(e)s")
+                   % {'t': parsed_args.trunk, 'e': e})
+            raise exceptions.CommandError(msg)
         if parsed_args.set_subports:
             subport_attrs = _get_attrs_for_subports(self.app.client_manager,
                                                     parsed_args)
-            client.trunk_add_subports(trunk_id, subport_attrs)
+            try:
+                client.trunk_add_subports(trunk_id, subport_attrs)
+            except Exception as e:
+                msg = (_("Failed to add subports to trunk '%(t)s': %(e)s")
+                       % {'t': parsed_args.trunk, 'e': e})
+                raise exceptions.CommandError(msg)
 
 
 class ShowNetworkTrunk(command.ShowOne):
@@ -343,5 +377,4 @@ def _get_attrs_for_subports(client_manager, parsed_args):
 
 
 def _get_id(client, id_or_name, resource):
-    return neutronV20.find_resourceid_by_name_or_id(
-        client, resource, str(id_or_name))
+    return client.find_resource(resource, str(id_or_name))['id']

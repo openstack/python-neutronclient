@@ -15,12 +15,11 @@
 
 import mock
 from mock import call
+import testtools
 
 from osc_lib import exceptions
+from osc_lib.tests import utils as tests_utils
 from osc_lib import utils
-
-# TODO(abhiraut): Switch to osc-lib test utils
-from openstackclient.tests import utils as tests_utils
 
 from neutronclient.osc.v2.trunk import network_trunk as trunk
 from neutronclient.tests.unit.osc.v2 import fakes as test_fakes
@@ -147,10 +146,8 @@ class TestCreateNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         ]
 
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
-        try:
+        with testtools.ExpectedException(exceptions.CommandError) as e:
             self.cmd.take_action(parsed_args)
-            self.fail('CommandError should be raised.')
-        except exceptions.CommandError as e:
             self.assertEqual("Segmentation-id 'boom' is not an integer",
                              str(e))
 
@@ -217,10 +214,8 @@ class TestDeleteNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         trunk._get_id = (
             mock.MagicMock(side_effect=get_mock_result)
         )
-        try:
+        with testtools.ExpectedException(exceptions.CommandError) as e:
             self.cmd.take_action(parsed_args)
-            self.fail('CommandError should be raised.')
-        except exceptions.CommandError as e:
             self.assertEqual('1 of 2 trunks failed to delete.', str(e))
         self.neutronclient.delete_trunk.assert_called_once_with(
             self._trunks[0]
@@ -295,12 +290,25 @@ class TestListNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         'Name',
         'Parent Port',
     )
+    columns_long = columns + (
+        'Status',
+        'State',
+    )
     data = []
     for t in _trunks:
         data.append((
             t['id'],
             t['name'],
             t['port_id'],
+        ))
+    data_long = []
+    for t in _trunks:
+        data_long.append((
+            t['id'],
+            t['name'],
+            t['port_id'],
+            t['status'],
+            trunk._format_admin_state(t['admin_state_up']),
         ))
 
     def setUp(self):
@@ -323,6 +331,21 @@ class TestListNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         self.neutronclient.list_trunks.assert_called_once_with()
         self.assertEqual(self.columns, columns)
         self.assertEqual(self.data, list(data))
+
+    def test_trunk_list_long(self):
+        arglist = [
+            '--long',
+        ]
+        verifylist = [
+            ('long', True),
+        ]
+        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+
+        columns, data = self.cmd.take_action(parsed_args)
+
+        self.neutronclient.list_trunks.assert_called_once_with()
+        self.assertEqual(self.columns_long, columns)
+        self.assertEqual(self.data_long, list(data))
 
 
 class TestSetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
@@ -435,7 +458,7 @@ class TestSetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
     def test_set_network_trunk_subports(self):
         subport = self._trunk['sub_ports'][0]
         arglist = [
-            "--subport", 'port=%(port)s,segmentation-type=%(seg_type)s,'
+            '--subport', 'port=%(port)s,segmentation-type=%(seg_type)s,'
             'segmentation-id=%(seg_id)s' % {
                 'seg_id': subport['segmentation_id'],
                 'seg_type': subport['segmentation_type'],
@@ -457,6 +480,56 @@ class TestSetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
             self._trunk['name'], {'sub_ports': [subport]}
         )
         self.assertIsNone(result)
+
+    def test_set_trunk_attrs_with_exception(self):
+        arglist = [
+            '--name', 'reallylongname',
+            self._trunk['name'],
+        ]
+        verifylist = [
+            ('trunk', self._trunk['name']),
+            ('name', 'reallylongname'),
+        ]
+        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+
+        self.neutronclient.update_trunk = (
+            mock.MagicMock(side_effect=exceptions.CommandError)
+        )
+        with testtools.ExpectedException(exceptions.CommandError) as e:
+            self.cmd.take_action(parsed_args)
+            self.assertEqual(
+                "Failed to set trunk '%s': " % self._trunk['name'],
+                str(e))
+        attrs = {'name': 'reallylongname'}
+        self.neutronclient.update_trunk.assert_called_once_with(
+            self._trunk['name'], {trunk.TRUNK: attrs})
+        self.neutronclient.trunk_add_subports.assert_not_called()
+
+    def test_set_trunk_add_subport_with_exception(self):
+        arglist = [
+            '--subport', 'port=invalid_subport',
+            self._trunk['name'],
+        ]
+        verifylist = [
+            ('trunk', self._trunk['name']),
+            ('set_subports', [{'port': 'invalid_subport'}]),
+        ]
+        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+
+        self.neutronclient.trunk_add_subports = (
+            mock.MagicMock(side_effect=exceptions.CommandError)
+        )
+        with testtools.ExpectedException(exceptions.CommandError) as e:
+            self.cmd.take_action(parsed_args)
+            self.assertEqual(
+                "Failed to add subports to trunk '%s': " % self._trunk['name'],
+                str(e))
+        self.neutronclient.update_trunk.assert_called_once_with(
+            self._trunk['name'], {trunk.TRUNK: {}})
+        self.neutronclient.trunk_add_subports.assert_called_once_with(
+            self._trunk['name'],
+            {'sub_ports': [{'port_id': 'invalid_subport'}]}
+        )
 
 
 class TestListNetworkSubport(test_fakes.TestNeutronClientOSCV2):
