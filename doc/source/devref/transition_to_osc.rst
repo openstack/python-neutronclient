@@ -71,7 +71,7 @@ Transition Steps
    backwards compatibility of its networking support and OSC updates
    its dependencies to include OpenStack Python SDK version 1.0 or later.
 
-5. **In Progress:** OSC switches its networking support for the
+5. **Done:** OSC switches its networking support for the
    `ip floating <http://docs.openstack.org/developer/python-openstackclient/command-objects/ip-floating.html>`_,
    `ip floating pool <http://docs.openstack.org/developer/python-openstackclient/command-objects/ip-floating-pool.html>`_,
    `ip fixed <http://docs.openstack.org/developer/python-openstackclient/command-objects/ip-fixed.html>`_,
@@ -82,13 +82,13 @@ Transition Steps
    is enabled, then the nova client's Python library will continue to
    be used. See the following OSC bugs:
 
-   * **In Progress** `Floating IP CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519502>`_
+   * **Done** `Floating IP CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519502>`_
 
-   * **In Progress** `Port CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519909>`_
+   * **Done** `Port CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519909>`_
 
    * **Done** `Security Group CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519511>`_
 
-   * **In Progress** `Security Group Rule CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519512>`_
+   * **Done** `Security Group Rule CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519512>`_
 
 6. **In Progress:** OSC continues enhancing its networking support.
    At this point and when applicable, enhancements to the ``neutron``
@@ -122,8 +122,8 @@ Transition Steps
 Developer Guide
 ---------------
 The ``neutron`` CLI version 4.x, without extensions, supports over 200
-commands while the ``openstack`` CLI version 2.2.0 supports about 35
-networking commands. Of the 35 commands, many do not have all of the options
+commands while the ``openstack`` CLI version 2.6.0 supports over 50
+networking commands. Of the 50 commands, some do not have all of the options
 or arguments of their ``neutron`` CLI equivalent. With this large functional
 gap, a couple critical questions for developers during this transition are "Which
 CLI do I change?" and "Where does my CLI belong?" The answer depends on the
