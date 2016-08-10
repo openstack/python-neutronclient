@@ -11,6 +11,7 @@
       License for the specific language governing permissions and limitations
       under the License.
 
+
       Convention for heading levels in Neutron devref:
       =======  Heading 0 (reserved for the title in a document)
       -------  Heading 1
@@ -19,40 +20,14 @@
       '''''''  Heading 4
       (Avoid deeper levels because they do not render well.)
 
-Python bindings to the OpenStack Networking API
-===============================================
+Using Network CLI extensions to OpenStack Client
+================================================
 
-This is a client for OpenStack Networking API. There is a :doc:`Python API
-<usage/library>` (the neutronclient module), and a :doc:`command-line script
-<usage/cli>` (installed as **neutron**). Each implements the entire OpenStack
-Networking API.
-
-Using neutronclient
--------------------
+List of released CLI commands available in openstack client. These commands
+can be referenced by doing ``openstack help network``.
 
 .. toctree::
+   :glob:
    :maxdepth: 2
 
-   usage/cli
-   usage/library
-   usage/osc_cli_plugins
-
-Developer Guide
----------------
-
-In the Developer Guide, you will find information on Neutron’s client
-lower level programming details or APIs as well as the transition to
-OpenStack client.
-
-.. toctree::
-   :maxdepth: 2
-
-   devref/client_command_extensions
-   devref/cli_option_guideline
-   devref/transition_to_osc
-
-History
--------
-
-Release notes is available at
-http://docs.openstack.org/releasenotes/python-neutronclient/.
+   osc/v2/*
