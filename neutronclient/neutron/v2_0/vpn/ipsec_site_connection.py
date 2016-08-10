@@ -61,11 +61,11 @@ class IPsecSiteConnectionMixin(object):
         parser.add_argument(
             '--local-ep-group',
             help=_('Local endpoint group ID/name with subnet(s) for '
-                   'IPSec connection.'))
+                   'the IPsec connection.'))
         parser.add_argument(
             '--peer-ep-group',
             help=_('Peer endpoint group ID/name with CIDR(s) for '
-                   'IPsec connection.'))
+                   'the IPsec connection.'))
 
     def args2body(self, parsed_args, body=None):
         """Add in conditional args and then return all conn info."""
@@ -100,7 +100,7 @@ class CreateIPsecSiteConnection(IPsecSiteConnectionMixin,
             help=_('Set admin state up to false.'))
         parser.add_argument(
             '--name',
-            help=_('Set friendly name for the connection.'))
+            help=_('Set a name for the connection.'))
         parser.add_argument(
             '--description',
             help=_('Set a description for the connection.'))

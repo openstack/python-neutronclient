@@ -110,7 +110,7 @@ class AssociateFlavor(neutronV20.NeutronCommand):
         parser.add_argument(
             'flavor',
             metavar='FLAVOR',
-            help=_('Name or ID of the flavor to associate.'))
+            help=_('ID or name of the flavor to associate.'))
         parser.add_argument(
             'flavor_profile',
             metavar='FLAVOR_PROFILE',
@@ -143,7 +143,7 @@ class DisassociateFlavor(neutronV20.NeutronCommand):
         parser.add_argument(
             'flavor',
             metavar='FLAVOR',
-            help=_('Name or ID of the flavor.'))
+            help=_('ID or name of the flavor to be disassociated.'))
         parser.add_argument(
             'flavor_profile',
             metavar='FLAVOR_PROFILE',

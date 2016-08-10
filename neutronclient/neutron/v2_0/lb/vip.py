@@ -42,7 +42,7 @@ class CreateVip(neutronV20.CreateCommand):
     def add_known_arguments(self, parser):
         parser.add_argument(
             'pool_id', metavar='POOL',
-            help=_('Pool ID or name this vip belongs to.'))
+            help=_('ID or name of the pool to which this vip belongs.'))
         parser.add_argument(
             '--address',
             help=_('IP address of the vip.'))
@@ -53,14 +53,15 @@ class CreateVip(neutronV20.CreateCommand):
         parser.add_argument(
             '--connection-limit',
             help=_('The maximum number of connections per second allowed for '
-                   'the vip. Positive integer or -1 for unlimited (default).'))
+                   'the vip. Valid values: a positive integer or -1 '
+                   'for unlimited (default).'))
         parser.add_argument(
             '--description',
-            help=_('Description of the vip.'))
+            help=_('Description of the vip to be created.'))
         parser.add_argument(
             '--name',
             required=True,
-            help=_('Name of the vip.'))
+            help=_('Name of the vip to be created.'))
         parser.add_argument(
             '--protocol-port',
             required=True,

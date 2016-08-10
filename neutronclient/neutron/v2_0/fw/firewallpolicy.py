@@ -114,11 +114,11 @@ class UpdateFirewallPolicy(neutronv20.UpdateCommand):
         utils.add_boolean_argument(
             parser, '--shared',
             help=_('Update the sharing status of the policy. '
-                   '(True means shared)'))
+                   '(True means shared).'))
         utils.add_boolean_argument(
             parser, '--audited',
             help=_('Update the audit status of the policy. '
-                   '(True means auditing is enabled)'))
+                   '(True means auditing is enabled).'))
 
     def args2body(self, parsed_args):
         return parse_common_args(self.get_client(), parsed_args)
@@ -213,7 +213,8 @@ class FirewallPolicyRemoveRule(neutronv20.UpdateCommand):
         parser.add_argument(
             'firewall_rule_id',
             metavar='FIREWALL_RULE',
-            help=_('Firewall rule to remove from policy.'))
+            help=_('ID or name of the firewall rule to be removed '
+                   'from the policy.'))
         self.add_known_arguments(parser)
         return parser
 

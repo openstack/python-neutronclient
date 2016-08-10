@@ -113,7 +113,7 @@ class ListRouterPort(neutronV20.ListCommand):
         parser = super(ListRouterPort, self).get_parser(prog_name)
         parser.add_argument(
             'id', metavar='ROUTER',
-            help=_('ID or name of router to look up.'))
+            help=_('ID or name of the router to look up.'))
         return parser
 
     def take_action(self, parsed_args):
@@ -272,7 +272,7 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
 
         parser.add_argument(
             'network_id', metavar='NETWORK',
-            help=_('Network ID or name this port belongs to.'))
+            help=_('ID or name of the network this port belongs to.'))
         dns.add_dns_argument_create(parser, self.resource, 'name')
 
     def args2body(self, parsed_args):
