@@ -478,17 +478,19 @@ class DeleteCommand(NeutronCommand):
     log = None
     allow_names = True
     help_resource = None
+    bulk_delete = True
 
     def get_parser(self, prog_name):
         parser = super(DeleteCommand, self).get_parser(prog_name)
-        if self.allow_names:
-            help_str = _('ID or name of %s to delete.')
-        else:
-            help_str = _('ID of %s to delete.')
         if not self.help_resource:
             self.help_resource = self.resource
+        if self.allow_names:
+            help_str = _('ID(s) or name(s) of %s to delete.')
+        else:
+            help_str = _('ID(s) of %s to delete.')
         parser.add_argument(
             'id', metavar=self.resource.upper(),
+            nargs='+' if self.bulk_delete else 1,
             help=help_str % self.help_resource)
         self.add_known_arguments(parser)
         return parser
@@ -498,24 +500,62 @@ class DeleteCommand(NeutronCommand):
         neutron_client = self.get_client()
         obj_deleter = getattr(neutron_client,
                               "delete_%s" % self.cmd_resource)
+
+        if self.bulk_delete:
+            self._bulk_delete(obj_deleter, neutron_client, parsed_args.id)
+        else:
+            self.delete_item(obj_deleter, neutron_client, parsed_args.id)
+            print((_('Deleted %(resource)s: %(id)s')
+                   % {'id': parsed_args.id,
+                      'resource': self.resource}),
+                  file=self.app.stdout)
+        return
+
+    def _bulk_delete(self, obj_deleter, neutron_client, parsed_args_ids):
+        successful_delete = []
+        non_existent = []
+        multiple_ids = []
+        for item_id in parsed_args_ids:
+            try:
+                self.delete_item(obj_deleter, neutron_client, item_id)
+                successful_delete.append(item_id)
+            except exceptions.NotFound:
+                non_existent.append(item_id)
+            except exceptions.NeutronClientNoUniqueMatch:
+                multiple_ids.append(item_id)
+        if successful_delete:
+            print((_('Deleted %(resource)s(s): %(id)s'))
+                  % {'id': ", ".join(successful_delete),
+                     'resource': self.cmd_resource},
+                  file=self.app.stdout)
+        if non_existent:
+            print((_("Unable to find %(resource)s(s) with id(s) "
+                     "'%(id)s'") %
+                  {'resource': self.cmd_resource,
+                   'id': ", ".join(non_existent)}),
+                  file=self.app.stdout)
+        if multiple_ids:
+            print((_("Multiple %(resource)s(s) matches found for name(s)"
+                     " '%(id)s'. Please use an ID to be more specific.")) %
+                  {'resource': self.cmd_resource,
+                   'id': ", ".join(multiple_ids)},
+                  file=self.app.stdout)
+
+    def delete_item(self, obj_deleter, neutron_client, item_id):
         if self.allow_names:
             params = {'cmd_resource': self.cmd_resource,
                       'parent_id': self.parent_id}
             _id = find_resourceid_by_name_or_id(neutron_client,
                                                 self.resource,
-                                                parsed_args.id,
+                                                item_id,
                                                 **params)
         else:
-            _id = parsed_args.id
+            _id = item_id
 
         if self.parent_id:
             obj_deleter(_id, self.parent_id)
         else:
             obj_deleter(_id)
-        print((_('Deleted %(resource)s: %(id)s')
-               % {'id': parsed_args.id,
-                  'resource': self.resource}),
-              file=self.app.stdout)
         return
 
 
