@@ -114,6 +114,11 @@ class CLITestV20AddressScopeJSON(test_cli20.CLITestV20Base):
                                    ['myid', '--name', 'newname-address-scope'],
                                    {'name': 'newname-address-scope'}
                                    )
+        # Update address_scope: myid --shared
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--shared', 'True'],
+                                   {'shared': "True"}
+                                   )
 
     def test_list_address_scope(self):
         # address_scope-list.
