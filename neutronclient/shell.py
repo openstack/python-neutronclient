@@ -181,6 +181,7 @@ COMMAND_V2 = {
     'purge': purge.Purge,
     'quota-list': quota.ListQuota,
     'quota-show': quota.ShowQuota,
+    'quota-default-show': quota.ShowQuotaDefault,
     'quota-delete': quota.DeleteQuota,
     'quota-update': quota.UpdateQuota,
     'ext-list': extension.ListExt,

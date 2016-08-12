@@ -16,6 +16,7 @@
 
 from __future__ import print_function
 
+import abc
 import argparse
 
 from cliff import lister
@@ -90,14 +91,17 @@ class ListQuota(neutronV20.NeutronCommand, lister.Lister):
                 for s in info))
 
 
-class ShowQuota(neutronV20.NeutronCommand, show.ShowOne):
-    """Show quotas of a given tenant.
+class ShowQuotaBase(neutronV20.NeutronCommand, show.ShowOne):
+    """Base class to show quotas of a given tenant."""
 
-    """
     resource = "quota"
 
+    @abc.abstractmethod
+    def retrieve_data(self, tenant_id, neutron_client):
+        """Retrieve data using neutron client for the given tenant."""
+
     def get_parser(self, prog_name):
-        parser = super(ShowQuota, self).get_parser(prog_name)
+        parser = super(ShowQuotaBase, self).get_parser(prog_name)
         parser.add_argument(
             '--tenant-id', metavar='tenant-id',
             help=_('The owner tenant ID.'))
@@ -115,27 +119,24 @@ class ShowQuota(neutronV20.NeutronCommand, show.ShowOne):
     def take_action(self, parsed_args):
         neutron_client = self.get_client()
         tenant_id = get_tenant_id(parsed_args, neutron_client)
-        params = {}
-        obj_shower = getattr(neutron_client,
-                             "show_%s" % self.resource)
-        data = obj_shower(tenant_id, **params)
+        data = self.retrieve_data(tenant_id, neutron_client)
         if self.resource in data:
-            for k, v in six.iteritems(data[self.resource]):
-                if isinstance(v, list):
-                    value = ""
-                    for _item in v:
-                        if value:
-                            value += "\n"
-                        if isinstance(_item, dict):
-                            value += jsonutils.dumps(_item)
-                        else:
-                            value += str(_item)
-                    data[self.resource][k] = value
-                elif v is None:
-                    data[self.resource][k] = ''
             return zip(*sorted(six.iteritems(data[self.resource])))
-        else:
-            return None
+        return
+
+
+class ShowQuota(ShowQuotaBase):
+    """Show quotas for a given tenant."""
+
+    def retrieve_data(self, tenant_id, neutron_client):
+        return neutron_client.show_quota(tenant_id)
+
+
+class ShowQuotaDefault(ShowQuotaBase):
+    """Show default quotas for a given tenant."""
+
+    def retrieve_data(self, tenant_id, neutron_client):
+        return neutron_client.show_quota_default(tenant_id)
 
 
 class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
@@ -240,4 +241,4 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
                     data[self.resource][k] = ''
             return zip(*sorted(six.iteritems(data[self.resource])))
         else:
-            return None
+            return

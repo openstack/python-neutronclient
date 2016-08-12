@@ -16,6 +16,8 @@
 
 import sys
 
+from mox3 import mox
+
 from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0 import quota as test_quota
 from neutronclient.tests.unit import test_cli20
@@ -59,3 +61,34 @@ class CLITestV20Quota(test_cli20.CLITestV20Base):
             exceptions.NeutronClientException, self._test_update_resource,
             resource, cmd, self.test_id, args=args,
             extrafields={'network': 'new'})
+
+    def test_show_quota_default(self):
+        resource = 'quota'
+        cmd = test_quota.ShowQuotaDefault(
+            test_cli20.MyApp(sys.stdout), None)
+        args = ['--tenant-id', self.test_id]
+        self.mox.StubOutWithMock(cmd, "get_client")
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        cmd.get_client().MultipleTimes().AndReturn(self.client)
+        expected_res = {'quota': {'port': 50, 'network': 10, 'subnet': 10}}
+        resstr = self.client.serialize(expected_res)
+        path = getattr(self.client, "quota_default_path")
+        return_tup = (test_cli20.MyResp(200), resstr)
+        self.client.httpclient.request(
+            test_cli20.end_url(path % self.test_id), 'GET',
+            body=None,
+            headers=mox.ContainsKeyValue(
+                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(return_tup)
+        self.mox.ReplayAll()
+
+        cmd_parser = cmd.get_parser("test_" + resource)
+        parsed_args = cmd_parser.parse_args(args)
+        cmd.run(parsed_args)
+
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
+        _str = self.fake_stdout.make_string()
+        self.assertIn('network', _str)
+        self.assertIn('subnet', _str)
+        self.assertIn('port', _str)
+        self.assertNotIn('subnetpool', _str)
