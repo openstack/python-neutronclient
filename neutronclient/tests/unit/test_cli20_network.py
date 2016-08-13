@@ -595,7 +595,7 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         myid1 = 'myid1'
         myid2 = 'myid2'
         args = [myid1, myid2]
-        self._test_delete_resource(resource, cmd, myid1, args, extra_ids=myid2)
+        self._test_delete_resource(resource, cmd, myid1, args, extra_id=myid2)
 
     def _test_extend_list(self, mox_calls):
         data = [{'id': 'netid%d' % i, 'name': 'net%d' % i,
