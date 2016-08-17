@@ -102,7 +102,6 @@ class ShellTest(testtools.TestCase):
         self.assertThat(
             help_text,
             matchers.MatchesRegex(required))
-        self.assertFalse(stderr)
 
     def test_bash_completion(self):
         required = '.*os_user_domain_id.*'
@@ -110,7 +109,6 @@ class ShellTest(testtools.TestCase):
         self.assertThat(
             bash_completion,
             matchers.MatchesRegex(required))
-        self.assertFalse(stderr)
 
     def test_help_on_subcommand(self):
         required = [
@@ -120,7 +118,6 @@ class ShellTest(testtools.TestCase):
             self.assertThat(
                 stdout,
                 matchers.MatchesRegex(r, re.DOTALL | re.MULTILINE))
-        self.assertFalse(stderr)
 
     def test_help_command(self):
         required = 'usage:'
@@ -128,11 +125,9 @@ class ShellTest(testtools.TestCase):
         self.assertThat(
             help_text,
             matchers.MatchesRegex(required))
-        self.assertFalse(stderr)
 
     def test_bash_completion_in_outputs_of_help_command(self):
         help_text, stderr = self.shell('help')
-        self.assertFalse(stderr)
         completion_cmd = "bash-completion"
         completion_help_str = ("Prints all of the commands and options "
                                "for bash-completion.")
@@ -146,7 +141,6 @@ class ShellTest(testtools.TestCase):
             '.*help',
             '.*--dns-nameserver']
         help_text, stderr = self.shell('neutron bash-completion')
-        self.assertFalse(stderr)
         for r in required:
             self.assertThat(help_text,
                             matchers.MatchesRegex(r, re.DOTALL | re.MULTILINE))
