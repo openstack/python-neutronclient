@@ -92,11 +92,10 @@ Transition Steps
 
 6. **In Progress:** OSC continues enhancing its networking support.
    At this point and when applicable, enhancements to the ``neutron``
-   CLI must also be made to the ``openstack`` CLI and the OpenStack Python SDK.
-   Enhancements to the networking support in the OpenStack Python SDK will be
-   handled via bugs. Users of the neutron client's command extensions should
-   start their transition to the OSC plugin system.
-   See the developer guide section below for more information on this step.
+   CLI must also be made to the ``openstack`` CLI and possibly the
+   OpenStack Python SDK. Users of the neutron client's command extensions
+   should start their transition to the OSC plugin system. See the
+   developer guide section below for more information on this step.
 
 7. **Not Started:** Deprecate the ``neutron`` CLI once the criteria below have
    been meet. Running the CLI after it has been deprecated will issue a warning
@@ -125,12 +124,11 @@ The ``neutron`` CLI version 4.x, without extensions, supports over 200
 commands while the ``openstack`` CLI version 2.6.0 supports over 50
 networking commands. Of the 50 commands, some do not have all of the options
 or arguments of their ``neutron`` CLI equivalent. With this large functional
-gap, a couple critical questions for developers during this transition are "Which
-CLI do I change?" and "Where does my CLI belong?" The answer depends on the
-state of a command and the state of the overall transition. Details are
-outlined in the tables below. Early stages of the transition will require dual
-maintenance. Eventually, dual maintenance will be reduced to critical bug fixes
-only with feature requests only being made to the ``openstack`` CLI.
+gap, a few critical questions for developers during this transition are "Which
+CLI do I change?", "Where does my CLI belong?", and "Which Python library do I change?"
+The answer depends on the state of a command and the state of the overall transition.
+Details are outlined in the tables below. Early stages of the transition will require
+dual maintenance.
 
 **Which CLI do I change?**
 
@@ -156,6 +154,9 @@ only with feature requests only being made to the ``openstack`` CLI.
 +===========================+===================+=================================================+
 | Core                      | No                | python-openstackclient                          |
 +---------------------------+-------------------+-------------------------------------------------+
+| Advanced Feature          | Yes               | python-neutronclient                            |
+| (neutron repository)      |                   | (``neutronclient/osc/v2/<advanced_feature>``)   |
++---------------------------+-------------------+-------------------------------------------------+
 | Dynamic Routing           | Yes               | python-neutronclient                            |
 |                           |                   | (``neutronclient/osc/v2/dynamic_routing``)      |
 +---------------------------+-------------------+-------------------------------------------------+
@@ -169,21 +170,38 @@ only with feature requests only being made to the ``openstack`` CLI.
 | LBaaS v2                  | Yes               | python-neutronclient                            |
 |                           |                   | (``neutronclient/osc/v2/lbaas``)                |
 +---------------------------+-------------------+-------------------------------------------------+
-| Other                     | Yes               | Applicable project owning networking resource   |
-+---------------------------+-------------------+-------------------------------------------------+
 | VPNaaS                    | Yes               | python-neutronclient                            |
 |                           |                   | (``neutronclient/osc/v2/vpnaas``)               |
 +---------------------------+-------------------+-------------------------------------------------+
+| Other                     | Yes               | Applicable project owning networking resource   |
++---------------------------+-------------------+-------------------------------------------------+
+
+**Which Python library do I change?**
+
++-------------------------------------------------+-----------------------------------------------+
+| OpenStack Project for ``openstack`` Commands    | Python Library to Change                      |
++=================================================+===============================================+
+| python-openstackclient                          | python-openstacksdk                           |
++-------------------------------------------------+-----------------------------------------------+
+| python-neutronclient                            | python-neutronclient                          |
++-------------------------------------------------+-----------------------------------------------+
+| Other                                           | Applicable project owning network resource    |
++-------------------------------------------------+-----------------------------------------------+
 
 
 **Important:** The actual name of the command object and/or action in OSC may differ
 from those used by neutron in order to follow the OSC command structure and to avoid
-name conflicts. Developers should get new command objects and actions approved by
-the OSC team before proceeding with the implementation.
+name conflicts. The `network` prefix must be used to avoid name conflicts if the
+command object name is highly likely to have an ambiguous meaning. Developers should
+get new command objects and actions approved by the OSC team before proceeding with the
+implementation.
 
-The "Core" group includes network resources that provide ``neutron`` project features
-(i.e. not advanced service or other features).  Examples in the "Core" group include:
-network, subnet, port, etc.
+The "Core" group includes network resources that provide core ``neutron`` project
+features (e.g. network, subnet, port, etc.) and not advanced features in the
+``neutron`` project (e.g. trunk, etc.) or advanced services in separate projects
+(FWaaS, LBaaS, VPNaaS, dynamic routing, etc.).
+The "Other" group applies projects other than the core ``neutron`` project.
+Contact the neutron PTL or core team with questions on network resource classification.
 
 When adding or updating an ``openstack`` networking command to
 python-openstackclient, changes may first be required to the
@@ -192,8 +210,7 @@ properties and/or actions. Once the OpenStack Python SDK changes are merged,
 the related OSC changes can be merged. The OSC changes may require an update
 to the OSC openstacksdk version in the
 `requirements.txt <https://github.com/openstack/python-openstackclient/blob/master/requirements.txt>`_
-file. ``openstack`` networking commands outside python-openstackclient
-are encouraged but not required to use the OpenStack Python SDK.
+file.
 
 When adding an ``openstack`` networking command to python-openstackclient,
 you can optionally propose an
