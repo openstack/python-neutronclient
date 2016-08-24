@@ -1,0 +1,7 @@
+---
+fixes:
+  - Fix 'bug 1596750 <https://bugs.launchpad.net/neutron/+bug/1596750>'
+    that using 'rbac-create' without specifying 'target-tenant' will
+    return 'Request Failed internal server error while processing your
+    request'.
+    Update the default value of the argument '--target-tenant' to '*'

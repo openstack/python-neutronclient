@@ -69,6 +69,7 @@ class CreateRBACPolicy(neutronV20.CreateCommand):
             help=_('Type of the object that RBAC policy affects.'))
         parser.add_argument(
             '--target-tenant',
+            default='*',
             help=_('ID of the tenant to which the RBAC '
                    'policy will be enforced.'))
         parser.add_argument(

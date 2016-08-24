@@ -44,7 +44,7 @@ class CLITestV20RBACBaseJSON(test_cli20.CLITestV20Base):
                 '--action', 'access_as_shared']
         position_names = ['object_id', 'object_type',
                           'target_tenant', 'action']
-        position_values = [name, self.object_type_val, None,
+        position_values = [name, self.object_type_val, '*',
                            'access_as_shared']
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
