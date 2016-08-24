@@ -53,3 +53,24 @@ class TestAutoAllocatedTopologyJSON(test_cli20.CLITestV20Base):
         args = ['--dry-run', 'some-tenant']
         self._test_show_resource(resource, cmd, "some-tenant", args,
                                  fields=('dry-run',))
+
+    def test_delete_auto_allocated_topology_arg(self):
+        resource = 'auto_allocated_topology'
+        cmd = aat.DeleteAutoAllocatedTopology(test_cli20.MyApp(sys.stdout),
+                                              None)
+        args = ['--tenant-id', self.test_id]
+        self._test_delete_resource(resource, cmd, self.test_id, args)
+
+    def test_delete_auto_allocated_topology_posarg(self):
+        resource = 'auto_allocated_topology'
+        cmd = aat.DeleteAutoAllocatedTopology(test_cli20.MyApp(sys.stdout),
+                                              None)
+        args = ['some-tenant']
+        self._test_delete_resource(resource, cmd, "some-tenant", args)
+
+    def test_delete_auto_allocated_topology_no_arg(self):
+        resource = 'auto_allocated_topology'
+        cmd = aat.DeleteAutoAllocatedTopology(test_cli20.MyApp(sys.stdout),
+                                              None)
+        args = []
+        self._test_delete_resource(resource, cmd, "None", args)

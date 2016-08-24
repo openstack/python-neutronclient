@@ -413,6 +413,8 @@ COMMAND_V2 = {
     'availability-zone-list': availability_zone.ListAvailabilityZone,
     'auto-allocated-topology-show': (
         auto_allocated_topology.ShowAutoAllocatedTopology),
+    'auto-allocated-topology-delete': (
+        auto_allocated_topology.DeleteAutoAllocatedTopology),
     'bgp-dragent-speaker-add': (
         bgp_drsched.AddBGPSpeakerToDRAgent
     ),
