@@ -33,6 +33,11 @@ def _format_subnets(network):
         return ''
 
 
+def args2body_common(body, parsed_args):
+    neutronV20.update_dict(parsed_args, body,
+                           ['name', 'description'])
+
+
 class ListNetwork(neutronV20.ListCommand):
     """List networks that belong to a given tenant."""
 
@@ -193,8 +198,8 @@ class CreateNetwork(neutronV20.CreateCommand, qos_policy.CreateQosPolicyMixin):
         dns.add_dns_argument_create(parser, self.resource, 'domain')
 
     def args2body(self, parsed_args):
-        body = {'name': parsed_args.name,
-                'admin_state_up': parsed_args.admin_state}
+        body = {'admin_state_up': parsed_args.admin_state}
+        args2body_common(body, parsed_args)
         neutronV20.update_dict(parsed_args, body,
                                ['shared', 'tenant_id',
                                 'vlan_transparent',
@@ -202,11 +207,9 @@ class CreateNetwork(neutronV20.CreateCommand, qos_policy.CreateQosPolicyMixin):
                                 'provider:physical_network',
                                 'provider:segmentation_id',
                                 'description'])
-
         self.args2body_qos_policy(parsed_args, body)
         availability_zone.args2body_az_hint(parsed_args, body)
         dns.args2body_dns_create(parsed_args, body, 'domain')
-
         return {'network': body}
 
 
@@ -222,11 +225,18 @@ class UpdateNetwork(neutronV20.UpdateCommand, qos_policy.UpdateQosPolicyMixin):
     resource = 'network'
 
     def add_known_arguments(self, parser):
+        parser.add_argument(
+            '--name',
+            help=_('Name of the network.'))
+        parser.add_argument(
+            '--description',
+            help=_('Description of this network.'))
         self.add_arguments_qos_policy(parser)
         dns.add_dns_argument_update(parser, self.resource, 'domain')
 
     def args2body(self, parsed_args):
         body = {}
+        args2body_common(body, parsed_args)
         self.args2body_qos_policy(parsed_args, body)
         dns.args2body_dns_update(parsed_args, body, 'domain')
         return {'network': body}
