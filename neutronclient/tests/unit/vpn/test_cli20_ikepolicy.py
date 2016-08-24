@@ -86,10 +86,6 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
     def test_create_ikepolicy_auth_sha256(self):
         self._test_create_ikepolicy_all_params(auth='sha256')
 
-    def test_create_ikepolicy_invalid_auth(self):
-        self._test_create_ikepolicy_all_params(auth='xyz',
-                                               expected_exc=SystemExit)
-
     def test_create_ikepolicy_with_limited_params(self):
         # vpn-ikepolicy-create with limited params.
         resource = 'ikepolicy'
@@ -219,6 +215,12 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'newname'],
                                    {'name': 'newname', })
+        # vpn-ikepolicy-update myid --pfs group2 --ike-version v2.
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--pfs', 'group2',
+                                    '--ike-version', 'v2'],
+                                   {'pfs': 'group2',
+                                    'ike_version': 'v2'})
 
     def test_delete_ikepolicy(self):
         # vpn-ikepolicy-delete my-id.

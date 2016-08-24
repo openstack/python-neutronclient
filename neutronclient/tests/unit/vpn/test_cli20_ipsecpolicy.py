@@ -85,10 +85,6 @@ class CLITestV20VpnIpsecPolicyJSON(test_cli20.CLITestV20Base):
     def test_create_ipsecpolicy_auth_sha256(self):
         self._test_create_ipsecpolicy_all_params(auth='sha256')
 
-    def test_create_ipsecpolicy_invalid_auth(self):
-        self._test_create_ipsecpolicy_all_params(auth='xyz',
-                                                 expected_exc=SystemExit)
-
     def test_create_ipsecpolicy_with_limited_params(self):
         # vpn-ipsecpolicy-create with limited params.
         resource = 'ipsecpolicy'
@@ -213,13 +209,26 @@ class CLITestV20VpnIpsecPolicyJSON(test_cli20.CLITestV20Base):
         self._test_show_resource(resource, cmd, self.test_id,
                                  args, ['id', 'name'])
 
-    def test_update_ipsecpolicy(self):
+    def test_update_ipsecpolicy_name(self):
         # vpn-ipsecpolicy-update myid --name newname --tags a b.
         resource = 'ipsecpolicy'
         cmd = ipsecpolicy.UpdateIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'newname'],
                                    {'name': 'newname', })
+
+    def test_update_ipsecpolicy_other_params(self):
+        # vpn-ipsecpolicy-update myid --transform-protocol esp
+        # --pfs group14  --encapsulation-mode transport
+        resource = 'ipsecpolicy'
+        cmd = ipsecpolicy.UpdateIPsecPolicy(test_cli20.MyApp(sys.stdout), None)
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--transform-protocol', 'esp',
+                                    '--pfs', 'group14',
+                                    '--encapsulation-mode', 'transport'],
+                                   {'transform_protocol': 'esp',
+                                    'pfs': 'group14',
+                                    'encapsulation_mode': 'transport', })
 
     def test_delete_ipsecpolicy(self):
         # vpn-ipsecpolicy-delete my-id.

@@ -143,6 +143,10 @@ class CLITestV20VpnServiceJSON(test_cli20.CLITestV20Base):
         self._test_update_resource(resource, cmd, 'myid',
                                    ['myid', '--name', 'newname'],
                                    {'name': 'newname', })
+        # vpn-service-update myid --admin-state-up False
+        self._test_update_resource(resource, cmd, 'myid',
+                                   ['myid', '--admin-state-up', 'False'],
+                                   {'admin_state_up': 'False', })
 
     def test_delete_vpnservice(self):
         # vpn-service-delete my-id.
