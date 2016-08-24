@@ -130,7 +130,18 @@ def str2dict(strdict, required_keys=None, optional_keys=None):
     """
     result = {}
     if strdict:
+        i = 0
+        kvlist = []
         for kv in strdict.split(','):
+            if '=' in kv:
+                kvlist.append(kv)
+                i += 1
+            elif i == 0:
+                msg = _("missing value for key '%s'")
+                raise argparse.ArgumentTypeError(msg % kv)
+            else:
+                kvlist[i-1] = "%s,%s" % (kvlist[i-1], kv)
+        for kv in kvlist:
             key, sep, value = kv.partition('=')
             if not sep:
                 msg = _("invalid key-value '%s', expected format: key=value")
