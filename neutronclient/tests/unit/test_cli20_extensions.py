@@ -15,18 +15,16 @@
 
 import sys
 
-from neutronclient.neutron.v2_0.extension import ListExt
-from neutronclient.neutron.v2_0.extension import ShowExt
-from neutronclient.tests.unit.test_cli20 import CLITestV20Base
-from neutronclient.tests.unit.test_cli20 import MyApp
+from neutronclient.neutron.v2_0 import extension
+from neutronclient.tests.unit import test_cli20
 
 
-class CLITestV20Extension(CLITestV20Base):
+class CLITestV20Extension(test_cli20.CLITestV20Base):
     id_field = 'alias'
 
     def test_list_extensions(self):
         resources = 'extensions'
-        cmd = ListExt(MyApp(sys.stdout), None)
+        cmd = extension.ListExt(test_cli20.MyApp(sys.stdout), None)
         contents = [{'alias': 'ext1', 'name': 'name1', 'other': 'other1'},
                     {'alias': 'ext2', 'name': 'name2', 'other': 'other2'}]
         ret = self._test_list_resources(resources, cmd,
@@ -41,7 +39,7 @@ class CLITestV20Extension(CLITestV20Base):
         # -F option does not work for ext-show at the moment, so -F option
         # is not passed in the commandline args as other tests do.
         resource = 'extension'
-        cmd = ShowExt(MyApp(sys.stdout), None)
+        cmd = extension.ShowExt(test_cli20.MyApp(sys.stdout), None)
         args = [self.test_id]
         ext_alias = self.test_id
         self._test_show_resource(resource, cmd, ext_alias, args, fields=[])
