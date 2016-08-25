@@ -19,14 +19,10 @@ ${config}
 "
 }
 
-if [ "$VENV" == "functional" ]
-then
-    load_rc_hook fwaas
-fi
-
 if [ "$VENV" == "functional-adv-svcs" ]
 then
-    export DEVSTACK_LOCAL_CONFIG="enable_plugin neutron-vpnaas git://git.openstack.org/openstack/neutron-vpnaas"
+    load_rc_hook fwaas
+    load_rc_hook vpnaas
 fi
 
 $BASE/new/devstack-gate/devstack-vm-gate.sh
