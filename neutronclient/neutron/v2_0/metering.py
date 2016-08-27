@@ -13,6 +13,7 @@
 # under the License.
 
 from neutronclient._i18n import _
+from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronv20
 
 
@@ -93,6 +94,7 @@ class CreateMeteringLabelRule(neutronv20.CreateCommand):
         parser.add_argument(
             '--direction',
             default='ingress', choices=['ingress', 'egress'],
+            type=utils.convert_to_lowercase,
             help=_('Direction of traffic, default: ingress.'))
         parser.add_argument(
             '--excluded',

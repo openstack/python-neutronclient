@@ -18,6 +18,7 @@ import argparse
 
 from neutronclient._i18n import _
 from neutronclient.common import exceptions
+from neutronclient.common import utils
 from neutronclient.neutron import v2_0 as neutronV20
 
 
@@ -314,6 +315,7 @@ class CreateSecurityGroupRule(neutronV20.CreateCommand):
                    'which the rule is added.'))
         parser.add_argument(
             '--direction',
+            type=utils.convert_to_lowercase,
             default='ingress', choices=['ingress', 'egress'],
             help=_('Direction of traffic: ingress/egress.'))
         parser.add_argument(
@@ -321,6 +323,7 @@ class CreateSecurityGroupRule(neutronV20.CreateCommand):
             help=_('IPv4/IPv6'))
         parser.add_argument(
             '--protocol',
+            type=utils.convert_to_lowercase,
             help=_('Protocol of packet. Allowed values are '
                    '[icmp, icmpv6, tcp, udp] and '
                    'integer representations [0-255].'))

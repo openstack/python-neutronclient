@@ -26,19 +26,22 @@ def add_common_args(parser, is_create=True):
     parser.add_argument(
         '--auth-algorithm',
         default='sha1' if is_create else argparse.SUPPRESS,
-        help=_('Authentication algorithm in lowercase, default:sha1'))
+        type=utils.convert_to_lowercase,
+        help=_('Authentication algorithm for IPsec policy, default:sha1.'))
     parser.add_argument(
         '--description',
         help=_('Description of the IPsec policy.'))
     parser.add_argument(
-        '--encryption-algorithm',
-        default='aes-128' if is_create else argparse.SUPPRESS,
-        help=_('Encryption algorithm in lowercase, default:aes-128'))
-    parser.add_argument(
         '--encapsulation-mode',
         default='tunnel' if is_create else argparse.SUPPRESS,
         choices=['tunnel', 'transport'],
-        help=_('Encapsulation mode in lowercase, default:tunnel'))
+        type=utils.convert_to_lowercase,
+        help=_('Encapsulation mode for IPsec policy, default:tunnel.'))
+    parser.add_argument(
+        '--encryption-algorithm',
+        default='aes-128' if is_create else argparse.SUPPRESS,
+        type=utils.convert_to_lowercase,
+        help=_('Encryption algorithm for IPsec policy, default:aes-128.'))
     parser.add_argument(
         '--lifetime',
         metavar="units=UNITS,value=VALUE",
@@ -47,12 +50,14 @@ def add_common_args(parser, is_create=True):
     parser.add_argument(
         '--pfs',
         default='group5' if is_create else argparse.SUPPRESS,
-        help=_('Perfect Forward Secrecy in lowercase, default:group5'))
+        type=utils.convert_to_lowercase,
+        help=_('Perfect Forward Secrecy for IPsec policy, default:group5.'))
     parser.add_argument(
         '--transform-protocol',
         default='esp' if is_create else argparse.SUPPRESS,
+        type=utils.convert_to_lowercase,
         choices=['esp', 'ah', 'ah-esp'],
-        help=_('Transform protocol in lowercase, default:esp'))
+        help=_('Transform protocol for IPsec policy, default:esp.'))
 
 
 def parse_common_args2body(parsed_args, body):
@@ -88,6 +93,7 @@ class CreateIPsecPolicy(neutronv20.CreateCommand):
     """Create an IPsec policy."""
 
     resource = 'ipsecpolicy'
+    help_resource = 'IPsec policy'
 
     def add_known_arguments(self, parser):
         parser.add_argument(

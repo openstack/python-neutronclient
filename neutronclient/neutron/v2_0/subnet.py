@@ -184,10 +184,12 @@ class CreateSubnet(neutronV20.CreateCommand):
             help=_('CIDR of subnet to create.'))
         parser.add_argument(
             '--ipv6-ra-mode',
+            type=utils.convert_to_lowercase,
             choices=['dhcpv6-stateful', 'dhcpv6-stateless', 'slaac'],
             help=_('IPv6 RA (Router Advertisement) mode.'))
         parser.add_argument(
             '--ipv6-address-mode',
+            type=utils.convert_to_lowercase,
             choices=['dhcpv6-stateful', 'dhcpv6-stateless', 'slaac'],
             help=_('IPv6 address mode.'))
         parser.add_argument(
