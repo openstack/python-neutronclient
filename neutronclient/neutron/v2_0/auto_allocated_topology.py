@@ -14,6 +14,8 @@
 #    under the License.
 #
 
+from __future__ import print_function
+
 import argparse
 from cliff import show
 from oslo_serialization import jsonutils
@@ -79,3 +81,33 @@ class ShowAutoAllocatedTopology(v2_0.NeutronCommand, show.ShowOne):
             return zip(*sorted(data[self.resource].items()))
         else:
             return None
+
+
+class DeleteAutoAllocatedTopology(v2_0.NeutronCommand):
+    """Delete the auto-allocated topology of a given tenant."""
+
+    resource = 'auto_allocated_topology'
+
+    def get_parser(self, prog_name):
+        parser = super(DeleteAutoAllocatedTopology, self).get_parser(prog_name)
+        parser.add_argument(
+            '--tenant-id', metavar='tenant-id',
+            help=_('The owner tenant ID.'))
+        # Allow people to do
+        #    neutron auto-allocated-topology-delete <tenant-id>
+        # (Only useful to users who can look at other tenants' topologies.)
+        # We use a different name for this arg because the default will
+        # override whatever is in the named arg otherwise.
+        parser.add_argument(
+            'pos_tenant_id',
+            help=argparse.SUPPRESS, nargs='?')
+        return parser
+
+    def take_action(self, parsed_args):
+        client = self.get_client()
+        tenant_id = parsed_args.tenant_id or parsed_args.pos_tenant_id
+        client.delete_auto_allocated_topology(tenant_id)
+        # It tenant is None, let's be clear on what it means.
+        tenant_id = tenant_id or 'None (i.e. yours)'
+        print(_('Deleted topology for tenant %s.') % tenant_id,
+              file=self.app.stdout)

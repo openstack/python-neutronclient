@@ -1809,6 +1809,14 @@ class Client(ClientBase):
 
     @debtcollector.renames.renamed_kwarg(
         'tenant_id', 'project_id', replace=True)
+    def delete_auto_allocated_topology(self, project_id, **_params):
+        """Delete a project's auto-allocated topology."""
+        return self.delete(
+            self.auto_allocated_topology_path % project_id,
+            params=_params)
+
+    @debtcollector.renames.renamed_kwarg(
+        'tenant_id', 'project_id', replace=True)
     def validate_auto_allocated_topology_requirements(self, project_id):
         """Validate requirements for getting an auto-allocated topology."""
         return self.get_auto_allocated_topology(project_id, fields=['dry-run'])
