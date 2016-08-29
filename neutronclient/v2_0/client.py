@@ -1693,10 +1693,10 @@ class Client(ClientBase):
                          self.qos_bandwidth_limit_rules_path % policy_id,
                          retrieve_all, **_params)
 
-    def show_bandwidth_limit_rule(self, rule, policy, body=None):
+    def show_bandwidth_limit_rule(self, rule, policy, **_params):
         """Fetches information of a certain bandwidth limit rule."""
         return self.get(self.qos_bandwidth_limit_rule_path %
-                        (policy, rule), body=body)
+                        (policy, rule), params=_params)
 
     def create_bandwidth_limit_rule(self, policy, body=None):
         """Creates a new bandwidth limit rule."""
