@@ -295,7 +295,9 @@ class TestShowNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
 
 class TestListNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
     # Create trunks to be listed.
-    _trunks = fakes.FakeTrunk.create_trunks(count=3)
+    _trunks = fakes.FakeTrunk.create_trunks(
+        {'created_at': '2001-01-01 00:00:00',
+         'updated_at': '2001-01-01 00:00:00'}, count=3)
 
     columns = (
         'ID',
@@ -306,6 +308,8 @@ class TestListNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
     columns_long = columns + (
         'Status',
         'State',
+        'Created At',
+        'Updated At'
     )
     data = []
     for t in _trunks:
@@ -324,6 +328,8 @@ class TestListNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
             t['description'],
             t['status'],
             trunk._format_admin_state(t['admin_state_up']),
+            '2001-01-01 00:00:00',
+            '2001-01-01 00:00:00',
         ))
 
     def setUp(self):
