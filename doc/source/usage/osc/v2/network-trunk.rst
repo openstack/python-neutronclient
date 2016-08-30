@@ -37,6 +37,7 @@ Create a network trunk for a given project
         [--subport <port=,segmentation-type=,segmentation-id=>]
         [--enable | --disable]
         [--project <project> [--project-domain <project-domain>]]
+        [--description <description>]
         <name>
 
 .. option:: --parent-port <parent-port>
@@ -64,6 +65,10 @@ Create a network trunk for a given project
 
     Domain the project belongs to (name or ID).
     This can be used in case collisions between project names exist.
+
+.. option:: --description <description>
+
+    A description of the trunk.
 
 network trunk delete
 --------------------
@@ -106,6 +111,7 @@ Set network trunk properties
 
     os network trunk set
         [--name <name>]
+        [--description <description>]
         [--subport <port=,segmentation-type=,segmentation-id=>]
         [--enable | --disable]
         <trunk>
@@ -113,6 +119,10 @@ Set network trunk properties
 .. option:: --name <name>
 
     Set trunk name
+
+.. option:: --description <description>
+
+    A description of the trunk.
 
 .. option:: --subport <port=,segmentation-type=,segmentation-id=>
 
