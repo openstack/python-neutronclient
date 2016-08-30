@@ -561,7 +561,7 @@ class CLITestV20Base(base.BaseTestCase):
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(204), retval))
         self.mox.ReplayAll()
-        cmd_parser = cmd.get_parser("delete_" + cmd_resource)
+        cmd_parser = cmd.get_parser("update_" + cmd_resource)
         shell.run_command(cmd, cmd_parser, args)
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
