@@ -216,6 +216,10 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
                 quota[resource] = self._validate_int(
                     resource,
                     getattr(parsed_args, resource))
+        if not quota:
+            raise exceptions.CommandError(
+                message=_('Must specify a valid resource with new quota '
+                          'value'))
         return {self.resource: quota}
 
     def take_action(self, parsed_args):
