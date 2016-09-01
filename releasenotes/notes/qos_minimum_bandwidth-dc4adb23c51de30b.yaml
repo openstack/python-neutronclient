@@ -1,0 +1,4 @@
+---
+features:
+  - New create, update, list, show, and delete commands are added for the QoS
+    minimum bandwidth rule.

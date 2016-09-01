@@ -595,6 +595,10 @@ class Client(ClientBase):
     qos_bandwidth_limit_rule_path = "/qos/policies/%s/bandwidth_limit_rules/%s"
     qos_dscp_marking_rules_path = "/qos/policies/%s/dscp_marking_rules"
     qos_dscp_marking_rule_path = "/qos/policies/%s/dscp_marking_rules/%s"
+    qos_minimum_bandwidth_rules_path = \
+        "/qos/policies/%s/minimum_bandwidth_rules"
+    qos_minimum_bandwidth_rule_path = \
+        "/qos/policies/%s/minimum_bandwidth_rules/%s"
     qos_rule_types_path = "/qos/rule-types"
     qos_rule_type_path = "/qos/rule-types/%s"
     flavors_path = "/flavors"
@@ -660,6 +664,7 @@ class Client(ClientBase):
                      'qos_policies': 'qos_policy',
                      'policies': 'policy',
                      'bandwidth_limit_rules': 'bandwidth_limit_rule',
+                     'minimum_bandwidth_rules': 'minimum_bandwidth_rule',
                      'rules': 'rule',
                      'dscp_marking_rules': 'dscp_marking_rule',
                      'rule_types': 'rule_type',
@@ -1738,6 +1743,35 @@ class Client(ClientBase):
     def delete_dscp_marking_rule(self, rule, policy):
         """Deletes a DSCP marking rule."""
         return self.delete(self.qos_dscp_marking_rule_path %
+                           (policy, rule))
+
+    def list_minimum_bandwidth_rules(self, policy_id, retrieve_all=True,
+                                     **_params):
+        """Fetches a list of all minimum bandwidth rules for the given policy.
+
+        """
+        return self.list('qos_minimum_bandwidth_rules',
+                         self.qos_minimum_bandwidth_rules_path %
+                         policy_id, retrieve_all, **_params)
+
+    def show_minimum_bandwidth_rule(self, rule, policy, body=None):
+        """Fetches information of a certain minimum bandwidth rule."""
+        return self.get(self.qos_minimum_bandwidth_rule_path %
+                        (policy, rule), body=body)
+
+    def create_minimum_bandwidth_rule(self, policy, body=None):
+        """Creates a new minimum bandwidth rule."""
+        return self.post(self.qos_minimum_bandwidth_rules_path % policy,
+                         body=body)
+
+    def update_minimum_bandwidth_rule(self, rule, policy, body=None):
+        """Updates a minimum bandwidth rule."""
+        return self.put(self.qos_minimum_bandwidth_rule_path %
+                        (policy, rule), body=body)
+
+    def delete_minimum_bandwidth_rule(self, rule, policy):
+        """Deletes a minimum bandwidth rule."""
+        return self.delete(self.qos_minimum_bandwidth_rule_path %
                            (policy, rule))
 
     def create_flavor(self, body=None):
