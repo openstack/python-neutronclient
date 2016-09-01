@@ -35,6 +35,19 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values,
                                    description='rooter')
 
+    def test_create_router_flavor(self):
+        resource = 'router'
+        cmd = router.CreateRouter(test_cli20.MyApp(sys.stdout), None)
+        name = 'router1'
+        myid = 'myid'
+        flavor = 'router-flavor'
+        args = [name, '--flavor', flavor]
+        position_names = ['name', ]
+        position_values = [name, flavor]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   flavor_id='router-flavor')
+
     def test_create_router_tenant(self):
         # Create router: --tenant_id tenantid myname.
         resource = 'router'

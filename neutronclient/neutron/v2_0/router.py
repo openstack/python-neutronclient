@@ -71,6 +71,9 @@ class CreateRouter(neutronV20.CreateCommand):
         parser.add_argument(
             '--description',
             help=_('Description of router.'))
+        parser.add_argument(
+            '--flavor',
+            help=_('ID or name of flavor.'))
         utils.add_boolean_argument(
             parser, '--distributed', dest='distributed',
             help=_('Create a distributed router.'))
@@ -82,6 +85,10 @@ class CreateRouter(neutronV20.CreateCommand):
 
     def args2body(self, parsed_args):
         body = {'admin_state_up': parsed_args.admin_state}
+        if parsed_args.flavor:
+            _flavor_id = neutronV20.find_resourceid_by_name_or_id(
+                self.get_client(), 'flavor', parsed_args.flavor)
+            body['flavor_id'] = _flavor_id
         neutronV20.update_dict(parsed_args, body,
                                ['name', 'tenant_id', 'distributed', 'ha',
                                 'description'])
