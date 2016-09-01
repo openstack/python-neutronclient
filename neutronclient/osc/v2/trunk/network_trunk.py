@@ -159,10 +159,14 @@ class ListNetworkTrunk(command.Lister):
             headers += (
                 'Status',
                 'State',
+                'Created At',
+                'Updated At',
             )
             columns += (
                 'status',
                 'admin_state_up',
+                'created_at',
+                'updated_at'
             )
         return (headers,
                 (utils.get_dict_properties(
