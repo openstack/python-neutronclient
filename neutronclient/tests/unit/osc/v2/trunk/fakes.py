@@ -24,8 +24,8 @@ class FakeTrunk(object):
         :param Dictionary attrs:
             A dictionary with all attributes
         :return:
-            A Dictionary with id, name, admin_state_up,
-            port_id, sub_ports, status and project_id
+            A Dictionary with id, name, description, admin_state_up, port_id,
+            sub_ports, status and project_id
         """
         attrs = attrs or {}
 
@@ -33,6 +33,7 @@ class FakeTrunk(object):
         trunk_attrs = {
             'id': 'trunk-id-' + uuid.uuid4().hex,
             'name': 'trunk-name-' + uuid.uuid4().hex,
+            'description': '',
             'port_id': 'port-' + uuid.uuid4().hex,
             'admin_state_up': True,
             'project_id': 'project-id-' + uuid.uuid4().hex,

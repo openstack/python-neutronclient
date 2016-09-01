@@ -45,6 +45,11 @@ class CreateNetworkTrunk(command.ShowOne):
             help=_("Name of the trunk to create")
         )
         parser.add_argument(
+            '--description',
+            metavar='<description>',
+            help=_("A description of the trunk")
+        )
+        parser.add_argument(
             '--parent-port',
             metavar='<parent-port>',
             required=True,
@@ -141,12 +146,14 @@ class ListNetworkTrunk(command.Lister):
         headers = (
             'ID',
             'Name',
-            'Parent Port'
+            'Parent Port',
+            'Description'
         )
         columns = (
             'id',
             'name',
-            'port_id'
+            'port_id',
+            'description'
         )
         if parsed_args.long:
             headers += (
@@ -178,6 +185,11 @@ class SetNetworkTrunk(command.Command):
             '--name',
             metavar="<name>",
             help=_("Set trunk name")
+        )
+        parser.add_argument(
+            '--description',
+            metavar='<description>',
+            help=_("A description of the trunk")
         )
         parser.add_argument(
             '--subport',
@@ -313,6 +325,8 @@ def _get_attrs_for_trunk(client_manager, parsed_args):
     attrs = {}
     if parsed_args.name is not None:
         attrs['name'] = str(parsed_args.name)
+    if parsed_args.description is not None:
+        attrs['description'] = str(parsed_args.description)
     if parsed_args.enable:
         attrs['admin_state_up'] = True
     if parsed_args.disable:

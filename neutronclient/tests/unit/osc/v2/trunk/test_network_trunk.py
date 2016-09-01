@@ -36,6 +36,7 @@ class TestCreateNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
 
     columns = (
         'admin_state_up',
+        'description',
         'id',
         'name',
         'port_id',
@@ -43,15 +44,18 @@ class TestCreateNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         'status',
         'sub_ports',
     )
-    data = (
-        trunk._format_admin_state(_trunk['admin_state_up']),
-        _trunk['id'],
-        _trunk['name'],
-        _trunk['port_id'],
-        _trunk['project_id'],
-        _trunk['status'],
-        utils.format_list_of_dicts(_trunk['sub_ports']),
-    )
+
+    def get_data(self):
+        return (
+            trunk._format_admin_state(self._trunk['admin_state_up']),
+            self._trunk['description'],
+            self._trunk['id'],
+            self._trunk['name'],
+            self._trunk['port_id'],
+            self._trunk['project_id'],
+            self._trunk['status'],
+            utils.format_list_of_dicts(self._trunk['sub_ports']),
+        )
 
     def setUp(self):
         super(TestCreateNetworkTrunk, self).setUp()
@@ -59,6 +63,7 @@ class TestCreateNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
                    new=_get_id).start()
         self.neutronclient.create_trunk = mock.Mock(
             return_value={trunk.TRUNK: self._trunk})
+        self.data = self.get_data()
 
         # Get the command object to test
         self.cmd = trunk.CreateNetworkTrunk(self.app, self.namespace)
@@ -92,9 +97,12 @@ class TestCreateNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         self.assertEqual(self.data, data)
 
     def test_create_full_options(self):
+        self._trunk['description'] = 'foo description'
+        self.data = self.get_data()
         subport = self._trunk['sub_ports'][0]
         arglist = [
             "--disable",
+            "--description", self._trunk['description'],
             "--parent-port", self._trunk['port_id'],
             "--subport", 'port=%(port)s,segmentation-type=%(seg_type)s,'
             'segmentation-id=%(seg_id)s' % {
@@ -105,6 +113,7 @@ class TestCreateNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         ]
         verifylist = [
             ('name', self._trunk['name']),
+            ('description', self._trunk['description']),
             ('parent_port', self._trunk['port_id']),
             ('add_subports', [{
                 'port': subport['port_id'],
@@ -119,6 +128,7 @@ class TestCreateNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
 
         self.neutronclient.create_trunk.assert_called_once_with({
             trunk.TRUNK: {'name': self._trunk['name'],
+                          'description': self._trunk['description'],
                           'admin_state_up': False,
                           'sub_ports': [subport],
                           'port_id': self._trunk['port_id']}
@@ -229,6 +239,7 @@ class TestShowNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
 
     columns = (
         'admin_state_up',
+        'description',
         'id',
         'name',
         'port_id',
@@ -238,6 +249,7 @@ class TestShowNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
     )
     data = (
         trunk._format_admin_state(_trunk['admin_state_up']),
+        _trunk['description'],
         _trunk['id'],
         _trunk['name'],
         _trunk['port_id'],
@@ -289,6 +301,7 @@ class TestListNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         'ID',
         'Name',
         'Parent Port',
+        'Description'
     )
     columns_long = columns + (
         'Status',
@@ -300,6 +313,7 @@ class TestListNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
             t['id'],
             t['name'],
             t['port_id'],
+            t['description']
         ))
     data_long = []
     for t in _trunks:
@@ -307,6 +321,7 @@ class TestListNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
             t['id'],
             t['name'],
             t['port_id'],
+            t['description'],
             t['status'],
             trunk._format_admin_state(t['admin_state_up']),
         ))
@@ -356,6 +371,7 @@ class TestSetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         'admin_state_up',
         'id',
         'name',
+        'description',
         'port_id',
         'project_id',
         'status',
@@ -365,6 +381,7 @@ class TestSetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         trunk._format_admin_state(_trunk['admin_state_up']),
         _trunk['id'],
         _trunk['name'],
+        _trunk['description'],
         _trunk['port_id'],
         _trunk['project_id'],
         _trunk['status'],
@@ -383,25 +400,31 @@ class TestSetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         # Get the command object to test
         self.cmd = trunk.SetNetworkTrunk(self.app, self.namespace)
 
-    def test_set_network_trunk_name(self):
+    def _test_set_network_trunk_attr(self, attr, value):
         arglist = [
-            '--name', 'trunky',
-            self._trunk['name'],
+            '--%s' % attr, value,
+            self._trunk[attr],
         ]
         verifylist = [
-            ('name', 'trunky'),
-            ('trunk', self._trunk['name']),
+            (attr, value),
+            ('trunk', self._trunk[attr]),
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
 
         result = self.cmd.take_action(parsed_args)
 
         attrs = {
-            'name': 'trunky',
+            attr: value,
         }
         self.neutronclient.update_trunk.assert_called_once_with(
-            self._trunk['name'], {trunk.TRUNK: attrs})
+            self._trunk[attr], {trunk.TRUNK: attrs})
         self.assertIsNone(result)
+
+    def test_set_network_trunk_name(self):
+        self._test_set_network_trunk_attr('name', 'trunky')
+
+    def test_test_set_network_trunk_description(self):
+        self._test_set_network_trunk_attr('description', 'description')
 
     def test_set_network_trunk_admin_state_up_disable(self):
         arglist = [
