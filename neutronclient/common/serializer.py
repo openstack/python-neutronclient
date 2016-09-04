@@ -13,15 +13,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import logging
-
 from oslo_serialization import jsonutils
 import six
 
 from neutronclient._i18n import _
 from neutronclient.common import exceptions as exception
 
-LOG = logging.getLogger(__name__)
 
 if six.PY3:
     long = int
