@@ -67,7 +67,7 @@ class ListPool(neutronV20.ListCommand):
 
     resource = 'pool'
     shadow_resource = 'lbaas_pool'
-    list_columns = ['id', 'name', 'lb_method', 'protocol',
+    list_columns = ['id', 'name', 'lb_algorithm', 'protocol',
                     'admin_state_up']
     pagination_support = True
     sorting_support = True
