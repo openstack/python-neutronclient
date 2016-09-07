@@ -145,10 +145,11 @@ class DisassociateHealthMonitor(neutronV20.NeutronCommand):
         parser = super(DisassociateHealthMonitor, self).get_parser(prog_name)
         parser.add_argument(
             'health_monitor_id', metavar='HEALTH_MONITOR_ID',
-            help=_('Health monitor to associate.'))
+            help=_('Health monitor to disassociate.'))
         parser.add_argument(
             'pool_id', metavar='POOL',
-            help=_('ID of the pool to be associated with the health monitor.'))
+            help=_('ID of the pool to be disassociated with the health '
+                   'monitor.'))
         return parser
 
     def take_action(self, parsed_args):
