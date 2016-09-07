@@ -1,0 +1,4 @@
+---
+features:
+  - CLI support for the "Firewall as a Service v2" feature, which is enhanced
+    FWaaS functionality, as OSC plugin commands.
