@@ -66,8 +66,7 @@ class CreateHealthMonitor(neutronV20.CreateCommand):
         parser.add_argument(
             '--delay',
             required=True,
-            help=_('The time in milliseconds between sending probes to '
-                   'members.'))
+            help=_('The time in seconds between sending probes to members.'))
         parser.add_argument(
             '--max-retries',
             required=True,
@@ -76,8 +75,8 @@ class CreateHealthMonitor(neutronV20.CreateCommand):
         parser.add_argument(
             '--timeout',
             required=True,
-            help=_('Maximum number of milliseconds for a monitor to wait for '
-                   'a connection to be established before it times out. The '
+            help=_('Maximum number of seconds for a monitor to wait for a '
+                   'connection to be established before it times out. The '
                    'value must be less than the delay value.'))
         parser.add_argument(
             '--type',
