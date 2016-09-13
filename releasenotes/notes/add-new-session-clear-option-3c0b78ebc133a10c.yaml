@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    A new option ``--no-session-persistence`` has been added to
+    the ``neutron lbaas-pool-update`` CLI to clear the session persistence
+    with which the current pool is associated.

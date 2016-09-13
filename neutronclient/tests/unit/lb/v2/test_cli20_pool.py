@@ -179,6 +179,17 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
                 }, }
         self._test_update_resource(resource, cmd, 'myid', args, body,
                                    cmd_resource=cmd_resource)
+        # lbaas-pool-update myid --name Name
+        # --no-session-persistence
+
+        resource = 'pool'
+        cmd_resource = 'lbaas_pool'
+        cmd = pool.UpdatePool(test_cli20.MyApp(sys.stdout), None)
+        args = ['myid', '--name', 'Name', '--no-session-persistence']
+        body = {'name': "Name",
+                "session_persistence": None, }
+        self._test_update_resource(resource, cmd, 'myid', args, body,
+                                   cmd_resource=cmd_resource)
 
     def test_delete_pool(self):
         # lbaas-pool-delete my-id.

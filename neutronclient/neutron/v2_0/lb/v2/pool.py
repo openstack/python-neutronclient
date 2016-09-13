@@ -39,7 +39,7 @@ def _get_listener_id(client, listener_id_or_name):
         client, 'listener', listener_id_or_name)
 
 
-def _add_common_args(parser):
+def _add_common_args(parser, is_create=True):
     parser.add_argument(
         '--description',
         help=_('Description of the pool.'))
@@ -47,7 +47,7 @@ def _add_common_args(parser):
         '--name', help=_('The name of the pool.'))
     parser.add_argument(
         '--lb-algorithm',
-        required=True,
+        required=is_create,
         type=utils.convert_to_uppercase,
         choices=['ROUND_ROBIN', 'LEAST_CONNECTIONS', 'SOURCE_IP'],
         help=_('The algorithm used to distribute load between the members '
@@ -57,8 +57,7 @@ def _add_common_args(parser):
 def _parse_common_args(parsed_args):
     body = {}
     neutronV20.update_dict(parsed_args,
-                           body, ['description', 'lb_algorithm', 'name',
-                                  'session_persistence'])
+                           body, ['description', 'lb_algorithm', 'name'])
     return body
 
 
@@ -142,7 +141,8 @@ class CreatePool(neutronV20.CreateCommand):
             body['loadbalancer_id'] = loadbalancer_id
         body['admin_state_up'] = parsed_args.admin_state
         neutronV20.update_dict(parsed_args, body,
-                               ['tenant_id', 'protocol'])
+                               ['tenant_id', 'protocol',
+                                'session_persistence'])
         return {self.resource: body}
 
 
@@ -157,17 +157,26 @@ class UpdatePool(neutronV20.UpdateCommand):
             parser, '--admin-state-up',
             help=_('Update the administrative state of '
                    'the pool (True meaning "Up").'))
-        parser.add_argument(
+        session_group = parser.add_mutually_exclusive_group()
+        session_group.add_argument(
             '--session-persistence',
             metavar='type=TYPE[,cookie_name=COOKIE_NAME]',
             type=utils.str2dict_type(required_keys=['type'],
                                      optional_keys=['cookie_name']),
             help=_('The type of session persistence to use and associated '
                    'cookie name.'))
-        _add_common_args(parser)
+        session_group.add_argument(
+            '--no-session-persistence',
+            action='store_true',
+            help=_('Clear session persistence for the pool.'))
+        _add_common_args(parser, False)
 
     def args2body(self, parsed_args):
         body = _parse_common_args(parsed_args)
+        if parsed_args.no_session_persistence:
+            body['session_persistence'] = None
+        elif parsed_args.session_persistence:
+            body['session_persistence'] = parsed_args.session_persistence
         neutronV20.update_dict(parsed_args, body,
                                ['admin_state_up'])
         return {self.resource: body}
