@@ -58,6 +58,8 @@ class CreateNetworkTrunk(command.ShowOne):
             '--subport',
             metavar='<port=,segmentation-type=,segmentation-id=>',
             action=parseractions.MultiKeyValueAction, dest='add_subports',
+            optional_keys=['segmentation-id', 'segmentation-type'],
+            required_keys=['port'],
             help=_("Subport to add. Subport is of form "
                    "\'port=<name or ID>,segmentation-type=,segmentation-ID=\' "
                    "(--subport) option can be repeated")
@@ -193,6 +195,8 @@ class SetNetworkTrunk(command.Command):
             '--subport',
             metavar='<port=,segmentation-type=,segmentation-id=>',
             action=parseractions.MultiKeyValueAction, dest='set_subports',
+            optional_keys=['segmentation-id', 'segmentation-type'],
+            required_keys=['port'],
             help=_("Subport to add. Subport is of form "
                    "\'port=<name or ID>,segmentation-type=,segmentation-ID=\'"
                    "(--subport) option can be repeated")

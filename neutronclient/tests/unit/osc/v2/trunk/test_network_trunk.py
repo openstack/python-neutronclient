@@ -13,6 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import argparse
+import copy
 import mock
 from mock import call
 import testtools
@@ -161,6 +163,56 @@ class TestCreateNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
             self.cmd.take_action(parsed_args)
             self.assertEqual("Segmentation-id 'boom' is not an integer",
                              str(e))
+
+    def test_create_network_trunk_subports_without_optional_keys(self):
+        subport = copy.copy(self._trunk['sub_ports'][0])
+        # Pop out the segmentation-id and segmentation-type
+        subport.pop('segmentation_type')
+        subport.pop('segmentation_id')
+        arglist = [
+            '--parent-port', self._trunk['port_id'],
+            '--subport', 'port=%(port)s' % {'port': subport['port_id']},
+            self._trunk['name'],
+        ]
+        verifylist = [
+            ('name', self._trunk['name']),
+            ('parent_port', self._trunk['port_id']),
+            ('add_subports', [{
+                'port': subport['port_id']}]),
+        ]
+
+        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+        columns, data = (self.cmd.take_action(parsed_args))
+
+        self.neutronclient.create_trunk.assert_called_once_with({
+            trunk.TRUNK: {'name': self._trunk['name'],
+                          'admin_state_up': True,
+                          'sub_ports': [subport],
+                          'port_id': self._trunk['port_id']}
+        })
+        self.assertEqual(self.columns, columns)
+        self.assertEqual(self.data, data)
+
+    def test_create_network_trunk_subports_without_required_key_fail(self):
+        subport = self._trunk['sub_ports'][0]
+        arglist = [
+            '--parent-port', self._trunk['port_id'],
+            '--subport', 'segmentation-type=%(seg_type)s,'
+            'segmentation-id=%(seg_id)s' % {
+                'seg_id': subport['segmentation_id'],
+                'seg_type': subport['segmentation_type']},
+            self._trunk['name'],
+        ]
+        verifylist = [
+            ('name', self._trunk['name']),
+            ('parent_port', self._trunk['port_id']),
+            ('add_subports', [{
+                'segmentation-id': str(subport['segmentation_id']),
+                'segmentation-type': subport['segmentation_type']}]),
+        ]
+
+        with testtools.ExpectedException(argparse.ArgumentTypeError):
+            self.check_parser(self.cmd, arglist, verifylist)
 
 
 class TestDeleteNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
@@ -510,6 +562,50 @@ class TestSetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
             self._trunk['name'], {'sub_ports': [subport]}
         )
         self.assertIsNone(result)
+
+    def test_set_network_trunk_subports_without_optional_keys(self):
+        subport = copy.copy(self._trunk['sub_ports'][0])
+        # Pop out the segmentation-id and segmentation-type
+        subport.pop('segmentation_type')
+        subport.pop('segmentation_id')
+        arglist = [
+            '--subport', 'port=%(port)s' % {'port': subport['port_id']},
+            self._trunk['name'],
+        ]
+        verifylist = [
+            ('trunk', self._trunk['name']),
+            ('set_subports', [{
+                'port': subport['port_id']}]),
+        ]
+
+        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+        result = self.cmd.take_action(parsed_args)
+
+        self.neutronclient.trunk_add_subports.assert_called_once_with(
+            self._trunk['name'], {'sub_ports': [subport]}
+        )
+        self.assertIsNone(result)
+
+    def test_set_network_trunk_subports_without_required_key_fail(self):
+        subport = self._trunk['sub_ports'][0]
+        arglist = [
+            '--subport', 'segmentation-type=%(seg_type)s,'
+            'segmentation-id=%(seg_id)s' % {
+                'seg_id': subport['segmentation_id'],
+                'seg_type': subport['segmentation_type']},
+            self._trunk['name'],
+        ]
+        verifylist = [
+            ('trunk', self._trunk['name']),
+            ('set_subports', [{
+                'segmentation-id': str(subport['segmentation_id']),
+                'segmentation-type': subport['segmentation_type']}]),
+        ]
+
+        with testtools.ExpectedException(argparse.ArgumentTypeError):
+            self.check_parser(self.cmd, arglist, verifylist)
+
+        self.neutronclient.trunk_add_subports.assert_not_called()
 
     def test_set_trunk_attrs_with_exception(self):
         arglist = [
