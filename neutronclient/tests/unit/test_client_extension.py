@@ -131,7 +131,7 @@ class CLITestV20ExtensionJSONAlternatePlurals(test_cli20.CLITestV20Base):
     def _mock_extension_loading(self):
         ext_pkg = 'neutronclient.common.extension'
         contrib = mock.patch(ext_pkg + '._discover_via_entry_points').start()
-        ip_address = mock.MagicMock()
+        ip_address = mock.Mock()
         ip_address.IPAddress = self.IPAddress
         ip_address.IPAddressesList = self.IPAddressesList
         contrib.return_value = [("ip_address", ip_address)]
@@ -184,7 +184,7 @@ class CLITestV20ExtensionJSONChildResource(test_cli20.CLITestV20Base):
     def _mock_extension_loading(self):
         ext_pkg = 'neutronclient.common.extension'
         contrib = mock.patch(ext_pkg + '._discover_via_entry_points').start()
-        child = mock.MagicMock()
+        child = mock.Mock()
         child.Child = self.Child
         child.ChildrenList = self.ChildrenList
         child.ChildShow = self.ChildShow

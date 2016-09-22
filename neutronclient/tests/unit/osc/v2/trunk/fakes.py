@@ -66,7 +66,7 @@ class FakeTrunk(object):
 
     @staticmethod
     def get_trunks(trunks=None, count=2):
-        """Get an iterable MagicMock object with a list of faked trunks.
+        """Get an iterable Mock object with a list of faked trunks.
 
         If trunks list is provided, then initialize the Mock object with the
         list. Otherwise create one.
@@ -81,4 +81,4 @@ class FakeTrunk(object):
         """
         if trunks is None:
             trunks = FakeTrunk.create_trunks(count)
-        return mock.MagicMock(side_effect=trunks)
+        return mock.Mock(side_effect=trunks)

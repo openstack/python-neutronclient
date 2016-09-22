@@ -222,7 +222,7 @@ class TestDeleteNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
 
         get_mock_result = [self._trunks[0], exceptions.CommandError]
         trunk._get_id = (
-            mock.MagicMock(side_effect=get_mock_result)
+            mock.Mock(side_effect=get_mock_result)
         )
         with testtools.ExpectedException(exceptions.CommandError) as e:
             self.cmd.take_action(parsed_args)
@@ -522,7 +522,7 @@ class TestSetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
 
         self.neutronclient.update_trunk = (
-            mock.MagicMock(side_effect=exceptions.CommandError)
+            mock.Mock(side_effect=exceptions.CommandError)
         )
         with testtools.ExpectedException(exceptions.CommandError) as e:
             self.cmd.take_action(parsed_args)
@@ -546,7 +546,7 @@ class TestSetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
 
         self.neutronclient.trunk_add_subports = (
-            mock.MagicMock(side_effect=exceptions.CommandError)
+            mock.Mock(side_effect=exceptions.CommandError)
         )
         with testtools.ExpectedException(exceptions.CommandError) as e:
             self.cmd.take_action(parsed_args)
