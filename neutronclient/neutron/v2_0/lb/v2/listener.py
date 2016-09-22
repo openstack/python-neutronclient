@@ -45,7 +45,8 @@ def _add_common_args(parser):
         '--connection-limit',
         type=int,
         help=_('The maximum number of connections per second allowed for '
-               'the vip. Positive integer or -1 for unlimited (default).'))
+               'the listener. Positive integer or -1 '
+               'for unlimited (default).'))
     parser.add_argument(
         '--default-pool',
         help=_('Default pool for the listener.'))
