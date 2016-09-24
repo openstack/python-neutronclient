@@ -597,6 +597,18 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         args = [myid1, myid2]
         self._test_delete_resource(resource, cmd, myid1, args, extra_id=myid2)
 
+    def test_bulk_delete_network_fail(self):
+        # Delete net: myid1 myid2.
+        resource = 'network'
+        cmd = network.DeleteNetwork(test_cli20.MyApp(sys.stdout), None)
+        myid1 = 'myid1'
+        myid2 = 'myid2'
+        args = [myid1, myid2]
+        self.assertRaises(exceptions.NeutronCLIError,
+                          self._test_delete_resource,
+                          resource, cmd, myid1, args, extra_id=myid2,
+                          delete_fail=True)
+
     def _test_extend_list(self, mox_calls):
         data = [{'id': 'netid%d' % i, 'name': 'net%d' % i,
                  'subnets': ['mysubid%d' % i]}

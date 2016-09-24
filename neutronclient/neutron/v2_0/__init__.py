@@ -528,18 +528,20 @@ class DeleteCommand(NeutronCommand):
                   % {'id': ", ".join(successful_delete),
                      'resource': self.cmd_resource},
                   file=self.app.stdout)
-        if non_existent:
-            print((_("Unable to find %(resource)s(s) with id(s) "
-                     "'%(id)s'") %
-                  {'resource': self.cmd_resource,
-                   'id': ", ".join(non_existent)}),
-                  file=self.app.stdout)
-        if multiple_ids:
-            print((_("Multiple %(resource)s(s) matches found for name(s)"
-                     " '%(id)s'. Please use an ID to be more specific.")) %
-                  {'resource': self.cmd_resource,
-                   'id': ", ".join(multiple_ids)},
-                  file=self.app.stdout)
+        if non_existent or multiple_ids:
+            err_msgs = []
+            if non_existent:
+                err_msgs.append((_("Unable to find %(resource)s(s) with id(s) "
+                                   "'%(id)s'.") %
+                                 {'resource': self.cmd_resource,
+                                  'id': ", ".join(non_existent)}))
+            if multiple_ids:
+                err_msgs.append((_("Multiple %(resource)s(s) matches found "
+                                   "for name(s) '%(id)s'. Please use an ID "
+                                   "to be more specific.") %
+                                 {'resource': self.cmd_resource,
+                                  'id': ", ".join(multiple_ids)}))
+            raise exceptions.NeutronCLIError(message='\n'.join(err_msgs))
 
     def delete_item(self, obj_deleter, neutron_client, item_id):
         if self.allow_names:

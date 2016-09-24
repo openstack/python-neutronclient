@@ -512,7 +512,9 @@ class CLITestV20Base(base.BaseTestCase):
         self.assertIn(myid, _str)
         self.assertIn('myname', _str)
 
-    def _test_set_path_and_delete(self, path, parent_id, myid):
+    def _test_set_path_and_delete(self, path, parent_id, myid,
+                                  delete_fail=False):
+        return_val = 404 if delete_fail else 204
         if parent_id:
             path = path % (parent_id, myid)
         else:
@@ -521,11 +523,12 @@ class CLITestV20Base(base.BaseTestCase):
             end_url(path, format=self.format), 'DELETE',
             body=None,
             headers=mox.ContainsKeyValue(
-                'X-Auth-Token', TOKEN)).AndReturn((MyResp(204), None))
+                'X-Auth-Token', TOKEN)).AndReturn((MyResp(
+                    return_val), None))
 
     def _test_delete_resource(self, resource, cmd, myid, args,
                               cmd_resource=None, parent_id=None,
-                              extra_id=None):
+                              extra_id=None, delete_fail=False):
         self.mox.StubOutWithMock(cmd, "get_client")
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         cmd.get_client().MultipleTimes().AndReturn(self.client)
@@ -535,7 +538,8 @@ class CLITestV20Base(base.BaseTestCase):
         self._test_set_path_and_delete(path, parent_id, myid)
         # extra_id is used to test for bulk_delete
         if extra_id:
-            self._test_set_path_and_delete(path, parent_id, extra_id)
+            self._test_set_path_and_delete(path, parent_id, extra_id,
+                                           delete_fail)
         self.mox.ReplayAll()
         cmd_parser = cmd.get_parser("delete_" + cmd_resource)
         shell.run_command(cmd, cmd_parser, args)
