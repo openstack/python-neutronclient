@@ -15,6 +15,8 @@
 
 import argparse
 
+from oslo_utils import netutils
+
 import testtools
 
 from neutronclient.common import exceptions
@@ -140,9 +142,9 @@ class TestUtils(testtools.TestCase):
         self.assertEqual(('test_name', 'test_id', 'test', 'pass'), act)
 
     def test_is_cidr(self):
-        self.assertTrue(utils.is_valid_cidr('10.10.10.0/24'))
-        self.assertFalse(utils.is_valid_cidr('10.10.10..0/24'))
-        self.assertFalse(utils.is_valid_cidr('wrong_cidr_format'))
+        self.assertTrue(netutils.is_valid_cidr('10.10.10.0/24'))
+        self.assertFalse(netutils.is_valid_cidr('10.10.10..0/24'))
+        self.assertFalse(netutils.is_valid_cidr('wrong_cidr_format'))
 
 
 class ImportClassTestCase(testtools.TestCase):
