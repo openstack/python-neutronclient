@@ -33,13 +33,6 @@ def _format_fixed_ips(port):
         return ''
 
 
-def _format_fixed_ips_csv(port):
-    try:
-        return jsonutils.dumps(port['fixed_ips'])
-    except (TypeError, KeyError):
-        return ''
-
-
 def _add_updatable_args(parser):
     parser.add_argument(
         '--name',
@@ -94,7 +87,6 @@ class ListPort(neutronV20.ListCommand):
 
     resource = 'port'
     _formatters = {'fixed_ips': _format_fixed_ips, }
-    _formatters_csv = {'fixed_ips': _format_fixed_ips_csv, }
     list_columns = ['id', 'name', 'mac_address', 'fixed_ips']
     pagination_support = True
     sorting_support = True
