@@ -193,6 +193,9 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
             '--listener', metavar='listeners',
             help=_('The limit of listeners.'))
         parser.add_argument(
+            '--rbac-policy', metavar='rbac_policies',
+            help=_('The limit of RBAC policies.'))
+        parser.add_argument(
             'pos_tenant_id',
             help=argparse.SUPPRESS, nargs='?')
 
@@ -212,7 +215,7 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
         for resource in ('network', 'subnet', 'port', 'router', 'floatingip',
                          'security_group', 'security_group_rule',
                          'vip', 'pool', 'member', 'healthmonitor',
-                         'loadbalancer', 'listener'):
+                         'loadbalancer', 'listener', 'rbac_policy'):
             if getattr(parsed_args, resource):
                 quota[resource] = self._validate_int(
                     resource,
