@@ -21,7 +21,6 @@ import argparse
 import functools
 import hashlib
 import logging
-import netaddr
 import os
 
 from oslo_utils import encodeutils
@@ -226,11 +225,3 @@ def add_boolean_argument(parser, name, **kwargs):
         choices=['True', 'true', 'False', 'false'],
         default=default,
         **kwargs)
-
-
-def is_valid_cidr(cidr):
-    try:
-        netaddr.IPNetwork(cidr)
-        return True
-    except Exception:
-        return False

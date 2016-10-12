@@ -30,6 +30,7 @@ import sys
 from keystoneauth1 import session
 import os_client_config
 from oslo_utils import encodeutils
+from oslo_utils import netutils
 
 from cliff import app
 from cliff import command
@@ -39,7 +40,6 @@ from neutronclient._i18n import _
 from neutronclient.common import clientmanager
 from neutronclient.common import exceptions as exc
 from neutronclient.common import extension as client_extension
-from neutronclient.common import utils
 from neutronclient.neutron.v2_0 import address_scope
 from neutronclient.neutron.v2_0 import agent
 from neutronclient.neutron.v2_0 import agentscheduler
@@ -120,7 +120,7 @@ def get_first_valid_cidr(value_specs):
     # When cidr was separated from network, the value will not be able
     # to be parsed into known_args, but saved to _values_specs instead.
     for value in value_specs:
-        if utils.is_valid_cidr(value):
+        if netutils.is_valid_cidr(value):
             return value
 
 
