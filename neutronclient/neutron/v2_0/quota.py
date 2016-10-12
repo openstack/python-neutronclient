@@ -184,6 +184,7 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
             help=_('The limit of pool members.'))
         parser.add_argument(
             '--health-monitor', metavar='health_monitors',
+            dest='healthmonitor',
             help=_('The limit of health monitors.'))
         parser.add_argument(
             '--loadbalancer', metavar='loadbalancers',
@@ -210,7 +211,7 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
         quota = {}
         for resource in ('network', 'subnet', 'port', 'router', 'floatingip',
                          'security_group', 'security_group_rule',
-                         'vip', 'pool', 'member', 'health_monitor',
+                         'vip', 'pool', 'member', 'healthmonitor',
                          'loadbalancer', 'listener'):
             if getattr(parsed_args, resource):
                 quota[resource] = self._validate_int(
