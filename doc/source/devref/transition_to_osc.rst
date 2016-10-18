@@ -70,6 +70,7 @@ Transition Steps
 4. **In Progress:** OpenStack Python SDK releases version 1.0 to guarantee
    backwards compatibility of its networking support and OSC updates
    its dependencies to include OpenStack Python SDK version 1.0 or later.
+   See the following blueprint: https://blueprints.launchpad.net/python-openstackclient/+spec/network-command-sdk-support
 
 5. **Done:** OSC switches its networking support for the
    `ip floating <http://docs.openstack.org/developer/python-openstackclient/command-objects/ip-floating.html>`_,
@@ -97,12 +98,15 @@ Transition Steps
    should start their transition to the OSC plugin system. See the
    developer guide section below for more information on this step.
 
-7. **Not Started:** Deprecate the ``neutron`` CLI once the criteria below have
-   been meet. Running the CLI after it has been deprecated will issue a warning
-   messages such as the following:
-   ``DeprecationWarning: The neutron CLI is deprecated in favor of python-openstackclient.``
-   In addition, only security fixes will be made to the CLI after it has been
-   deprecated.
+7. **In Progress:** Deprecate the ``neutron`` CLI. Running the CLI after
+   it has been `deprecated <https://review.openstack.org/#/c/393903/>`_
+   will issue a warning message:
+   ``neutron CLI is deprecated and will be removed in the future. Use openstack CLI instead.``
+   In addition, no new features will be added to the CLI, though fixes to
+   the CLI will be assessed on a case by case basis.
+
+8. **Not Started:** Remove the ``neutron`` CLI after two deprecation cycles
+   once the criteria below have been met.
 
    * The networking support provide by the ``openstack`` CLI is functionally
      equivalent to the ``neutron`` CLI and it contains sufficient functional
@@ -116,13 +120,11 @@ Transition Steps
      to the OSC plugin system and use the ``openstack`` CLI instead of the
      ``neutron`` CLI.
 
-8. **Not Started:** Remove the ``neutron`` CLI after two deprecation cycles.
-
 Developer Guide
 ---------------
-The ``neutron`` CLI version 4.x, without extensions, supports over 200
-commands while the ``openstack`` CLI version 2.6.0 supports over 50
-networking commands. Of the 50 commands, some do not have all of the options
+The ``neutron`` CLI version 6.x, without extensions, supports over 200
+commands while the ``openstack`` CLI version 3.3.0 supports over 70
+networking commands. Of the 70 commands, some do not have all of the options
 or arguments of their ``neutron`` CLI equivalent. With this large functional
 gap, a few critical questions for developers during this transition are "Which
 CLI do I change?", "Where does my CLI belong?", and "Which Python library do I change?"
