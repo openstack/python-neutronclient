@@ -22,6 +22,7 @@ import re
 import time
 
 import debtcollector.renames
+from keystoneauth1 import exceptions as ksa_exc
 import requests
 import six.moves.urllib.parse as urlparse
 from six import string_types
@@ -335,7 +336,7 @@ class ClientBase(object):
             try:
                 return self.do_request(method, action, body=body,
                                        headers=headers, params=params)
-            except exceptions.ConnectionFailed:
+            except (exceptions.ConnectionFailed, ksa_exc.ConnectionError):
                 # Exception has already been logged by do_request()
                 if i < self.retries:
                     _logger.debug('Retrying connection to Neutron service')
