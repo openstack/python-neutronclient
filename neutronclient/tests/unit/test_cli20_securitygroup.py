@@ -385,13 +385,12 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
             test_cli20.MyApp(sys.stdout), None)
         self.mox.StubOutWithMock(cmd, 'get_client')
         self.mox.StubOutWithMock(self.client.httpclient, 'request')
-        cmd.get_client().AndReturn(self.client)
+        cmd.get_client().MultipleTimes().AndReturn(self.client)
         query = ''
         if query_fields:
             query = '&'.join(['fields=' + f for f in query_fields])
         setup_list_stub('security_group_rules', api_data, query)
         if conv:
-            cmd.get_client().AndReturn(self.client)
             sec_ids = set()
             for n in api_data:
                 sec_ids.add(n['security_group_id'])

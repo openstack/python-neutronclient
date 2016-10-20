@@ -1,0 +1,6 @@
+---
+features:
+  - Show tenant_id when ``*-list`` command is run by admin. In neutron
+    the list operations by admin retrieve all resources from all tenants.
+    It is not easy to distinguish resources without tenant_id.
+    This feature is useful for admin operations.

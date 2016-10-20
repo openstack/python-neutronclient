@@ -47,19 +47,28 @@ class ClientTestBase(base.ClientTestBase):
 
     """
 
-    def _get_clients(self):
-        self.creds = credentials()
+    def _get_clients_from_os_cloud_config(self, cloud='devstack-admin'):
+        creds = credentials(cloud)
         cli_dir = os.environ.get(
             'OS_NEUTRONCLIENT_EXEC_DIR',
             os.path.join(os.path.abspath('.'), '.tox/functional/bin'))
 
         return base.CLIClient(
-            username=self.creds['username'],
-            password=self.creds['password'],
-            tenant_name=self.creds['project_name'],
-            uri=self.creds['auth_url'],
+            username=creds['username'],
+            password=creds['password'],
+            tenant_name=creds['project_name'],
+            uri=creds['auth_url'],
             cli_dir=cli_dir)
+
+    def _get_clients(self):
+        return self._get_clients_from_os_cloud_config()
 
     def neutron(self, *args, **kwargs):
         return self.clients.neutron(*args,
                                     **kwargs)
+
+    def neutron_non_admin(self, *args, **kwargs):
+        if not hasattr(self, '_non_admin_clients'):
+            self._non_admin_clients = self._get_clients_from_os_cloud_config(
+                cloud='devstack')
+        return self._non_admin_clients.neutron(*args, **kwargs)

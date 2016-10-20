@@ -299,9 +299,8 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
         self.mox.StubOutWithMock(cmd, 'get_client')
         self.mox.StubOutWithMock(self.client.httpclient, 'request')
-        cmd.get_client().AndReturn(self.client)
+        cmd.get_client().MultipleTimes().AndReturn(self.client)
         setup_list_stub('networks', data, '')
-        cmd.get_client().AndReturn(self.client)
         filters = ''
         for n in data:
             for s in n['subnets']:
