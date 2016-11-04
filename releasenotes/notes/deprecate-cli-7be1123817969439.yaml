@@ -1,0 +1,8 @@
+---
+deprecations:
+  - The neutron CLI is now deprecated. This is the signal that it is
+    time to start using the openstack CLI. No new features will be
+    added to the neutron CLI, though fixes to the CLI will be assessed
+    on a case by case basis. Fixes to the API bindings, as well as
+    development of new API bindings as well as OSC plugins are exempt
+    from this deprecation.
