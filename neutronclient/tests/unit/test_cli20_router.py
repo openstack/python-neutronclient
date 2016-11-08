@@ -345,6 +345,18 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
                                     {"network_id": "externalid"}}
                                    )
 
+    def test_set_gateway_enable_snat(self):
+        # enable external gateway for router: myid externalid.
+        resource = 'router'
+        cmd = router.SetGatewayRouter(test_cli20.MyApp(sys.stdout), None)
+        args = ['myid', 'externalid', '--enable-snat']
+        self._test_update_resource(resource, cmd, 'myid',
+                                   args,
+                                   {"external_gateway_info":
+                                    {"network_id": "externalid",
+                                     "enable_snat": True}}
+                                   )
+
     def test_set_gateway_disable_snat(self):
         # set external gateway for router: myid externalid.
         resource = 'router'
