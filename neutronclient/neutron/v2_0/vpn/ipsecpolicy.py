@@ -27,6 +27,7 @@ def add_common_args(parser, is_create=True):
         '--auth-algorithm',
         default='sha1' if is_create else argparse.SUPPRESS,
         type=utils.convert_to_lowercase,
+        choices=['sha1', 'sha256', 'sha384', 'sha512'],
         help=_('Authentication algorithm for IPsec policy, default:sha1.'))
     parser.add_argument(
         '--description',

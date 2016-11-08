@@ -86,6 +86,16 @@ class CLITestV20VpnIkePolicyJSON(test_cli20.CLITestV20Base):
     def test_create_ikepolicy_auth_sha256(self):
         self._test_create_ikepolicy_all_params(auth='sha256')
 
+    def test_create_ikepolicy_auth_sha384(self):
+        self._test_create_ikepolicy_all_params(auth='sha384')
+
+    def test_create_ikepolicy_auth_sha512(self):
+        self._test_create_ikepolicy_all_params(auth='sha512')
+
+    def test_create_ikepolicy_invalid_auth(self):
+        self._test_create_ikepolicy_all_params(auth='invalid',
+                                               expected_exc=SystemExit)
+
     def test_create_ikepolicy_with_limited_params(self):
         # vpn-ikepolicy-create with limited params.
         resource = 'ikepolicy'
