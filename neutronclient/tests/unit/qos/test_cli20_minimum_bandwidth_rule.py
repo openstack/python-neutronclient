@@ -138,5 +138,6 @@ class CLITestV20QoSMinimumBandwidthRuleJSON(test_cli20.CLITestV20Base):
         policy_id = 'policy_id'
         args = [policy_id]
         contents = [{'name': 'rule1', 'min-kbps': 1000, 'direction': 'egress'}]
-        self._test_list_resources(self.cmd_ress, cmd, parent_id=policy_id,
+        self._test_list_resources(self.ress, cmd, parent_id=policy_id,
+                                  cmd_resources=self.cmd_ress,
                                   base_args=args, response_contents=contents)

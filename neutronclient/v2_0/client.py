@@ -1845,7 +1845,7 @@ class Client(ClientBase):
         """Fetches a list of all minimum bandwidth rules for the given policy.
 
         """
-        return self.list('qos_minimum_bandwidth_rules',
+        return self.list('minimum_bandwidth_rules',
                          self.qos_minimum_bandwidth_rules_path %
                          policy_id, retrieve_all, **_params)
 
