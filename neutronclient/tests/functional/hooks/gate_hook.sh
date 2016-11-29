@@ -22,7 +22,6 @@ ${config}
 if [ "$VENV" == "functional-adv-svcs" ]
 then
     load_rc_hook fwaas
-    load_rc_hook vpnaas
 fi
 
 $BASE/new/devstack-gate/devstack-vm-gate.sh
