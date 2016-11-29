@@ -63,3 +63,10 @@ class ClientTestBase(base.ClientTestBase):
     def neutron(self, *args, **kwargs):
         return self.clients.neutron(*args,
                                     **kwargs)
+
+    def is_extension_enabled(self, extension_alias):
+        extensions = self.parser.listing(self.neutron('ext-list'))
+        for extension in extensions:
+            if extension_alias in extension['alias']:
+                return True
+        return False

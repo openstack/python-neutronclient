@@ -13,9 +13,14 @@
 from neutronclient.tests.functional import base
 
 
-class SimpleReadOnlyNeutronClientTest(base.ClientTestBase):
+class SimpleReadOnlyNeutronFwv1ClientTest(base.ClientTestBase):
 
     """Tests for FWaaS v1 based client commands that are read only"""
+
+    def setUp(self):
+        super(SimpleReadOnlyNeutronFwv1ClientTest, self).setUp()
+        if not self.is_extension_enabled('fwaas'):
+            self.skipTest('FWaaS is not enabled')
 
     def test_neutron_firewall_list(self):
         firewall_list = self.parser.listing(self.neutron
