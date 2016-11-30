@@ -25,6 +25,10 @@ class SimpleReadOnlyNeutronVpnClientTest(base.ClientTestBase):
     * with and without optional parameters
     * initially just check return codes, and later test command outputs
     """
+    def setUp(self):
+        super(SimpleReadOnlyNeutronVpnClientTest, self).setUp()
+        if not self.is_extension_enabled('vpnaas'):
+            self.skipTest('VPNaaS is not enabled')
 
     def test_neutron_vpn_ikepolicy_list(self):
         ikepolicy = self.parser.listing(self.neutron('vpn-ikepolicy-list'))
