@@ -151,32 +151,33 @@ dual maintenance.
 
 **Where does my CLI belong?**
 
+If you are developing an API in any of the `neutron repos <http://governance.openstack.org/reference/projects/neutron.html>`_
+the client-side support must be generally located in either the openstackclient or neutronclient
+repos. Whether the actual code goes into one or the other repo it depends on the nature of the
+feature, its maturity level, and/or the depth of feedback required during the development.
+
+The table below provides an idea of what goes where. Generally speaking, we consider Core anything
+that is L2 and L3 related or that it has been located in the neutron repo for quite sometime, e.g.
+QoS or Metering, or that it is available in each neutron deployment irrespective of its configuration
+(e.g. auto-allocated-topology). Any client feature that falls into this categorization will need to
+be contributed in OSC. Any other that does not, will need to go into neutronclient, assuming that
+its server-side is located in a neutron controlled repo. This is a general guideline, when in doubt,
+please reach out to a member of the neutron core team for clarifications.
+
 +---------------------------+-------------------+-------------------------------------------------+
 | Networking Commands       | OSC Plugin        | OpenStack Project for ``openstack`` Commands    |
 +===========================+===================+=================================================+
 | Core                      | No                | python-openstackclient                          |
 +---------------------------+-------------------+-------------------------------------------------+
-| Advanced Feature          | Yes               | python-neutronclient                            |
-| (neutron repository)      |                   | (``neutronclient/osc/v2/<advanced_feature>``)   |
-+---------------------------+-------------------+-------------------------------------------------+
-| Dynamic Routing           | Yes               | python-neutronclient                            |
-|                           |                   | (``neutronclient/osc/v2/dynamic_routing``)      |
-+---------------------------+-------------------+-------------------------------------------------+
-| FWaaS v1                  | N/A               | None (deprecated)                               |
-+---------------------------+-------------------+-------------------------------------------------+
-| FWaaS v2                  | Yes               | python-neutronclient                            |
-|                           |                   | (``neutronclient/osc/v2/fwaas``)                |
-+---------------------------+-------------------+-------------------------------------------------+
-| LBaaS v1                  | N/A               | None (deprecated)                               |
-+---------------------------+-------------------+-------------------------------------------------+
-| LBaaS v2                  | Yes               | python-neutronclient                            |
-|                           |                   | (``neutronclient/osc/v2/lbaas``)                |
-+---------------------------+-------------------+-------------------------------------------------+
-| VPNaaS                    | Yes               | python-neutronclient                            |
-|                           |                   | (``neutronclient/osc/v2/vpnaas``)               |
+| Extension                 | Yes               | python-neutronclient                            |
+| (i.e. neutron stadium)    |                   | (``neutronclient/osc/v2/<extension>``)          |
 +---------------------------+-------------------+-------------------------------------------------+
 | Other                     | Yes               | Applicable project owning networking resource   |
 +---------------------------+-------------------+-------------------------------------------------+
+
+When a repo stops being under neutron governance, its client-side counterpart will have to go through
+deprecation. Bear in mind that for grandfathered extensions like FWaaS v1, VPNaaS, and LBaaS v1, this
+is not required as the neutronclient is already deprecated on its own.
 
 **Which Python library do I change?**
 
