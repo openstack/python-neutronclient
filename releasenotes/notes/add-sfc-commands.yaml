@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Add OSC plugin support for the “Networking Service Function Chaining” feature commands along with client bindings.
+    [Blueprint `openstackclient-cli-porting <https://blueprints.launchpad.net/networking-sfc/+spec/openstackclient-cli-porting>`_]

@@ -511,6 +511,16 @@ class Client(ClientBase):
     security_group_path = "/security-groups/%s"
     security_group_rules_path = "/security-group-rules"
     security_group_rule_path = "/security-group-rules/%s"
+
+    sfc_flow_classifiers_path = "/sfc/flow_classifiers"
+    sfc_flow_classifier_path = "/sfc/flow_classifiers/%s"
+    sfc_port_pairs_path = "/sfc/port_pairs"
+    sfc_port_pair_path = "/sfc/port_pairs/%s"
+    sfc_port_pair_groups_path = "/sfc/port_pair_groups"
+    sfc_port_pair_group_path = "/sfc/port_pair_groups/%s"
+    sfc_port_chains_path = "/sfc/port_chains"
+    sfc_port_chain_path = "/sfc/port_chains/%s"
+
     endpoint_groups_path = "/vpn/endpoint-groups"
     endpoint_group_path = "/vpn/endpoint-groups/%s"
     vpnservices_path = "/vpn/vpnservices"
@@ -692,6 +702,10 @@ class Client(ClientBase):
                      'bgpvpns': 'bgpvpn',
                      'network_associations': 'network_association',
                      'router_associations': 'router_association',
+                     'flow_classifiers': 'flow_classifier',
+                     'port_pairs': 'port_pair',
+                     'port_pair_groups': 'port_pair_group',
+                     'port_chains': 'port_chain',
                      }
 
     def list_ext(self, collection, path, retrieve_all, **_params):
@@ -2158,6 +2172,95 @@ class Client(ClientBase):
         """Deletes the specified BGP VPN router association"""
         return self.delete(
             self.bgpvpn_router_association_path % (bgpvpn, router_assoc))
+
+    def create_port_pair(self, body=None):
+        """Creates a new Port Pair."""
+        return self.post(self.sfc_port_pairs_path, body=body)
+
+    def update_port_pair(self, port_pair, body=None):
+        """Update a Port Pair."""
+        return self.put(self.sfc_port_pair_path % port_pair, body=body)
+
+    def delete_port_pair(self, port_pair):
+        """Deletes the specified Port Pair."""
+        return self.delete(self.sfc_port_pair_path % (port_pair))
+
+    def list_port_pair(self, retrieve_all=True, **_params):
+        """Fetches a list of all Port Pairs."""
+        return self.list('port_pairs', self.sfc_port_pairs_path, retrieve_all,
+                         **_params)
+
+    def show_port_pair(self, port_pair, **_params):
+        """Fetches information of a certain Port Pair."""
+        return self.get(self.sfc_port_pair_path % (port_pair), params=_params)
+
+    def create_port_pair_group(self, body=None):
+        """Creates a new Port Pair Group."""
+        return self.post(self.sfc_port_pair_groups_path, body=body)
+
+    def update_port_pair_group(self, port_pair_group, body=None):
+        """Update a Port Pair Group."""
+        return self.put(self.sfc_port_pair_group_path % port_pair_group,
+                        body=body)
+
+    def delete_port_pair_group(self, port_pair_group):
+        """Deletes the specified Port Pair Group."""
+        return self.delete(self.sfc_port_pair_group_path % (port_pair_group))
+
+    def list_port_pair_group(self, retrieve_all=True, **_params):
+        """Fetches a list of all Port Pair Groups."""
+        return self.list('port_pair_groups', self.sfc_port_pair_groups_path,
+                         retrieve_all, **_params)
+
+    def show_port_pair_group(self, port_pair_group, **_params):
+        """Fetches information of a certain Port Pair Group."""
+        return self.get(self.sfc_port_pair_group_path % (port_pair_group),
+                        params=_params)
+
+    def create_port_chain(self, body=None):
+        """Creates a new Port Chain."""
+        return self.post(self.sfc_port_chains_path, body=body)
+
+    def update_port_chain(self, port_chain, body=None):
+        """Update a Port Chain."""
+        return self.put(self.sfc_port_chain_path % port_chain, body=body)
+
+    def delete_port_chain(self, port_chain):
+        """Deletes the specified Port Chain."""
+        return self.delete(self.sfc_port_chain_path % (port_chain))
+
+    def list_port_chain(self, retrieve_all=True, **_params):
+        """Fetches a list of all Port Chains."""
+        return self.list('port_chains', self.sfc_port_chains_path,
+                         retrieve_all, **_params)
+
+    def show_port_chain(self, port_chain, **_params):
+        """Fetches information of a certain Port Chain."""
+        return self.get(self.sfc_port_chain_path % (port_chain),
+                        params=_params)
+
+    def create_flow_classifier(self, body=None):
+        """Creates a new Flow Classifier."""
+        return self.post(self.sfc_flow_classifiers_path, body=body)
+
+    def update_flow_classifier(self, flow_classifier, body=None):
+        """Update a Flow Classifier."""
+        return self.put(self.sfc_flow_classifier_path % flow_classifier,
+                        body=body)
+
+    def delete_flow_classifier(self, flow_classifier):
+        """Deletes the specified Flow Classifier."""
+        return self.delete(self.sfc_flow_classifier_path % (flow_classifier))
+
+    def list_flow_classifier(self, retrieve_all=True, **_params):
+        """Fetches a list of all Flow Classifiers."""
+        return self.list('flow_classifiers', self.sfc_flow_classifiers_path,
+                         retrieve_all, **_params)
+
+    def show_flow_classifier(self, flow_classifier, **_params):
+        """Fetches information of a certain Flow Classifier."""
+        return self.get(self.sfc_flow_classifier_path % (flow_classifier),
+                        params=_params)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
