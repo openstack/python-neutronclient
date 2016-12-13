@@ -15,7 +15,7 @@ import logging
 
 # TODO(rtheis/amotoki): Add functional test infrastructure for OSC
 # plugin commands.
-# TODO(amotoki): Add and update document on OSC pluign.
+# TODO(amotoki): Add and update document on OSC plugin.
 
 from osc_lib import utils
 
