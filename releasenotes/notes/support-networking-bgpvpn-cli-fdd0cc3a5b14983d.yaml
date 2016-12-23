@@ -1,0 +1,5 @@
+---
+features:
+  - CLI support for the "Neutron BGP VPN Interconnection" feature,
+    which is an API extension to support inter-connection between
+    L3VPNs/E-VPNs and Neutron resources, as OSC plugin commands.
