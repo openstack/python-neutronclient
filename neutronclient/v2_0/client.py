@@ -630,6 +630,15 @@ class Client(ClientBase):
     subports_path = "/trunks/%s/get_subports"
     subports_add_path = "/trunks/%s/add_subports"
     subports_remove_path = "/trunks/%s/remove_subports"
+    bgpvpns_path = "/bgpvpn/bgpvpns"
+    bgpvpn_path = "/bgpvpn/bgpvpns/%s"
+    bgpvpn_network_associations_path =\
+        "/bgpvpn/bgpvpns/%s/network_associations"
+    bgpvpn_network_association_path =\
+        "/bgpvpn/bgpvpns/%s/network_associations/%s"
+    bgpvpn_router_associations_path = "/bgpvpn/bgpvpns/%s/router_associations"
+    bgpvpn_router_association_path =\
+        "/bgpvpn/bgpvpns/%s/router_associations/%s"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -680,6 +689,9 @@ class Client(ClientBase):
                      'bgp_peers': 'bgp_peer',
                      'network_ip_availabilities': 'network_ip_availability',
                      'trunks': 'trunk',
+                     'bgpvpns': 'bgpvpn',
+                     'network_associations': 'network_association',
+                     'router_associations': 'router_association',
                      }
 
     def list_ext(self, collection, path, retrieve_all, **_params):
@@ -2070,6 +2082,82 @@ class Client(ClientBase):
     def trunk_get_subports(self, trunk, **_params):
         """Fetch a list of all subports attached to given trunk."""
         return self.get(self.subports_path % (trunk), params=_params)
+
+    def list_bgpvpns(self, retrieve_all=True, **_params):
+        """Fetches a list of all BGP VPNs for a project"""
+        return self.list('bgpvpns', self.bgpvpns_path, retrieve_all, **_params)
+
+    def show_bgpvpn(self, bgpvpn, **_params):
+        """Fetches information of a certain BGP VPN"""
+        return self.get(self.bgpvpn_path % bgpvpn, params=_params)
+
+    def create_bgpvpn(self, body=None):
+        """Creates a new BGP VPN"""
+        return self.post(self.bgpvpns_path, body=body)
+
+    def update_bgpvpn(self, bgpvpn, body=None):
+        """Updates a BGP VPN"""
+        return self.put(self.bgpvpn_path % bgpvpn, body=body)
+
+    def delete_bgpvpn(self, bgpvpn):
+        """Deletes the specified BGP VPN"""
+        return self.delete(self.bgpvpn_path % bgpvpn)
+
+    def list_bgpvpn_network_assocs(self, bgpvpn, retrieve_all=True, **_params):
+        """Fetches a list of network associations for a given BGP VPN."""
+        return self.list('network_associations',
+                         self.bgpvpn_network_associations_path % bgpvpn,
+                         retrieve_all, **_params)
+
+    def show_bgpvpn_network_assoc(self, bgpvpn, net_assoc, **_params):
+        """Fetches information of a certain BGP VPN's network association"""
+        return self.get(
+            self.bgpvpn_network_association_path % (bgpvpn, net_assoc),
+            params=_params)
+
+    def create_bgpvpn_network_assoc(self, bgpvpn, body=None):
+        """Creates a new BGP VPN network association"""
+        return self.post(self.bgpvpn_network_associations_path % bgpvpn,
+                         body=body)
+
+    def update_bgpvpn_network_assoc(self, bgpvpn, net_assoc, body=None):
+        """Updates a BGP VPN network association"""
+        return self.put(
+            self.bgpvpn_network_association_path % (bgpvpn, net_assoc),
+            body=body)
+
+    def delete_bgpvpn_network_assoc(self, bgpvpn, net_assoc):
+        """Deletes the specified BGP VPN network association"""
+        return self.delete(
+            self.bgpvpn_network_association_path % (bgpvpn, net_assoc))
+
+    def list_bgpvpn_router_assocs(self, bgpvpn, retrieve_all=True, **_params):
+        """Fetches a list of router associations for a given BGP VPN."""
+        return self.list('router_associations',
+                         self.bgpvpn_router_associations_path % bgpvpn,
+                         retrieve_all, **_params)
+
+    def show_bgpvpn_router_assoc(self, bgpvpn, router_assoc, **_params):
+        """Fetches information of a certain BGP VPN's router association"""
+        return self.get(
+            self.bgpvpn_router_association_path % (bgpvpn, router_assoc),
+            params=_params)
+
+    def create_bgpvpn_router_assoc(self, bgpvpn, body=None):
+        """Creates a new BGP VPN router association"""
+        return self.post(self.bgpvpn_router_associations_path % bgpvpn,
+                         body=body)
+
+    def update_bgpvpn_router_assoc(self, bgpvpn, router_assoc, body=None):
+        """Updates a BGP VPN router association"""
+        return self.put(
+            self.bgpvpn_router_association_path % (bgpvpn, router_assoc),
+            body=body)
+
+    def delete_bgpvpn_router_assoc(self, bgpvpn, router_assoc):
+        """Deletes the specified BGP VPN router association"""
+        return self.delete(
+            self.bgpvpn_router_association_path % (bgpvpn, router_assoc))
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
