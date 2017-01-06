@@ -94,7 +94,7 @@ class LibraryTestCase(object):
         nets = self.client.list_networks()
         self.assertIsInstance(nets['networks'], list)
 
-    def test_post_put_delele_network(self):
+    def test_post_put_delete_network(self):
         name = str(uuid.uuid4())
         net = self.client.create_network({'network': {'name': name}})
         net_id = net['network']['id']
