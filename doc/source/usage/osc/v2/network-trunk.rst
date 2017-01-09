@@ -17,7 +17,7 @@ List all subports for a given network trunk
 .. program:: network subport list
 .. code:: bash
 
-    os network subport list
+    openstack network subport list
         --trunk <trunk>
 
 .. option:: --trunk <trunk>
@@ -32,7 +32,7 @@ Create a network trunk for a given project
 .. program:: network trunk create
 .. code:: bash
 
-    os network trunk create
+    openstack network trunk create
         --parent-port <parent-port>
         [--subport <port=,segmentation-type=,segmentation-id=>]
         [--enable | --disable]
@@ -78,7 +78,7 @@ Delete a given network trunk
 .. program:: network trunk delete
 .. code:: bash
 
-    os network trunk delete
+    openstack network trunk delete
         <trunk> [<trunk> ...]
 
 .. _network_trunk_delete-trunk:
@@ -94,7 +94,7 @@ List all network trunks
 .. program:: network trunk list
 .. code:: bash
 
-    os network trunk list
+    openstack network trunk list
         [--long]
 
 .. option:: --long
@@ -109,7 +109,7 @@ Set network trunk properties
 .. program:: network trunk set
 .. code:: bash
 
-    os network trunk set
+    openstack network trunk set
         [--name <name>]
         [--description <description>]
         [--subport <port=,segmentation-type=,segmentation-id=>]
@@ -150,7 +150,7 @@ Show information of a given network trunk
 .. program:: network trunk show
 .. code:: bash
 
-    os network trunk show
+    openstack network trunk show
         <trunk>
 
 .. _network_trunk_show-trunk:
@@ -166,7 +166,7 @@ Unset subports from a given network trunk
 .. program:: network trunk unset
 .. code:: bash
 
-    os network trunk unset
+    openstack network trunk unset
         --subport <subport>
         <trunk>
 
