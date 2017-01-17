@@ -1,4 +1,4 @@
-# Copyright 2016 FUJITSU LIMITED
+# Copyright 2016-2017 FUJITSU LIMITED
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -114,22 +114,22 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
             parsed_args.no_ingress_firewall_policy):
         attrs['ingress_firewall_policy_id'] = client.find_resource(
             const.FWP, parsed_args.ingress_firewall_policy,
-            cmd_resource='fwaas_' + const.FWP)['id']
+            cmd_resource=const.CMD_FWP)['id']
     elif parsed_args.ingress_firewall_policy:
         attrs['ingress_firewall_policy_id'] = client.find_resource(
             const.FWP, parsed_args.ingress_firewall_policy,
-            cmd_resource='fwaas_' + const.FWP)['id']
+            cmd_resource=const.CMD_FWP)['id']
     elif parsed_args.no_ingress_firewall_policy:
         attrs['ingress_firewall_policy_id'] = None
     if (parsed_args.egress_firewall_policy and
             parsed_args.no_egress_firewall_policy):
         attrs['egress_firewall_policy_id'] = client.find_resource(
             const.FWP, parsed_args.egress_firewall_policy,
-            cmd_resource='fwaas_' + const.FWP)['id']
+            cmd_resource=const.CMD_FWP)['id']
     elif parsed_args.egress_firewall_policy:
         attrs['egress_firewall_policy_id'] = client.find_resource(
             const.FWP, parsed_args.egress_firewall_policy,
-            cmd_resource='fwaas_' + const.FWP)['id']
+            cmd_resource=const.CMD_FWP)['id']
     elif parsed_args.no_egress_firewall_policy:
         attrs['egress_firewall_policy_id'] = None
     if parsed_args.public:
@@ -153,7 +153,8 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
             ports.append(client.find_resource('port', p)['id'])
         if not is_create:
             ports += client.find_resource(
-                const.FWG, parsed_args.firewall_group)['ports']
+                const.FWG, parsed_args.firewall_group,
+                cmd_resource=const.CMD_FWG)['ports']
         attrs['ports'] = sorted(set(ports))
     elif parsed_args.no_port:
         attrs['ports'] = []
@@ -209,7 +210,7 @@ class DeleteFirewallGroup(command.Command):
         for fwg in parsed_args.firewall_group:
             try:
                 fwg_id = client.find_resource(
-                    const.FWG, fwg, cmd_resource='fwaas_' + const.FWG)['id']
+                    const.FWG, fwg, cmd_resource=const.CMD_FWG)['id']
                 client.delete_fwaas_firewall_group(fwg_id)
             except Exception as e:
                 result += 1
@@ -218,7 +219,7 @@ class DeleteFirewallGroup(command.Command):
                           const.FWG: fwg, 'e': e})
 
         if result > 0:
-            total = len(parsed_args.firewall_groups)
+            total = len(parsed_args.firewall_group)
             msg = (_("%(result)s of %(total)s firewall group(s) "
                      "failed to delete.") % {'result': result, 'total': total})
             raise exceptions.CommandError(msg)
@@ -271,7 +272,7 @@ class SetFirewallGroup(command.Command):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         fwg_id = client.find_resource(const.FWG, parsed_args.firewall_group,
-                                      cmd_resource='fwaas_' + const.FWG)['id']
+                                      cmd_resource=const.CMD_FWG)['id']
         attrs = _get_common_attrs(self.app.client_manager, parsed_args,
                                   is_create=False)
         try:
@@ -296,7 +297,7 @@ class ShowFirewallGroup(command.ShowOne):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         fwg_id = client.find_resource(const.FWG, parsed_args.firewall_group,
-                                      cmd_resource='fwaas_' + const.FWG)['id']
+                                      cmd_resource=const.CMD_FWG)['id']
         obj = client.show_fwaas_firewall_group(fwg_id)[const.FWG]
         columns, display_columns = osc_utils.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
@@ -356,7 +357,8 @@ class UnsetFirewallGroup(command.Command):
             attrs['admin_state_up'] = False
         if parsed_args.port:
             old = client.find_resource(
-                const.FWG, parsed_args.firewall_group)['ports']
+                const.FWG, parsed_args.firewall_group,
+                cmd_resource=const.CMD_FWG)['ports']
             new = [client.find_resource(
                 'port', r)['id'] for r in parsed_args.port]
             attrs['ports'] = sorted(list(set(old) - set(new)))
@@ -367,7 +369,7 @@ class UnsetFirewallGroup(command.Command):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         fwg_id = client.find_resource(const.FWG, parsed_args.firewall_group,
-                                      cmd_resource='fwaas_' + const.FWG)['id']
+                                      cmd_resource=const.CMD_FWG)['id']
         attrs = self._get_attrs(self.app.client_manager, parsed_args)
         try:
             client.update_fwaas_firewall_group(fwg_id, {const.FWG: attrs})
