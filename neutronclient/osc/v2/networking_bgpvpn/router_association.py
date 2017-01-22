@@ -35,7 +35,7 @@ class BgpvpnRouterAssoc(object):
 
     _attr_map = (
         ('id', 'ID', nc_osc_utils.LIST_BOTH),
-        ('tenant_id', 'Project ID', nc_osc_utils.LIST_LONG_ONLY),
+        ('tenant_id', 'Project', nc_osc_utils.LIST_LONG_ONLY),
         ('%s_id' % _assoc_res_name, '%s ID' % _assoc_res_name.capitalize(),
          nc_osc_utils.LIST_BOTH),
     )

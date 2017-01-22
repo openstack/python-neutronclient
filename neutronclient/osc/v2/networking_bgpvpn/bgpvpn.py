@@ -31,7 +31,7 @@ LOG = logging.getLogger(__name__)
 
 _attr_map = (
     ('id', 'ID', nc_osc_utils.LIST_BOTH),
-    ('tenant_id', 'Project ID', nc_osc_utils.LIST_LONG_ONLY),
+    ('tenant_id', 'Project', nc_osc_utils.LIST_LONG_ONLY),
     ('name', 'Name', nc_osc_utils.LIST_BOTH),
     ('type', 'Type', nc_osc_utils.LIST_BOTH),
     ('route_targets', 'Route Targets', nc_osc_utils.LIST_LONG_ONLY),
