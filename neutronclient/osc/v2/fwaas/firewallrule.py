@@ -1,4 +1,4 @@
-# Copyright 2016 FUJITSU LIMITED
+# Copyright 2016-2017 FUJITSU LIMITED
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -223,7 +223,7 @@ class DeleteFirewallRule(command.Command):
         for fwr in parsed_args.firewall_rule:
             try:
                 fwr_id = client.find_resource(
-                    const.FWR, fwr, cmd_resource='fwaas_' + const.FWR)['id']
+                    const.FWR, fwr, cmd_resource=const.CMD_FWR)['id']
                 client.delete_fwaas_firewall_rule(fwr_id)
             except Exception as e:
                 result += 1
@@ -233,7 +233,7 @@ class DeleteFirewallRule(command.Command):
 
         if result > 0:
             total = len(parsed_args.firewall_rule)
-            msg = (_("%(result)s of %(total)s Firewall rule(s) failed "
+            msg = (_("%(result)s of %(total)s firewall rule(s) failed "
                      "to delete.") % {'result': result, 'total': total})
             raise exceptions.CommandError(msg)
 
@@ -301,7 +301,7 @@ class SetFirewallRule(command.Command):
                                   parsed_args, is_create=False)
         fwr_id = client.find_resource(
             const.FWR, parsed_args.firewall_rule,
-            cmd_resource='fwaas_' + const.FWR)['id']
+            cmd_resource=const.CMD_FWR)['id']
         try:
             client.update_fwaas_firewall_rule(fwr_id, {const.FWR: attrs})
         except Exception as e:
@@ -325,7 +325,7 @@ class ShowFirewallRule(command.ShowOne):
         client = self.app.client_manager.neutronclient
         fwr_id = client.find_resource(
             const.FWR, parsed_args.firewall_rule,
-            cmd_resource='fwaas_' + const.FWR)['id']
+            cmd_resource=const.CMD_FWR)['id']
         obj = client.show_fwaas_firewall_rule(fwr_id)[const.FWR]
         columns, display_columns = osc_utils.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
@@ -390,7 +390,7 @@ class UnsetFirewallRule(command.Command):
         attrs = self._get_attrs(self.app.client_manager, parsed_args)
         fwr_id = client.find_resource(
             const.FWR, parsed_args.firewall_rule,
-            cmd_resource='fwaas_' + const.FWR)['id']
+            cmd_resource=const.CMD_FWR)['id']
         try:
             client.update_fwaas_firewall_rule(fwr_id, {const.FWR: attrs})
         except Exception as e:

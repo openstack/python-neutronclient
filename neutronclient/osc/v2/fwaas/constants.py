@@ -1,4 +1,4 @@
-# Copyright 2016 FUJITSU LIMITED
+# Copyright 2016-2017 FUJITSU LIMITED
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -20,7 +20,6 @@ FWP = 'firewall_policy'
 FWPS = 'firewall_policies'
 FWR = 'firewall_rule'
 FWRS = 'firewall_rules'
-
-CMD_RESOURCE_MAP = dict(
-    (res, 'fwaas_' + res) for res in [FWG, FWGS, FWP, FWPS, FWR, FWRS]
-)
+CMD_FWG = 'fwaas_' + FWG
+CMD_FWP = 'fwaas_' + FWP
+CMD_FWR = 'fwaas_' + FWR

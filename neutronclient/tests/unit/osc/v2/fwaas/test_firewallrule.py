@@ -23,6 +23,7 @@ from osc_lib import exceptions
 from osc_lib.tests import utils
 
 from neutronclient.osc import utils as osc_utils
+from neutronclient.osc.v2.fwaas import constants as const
 from neutronclient.osc.v2.fwaas import firewallrule
 from neutronclient.tests.unit.osc.v2 import fakes as test_fakes
 from neutronclient.tests.unit.osc.v2.fwaas import common
@@ -76,10 +77,14 @@ class TestFirewallRule(test_fakes.TestNeutronClientOSCV2):
 
     def setUp(self):
         super(TestFirewallRule, self).setUp()
-        self.neutronclient.find_resource = mock.Mock()
-        self.neutronclient.find_resource.side_effect = \
-            lambda x, y, **k: {'id': y}
-        # fw_common.get_id.side_effect = lambda x, y, z: z
+
+        def _mock_fwr(*args, **kwargs):
+            self.neutronclient.find_resource.assert_called_once_with(
+                self.res, self.resource['id'], cmd_resource=const.CMD_FWR)
+            return {'id': args[1]}
+
+        self.neutronclient.find_resource.side_effect = mock.Mock(
+            side_effect=_mock_fwr)
         osc_utils.find_project = mock.Mock()
         osc_utils.find_project.id = _fwr['tenant_id']
         self.res = 'firewall_rule'
