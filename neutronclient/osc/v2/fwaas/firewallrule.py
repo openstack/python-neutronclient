@@ -147,7 +147,8 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
     if parsed_args.description:
         attrs['description'] = str(parsed_args.description)
     if parsed_args.protocol:
-        attrs['protocol'] = parsed_args.protocol
+        protocol = parsed_args.protocol
+        attrs['protocol'] = None if protocol == 'any' else protocol
     if parsed_args.action:
         attrs['action'] = parsed_args.action
     if parsed_args.ip_version:
