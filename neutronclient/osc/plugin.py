@@ -11,6 +11,8 @@
 #   under the License.
 #
 
+"""OpenStackClient plugin for advanced Networking service."""
+
 import logging
 
 # TODO(rtheis/amotoki): Add functional test infrastructure for OSC
