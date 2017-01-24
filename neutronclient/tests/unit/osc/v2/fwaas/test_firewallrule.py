@@ -57,6 +57,8 @@ def _generate_req_and_res(verifylist):
             new_value = True
         elif (key == 'disable' or key == 'disable_rule') and val:
             new_value = False
+        elif (key == 'protocol' and val and val.lower() == 'any'):
+            new_value = None
         else:
             new_value = val
         request[converted] = new_value
@@ -261,7 +263,7 @@ class TestCreateFirewallRule(TestFirewallRule, common.TestCreateFWaaS):
                 self.check_parser, self.cmd, arglist, verifylist)
 
     def test_create_with_all_params_protocol_upper_capitalized(self):
-        for protocol in ('TCP', 'Tcp', 'ANY', 'AnY'):
+        for protocol in ('TCP', 'Tcp', 'ANY', 'AnY', 'iCMp'):
             arglist, verifylist = self._set_all_params({'protocol': protocol})
             self.assertRaises(
                 testtools.matchers._impl.MismatchError,
@@ -359,7 +361,7 @@ class TestSetFirewallRule(TestFirewallRule, common.TestSetFWaaS):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'protocol': protocol}})
+            target, {self.res: {'protocol': None}})
         self.assertIsNone(result)
 
     def test_set_protocol_with_udp(self):
@@ -644,6 +646,20 @@ class TestUnsetFirewallRule(TestFirewallRule, common.TestUnsetFWaaS):
             return_value={self.res: _fwr})
         self.mocked = self.neutronclient.update_fwaas_firewall_rule
         self.cmd = firewallrule.UnsetFirewallRule(self.app, self.namespace)
+
+    def test_unset_protocol_and_raise(self):
+        self.neutronclient.update_fwaas_firewall_rule.side_effect = Exception
+        target = self.resource['id']
+        arglist = [
+            target,
+            '--protocol',
+        ]
+        verifylist = [
+            (self.res, target),
+            ('protocol', False)
+        ]
+        self.assertRaises(utils.ParserException, self.check_parser,
+                          self.cmd, arglist, verifylist)
 
     def test_unset_source_port(self):
         target = self.resource['id']
