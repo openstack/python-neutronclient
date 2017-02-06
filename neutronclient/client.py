@@ -110,6 +110,17 @@ class HTTPClient(object):
             _logger.debug("throwing ConnectionFailed : %s", e)
             raise exceptions.ConnectionFailed(reason=e)
         utils.http_log_resp(_logger, resp, body)
+
+        # log request-id for each api call
+        request_id = resp.headers.get('x-openstack-request-id')
+        if request_id:
+            _logger.debug('%(method)s call to neutron for '
+                          '%(url)s used request id '
+                          '%(response_request_id)s',
+                          {'method': resp.request.method,
+                           'url': resp.url,
+                           'response_request_id': request_id})
+
         if resp.status_code == 401:
             raise exceptions.Unauthorized(message=body)
         return resp, body
