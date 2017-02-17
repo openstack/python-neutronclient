@@ -1,6 +1,0 @@
-include tox.ini
-include LICENSE README.rst HACKING.rst
-include AUTHORS
-include ChangeLog
-include tools/*
-recursive-include tests *
