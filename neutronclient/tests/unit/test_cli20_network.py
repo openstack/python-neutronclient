@@ -25,74 +25,57 @@ from neutronclient import shell
 from neutronclient.tests.unit import test_cli20
 
 
-class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
+class CLITestV20CreateNetworkJSON(test_cli20.CLITestV20Base):
     def setUp(self):
-        super(CLITestV20NetworkJSON, self).setUp(plurals={'tags': 'tag'})
+        super(CLITestV20CreateNetworkJSON, self).setUp(plurals={'tags': 'tag'})
+
+    def _test_create_network(self, **kwargs):
+        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
+        resource = kwargs.pop('resource', 'network')
+
+        name = kwargs.pop('name', 'myname')
+        myid = kwargs.pop('myid', 'myid')
+        args = kwargs.pop('args', [name, ])
+        position_names = kwargs.pop('position_names', ['name', ])
+        position_values = kwargs.pop('position_values', [name, ])
+
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values,
+                                   **kwargs)
 
     def test_create_network(self):
         # Create net: myname.
-        resource = 'network'
-        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
-        name = 'myname'
-        myid = 'myid'
-        args = [name, ]
-        position_names = ['name', ]
-        position_values = [name, ]
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values)
+        self._test_create_network()
 
     def test_create_network_with_unicode(self):
         # Create net: u'\u7f51\u7edc'.
-        resource = 'network'
-        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
-        name = u'\u7f51\u7edc'
-        myid = 'myid'
-        args = [name, ]
-        position_names = ['name', ]
-        position_values = [name, ]
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values)
+        self._test_create_network(name=u'\u7f51\u7edc')
 
     def test_create_network_description(self):
         # Create net: --tenant_id tenantid myname.
-        resource = 'network'
-        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
-        myid = 'myid'
         args = ['--description', 'Nice network', name]
-        position_names = ['name', ]
-        position_values = [name, ]
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values,
-                                   description='Nice network')
+        self._test_create_network(name=name,
+                                  args=args,
+                                  description='Nice network')
 
-    def test_create_network_tenant(self):
+    def test_create_network_tenant_underscore(self):
         # Create net: --tenant_id tenantid myname.
-        resource = 'network'
-        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
-        myid = 'myid'
         args = ['--tenant_id', 'tenantid', name]
-        position_names = ['name', ]
-        position_values = [name, ]
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values,
-                                   tenant_id='tenantid')
+        self._test_create_network(name=name, args=args, tenant_id="tenantid")
 
+    def test_create_network_tenant_dash(self):
         # Test dashed options
+        # Create net: --tenant_id tenantid myname.
+        name = 'myname'
         args = ['--tenant-id', 'tenantid', name]
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values,
-                                   tenant_id='tenantid')
+        self._test_create_network(name=name, args=args, tenant_id="tenantid")
 
     def test_create_network_provider_args(self):
         # Create net: with --provider arguments.
-        resource = 'network'
-        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
-        name = 'myname'
-        myid = 'myid'
-
         # Test --provider attributes before network name
+        name = 'myname'
         args = ['--provider:network_type', 'vlan',
                 '--provider:physical_network', 'physnet1',
                 '--provider:segmentation_id', '400', name]
@@ -100,94 +83,78 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                           'provider:physical_network',
                           'provider:segmentation_id', 'name']
         position_values = ['vlan', 'physnet1', '400', name]
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values)
+        self._test_create_network(name=name,
+                                  args=args,
+                                  position_names=position_names,
+                                  position_values=position_values)
 
     def test_create_network_tags(self):
         # Create net: myname --tags a b.
-        resource = 'network'
-        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
-        myid = 'myid'
         args = [name, '--tags', 'a', 'b']
-        position_names = ['name', ]
-        position_values = [name, ]
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values,
-                                   tags=['a', 'b'])
+        self._test_create_network(name=name, args=args, tags=['a', 'b'])
 
-    def test_create_network_state(self):
+    def test_create_network_state_underscore(self):
         # Create net: --admin_state_down myname.
-        resource = 'network'
-        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
-        myid = 'myid'
         args = ['--admin_state_down', name, ]
-        position_names = ['name', ]
-        position_values = [name, ]
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values,
-                                   admin_state_up=False)
+        self._test_create_network(name=name, args=args, admin_state_up=False)
 
+    def test_create_network_state_dash(self):
         # Test dashed options
+        name = 'myname'
         args = ['--admin-state-down', name, ]
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values,
-                                   admin_state_up=False)
+        self._test_create_network(name=name, args=args, admin_state_up=False)
 
     def test_create_network_vlan_transparent(self):
         # Create net: myname --vlan-transparent True.
-        resource = 'network'
-        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
-        myid = 'myid'
         args = ['--vlan-transparent', 'True', name]
-        vlantrans = {'vlan_transparent': 'True'}
-        position_names = ['name', ]
-        position_values = [name, ]
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values,
-                                   **vlantrans)
+        self._test_create_network(name=name,
+                                  args=args,
+                                  vlan_transparent='True')
 
     def test_create_network_with_qos_policy(self):
         # Create net: --qos-policy mypolicy.
-        resource = 'network'
-        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
-        myid = 'myid'
         qos_policy_name = 'mypolicy'
         args = [name, '--qos-policy', qos_policy_name]
         position_names = ['name', 'qos_policy_id']
         position_values = [name, qos_policy_name]
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values)
+        self._test_create_network(name=name,
+                                  args=args,
+                                  position_names=position_names,
+                                  position_values=position_values)
 
     def test_create_network_with_az_hint(self):
         # Create net: --availability-zone-hint zone1
         # --availability-zone-hint zone2.
-        resource = 'network'
-        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
-        myid = 'myid'
         args = ['--availability-zone-hint', 'zone1',
                 '--availability-zone-hint', 'zone2', name]
         position_names = ['availability_zone_hints', 'name']
         position_values = [['zone1', 'zone2'], name]
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values)
+        self._test_create_network(name=name,
+                                  args=args,
+                                  position_names=position_names,
+                                  position_values=position_values)
 
     def test_create_network_with_dns_domain(self):
         # Create net: --dns-domain my-domain.org.
-        resource = 'network'
-        cmd = network.CreateNetwork(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
-        myid = 'myid'
         dns_domain_name = 'my-domain.org.'
         args = [name, '--dns-domain', dns_domain_name]
         position_names = ['name', 'dns_domain']
         position_values = [name, dns_domain_name]
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values)
+        self._test_create_network(name=name,
+                                  args=args,
+                                  position_names=position_names,
+                                  position_values=position_values)
+
+
+class CLITestV20ListNetworkJSON(test_cli20.CLITestV20Base):
+    def setUp(self):
+        super(CLITestV20ListNetworkJSON, self).setUp(plurals={'tags': 'tag'})
 
     def test_list_nets_empty_with_column(self):
         resources = "networks"
@@ -501,7 +468,7 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         self._test_list_external_nets(resources, cmd,
                                       detail=True, tags=['a', 'b'])
 
-    def test_list_externel_nets_fields(self):
+    def test_list_external_nets_fields(self):
         # List external nets: --fields a --fields b -- --fields c d.
         resources = "networks"
         cmd = network.ListExternalNetwork(test_cli20.MyApp(sys.stdout), None)
@@ -509,6 +476,14 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                                       fields_1=['a', 'b'],
                                       fields_2=['c', 'd'])
 
+    def test_list_shared_networks(self):
+        # list nets : --shared False
+        cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
+        self._test_list_networks(cmd, base_args='--shared False'.split(),
+                                 query='shared=False')
+
+
+class CLITestV20UpdateNetworkJSON(test_cli20.CLITestV20Base):
     def test_update_network_exception(self):
         # Update net: myid.
         resource = 'network'
@@ -571,6 +546,8 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                                    ['myid', '--no-dns-domain'],
                                    {'dns_domain': "", })
 
+
+class CLITestV20ShowNetworkJSON(test_cli20.CLITestV20Base):
     def test_show_network(self):
         # Show net: --fields id --fields name myid.
         resource = 'network'
@@ -579,6 +556,8 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
         self._test_show_resource(resource, cmd, self.test_id, args,
                                  ['id', 'name'])
 
+
+class CLITestV20DeleteNetworkJSON(test_cli20.CLITestV20Base):
     def test_delete_network(self):
         # Delete net: myid.
         resource = 'network'
@@ -608,6 +587,8 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                           resource, cmd, myid1, args, extra_id=myid2,
                           delete_fail=True)
 
+
+class CLITestV20ExtendListNetworkJSON(test_cli20.CLITestV20Base):
     def _test_extend_list(self, mox_calls):
         data = [{'id': 'netid%d' % i, 'name': 'net%d' % i,
                  'subnets': ['mysubid%d' % i]}
@@ -677,9 +658,3 @@ class CLITestV20NetworkJSON(test_cli20.CLITestV20Base):
                         'X-Auth-Token', test_cli20.TOKEN)).AndReturn(response)
 
         self._test_extend_list(mox_calls)
-
-    def test_list_shared_networks(self):
-        # list nets : --shared False
-        cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
-        self._test_list_networks(cmd, base_args='--shared False'.split(),
-                                 query='shared=False')
