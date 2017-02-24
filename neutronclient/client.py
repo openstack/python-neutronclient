@@ -24,11 +24,14 @@ import os
 import debtcollector.renames
 from keystoneauth1 import access
 from keystoneauth1 import adapter
+from oslo_utils import importutils
 import requests
 
 from neutronclient._i18n import _
 from neutronclient.common import exceptions
 from neutronclient.common import utils
+
+osprofiler_web = importutils.try_import("osprofiler.web")
 
 _logger = logging.getLogger(__name__)
 
@@ -151,6 +154,10 @@ class HTTPClient(object):
             headers.setdefault('Content-Type', content_type)
 
         headers['User-Agent'] = USER_AGENT
+        # NOTE(dbelova): osprofiler_web.get_trace_id_headers does not add any
+        # headers in case if osprofiler is not initialized.
+        if osprofiler_web:
+            headers.update(osprofiler_web.get_trace_id_headers())
 
         resp = requests.request(
             method,
@@ -301,6 +308,10 @@ class SessionClient(adapter.Adapter):
 
         headers = kwargs.setdefault('headers', {})
         headers.setdefault('Accept', content_type)
+        # NOTE(dbelova): osprofiler_web.get_trace_id_headers does not add any
+        # headers in case if osprofiler is not initialized.
+        if osprofiler_web:
+            headers.update(osprofiler_web.get_trace_id_headers())
 
         try:
             kwargs.setdefault('data', kwargs.pop('body'))

@@ -15,6 +15,8 @@
 
 import abc
 
+import osprofiler.profiler
+import osprofiler.web
 from requests_mock.contrib import fixture as mock_fixture
 import six
 import testtools
@@ -71,6 +73,14 @@ class TestHTTPClientMixin(object):
         headers = {'Accept': 'application/json',
                    'Content-Type': 'application/json'}
         self._test_headers(headers, body=BODY, headers=headers)
+
+    def test_osprofiler_headers_are_injected(self):
+        osprofiler.profiler.init('SWORDFISH')
+        self.addCleanup(osprofiler.profiler._clean)
+
+        headers = {'Accept': 'application/json'}
+        headers.update(osprofiler.web.get_trace_id_headers())
+        self._test_headers(headers)
 
 
 class TestHTTPClient(TestHTTPClientMixin, testtools.TestCase):
