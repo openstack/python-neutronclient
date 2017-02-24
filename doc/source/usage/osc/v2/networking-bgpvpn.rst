@@ -110,7 +110,7 @@ Set BGP VPN properties
     Empty route distinguisher list
 
 bgpvpn unset
-----------
+------------
 
 Unset BGP VPN properties
 
