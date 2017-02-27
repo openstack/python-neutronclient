@@ -44,6 +44,13 @@ In the Developer Guide, you will find information on Neutron’s client
 lower level programming details or APIs as well as the transition to
 OpenStack client.
 
+.. note:
+
+   neutron CLI has been deprecated from Ocata release.
+   We do not add, change and drop any existing commands any more.
+   We only accept changes on OSC plugin, neutronclient python bindings
+   and bug fixes on the deprecated CLI (``neutron`` command).
+
 .. toctree::
    :maxdepth: 2
 
