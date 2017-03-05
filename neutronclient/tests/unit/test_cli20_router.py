@@ -240,7 +240,7 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
                 '--route',
                 'destination=10.0.3.0/24,nexthop=10.0.0.10']
         routes = [{'destination': '10.0.3.0/24',
-                  'nexthop': '10.0.0.10'}]
+                   'nexthop': '10.0.0.10'}]
         updatefields = {'routes': routes}
         self._test_update_resource(resource, cmd, myid, args, updatefields)
 
@@ -258,9 +258,9 @@ class CLITestV20RouterJSON(test_cli20.CLITestV20Base):
                 'destination=fd7a:1d63:2063::/64,'
                 'nexthop=fd7a:1d63:2063:0:f816:3eff:fe0e:a697']
         routes = [{'destination': '10.0.3.0/24',
-                  'nexthop': '10.0.0.10'},
+                   'nexthop': '10.0.0.10'},
                   {'destination': 'fd7a:1d63:2063::/64',
-                  'nexthop': 'fd7a:1d63:2063:0:f816:3eff:fe0e:a697'}]
+                   'nexthop': 'fd7a:1d63:2063:0:f816:3eff:fe0e:a697'}]
         updatefields = {'routes': routes}
         self._test_update_resource(resource, cmd, myid, args, updatefields)
 

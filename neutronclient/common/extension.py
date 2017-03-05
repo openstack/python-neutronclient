@@ -42,7 +42,6 @@ class ClientExtensionShow(NeutronClientExtension, neutronV20.ShowCommand):
 
 
 class ClientExtensionList(NeutronClientExtension, neutronV20.ListCommand):
-
     def take_action(self, parsed_args):
         # NOTE(mdietz): Calls 'execute' to provide a consistent pattern
         #               for any implementers adding extensions with

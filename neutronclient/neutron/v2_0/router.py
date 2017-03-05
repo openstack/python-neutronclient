@@ -182,7 +182,7 @@ class RouterInterfaceCommand(neutronV20.NeutronCommand):
             resource, value = parsed_args.interface.split('=', 1)
             if resource not in ['subnet', 'port']:
                 exceptions.CommandError(_('You must specify either subnet or '
-                                        'port for INTERFACE parameter.'))
+                                          'port for INTERFACE parameter.'))
         else:
             resource = 'subnet'
             value = parsed_args.interface
