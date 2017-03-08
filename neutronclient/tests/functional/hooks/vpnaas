@@ -1,0 +1,1 @@
+enable_plugin neutron-vpnaas git://git.openstack.org/openstack/neutron-vpnaas
