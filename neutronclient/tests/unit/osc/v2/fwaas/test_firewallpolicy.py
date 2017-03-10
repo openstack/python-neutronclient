@@ -343,19 +343,19 @@ class TestSetFirewallPolicy(TestFirewallPolicy, common.TestSetFWaaS):
             if self.neutronclient.find_resource.call_count == 1:
                 self.neutronclient.find_resource.assert_called_with(
                     self.res, target, cmd_resource=const.CMD_FWP)
-            # 2. Find specified firewall_rule
+            # 2. Find specified firewall_policy's 'firewall_rules' attribute
             if self.neutronclient.find_resource.call_count == 2:
                 self.neutronclient.find_resource.assert_called_with(
-                    'firewall_rule', args[1], cmd_resource=const.CMD_FWR)
+                    self.res, args[1], cmd_resource=const.CMD_FWP)
+                return {'firewall_rules': _fwp['firewall_rules']}
             # 3. Find specified firewall_rule
             if self.neutronclient.find_resource.call_count == 3:
                 self.neutronclient.find_resource.assert_called_with(
                     'firewall_rule', args[1], cmd_resource=const.CMD_FWR)
-            # 4. Find specified firewall_policy's 'firewall_rules' attribute
+            # 4. Find specified firewall_rule
             if self.neutronclient.find_resource.call_count == 4:
                 self.neutronclient.find_resource.assert_called_with(
-                    self.res, target, cmd_resource=const.CMD_FWP)
-                return {'firewall_rules': _fwp['firewall_rules']}
+                    'firewall_rule', args[1], cmd_resource=const.CMD_FWR)
             return {'id': args[1]}
 
         self.neutronclient.find_resource.side_effect = _mock_policy
@@ -372,7 +372,7 @@ class TestSetFirewallPolicy(TestFirewallPolicy, common.TestSetFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        expect = sorted(set(_fwp['firewall_rules'] + [rule1, rule2]))
+        expect = _fwp['firewall_rules'] + [rule1, rule2]
         body = {self.res: {'firewall_rules': expect}}
         self.mocked.assert_called_once_with(target, body)
         self.assertEqual(4, self.neutronclient.find_resource.call_count)

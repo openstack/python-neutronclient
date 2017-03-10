@@ -54,20 +54,20 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
             ).id
     if parsed_args.firewall_rule and parsed_args.no_firewall_rule:
         _firewall_rules = []
-        for f in set(parsed_args.firewall_rule):
+        for f in parsed_args.firewall_rule:
             _firewall_rules.append(client.find_resource(
                 const.FWR, f, cmd_resource=const.CMD_FWR)['id'])
-        attrs[const.FWRS] = sorted(_firewall_rules)
+        attrs[const.FWRS] = _firewall_rules
     elif parsed_args.firewall_rule:
         rules = []
-        for f in set(parsed_args.firewall_rule):
-            rules.append(client.find_resource(
-                const.FWR, f, cmd_resource=const.CMD_FWR)['id'])
         if not is_create:
             rules += client.find_resource(
                 const.FWP, parsed_args.firewall_policy,
                 cmd_resource=const.CMD_FWP)[const.FWRS]
-        attrs[const.FWRS] = sorted(set(rules))
+        for f in parsed_args.firewall_rule:
+            rules.append(client.find_resource(
+                const.FWR, f, cmd_resource=const.CMD_FWR)['id'])
+        attrs[const.FWRS] = rules
     elif parsed_args.no_firewall_rule:
         attrs[const.FWRS] = []
     if parsed_args.audited:
@@ -395,14 +395,14 @@ class UnsetFirewallPolicy(command.Command):
         client = client_manager.neutronclient
 
         if parsed_args.firewall_rule:
-            old = client.find_resource(
+            current = client.find_resource(
                 const.FWP, parsed_args.firewall_policy,
                 cmd_resource=const.CMD_FWP)[const.FWRS]
-            new = []
+            removed = []
             for f in set(parsed_args.firewall_rule):
-                new.append(client.find_resource(
+                removed.append(client.find_resource(
                     const.FWR, f, cmd_resource=const.CMD_FWR)['id'])
-            attrs[const.FWRS] = sorted(list(set(old) - set(new)))
+            attrs[const.FWRS] = [r for r in current if r not in removed]
         if parsed_args.all_firewall_rule:
             attrs[const.FWRS] = []
         if parsed_args.audited:
