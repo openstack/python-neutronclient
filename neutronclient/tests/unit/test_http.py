@@ -39,7 +39,7 @@ class TestHTTPClientMixin(object):
         super(TestHTTPClientMixin, self).setUp()
 
         self.requests = self.useFixture(mock_fixture.Fixture())
-        self.clazz, self.http = self.initialize()
+        self.http = self.initialize()
 
     @abc.abstractmethod
     def initialize(self):
@@ -86,8 +86,7 @@ class TestHTTPClientMixin(object):
 class TestHTTPClient(TestHTTPClientMixin, testtools.TestCase):
 
     def initialize(self):
-        return [client.HTTPClient,
-                client.HTTPClient(token=AUTH_TOKEN, endpoint_url=END_URL)]
+        return client.HTTPClient(token=AUTH_TOKEN, endpoint_url=END_URL)
 
     def test_request_error(self):
         def cb(*args, **kwargs):
