@@ -21,7 +21,3 @@ message = ("moved to neutronclient._i18n; please migrate to local "
            "http://docs.openstack.org/developer/oslo.i18n/usage.html")
 
 _ = moves.moved_function(_i18n._, '_', __name__, message=message)
-_LC = moves.moved_function(_i18n._LC, '_LC', __name__, message=message)
-_LE = moves.moved_function(_i18n._LE, '_LE', __name__, message=message)
-_LW = moves.moved_function(_i18n._LW, '_LW', __name__, message=message)
-_LI = moves.moved_function(_i18n._LI, '_LI', __name__, message=message)

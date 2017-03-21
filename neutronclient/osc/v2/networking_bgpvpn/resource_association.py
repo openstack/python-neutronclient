@@ -21,8 +21,6 @@ from osc_lib import exceptions
 from osc_lib import utils as osc_utils
 
 from neutronclient._i18n import _
-from neutronclient._i18n import _LE
-from neutronclient._i18n import _LW
 from neutronclient.osc import utils as nc_osc_utils
 from neutronclient.osc.v2.networking_bgpvpn import constants
 
@@ -105,13 +103,13 @@ class DeleteBgpvpnResAssoc(command.Command):
             try:
                 delete_method(bgpvpn['id'], id)
                 LOG.warning(
-                    _LW("%(assoc_res_name)s association %(id)s deleted"),
+                    "%(assoc_res_name)s association %(id)s deleted",
                     {'assoc_res_name': self._assoc_res_name.capitalize(),
                      'id': id})
             except Exception as e:
                 fails += 1
-                LOG.error(_LE("Failed to delete %(assoc_res_name)s "
-                              "association with ID '%(id)s': %(e)s"),
+                LOG.error("Failed to delete %(assoc_res_name)s "
+                          "association with ID '%(id)s': %(e)s",
                           {'assoc_res_name': self._assoc_res_name,
                            'id': id,
                            'e': e})

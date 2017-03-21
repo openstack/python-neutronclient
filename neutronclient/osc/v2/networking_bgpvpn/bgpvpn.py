@@ -22,8 +22,6 @@ from osc_lib import exceptions
 from osc_lib import utils as osc_utils
 
 from neutronclient._i18n import _
-from neutronclient._i18n import _LE
-from neutronclient._i18n import _LW
 from neutronclient.osc import utils as nc_osc_utils
 from neutronclient.osc.v2.networking_bgpvpn import constants
 
@@ -311,11 +309,11 @@ class DeleteBgpvpn(command.Command):
             try:
                 id = client.find_resource(constants.BGPVPN, id_or_name)['id']
                 client.delete_bgpvpn(id)
-                LOG.warning(_LW("BGP VPN %(id)s deleted"), {'id': id})
+                LOG.warning("BGP VPN %(id)s deleted", {'id': id})
             except Exception as e:
                 fails += 1
-                LOG.error(_LE("Failed to delete BGP VPN with name or ID "
-                              "'%(id_or_name)s': %(e)s"),
+                LOG.error("Failed to delete BGP VPN with name or ID "
+                          "'%(id_or_name)s': %(e)s",
                           {'id_or_name': id_or_name, 'e': e})
         if fails > 0:
             msg = (_("Failed to delete %(fails)s of %(total)s BGP VPN.") %
