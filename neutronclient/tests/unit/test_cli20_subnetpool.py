@@ -30,7 +30,7 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
     def setUp(self):
         super(CLITestV20SubnetPoolJSON, self).setUp(plurals={'tags': 'tag'})
 
-    def test_create_subnetpool_shared(self):
+    def test_create_subnetpool_with_options(self):
         # Create subnetpool: myname.
         resource = 'subnetpool'
         cmd = subnetpool.CreateSubnetPool(test_cli20.MyApp(sys.stdout), None)
@@ -41,14 +41,17 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
         prefix2 = '12.11.13.0/24'
         args = [name, '--min-prefixlen', str(min_prefixlen),
                 '--pool-prefix', prefix1, '--pool-prefix', prefix2,
-                '--shared', '--description', 'public pool']
-        position_names = ['name', 'min_prefixlen', 'prefixes', 'shared']
-        position_values = [name, min_prefixlen, [prefix1, prefix2], True]
+                '--shared', '--description', 'public pool',
+                '--tenant-id', 'tenantid']
+        position_names = ['name', 'min_prefixlen', 'prefixes', 'shared',
+                          'tenant_id']
+        position_values = [name, min_prefixlen, [prefix1, prefix2], True,
+                           'tenantid']
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values,
                                    description='public pool')
 
-    def test_create_subnetpool_not_shared(self):
+    def test_create_subnetpool_only_with_required_options(self):
         # Create subnetpool: myname.
         resource = 'subnetpool'
         cmd = subnetpool.CreateSubnetPool(test_cli20.MyApp(sys.stdout), None)
@@ -64,7 +67,7 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
-    def test_create_subnetpool(self, default='false'):
+    def test_create_subnetpool_with_is_default(self, default='false'):
         # Create subnetpool: myname.
         resource = 'subnetpool'
         cmd = subnetpool.CreateSubnetPool(test_cli20.MyApp(sys.stdout), None)
@@ -82,7 +85,7 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
                                    position_names, position_values)
 
     def test_create_subnetpool_default(self):
-        self.test_create_subnetpool(default='true')
+        self.test_create_subnetpool_with_is_default(default='true')
 
     def test_create_subnetpool_with_unicode(self):
         # Create subnetpool: u'\u7f51\u7edc'.
