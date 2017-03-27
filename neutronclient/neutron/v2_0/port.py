@@ -195,7 +195,7 @@ class UpdatePortAllowedAddressPair(object):
         group_aap = parser.add_mutually_exclusive_group()
         group_aap.add_argument(
             '--allowed-address-pair',
-            metavar='ip_address=IP_ADDR[,mac_address=MAC_ADDR]',
+            metavar='ip_address=IP_ADDR|CIDR[,mac_address=MAC_ADDR]',
             default=[],
             action='append',
             dest='allowed_address_pairs',
@@ -203,6 +203,9 @@ class UpdatePortAllowedAddressPair(object):
                 required_keys=['ip_address'],
                 optional_keys=['mac_address']),
             help=_('Allowed address pair associated with the port. '
+                   '"ip_address" parameter is required. IP address or '
+                   'CIDR can be specified for "ip_address". '
+                   '"mac_address" parameter is optional. '
                    'You can repeat this option.'))
         group_aap.add_argument(
             '--no-allowed-address-pairs',
