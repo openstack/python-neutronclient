@@ -1,0 +1,4 @@
+---
+features:
+  - Tag operation for subnet, port, subnetpool and router resources
+    are now supported.
