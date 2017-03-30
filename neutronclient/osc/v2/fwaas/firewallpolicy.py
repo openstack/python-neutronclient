@@ -16,10 +16,11 @@
 
 from __future__ import print_function
 
+import logging
+
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
-from oslo_log import log as logging
 
 from neutronclient._i18n import _
 from neutronclient.osc import utils as osc_utils

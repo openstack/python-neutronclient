@@ -14,11 +14,11 @@
 #    under the License.
 #
 import copy
+import logging
 
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
-from oslo_log import log as logging
 
 from neutronclient._i18n import _
 from neutronclient.common import utils as nc_utils

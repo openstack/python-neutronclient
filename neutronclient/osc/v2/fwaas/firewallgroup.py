@@ -12,12 +12,12 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-#
+
+import logging
 
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
-from oslo_log import log as logging
 
 from neutronclient._i18n import _
 from neutronclient.osc import utils as osc_utils
