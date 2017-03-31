@@ -99,6 +99,7 @@ class CreateSubnetPool(neutronV20.CreateCommand):
     def args2body(self, parsed_args):
         body = {'prefixes': parsed_args.prefixes}
         updatable_args2body(parsed_args, body)
+        neutronV20.update_dict(parsed_args, body, ['tenant_id'])
         if parsed_args.shared:
             body['shared'] = True
 
