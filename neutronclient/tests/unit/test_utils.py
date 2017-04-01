@@ -51,6 +51,13 @@ class TestUtils(testtools.TestCase):
         self.assertRaises(argparse.ArgumentTypeError,
                           utils.str2dict, input_str)
 
+    def test_string_with_comma_value_to_dictionary(self):
+        input_str = ('opt_name=classless-static-route,'
+                     'opt_value=169.254.169.254/32,10.0.0.1')
+        expected = {'opt_name': 'classless-static-route',
+                    'opt_value': '169.254.169.254/32,10.0.0.1'}
+        self.assertEqual(expected, utils.str2dict(input_str))
+
     def test_str2dict_optional_keys(self):
         self.assertDictEqual({'key1': 'value1'},
                              utils.str2dict('key1=value1',
