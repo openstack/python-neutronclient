@@ -250,7 +250,6 @@ class ClientBase(object):
         self.raise_errors = kwargs.pop('raise_errors', True)
         self.httpclient = client.construct_http_client(**kwargs)
         self.version = '2.0'
-        self.format = 'json'
         self.action_prefix = "/v%s" % (self.version)
         self.retry_interval = 1
 
@@ -270,7 +269,6 @@ class ClientBase(object):
 
     def do_request(self, method, action, body=None, headers=None, params=None):
         # Add format and project_id
-        action += ".%s" % self.format
         action = self.action_prefix + action
         if isinstance(params, dict) and params:
             params = utils.safe_encode_dict(params)

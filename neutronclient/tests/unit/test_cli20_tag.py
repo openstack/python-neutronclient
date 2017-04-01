@@ -30,8 +30,7 @@ class CLITestV20Tag(test_cli20.CLITestV20Base):
         if body:
             body = test_cli20.MyComparator(body, self.client)
         self.client.httpclient.request(
-            test_cli20.MyUrlComparator(
-                test_cli20.end_url(path, format=self.format), self.client),
+            test_cli20.MyUrlComparator(test_cli20.end_url(path), self.client),
             method, body=body,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', test_cli20.TOKEN)).AndReturn(
@@ -51,7 +50,7 @@ class CLITestV20Tag(test_cli20.CLITestV20Base):
         resstr = self.client.serialize(res)
         self.client.httpclient.request(
             test_cli20.MyUrlComparator(
-                test_cli20.end_url(path, query, format=self.format),
+                test_cli20.end_url(path, query),
                 self.client),
             'GET', body=None,
             headers=mox.ContainsKeyValue(

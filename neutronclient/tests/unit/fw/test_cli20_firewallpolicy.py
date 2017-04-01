@@ -173,7 +173,7 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
         path = getattr(self.client, resource + "_insert_path")
         self.client.httpclient.request(
             test_cli20.MyUrlComparator(
-                test_cli20.end_url(path % myid, format=self.format),
+                test_cli20.end_url(path % myid),
                 self.client),
             'PUT', body=test_cli20.MyComparator(body, self.client),
             headers=mox.ContainsKeyValue(
@@ -202,7 +202,7 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
         path = getattr(self.client, resource + "_remove_path")
         self.client.httpclient.request(
             test_cli20.MyUrlComparator(
-                test_cli20.end_url(path % myid, format=self.format),
+                test_cli20.end_url(path % myid),
                 self.client),
             'PUT', body=test_cli20.MyComparator(body, self.client),
             headers=mox.ContainsKeyValue(

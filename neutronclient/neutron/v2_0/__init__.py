@@ -336,7 +336,7 @@ class NeutronCommand(command.Command):
         parser = super(NeutronCommand, self).get_parser(prog_name)
         parser.add_argument(
             '--request-format',
-            help=_('DEPRECATED! Only JSON request format is supported.'),
+            help=argparse.SUPPRESS,
             default='json',
             choices=['json', ], )
         parser.add_argument(
