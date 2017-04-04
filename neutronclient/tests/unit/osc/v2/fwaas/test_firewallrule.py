@@ -35,6 +35,8 @@ CONVERT_MAP = {
     'project': 'tenant_id',
     'enable_rule': 'enabled',
     'disable_rule': 'enabled',
+    'share': 'shared',
+    'no_share': 'shared',
 }
 
 
@@ -115,7 +117,7 @@ class TestFirewallRule(test_fakes.TestNeutronClientOSCV2):
             'Source Port',
             'Destination IP Address',
             'Destination Port',
-            'Public',
+            'Shared',
             'Project',
         )
         self.data = _generate_data()
@@ -130,7 +132,7 @@ class TestFirewallRule(test_fakes.TestNeutronClientOSCV2):
             'Name',
             'Project',
             'Protocol',
-            'Public',
+            'Shared',
             'Source IP Address',
             'Source Port',
         )
@@ -145,7 +147,7 @@ class TestFirewallRule(test_fakes.TestNeutronClientOSCV2):
             _fwr['name'],
             _fwr['tenant_id'],
             _replace_display_columns('protocol', _fwr['protocol']),
-            _fwr['public'],
+            _fwr['shared'],
             _fwr['source_ip_address'],
             _fwr['source_port'],
         )
@@ -160,7 +162,7 @@ class TestFirewallRule(test_fakes.TestNeutronClientOSCV2):
             'name',
             'tenant_id',
             'protocol',
-            'public',
+            'shared',
             'source_ip_address',
             'source_port',
         )
@@ -217,12 +219,12 @@ class TestCreateFirewallRule(TestFirewallRule, common.TestCreateFWaaS):
             '--action', action,
             '--project', tenant_id,
             '--disable-rule',
-            '--public',
+            '--share',
         ]
         verifylist = [
             ('name', name),
             ('description', description),
-            ('public', True),
+            ('share', True),
             ('protocol', protocol),
             ('ip_version', ip_version),
             ('source_ip_address', source_ip),

@@ -36,8 +36,8 @@ CONVERT_MAP = {
     'egress_firewall_policy': 'egress_firewall_policy_id',
     'no_ingress_firewall_policy': 'ingress_firewall_policy_id',
     'no_egress_firewall_policy': 'egress_firewall_policy_id',
-    'public': 'public',
-    'private': 'public',
+    'share': 'shared',
+    'no_share': 'shared',
     'project': 'tenant_id',
     'enable': 'admin_state_up',
     'disable': 'admin_state_up',
@@ -115,7 +115,7 @@ class TestFirewallGroup(test_fakes.TestNeutronClientOSCV2):
             'Status',
             'Ports',
             'State',
-            'Public',
+            'Shared',
             'Project',
         ))
         self.data = _generate_response()
@@ -128,7 +128,7 @@ class TestFirewallGroup(test_fakes.TestNeutronClientOSCV2):
             _fwg['name'],
             _fwg['ports'],
             _fwg['tenant_id'],
-            _fwg['public'],
+            _fwg['shared'],
             v2_utils.AdminStateColumn(_fwg['admin_state_up']),
             _fwg['status'],
         )
@@ -140,7 +140,7 @@ class TestFirewallGroup(test_fakes.TestNeutronClientOSCV2):
             'name',
             'ports',
             'tenant_id',
-            'public',
+            'shared',
             'admin_state_up',
             'status',
         )
@@ -180,7 +180,6 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
         verifylist = []
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         headers, data = self.cmd.take_action(parsed_args)
-
         self.assertEqual(self.ordered_headers, headers)
         self.assertItemEqual(self.ordered_data, data)
 
@@ -250,7 +249,7 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
             '--egress-firewall-policy', egress_policy,
             '--port', port,
             '--project', tenant_id,
-            '--public',
+            '--share',
             '--disable',
         ]
         verifylist = [
@@ -259,7 +258,7 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
             ('ingress_firewall_policy', ingress_policy),
             ('egress_firewall_policy', egress_policy),
             ('port', [port]),
-            ('public', True),
+            ('share', True),
             ('project', tenant_id),
             ('disable', True),
         ]
@@ -270,14 +269,14 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
 
         self.check_results(headers, data, request)
 
-    def test_create_with_public_and_private(self):
+    def test_create_with_shared_and_no_share(self):
         arglist = [
-            '--public',
-            '--private',
+            '--share',
+            '--no-share',
         ]
         verifylist = [
-            ('public', True),
-            ('private', True),
+            ('share', True),
+            ('no_share', True),
         ]
         self.assertRaises(
             utils.ParserException,

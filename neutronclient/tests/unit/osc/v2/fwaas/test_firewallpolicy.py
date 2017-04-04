@@ -31,8 +31,8 @@ from neutronclient.tests.unit.osc.v2.fwaas import fakes
 
 _fwp = fakes.FirewallPolicy().create()
 CONVERT_MAP = {
-    'public': 'public',
-    'private': 'public',
+    'share': 'shared',
+    'no_share': 'shared',
     'project': 'tenant_id',
     'port': 'ports',
     'name': 'name',
@@ -109,7 +109,7 @@ class TestFirewallPolicy(test_fakes.TestNeutronClientOSCV2):
         self.headers = tuple(self.list_headers + (
             'Description',
             'Audited',
-            'Public',
+            'Shared',
             'Project')
         )
         self.data = _generate_data()
@@ -120,7 +120,7 @@ class TestFirewallPolicy(test_fakes.TestNeutronClientOSCV2):
             'ID',
             'Name',
             'Project',
-            'Public',
+            'Shared',
         )
         self.ordered_data = (
             _fwp['audited'],
@@ -129,7 +129,7 @@ class TestFirewallPolicy(test_fakes.TestNeutronClientOSCV2):
             _fwp['id'],
             _fwp['name'],
             _fwp['tenant_id'],
-            _fwp['public'],
+            _fwp['shared'],
         )
         self.ordered_columns = (
             'audited',
@@ -138,7 +138,7 @@ class TestFirewallPolicy(test_fakes.TestNeutronClientOSCV2):
             'id',
             'name',
             'tenant_id',
-            'public',
+            'shared',
         )
 
 
@@ -234,7 +234,7 @@ class TestCreateFirewallPolicy(TestFirewallPolicy, common.TestCreateFWaaS):
             '--firewall-rule', rule1,
             '--firewall-rule', rule2,
             '--project', project,
-            '--public',
+            '--share',
             '--audited',
         ]
         verifylist = [
@@ -242,7 +242,7 @@ class TestCreateFirewallPolicy(TestFirewallPolicy, common.TestCreateFWaaS):
             ('description', desc),
             ('firewall_rule', [rule1, rule2]),
             ('project', project),
-            ('public', True),
+            ('share', True),
             ('audited', True),
         ]
         request, response = _generate_req_and_res(verifylist)
@@ -271,17 +271,17 @@ class TestCreateFirewallPolicy(TestFirewallPolicy, common.TestCreateFWaaS):
             utils.ParserException,
             self.check_parser, self.cmd, arglist, verifylist)
 
-    def test_create_with_public_and_private(self):
+    def test_create_with_shared_and_no_share(self):
         name = 'my-fwp'
         arglist = [
             name,
-            '--public',
-            '--private',
+            '--share',
+            '--no-share',
         ]
         verifylist = [
             ('name', name),
-            ('public', True),
-            ('private', True),
+            ('share', True),
+            ('no_share', True),
         ]
         self.assertRaises(
             utils.ParserException,
