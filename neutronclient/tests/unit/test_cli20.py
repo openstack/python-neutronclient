@@ -816,6 +816,11 @@ class ClientV2TestJson(CLITestV20Base):
         self.mox.VerifyAll()
         self.mox.UnsetStubs()
 
+    def test_deserialize_without_data(self):
+        data = u''
+        result = self.client.deserialize(data, 200)
+        self.assertEqual(data, result)
+
 
 class CLITestV20ExceptionHandler(CLITestV20Base):
 

@@ -312,7 +312,8 @@ class ClientBase(object):
 
     def deserialize(self, data, status_code):
         """Deserializes a JSON string into a dictionary."""
-        if status_code == 204:
+        # TODO(hichihara): Remove checking 204 in bug 1611167
+        if status_code == 204 or not data:
             return data
         return serializer.Serializer().deserialize(
             data)['body']
