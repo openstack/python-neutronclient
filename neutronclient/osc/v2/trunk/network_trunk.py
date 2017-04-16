@@ -112,8 +112,8 @@ class DeleteNetworkTrunk(command.Command):
             except Exception as e:
                 result += 1
                 LOG.error(_("Failed to delete trunk with name "
-                          "or ID '%(trunk)s': %(e)s")
-                          % {'trunk': trunk, 'e': e})
+                          "or ID '%(trunk)s': %(e)s"),
+                          {'trunk': trunk, 'e': e})
         if result > 0:
             total = len(parsed_args.trunk)
             msg = (_("%(result)s of %(total)s trunks failed "

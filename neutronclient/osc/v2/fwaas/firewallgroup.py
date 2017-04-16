@@ -215,8 +215,8 @@ class DeleteFirewallGroup(command.Command):
             except Exception as e:
                 result += 1
                 LOG.error(_("Failed to delete firewall group with "
-                            "name or ID '%(firewall_group)s': %(e)s") % {
-                          const.FWG: fwg, 'e': e})
+                            "name or ID '%(firewall_group)s': %(e)s"),
+                          {const.FWG: fwg, 'e': e})
 
         if result > 0:
             total = len(parsed_args.firewall_group)

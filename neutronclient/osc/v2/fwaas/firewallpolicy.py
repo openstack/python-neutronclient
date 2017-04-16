@@ -170,8 +170,8 @@ class DeleteFirewallPolicy(command.Command):
             except Exception as e:
                 result += 1
                 LOG.error(_("Failed to delete Firewall policy with "
-                            "name or ID '%(firewall_policy)s': %(e)s") % {
-                          const.FWP: fwp, 'e': e})
+                            "name or ID '%(firewall_policy)s': %(e)s"),
+                          {const.FWP: fwp, 'e': e})
 
         if result > 0:
             total = len(parsed_args.firewall_policy)

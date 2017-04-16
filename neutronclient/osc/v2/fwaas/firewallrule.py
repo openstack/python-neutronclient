@@ -229,8 +229,8 @@ class DeleteFirewallRule(command.Command):
             except Exception as e:
                 result += 1
                 LOG.error(_("Failed to delete Firewall rule with "
-                            "name or ID '%(firewall_rule)s': %(e)s") % {
-                                const.FWR: fwr, 'e': e})
+                            "name or ID '%(firewall_rule)s': %(e)s"),
+                          {const.FWR: fwr, 'e': e})
 
         if result > 0:
             total = len(parsed_args.firewall_rule)
