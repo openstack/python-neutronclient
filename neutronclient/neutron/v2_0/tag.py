@@ -16,7 +16,7 @@ from neutronclient.neutron import v2_0 as neutronv20
 
 
 # List of resources can be set tag
-TAG_RESOURCES = ['network']
+TAG_RESOURCES = ['network', 'subnet', 'port', 'router', 'subnetpool']
 
 
 def _convert_resource_args(client, parsed_args):
