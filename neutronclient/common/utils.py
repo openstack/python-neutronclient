@@ -205,7 +205,7 @@ def http_log_resp(_logger, resp, body):
 
 
 def _safe_encode_without_obj(data):
-    if isinstance(data, six.string_types):
+    if isinstance(data, six.string_types) and data not in ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS']:
         return encodeutils.safe_encode(data)
     return data
 
