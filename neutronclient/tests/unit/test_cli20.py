@@ -37,7 +37,6 @@ from neutronclient import shell
 from neutronclient.v2_0 import client
 
 API_VERSION = "2.0"
-FORMAT = 'json'
 TOKEN = 'testtoken'
 ENDURL = 'localurl'
 REQUEST_ID = 'test_request_id'
@@ -89,8 +88,8 @@ class MyApp(object):
         self.stdout = _stdout
 
 
-def end_url(path, query=None, format=FORMAT):
-    _url_str = ENDURL + "/v" + API_VERSION + path + "." + format
+def end_url(path, query=None):
+    _url_str = ENDURL + "/v" + API_VERSION + path
     return query and _url_str + "?" + query or _url_str
 
 
@@ -113,16 +112,6 @@ class MyUrlComparator(mox.Comparator):
                 set(lhs_qs) == set(rhs_qs))
 
     def __str__(self):
-        if self.client and self.client.format != FORMAT:
-            lhs_parts = self.lhs.split("?", 1)
-            if len(lhs_parts) == 2:
-                lhs = ("%s.%s?%s" % (lhs_parts[0][:-4],
-                                     self.client.format,
-                                     lhs_parts[1]))
-            else:
-                lhs = ("%s.%s" % (lhs_parts[0][:-4],
-                                  self.client.format))
-            return lhs
         return self.lhs
 
     def __repr__(self):
@@ -183,7 +172,6 @@ class MyComparator(mox.Comparator):
 
 class CLITestV20Base(base.BaseTestCase):
 
-    format = 'json'
     test_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
     id_field = 'id'
 
@@ -212,7 +200,6 @@ class CLITestV20Base(base.BaseTestCase):
                    new=self._find_resourceid).start()
 
         self.client = client.Client(token=TOKEN, endpoint_url=self.endurl)
-        self.client.format = self.format
 
     def register_non_admin_status_resource(self, resource_name):
         # TODO(amotoki):
@@ -269,7 +256,7 @@ class CLITestV20Base(base.BaseTestCase):
 
         if not no_api_call:
             self.client.httpclient.request(
-                end_url(path, format=self.format), 'POST',
+                end_url(path), 'POST',
                 body=mox_body,
                 headers=mox.ContainsKeyValue(
                     'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
@@ -302,7 +289,7 @@ class CLITestV20Base(base.BaseTestCase):
         if parent_id:
             path = path % parent_id
         self.client.httpclient.request(
-            end_url(path, format=self.format), 'GET',
+            end_url(path), 'GET',
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
@@ -396,7 +383,7 @@ class CLITestV20Base(base.BaseTestCase):
             args.append('-f')
             args.append(output_format)
         self.client.httpclient.request(
-            MyUrlComparator(end_url(path, query, format=self.format),
+            MyUrlComparator(end_url(path, query),
                             self.client),
             'GET',
             body=None,
@@ -435,12 +422,12 @@ class CLITestV20Base(base.BaseTestCase):
         resstr1 = self.client.serialize(reses1)
         resstr2 = self.client.serialize(reses2)
         self.client.httpclient.request(
-            end_url(path, query, format=self.format), 'GET',
+            end_url(path, query), 'GET',
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr1))
         self.client.httpclient.request(
-            MyUrlComparator(end_url(path, fake_query, format=self.format),
+            MyUrlComparator(end_url(path, fake_query),
                             self.client), 'GET',
             body=None,
             headers=mox.ContainsKeyValue(
@@ -469,8 +456,7 @@ class CLITestV20Base(base.BaseTestCase):
         mox_body = MyComparator(body, self.client)
 
         self.client.httpclient.request(
-            MyUrlComparator(end_url(path, format=self.format),
-                            self.client),
+            MyUrlComparator(end_url(path), self.client),
             'PUT',
             body=mox_body,
             headers=mox.ContainsKeyValue(
@@ -502,7 +488,7 @@ class CLITestV20Base(base.BaseTestCase):
         else:
             path = path % myid
         self.client.httpclient.request(
-            end_url(path, query, format=self.format), 'GET',
+            end_url(path, query), 'GET',
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200), resstr))
@@ -523,7 +509,7 @@ class CLITestV20Base(base.BaseTestCase):
         else:
             path = path % (myid)
         self.client.httpclient.request(
-            end_url(path, format=self.format), 'DELETE',
+            end_url(path), 'DELETE',
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(
@@ -564,7 +550,7 @@ class CLITestV20Base(base.BaseTestCase):
         path = getattr(self.client, cmd_resource + "_path")
         path_action = '%s/%s' % (myid, action)
         self.client.httpclient.request(
-            end_url(path % path_action, format=self.format), 'PUT',
+            end_url(path % path_action), 'PUT',
             body=MyComparator(body, self.client),
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(expected_code),
@@ -672,7 +658,7 @@ class ClientV2TestJson(CLITestV20Base):
         resp_headers = {'x-openstack-request-id': REQUEST_ID}
 
         self.client.httpclient.request(
-            end_url(expected_action, query=expect_query, format=self.format),
+            end_url(expected_action, query=expect_query),
             'PUT', body=expect_body,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token',
@@ -696,8 +682,7 @@ class ClientV2TestJson(CLITestV20Base):
         resp_headers = {'x-openstack-request-id': REQUEST_ID}
 
         self.client.httpclient.request(
-            MyUrlComparator(end_url(
-                '/test', query=expect_query, format=self.format), self.client),
+            MyUrlComparator(end_url('/test', query=expect_query), self.client),
             'PUT', body='',
             headers=mox.ContainsKeyValue('X-Auth-Token', 'token')
         ).AndReturn((MyResp(400, headers=resp_headers, reason='An error'), ''))
@@ -729,9 +714,7 @@ class ClientV2TestJson(CLITestV20Base):
         expect_body = self.client.serialize(body)
         resp_headers = {'x-openstack-request-id': REQUEST_ID}
         self.client.httpclient.request(
-            MyUrlComparator(end_url(
-                '/test', query=expect_query,
-                format=self.format), self.client),
+            MyUrlComparator(end_url('/test', query=expect_query), self.client),
             'PUT', body=expect_body,
             headers=mox.ContainsKeyValue('X-Auth-Token', 'token')
         ).AndReturn((MyResp(200, resp_headers), expect_body))
@@ -761,13 +744,13 @@ class ClientV2TestJson(CLITestV20Base):
         resstr2 = self.client.serialize(reses2)
         resp_headers = {'x-openstack-request-id': REQUEST_ID}
         self.client.httpclient.request(
-            end_url(path, "", format=self.format), 'GET',
+            end_url(path, ""), 'GET',
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200, resp_headers),
                                                    resstr1))
         self.client.httpclient.request(
-            MyUrlComparator(end_url(path, fake_query, format=self.format),
+            MyUrlComparator(end_url(path, fake_query),
                             self.client), 'GET',
             body=None,
             headers=mox.ContainsKeyValue(
@@ -797,14 +780,13 @@ class ClientV2TestJson(CLITestV20Base):
         resstr2 = self.client.serialize(reses2)
         resp_headers = {'x-openstack-request-id': REQUEST_ID}
         self.client.httpclient.request(
-            end_url(path, "", format=self.format), 'GET',
+            end_url(path, ""), 'GET',
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200, resp_headers),
                                                    resstr1))
         self.client.httpclient.request(
-            MyUrlComparator(end_url(path, fake_query, format=self.format),
-                            self.client), 'GET',
+            MyUrlComparator(end_url(path, fake_query), self.client), 'GET',
             body=None,
             headers=mox.ContainsKeyValue(
                 'X-Auth-Token', TOKEN)).AndReturn((MyResp(200, resp_headers),
