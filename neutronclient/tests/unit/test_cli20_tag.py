@@ -81,6 +81,14 @@ class CLITestV20Tag(test_cli20.CLITestV20Base):
                 '--tag', 'red']
         self._test_tag_operation(cmd, path, 'PUT', args, "tag-add")
 
+    def test_add_tag_empty_tag(self):
+        cmd = tag.AddTag(test_cli20.MyApp(sys.stdout), None)
+        path = self._make_tag_path('network', 'myid', '')
+        args = ['--resource-type', 'network', '--resource', 'myid',
+                '--tag', '']
+        self.assertRaises(exceptions.CommandError, self._test_tag_operation,
+                          cmd, path, 'PUT', args, "tag-add")
+
     def test_replace_tag(self):
         cmd = tag.ReplaceTag(test_cli20.MyApp(sys.stdout), None)
         path = self._make_tags_path('network', 'myid')

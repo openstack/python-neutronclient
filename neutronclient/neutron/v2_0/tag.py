@@ -50,6 +50,9 @@ class AddTag(neutronv20.NeutronCommand):
 
     def take_action(self, parsed_args):
         client = self.get_client()
+        if not parsed_args.tag:
+            raise exceptions.CommandError(
+                _('Cannot add an empty value as tag'))
         resource_type, resource_id = _convert_resource_args(client,
                                                             parsed_args)
         client.add_tag(resource_type, resource_id, parsed_args.tag)
