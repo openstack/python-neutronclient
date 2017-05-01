@@ -233,6 +233,7 @@ class ShellTest(testtools.TestCase):
 
         options.update(base_options)
         if options.get('os_token'):
+            options.update({'auth_type': 'token'})
             options.update({'os_token': 'token', 'os_url': 'url'})
         else:
             options.update({'os_token': None, 'os_url': None})
