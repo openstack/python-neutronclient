@@ -107,7 +107,7 @@ class FirewallRule(FakeFWaaS):
             ('description', 'my-desc-' + uuid.uuid4().hex),
             ('ip_version', 4),
             ('action', 'deny'),
-            ('protocol', 'any'),
+            ('protocol', None),
             ('source_ip_address', '192.168.1.0/24'),
             ('source_port', '1:11111'),
             ('destination_ip_address', '192.168.2.2'),

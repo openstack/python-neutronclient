@@ -42,7 +42,18 @@ def _generate_data(ordered_dict=None, data=None):
     source = ordered_dict if ordered_dict else _fwr
     if data:
         source.update(data)
-    return tuple(source[key] for key in source)
+    return tuple(_replace_display_columns(key, source[key]) for key in source)
+
+
+def _replace_display_columns(key, val):
+    # TODO(amotoki): This is required because of the logic of
+    # osc_lib.utils.get_dict_properties().
+    # It needs to be fixed in osc-lib first.
+    if val is None:
+        return val
+    if key == 'protocol':
+        return firewallrule.format_protocol(val)
+    return val
 
 
 def _generate_req_and_res(verifylist):
@@ -133,7 +144,7 @@ class TestFirewallRule(test_fakes.TestNeutronClientOSCV2):
             _fwr['ip_version'],
             _fwr['name'],
             _fwr['tenant_id'],
-            _fwr['protocol'],
+            _replace_display_columns('protocol', _fwr['protocol']),
             _fwr['public'],
             _fwr['source_ip_address'],
             _fwr['source_port'],
@@ -179,7 +190,8 @@ class TestCreateFirewallRule(TestFirewallRule, common.TestCreateFWaaS):
         # Update response(finally returns 'data')
         self.data = _generate_data(ordered_dict=response)
         self.ordered_data = tuple(
-            response[column] for column in self.ordered_columns
+            _replace_display_columns(column, response[column])
+            for column in self.ordered_columns
         )
 
     def _set_all_params(self, args={}):
@@ -273,7 +285,7 @@ class TestCreateFirewallRule(TestFirewallRule, common.TestCreateFWaaS):
 class TestListFirewallRule(TestFirewallRule):
 
     def _setup_summary(self, expect=None):
-        protocol = _fwr['protocol'].upper()
+        protocol = (_fwr['protocol'] or 'any').upper()
         src = 'source(port): 192.168.1.0/24(1:11111)'
         dst = 'dest(port): 192.168.2.2(2:22222)'
         action = 'deny'
