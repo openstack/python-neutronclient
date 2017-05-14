@@ -17,8 +17,8 @@ from oslo_utils import encodeutils
 import six
 import testtools
 
+from neutronclient._i18n import _
 from neutronclient.common import exceptions
-from neutronclient.i18n import _
 
 
 class TestExceptions(testtools.TestCase):
