@@ -17,6 +17,7 @@
 """Network trunk and subports action implementations"""
 import logging
 
+from osc_lib.cli import format_columns
 from osc_lib.cli import parseractions
 from osc_lib.command import command
 from osc_lib import exceptions
@@ -310,8 +311,8 @@ class UnsetNetworkTrunk(command.Command):
 
 
 _formatters = {
-    'admin_state_up': v2_utils.format_admin_state,
-    'sub_ports': osc_utils.format_list_of_dicts,
+    'admin_state_up': v2_utils.AdminStateColumn,
+    'sub_ports': format_columns.ListDictColumn,
 }
 
 

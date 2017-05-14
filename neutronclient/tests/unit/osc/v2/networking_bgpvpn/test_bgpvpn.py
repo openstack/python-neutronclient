@@ -76,7 +76,7 @@ class TestCreateBgpvpn(fakes.TestNeutronClientBgpvpn):
         self.neutronclient.create_bgpvpn.assert_called_once_with(
             {constants.BGPVPN: {'type': 'l3'}})
         self.assertEqual(sorted_headers, cols)
-        self.assertEqual(_get_data(fake_bgpvpn), data)
+        self.assertItemEqual(_get_data(fake_bgpvpn), data)
 
     def test_create_bgpvpn_with_all_args(self):
         attrs = {
@@ -125,7 +125,7 @@ class TestCreateBgpvpn(fakes.TestNeutronClientBgpvpn):
         self.neutronclient.create_bgpvpn.assert_called_once_with(
             {constants.BGPVPN: fake_bgpvpn_call})
         self.assertEqual(sorted_headers, cols)
-        self.assertEqual(_get_data(fake_bgpvpn), data)
+        self.assertItemEqual(_get_data(fake_bgpvpn), data)
 
 
 class TestSetBgpvpn(fakes.TestNeutronClientBgpvpn):
@@ -409,9 +409,10 @@ class TestListBgpvpn(fakes.TestNeutronClientBgpvpn):
 
         self.neutronclient.list_bgpvpns.assert_called_once()
         self.assertEqual(headers, list(headers_short))
-        self.assertEqual(list(data),
-                         [_get_data(fake_bgpvpn, columns_short) for fake_bgpvpn
-                          in fake_bgpvpns[constants.BGPVPNS]])
+        self.assertListItemEqual(
+            list(data),
+            [_get_data(fake_bgpvpn, columns_short) for fake_bgpvpn
+             in fake_bgpvpns[constants.BGPVPNS]])
 
     def test_list_all_bgpvpn_long_mode(self):
         count = 3
@@ -430,9 +431,10 @@ class TestListBgpvpn(fakes.TestNeutronClientBgpvpn):
 
         self.neutronclient.list_bgpvpns.assert_called_once()
         self.assertEqual(headers, list(headers_long))
-        self.assertEqual(list(data),
-                         [_get_data(fake_bgpvpn, columns_long) for fake_bgpvpn
-                          in fake_bgpvpns[constants.BGPVPNS]])
+        self.assertListItemEqual(
+            list(data),
+            [_get_data(fake_bgpvpn, columns_long) for fake_bgpvpn
+             in fake_bgpvpns[constants.BGPVPNS]])
 
     def test_list_project_bgpvpn(self):
         count = 3
@@ -455,9 +457,10 @@ class TestListBgpvpn(fakes.TestNeutronClientBgpvpn):
         self.neutronclient.list_bgpvpns.assert_called_once_with(
             tenant_id=project_id)
         self.assertEqual(headers, list(headers_short))
-        self.assertEqual(list(data),
-                         [_get_data(fake_bgpvpn, columns_short) for fake_bgpvpn
-                          in fake_bgpvpns[constants.BGPVPNS]])
+        self.assertListItemEqual(
+            list(data),
+            [_get_data(fake_bgpvpn, columns_short) for fake_bgpvpn
+             in fake_bgpvpns[constants.BGPVPNS]])
 
     def test_list_bgpvpn_with_filters(self):
         count = 3
@@ -485,8 +488,8 @@ class TestListBgpvpn(fakes.TestNeutronClientBgpvpn):
             name=name,
             type=layer_type)
         self.assertEqual(headers, list(headers_short))
-        self.assertEqual(list(data),
-                         [_get_data(returned_bgpvpn, columns_short)])
+        self.assertListItemEqual(list(data),
+                                 [_get_data(returned_bgpvpn, columns_short)])
 
 
 class TestShowBgpvpn(fakes.TestNeutronClientBgpvpn):
@@ -512,4 +515,4 @@ class TestShowBgpvpn(fakes.TestNeutronClientBgpvpn):
         self.neutronclient.show_bgpvpn.assert_called_once_with(
             fake_bgpvpn['id'])
         self.assertEqual(sorted_headers, headers)
-        self.assertEqual(_get_data(fake_bgpvpn), data)
+        self.assertItemEqual(_get_data(fake_bgpvpn), data)

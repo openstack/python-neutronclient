@@ -52,7 +52,7 @@ def _replace_display_columns(key, val):
     if val is None:
         return val
     if key == 'protocol':
-        return firewallrule.format_protocol(val)
+        return firewallrule.ProtocolColumn(val)
     return val
 
 
@@ -86,7 +86,7 @@ class TestFirewallRule(test_fakes.TestNeutronClientOSCV2):
             req_body = {self.res: exp_req}
         self.mocked.assert_called_once_with(req_body)
         self.assertEqual(self.ordered_headers, headers)
-        self.assertEqual(self.ordered_data, data)
+        self.assertItemEqual(self.ordered_data, data)
 
     def setUp(self):
         super(TestFirewallRule, self).setUp()
@@ -329,7 +329,7 @@ class TestListFirewallRule(TestFirewallRule):
 
         self.mocked.assert_called_once_with()
         self.assertEqual(list(self.headers), headers)
-        self.assertEqual([self.data], list(data))
+        self.assertListItemEqual([self.data], list(data))
 
     def test_list_with_no_option(self):
         arglist = []
@@ -339,7 +339,7 @@ class TestListFirewallRule(TestFirewallRule):
 
         self.mocked.assert_called_once_with()
         self.assertEqual(list(self.short_header), headers)
-        self.assertEqual([self.short_data], list(data))
+        self.assertListItemEqual([self.short_data], list(data))
 
 
 class TestShowFirewallRule(TestFirewallRule, common.TestShowFWaaS):

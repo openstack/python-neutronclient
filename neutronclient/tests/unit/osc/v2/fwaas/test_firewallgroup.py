@@ -24,6 +24,7 @@ from osc_lib.tests import utils
 from neutronclient.osc import utils as osc_utils
 from neutronclient.osc.v2.fwaas import constants as const
 from neutronclient.osc.v2.fwaas import firewallgroup
+from neutronclient.osc.v2 import utils as v2_utils
 from neutronclient.tests.unit.osc.v2 import fakes as test_fakes
 from neutronclient.tests.unit.osc.v2.fwaas import common
 from neutronclient.tests.unit.osc.v2.fwaas import fakes
@@ -46,7 +47,8 @@ CONVERT_MAP = {
 
 def _generate_response(ordered_dict=None, data=None):
     source = ordered_dict if ordered_dict else _fwg
-    up = {'admin_state_up': 'UP' if source['admin_state_up'] else 'DOWN'}
+    up = {'admin_state_up':
+          v2_utils.AdminStateColumn(source['admin_state_up'])}
     if data:
         up.append(data)
     source.update(up)
@@ -81,7 +83,7 @@ class TestFirewallGroup(test_fakes.TestNeutronClientOSCV2):
             req_body = {self.res: exp_req}
         self.mocked.assert_called_once_with(req_body)
         self.assertEqual(self.ordered_headers, headers)
-        self.assertEqual(self.ordered_data, data)
+        self.assertItemEqual(self.ordered_data, data)
 
     def setUp(self):
         super(TestFirewallGroup, self).setUp()
@@ -127,7 +129,7 @@ class TestFirewallGroup(test_fakes.TestNeutronClientOSCV2):
             _fwg['ports'],
             _fwg['tenant_id'],
             _fwg['public'],
-            'UP' if _fwg['admin_state_up'] else 'DOWN',
+            v2_utils.AdminStateColumn(_fwg['admin_state_up']),
             _fwg['status'],
         )
         self.ordered_columns = (
@@ -180,7 +182,7 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
         headers, data = self.cmd.take_action(parsed_args)
 
         self.assertEqual(self.ordered_headers, headers)
-        self.assertEqual(self.ordered_data, data)
+        self.assertItemEqual(self.ordered_data, data)
 
     def test_create_with_port(self):
         # firewall_group-create with 'port'

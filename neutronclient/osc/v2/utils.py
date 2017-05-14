@@ -16,6 +16,9 @@
 to Networking v2 API and its extensions.
 """
 
+from cliff import columns as cliff_columns
 
-def format_admin_state(state):
-    return 'UP' if state else 'DOWN'
+
+class AdminStateColumn(cliff_columns.FormattableColumn):
+    def human_readable(self):
+        return 'UP' if self._value else 'DOWN'
