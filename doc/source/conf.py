@@ -5,9 +5,14 @@
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc',
-              'reno.sphinxext',
-              'openstackdocstheme',
+extensions = [
+    'sphinx.ext.autodoc',
+    'reno.sphinxext',
+    'openstackdocstheme',
+    # 'cliff.sphinxext',
+    # TODO(amotoki): Switch to cliff.sphinxext once cliff bug is fixed.
+    # https://bugs.launchpad.net/python-cliff/+bug/1692018
+    'neutronclient.cliff_sphinxext',
 ]
 
 # openstackdocstheme options
@@ -46,3 +51,7 @@ html_theme = 'openstackdocs'
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'neutronclientdoc'
+
+# -- Options for cliff.sphinxext plugin ---------------------------------------
+
+autoprogram_cliff_application = 'openstack'

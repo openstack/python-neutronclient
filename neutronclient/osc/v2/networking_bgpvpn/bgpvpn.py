@@ -216,7 +216,7 @@ class CreateBgpvpn(command.ShowOne):
             default='l3',
             choices=['l2', 'l3'],
             help=_("BGP VPN type selection between IP VPN (l3) and Ethernet "
-                   "VPN (l2) (default: %(default)s)"),
+                   "VPN (l2) (default: l3)"),
         )
         return parser
 
