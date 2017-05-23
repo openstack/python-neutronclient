@@ -46,6 +46,7 @@ else:
 logging.getLogger("requests").setLevel(_requests_log_level)
 MAX_URI_LEN = 8192
 USER_AGENT = 'python-neutronclient'
+REQ_ID_HEADER = 'X-OpenStack-Request-ID'
 
 
 class HTTPClient(object):
@@ -64,7 +65,7 @@ class HTTPClient(object):
                  endpoint_url=None, insecure=False,
                  endpoint_type='publicURL',
                  auth_strategy='keystone', ca_cert=None, log_credentials=False,
-                 service_type='network',
+                 service_type='network', global_request_id=None,
                  **kwargs):
 
         self.username = username
@@ -83,6 +84,7 @@ class HTTPClient(object):
         self.endpoint_url = endpoint_url
         self.auth_strategy = auth_strategy
         self.log_credentials = log_credentials
+        self.global_request_id = global_request_id
         if insecure:
             self.verify_cert = False
         else:
@@ -152,6 +154,9 @@ class HTTPClient(object):
 
         if body:
             headers.setdefault('Content-Type', content_type)
+
+        if self.global_request_id:
+            headers.setdefault(REQ_ID_HEADER, self.global_request_id)
 
         headers['User-Agent'] = USER_AGENT
         # NOTE(dbelova): osprofiler_web.get_trace_id_headers does not add any
@@ -299,6 +304,9 @@ class HTTPClient(object):
 
 
 class SessionClient(adapter.Adapter):
+    def __init__(self, *args, **kwargs):
+        self.global_request_id = kwargs.pop("global_request_id", None)
+        super(SessionClient, self).__init__(*args, **kwargs)
 
     def request(self, *args, **kwargs):
         kwargs.setdefault('authenticated', False)
@@ -308,6 +316,9 @@ class SessionClient(adapter.Adapter):
 
         headers = kwargs.setdefault('headers', {})
         headers.setdefault('Accept', content_type)
+
+        if self.global_request_id:
+            headers.setdefault(REQ_ID_HEADER, self.global_request_id)
         # NOTE(dbelova): osprofiler_web.get_trace_id_headers does not add any
         # headers in case if osprofiler is not initialized.
         if osprofiler_web:
@@ -397,6 +408,7 @@ def construct_http_client(username=None,
                           ca_cert=None,
                           service_type='network',
                           session=None,
+                          global_request_id=None,
                           **kwargs):
 
     if session:
@@ -405,6 +417,7 @@ def construct_http_client(username=None,
         return SessionClient(session=session,
                              service_type=service_type,
                              region_name=region_name,
+                             global_request_id=global_request_id,
                              **kwargs)
     else:
         # FIXME(bklei): username and password are now optional. Need
@@ -425,4 +438,5 @@ def construct_http_client(username=None,
                           service_type=service_type,
                           ca_cert=ca_cert,
                           log_credentials=log_credentials,
-                          auth_strategy=auth_strategy)
+                          auth_strategy=auth_strategy,
+                          global_request_id=global_request_id)
