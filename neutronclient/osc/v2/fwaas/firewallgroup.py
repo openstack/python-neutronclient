@@ -28,7 +28,7 @@ from neutronclient.osc.v2 import utils as v2_utils
 LOG = logging.getLogger(__name__)
 
 _formatters = {
-    'admin_state_up': v2_utils.format_admin_state,
+    'admin_state_up': v2_utils.AdminStateColumn,
 }
 
 _attr_map = (

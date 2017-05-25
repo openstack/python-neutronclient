@@ -16,6 +16,7 @@
 import copy
 import logging
 
+from cliff import columns as cliff_columns
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
@@ -181,10 +182,12 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
     return attrs
 
 
-def format_protocol(protocol):
-    return protocol if protocol else 'any'
+class ProtocolColumn(cliff_columns.FormattableColumn):
+    def human_readable(self):
+        return self._value if self._value else 'any'
 
-_formatters = {'protocol': format_protocol}
+
+_formatters = {'protocol': ProtocolColumn}
 
 
 class CreateFirewallRule(command.ShowOne):

@@ -14,6 +14,7 @@
 import argparse
 import mock
 
+from cliff import columns as cliff_columns
 from osc_lib.tests import utils
 
 
@@ -25,3 +26,20 @@ class TestNeutronClientOSCV2(utils.TestCommand):
         self.app.client_manager.session = mock.Mock()
         self.app.client_manager.neutronclient = mock.Mock()
         self.neutronclient = self.app.client_manager.neutronclient
+
+    # TODO(amotoki): Move this to osc_lib
+    def assertListItemEqual(self, expected, actual):
+        self.assertEqual(len(expected), len(actual))
+        for item_expected, item_actual in zip(expected, actual):
+            self.assertItemEqual(item_expected, item_actual)
+
+    # TODO(amotoki): Move this to osc_lib
+    def assertItemEqual(self, expected, actual):
+        self.assertEqual(len(expected), len(actual))
+        for col_expected, col_actual in zip(expected, actual):
+            if isinstance(col_expected, cliff_columns.FormattableColumn):
+                self.assertIsInstance(col_actual, col_expected.__class__)
+                self.assertEqual(col_expected.human_readable(),
+                                 col_actual.human_readable())
+            else:
+                self.assertEqual(col_expected, col_actual)

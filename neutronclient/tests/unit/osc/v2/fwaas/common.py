@@ -42,7 +42,7 @@ class TestListFWaaS(test_fakes.TestNeutronClientOSCV2):
 
         self.mocked.assert_called_once_with()
         self.assertEqual(list(self.headers), headers)
-        self.assertEqual([self.data], list(data))
+        self.assertListItemEqual([self.data], list(data))
 
 
 class TestShowFWaaS(test_fakes.TestNeutronClientOSCV2):
@@ -67,7 +67,7 @@ class TestShowFWaaS(test_fakes.TestNeutronClientOSCV2):
 
         self.mocked.assert_called_once_with(target)
         self.assertEqual(self.ordered_headers, headers)
-        self.assertEqual(self.ordered_data, data)
+        self.assertItemEqual(self.ordered_data, data)
 
 
 class TestCreateFWaaS(test_fakes.TestNeutronClientOSCV2):

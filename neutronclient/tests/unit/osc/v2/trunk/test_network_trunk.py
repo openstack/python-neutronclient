@@ -19,9 +19,9 @@ import mock
 from mock import call
 import testtools
 
+from osc_lib.cli import format_columns
 from osc_lib import exceptions
 from osc_lib.tests import utils as tests_utils
-from osc_lib import utils
 
 from neutronclient.osc.v2.trunk import network_trunk as trunk
 from neutronclient.osc.v2 import utils as v2_utils
@@ -50,14 +50,14 @@ class TestCreateNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
 
     def get_data(self):
         return (
-            v2_utils.format_admin_state(self._trunk['admin_state_up']),
+            v2_utils.AdminStateColumn(self._trunk['admin_state_up']),
             self._trunk['description'],
             self._trunk['id'],
             self._trunk['name'],
             self._trunk['port_id'],
             self._trunk['project_id'],
             self._trunk['status'],
-            utils.format_list_of_dicts(self._trunk['sub_ports']),
+            format_columns.ListDictColumn(self._trunk['sub_ports']),
         )
 
     def setUp(self):
@@ -97,7 +97,7 @@ class TestCreateNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
                           'port_id': self._trunk['port_id']}
         })
         self.assertEqual(self.columns, columns)
-        self.assertEqual(self.data, data)
+        self.assertItemEqual(self.data, data)
 
     def test_create_full_options(self):
         self._trunk['description'] = 'foo description'
@@ -137,7 +137,7 @@ class TestCreateNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
                           'port_id': self._trunk['port_id']}
         })
         self.assertEqual(self.columns, columns)
-        self.assertEqual(self.data, data)
+        self.assertItemEqual(self.data, data)
 
     def test_create_trunk_with_subport_invalid_segmentation_id_fail(self):
         subport = self._trunk['sub_ports'][0]
@@ -191,7 +191,7 @@ class TestCreateNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
                           'port_id': self._trunk['port_id']}
         })
         self.assertEqual(self.columns, columns)
-        self.assertEqual(self.data, data)
+        self.assertItemEqual(self.data, data)
 
     def test_create_network_trunk_subports_without_required_key_fail(self):
         subport = self._trunk['sub_ports'][0]
@@ -301,14 +301,14 @@ class TestShowNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         'sub_ports',
     )
     data = (
-        v2_utils.format_admin_state(_trunk['admin_state_up']),
+        v2_utils.AdminStateColumn(_trunk['admin_state_up']),
         _trunk['description'],
         _trunk['id'],
         _trunk['name'],
         _trunk['port_id'],
         _trunk['project_id'],
         _trunk['status'],
-        utils.format_list_of_dicts(_trunk['sub_ports']),
+        format_columns.ListDictColumn(_trunk['sub_ports']),
     )
 
     def setUp(self):
@@ -343,7 +343,7 @@ class TestShowNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         self.neutronclient.show_trunk.assert_called_once_with(
             self._trunk['id'])
         self.assertEqual(self.columns, columns)
-        self.assertEqual(self.data, data)
+        self.assertItemEqual(self.data, data)
 
 
 class TestListNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
@@ -380,7 +380,7 @@ class TestListNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
             t['port_id'],
             t['description'],
             t['status'],
-            v2_utils.format_admin_state(t['admin_state_up']),
+            v2_utils.AdminStateColumn(t['admin_state_up']),
             '2001-01-01 00:00:00',
             '2001-01-01 00:00:00',
         ))
@@ -404,7 +404,7 @@ class TestListNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
 
         self.neutronclient.list_trunks.assert_called_once_with()
         self.assertEqual(self.columns, columns)
-        self.assertEqual(self.data, list(data))
+        self.assertListItemEqual(self.data, list(data))
 
     def test_trunk_list_long(self):
         arglist = [
@@ -419,7 +419,7 @@ class TestListNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
 
         self.neutronclient.list_trunks.assert_called_once_with()
         self.assertEqual(self.columns_long, columns)
-        self.assertEqual(self.data_long, list(data))
+        self.assertListItemEqual(self.data_long, list(data))
 
 
 class TestSetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
@@ -437,14 +437,14 @@ class TestSetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         'sub_ports',
     )
     data = (
-        v2_utils.format_admin_state(_trunk['admin_state_up']),
+        v2_utils.AdminStateColumn(_trunk['admin_state_up']),
         _trunk['id'],
         _trunk['name'],
         _trunk['description'],
         _trunk['port_id'],
         _trunk['project_id'],
         _trunk['status'],
-        utils.format_list_of_dicts(_trunk['sub_ports']),
+        format_columns.ListDictColumn(_trunk['sub_ports']),
     )
 
     def setUp(self):
@@ -717,13 +717,13 @@ class TestUnsetNetworkTrunk(test_fakes.TestNeutronClientOSCV2):
         'sub_ports',
     )
     data = (
-        v2_utils.format_admin_state(_trunk['admin_state_up']),
+        v2_utils.AdminStateColumn(_trunk['admin_state_up']),
         _trunk['id'],
         _trunk['name'],
         _trunk['port_id'],
         _trunk['project_id'],
         _trunk['status'],
-        utils.format_list_of_dicts(_trunk['sub_ports']),
+        format_columns.ListDictColumn(_trunk['sub_ports']),
     )
 
     def setUp(self):

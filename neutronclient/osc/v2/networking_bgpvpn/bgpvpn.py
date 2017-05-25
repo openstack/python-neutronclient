@@ -16,6 +16,7 @@
 
 import logging
 
+from osc_lib.cli import format_columns
 from osc_lib.cli.parseractions import KeyValueAction
 from osc_lib.command import command
 from osc_lib import exceptions
@@ -41,12 +42,12 @@ _attr_map = (
     ('routers', 'Associated Routers', nc_osc_utils.LIST_LONG_ONLY),
 )
 _formatters = {
-    'route_targets': osc_utils.format_list,
-    'import_targets': osc_utils.format_list,
-    'export_targets': osc_utils.format_list,
-    'route_distinguishers': osc_utils.format_list,
-    'networks': osc_utils.format_list,
-    'routers': osc_utils.format_list,
+    'route_targets': format_columns.ListColumn,
+    'import_targets': format_columns.ListColumn,
+    'export_targets': format_columns.ListColumn,
+    'route_distinguishers': format_columns.ListColumn,
+    'networks': format_columns.ListColumn,
+    'routers': format_columns.ListColumn,
 }
 
 
