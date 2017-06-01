@@ -41,25 +41,28 @@ class CLITestV20ExtensionJSON(test_cli20.CLITestV20Base):
         return contrib
 
     def test_ext_cmd_loaded(self):
-        shell.NeutronShell('2.0')
+        neutron_shell = shell.NeutronShell('2.0')
         ext_cmd = {'fox-sockets-list': fox_sockets.FoxInSocketsList,
                    'fox-sockets-create': fox_sockets.FoxInSocketsCreate,
                    'fox-sockets-update': fox_sockets.FoxInSocketsUpdate,
                    'fox-sockets-delete': fox_sockets.FoxInSocketsDelete,
                    'fox-sockets-show': fox_sockets.FoxInSocketsShow}
-        self.assertDictContainsSubset(ext_cmd, shell.COMMANDS['2.0'])
+        for cmd_name, cmd_class in ext_cmd.items():
+            found = neutron_shell.command_manager.find_command([cmd_name])
+            self.assertEqual(cmd_class, found[0])
 
     def test_ext_cmd_help_doc_with_extension_name(self):
-        shell.NeutronShell('2.0')
+        neutron_shell = shell.NeutronShell('2.0')
         ext_cmd = {'fox-sockets-list': fox_sockets.FoxInSocketsList,
                    'fox-sockets-create': fox_sockets.FoxInSocketsCreate,
                    'fox-sockets-update': fox_sockets.FoxInSocketsUpdate,
                    'fox-sockets-delete': fox_sockets.FoxInSocketsDelete,
                    'fox-sockets-show': fox_sockets.FoxInSocketsShow}
-        self.assertDictContainsSubset(ext_cmd, shell.COMMANDS['2.0'])
-        for item in ext_cmd:
-            cmdcls = shell.COMMANDS['2.0'].get(item)
-            self.assertTrue(cmdcls.__doc__.startswith("[_fox_sockets]"))
+        for cmd_name, cmd_class in ext_cmd.items():
+            found = neutron_shell.command_manager.find_command([cmd_name])
+            found_factory = found[0]
+            self.assertEqual(cmd_class, found_factory)
+            self.assertTrue(found_factory.__doc__.startswith("[_fox_sockets]"))
 
     def test_delete_fox_socket(self):
         # Delete fox socket: myid.
@@ -138,9 +141,11 @@ class CLITestV20ExtensionJSONAlternatePlurals(test_cli20.CLITestV20Base):
         return contrib
 
     def test_ext_cmd_loaded(self):
-        shell.NeutronShell('2.0')
+        neutron_shell = shell.NeutronShell('2.0')
         ext_cmd = {'ip-address-list': self.IPAddressesList}
-        self.assertDictContainsSubset(ext_cmd, shell.COMMANDS['2.0'])
+        for cmd_name, cmd_class in ext_cmd.items():
+            found = neutron_shell.command_manager.find_command([cmd_name])
+            self.assertEqual(cmd_class, found[0])
 
     def test_list_ip_addresses(self):
         # List ip_addresses.
@@ -195,13 +200,15 @@ class CLITestV20ExtensionJSONChildResource(test_cli20.CLITestV20Base):
         return contrib
 
     def test_ext_cmd_loaded(self):
-        shell.NeutronShell('2.0')
+        neutron_shell = shell.NeutronShell('2.0')
         ext_cmd = {'parent-child-list': self.ChildrenList,
                    'parent-child-show': self.ChildShow,
                    'parent-child-update': self.ChildUpdate,
                    'parent-child-delete': self.ChildDelete,
                    'parent-child-create': self.ChildCreate}
-        self.assertDictContainsSubset(ext_cmd, shell.COMMANDS['2.0'])
+        for cmd_name, cmd_class in ext_cmd.items():
+            found = neutron_shell.command_manager.find_command([cmd_name])
+            self.assertEqual(cmd_class, found[0])
 
     def test_client_methods_have_parent_id_arg(self):
         methods = (self.client.list_parents_children,

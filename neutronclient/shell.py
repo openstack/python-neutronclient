@@ -40,60 +40,14 @@ from neutronclient._i18n import _
 from neutronclient.common import clientmanager
 from neutronclient.common import exceptions as exc
 from neutronclient.common import extension as client_extension
-from neutronclient.neutron.v2_0 import address_scope
-from neutronclient.neutron.v2_0 import agent
-from neutronclient.neutron.v2_0 import agentscheduler
-from neutronclient.neutron.v2_0 import auto_allocated_topology
-from neutronclient.neutron.v2_0 import availability_zone
-from neutronclient.neutron.v2_0.bgp import dragentscheduler as bgp_drsched
-from neutronclient.neutron.v2_0.bgp import peer as bgp_peer
-from neutronclient.neutron.v2_0.bgp import speaker as bgp_speaker
-from neutronclient.neutron.v2_0 import extension
-from neutronclient.neutron.v2_0.flavor import flavor
-from neutronclient.neutron.v2_0.flavor import flavor_profile
-from neutronclient.neutron.v2_0 import floatingip
-from neutronclient.neutron.v2_0.fw import firewall
-from neutronclient.neutron.v2_0.fw import firewallpolicy
-from neutronclient.neutron.v2_0.fw import firewallrule
-from neutronclient.neutron.v2_0.lb import healthmonitor as lb_healthmonitor
-from neutronclient.neutron.v2_0.lb import member as lb_member
-from neutronclient.neutron.v2_0.lb import pool as lb_pool
-from neutronclient.neutron.v2_0.lb.v2 import healthmonitor as lbaas_healthmon
-from neutronclient.neutron.v2_0.lb.v2 import l7policy as lbaas_l7policy
-from neutronclient.neutron.v2_0.lb.v2 import l7rule as lbaas_l7rule
-from neutronclient.neutron.v2_0.lb.v2 import listener as lbaas_listener
-from neutronclient.neutron.v2_0.lb.v2 import loadbalancer as lbaas_loadbalancer
-from neutronclient.neutron.v2_0.lb.v2 import member as lbaas_member
-from neutronclient.neutron.v2_0.lb.v2 import pool as lbaas_pool
-from neutronclient.neutron.v2_0.lb import vip as lb_vip
-from neutronclient.neutron.v2_0 import metering
-from neutronclient.neutron.v2_0 import network
-from neutronclient.neutron.v2_0 import network_ip_availability
-from neutronclient.neutron.v2_0 import port
-from neutronclient.neutron.v2_0 import purge
-from neutronclient.neutron.v2_0.qos import bandwidth_limit_rule
-from neutronclient.neutron.v2_0.qos import dscp_marking_rule
-from neutronclient.neutron.v2_0.qos import minimum_bandwidth_rule
-from neutronclient.neutron.v2_0.qos import policy as qos_policy
-from neutronclient.neutron.v2_0.qos import rule as qos_rule
-from neutronclient.neutron.v2_0 import quota
-from neutronclient.neutron.v2_0 import rbac
-from neutronclient.neutron.v2_0 import router
-from neutronclient.neutron.v2_0 import securitygroup
-from neutronclient.neutron.v2_0 import servicetype
 from neutronclient.neutron.v2_0 import subnet
-from neutronclient.neutron.v2_0 import subnetpool
-from neutronclient.neutron.v2_0 import tag
-from neutronclient.neutron.v2_0.vpn import endpoint_group
-from neutronclient.neutron.v2_0.vpn import ikepolicy
-from neutronclient.neutron.v2_0.vpn import ipsec_site_connection
-from neutronclient.neutron.v2_0.vpn import ipsecpolicy
-from neutronclient.neutron.v2_0.vpn import vpnservice
 from neutronclient.version import __version__
 
 
 VERSION = '2.0'
 NEUTRON_API_VERSION = '2.0'
+
+NAMESPACE_MAP = {NEUTRON_API_VERSION: 'neutron.cli.v2'}
 
 
 def run_command(cmd, cmd_parser, sub_argv):
@@ -156,320 +110,6 @@ class BashCompletionCommand(command.Command):
         pass
 
 
-COMMAND_V2 = {
-    'bash-completion': BashCompletionCommand,
-    'net-list': network.ListNetwork,
-    'net-external-list': network.ListExternalNetwork,
-    'net-show': network.ShowNetwork,
-    'net-create': network.CreateNetwork,
-    'net-delete': network.DeleteNetwork,
-    'net-update': network.UpdateNetwork,
-    'subnet-list': subnet.ListSubnet,
-    'subnet-show': subnet.ShowSubnet,
-    'subnet-create': subnet.CreateSubnet,
-    'subnet-delete': subnet.DeleteSubnet,
-    'subnet-update': subnet.UpdateSubnet,
-    'subnetpool-list': subnetpool.ListSubnetPool,
-    'subnetpool-show': subnetpool.ShowSubnetPool,
-    'subnetpool-create': subnetpool.CreateSubnetPool,
-    'subnetpool-delete': subnetpool.DeleteSubnetPool,
-    'subnetpool-update': subnetpool.UpdateSubnetPool,
-    'port-list': port.ListPort,
-    'port-show': port.ShowPort,
-    'port-create': port.CreatePort,
-    'port-delete': port.DeletePort,
-    'port-update': port.UpdatePort,
-    'purge': purge.Purge,
-    'quota-list': quota.ListQuota,
-    'quota-show': quota.ShowQuota,
-    'quota-default-show': quota.ShowQuotaDefault,
-    'quota-delete': quota.DeleteQuota,
-    'quota-update': quota.UpdateQuota,
-    'ext-list': extension.ListExt,
-    'ext-show': extension.ShowExt,
-    'router-list': router.ListRouter,
-    'router-port-list': port.ListRouterPort,
-    'router-show': router.ShowRouter,
-    'router-create': router.CreateRouter,
-    'router-delete': router.DeleteRouter,
-    'router-update': router.UpdateRouter,
-    'router-interface-add': router.AddInterfaceRouter,
-    'router-interface-delete': router.RemoveInterfaceRouter,
-    'router-gateway-set': router.SetGatewayRouter,
-    'router-gateway-clear': router.RemoveGatewayRouter,
-    'floatingip-list': floatingip.ListFloatingIP,
-    'floatingip-show': floatingip.ShowFloatingIP,
-    'floatingip-create': floatingip.CreateFloatingIP,
-    'floatingip-delete': floatingip.DeleteFloatingIP,
-    'floatingip-associate': floatingip.AssociateFloatingIP,
-    'floatingip-disassociate': floatingip.DisassociateFloatingIP,
-    'security-group-list': securitygroup.ListSecurityGroup,
-    'security-group-show': securitygroup.ShowSecurityGroup,
-    'security-group-create': securitygroup.CreateSecurityGroup,
-    'security-group-delete': securitygroup.DeleteSecurityGroup,
-    'security-group-update': securitygroup.UpdateSecurityGroup,
-    'security-group-rule-list': securitygroup.ListSecurityGroupRule,
-    'security-group-rule-show': securitygroup.ShowSecurityGroupRule,
-    'security-group-rule-create': securitygroup.CreateSecurityGroupRule,
-    'security-group-rule-delete': securitygroup.DeleteSecurityGroupRule,
-    'lbaas-loadbalancer-list': lbaas_loadbalancer.ListLoadBalancer,
-    'lbaas-loadbalancer-show': lbaas_loadbalancer.ShowLoadBalancer,
-    'lbaas-loadbalancer-create': lbaas_loadbalancer.CreateLoadBalancer,
-    'lbaas-loadbalancer-update': lbaas_loadbalancer.UpdateLoadBalancer,
-    'lbaas-loadbalancer-delete': lbaas_loadbalancer.DeleteLoadBalancer,
-    'lbaas-loadbalancer-stats': lbaas_loadbalancer.RetrieveLoadBalancerStats,
-    'lbaas-loadbalancer-status': lbaas_loadbalancer.RetrieveLoadBalancerStatus,
-    'lbaas-listener-list': lbaas_listener.ListListener,
-    'lbaas-listener-show': lbaas_listener.ShowListener,
-    'lbaas-listener-create': lbaas_listener.CreateListener,
-    'lbaas-listener-update': lbaas_listener.UpdateListener,
-    'lbaas-listener-delete': lbaas_listener.DeleteListener,
-    'lbaas-l7policy-list': lbaas_l7policy.ListL7Policy,
-    'lbaas-l7policy-show': lbaas_l7policy.ShowL7Policy,
-    'lbaas-l7policy-create': lbaas_l7policy.CreateL7Policy,
-    'lbaas-l7policy-update': lbaas_l7policy.UpdateL7Policy,
-    'lbaas-l7policy-delete': lbaas_l7policy.DeleteL7Policy,
-    'lbaas-l7rule-list': lbaas_l7rule.ListL7Rule,
-    'lbaas-l7rule-show': lbaas_l7rule.ShowL7Rule,
-    'lbaas-l7rule-create': lbaas_l7rule.CreateL7Rule,
-    'lbaas-l7rule-update': lbaas_l7rule.UpdateL7Rule,
-    'lbaas-l7rule-delete': lbaas_l7rule.DeleteL7Rule,
-    'lbaas-pool-list': lbaas_pool.ListPool,
-    'lbaas-pool-show': lbaas_pool.ShowPool,
-    'lbaas-pool-create': lbaas_pool.CreatePool,
-    'lbaas-pool-update': lbaas_pool.UpdatePool,
-    'lbaas-pool-delete': lbaas_pool.DeletePool,
-    'lbaas-healthmonitor-list': lbaas_healthmon.ListHealthMonitor,
-    'lbaas-healthmonitor-show': lbaas_healthmon.ShowHealthMonitor,
-    'lbaas-healthmonitor-create': lbaas_healthmon.CreateHealthMonitor,
-    'lbaas-healthmonitor-update': lbaas_healthmon.UpdateHealthMonitor,
-    'lbaas-healthmonitor-delete': lbaas_healthmon.DeleteHealthMonitor,
-    'lbaas-member-list': lbaas_member.ListMember,
-    'lbaas-member-show': lbaas_member.ShowMember,
-    'lbaas-member-create': lbaas_member.CreateMember,
-    'lbaas-member-update': lbaas_member.UpdateMember,
-    'lbaas-member-delete': lbaas_member.DeleteMember,
-    'lb-vip-list': lb_vip.ListVip,
-    'lb-vip-show': lb_vip.ShowVip,
-    'lb-vip-create': lb_vip.CreateVip,
-    'lb-vip-update': lb_vip.UpdateVip,
-    'lb-vip-delete': lb_vip.DeleteVip,
-    'lb-pool-list': lb_pool.ListPool,
-    'lb-pool-show': lb_pool.ShowPool,
-    'lb-pool-create': lb_pool.CreatePool,
-    'lb-pool-update': lb_pool.UpdatePool,
-    'lb-pool-delete': lb_pool.DeletePool,
-    'lb-pool-stats': lb_pool.RetrievePoolStats,
-    'lb-member-list': lb_member.ListMember,
-    'lb-member-show': lb_member.ShowMember,
-    'lb-member-create': lb_member.CreateMember,
-    'lb-member-update': lb_member.UpdateMember,
-    'lb-member-delete': lb_member.DeleteMember,
-    'lb-healthmonitor-list': lb_healthmonitor.ListHealthMonitor,
-    'lb-healthmonitor-show': lb_healthmonitor.ShowHealthMonitor,
-    'lb-healthmonitor-create': lb_healthmonitor.CreateHealthMonitor,
-    'lb-healthmonitor-update': lb_healthmonitor.UpdateHealthMonitor,
-    'lb-healthmonitor-delete': lb_healthmonitor.DeleteHealthMonitor,
-    'lb-healthmonitor-associate': lb_healthmonitor.AssociateHealthMonitor,
-    'lb-healthmonitor-disassociate': (
-        lb_healthmonitor.DisassociateHealthMonitor
-    ),
-    'agent-list': agent.ListAgent,
-    'agent-show': agent.ShowAgent,
-    'agent-delete': agent.DeleteAgent,
-    'agent-update': agent.UpdateAgent,
-    'dhcp-agent-network-add': agentscheduler.AddNetworkToDhcpAgent,
-    'dhcp-agent-network-remove': agentscheduler.RemoveNetworkFromDhcpAgent,
-    'net-list-on-dhcp-agent': agentscheduler.ListNetworksOnDhcpAgent,
-    'dhcp-agent-list-hosting-net': agentscheduler.ListDhcpAgentsHostingNetwork,
-    'l3-agent-router-add': agentscheduler.AddRouterToL3Agent,
-    'l3-agent-router-remove': agentscheduler.RemoveRouterFromL3Agent,
-    'router-list-on-l3-agent': agentscheduler.ListRoutersOnL3Agent,
-    'l3-agent-list-hosting-router': agentscheduler.ListL3AgentsHostingRouter,
-    'lb-pool-list-on-agent': agentscheduler.ListPoolsOnLbaasAgent,
-    'lb-agent-hosting-pool': agentscheduler.GetLbaasAgentHostingPool,
-    'lbaas-loadbalancer-list-on-agent':
-        agentscheduler.ListLoadBalancersOnLbaasAgent,
-    'lbaas-agent-hosting-loadbalancer':
-        agentscheduler.GetLbaasAgentHostingLoadBalancer,
-    'service-provider-list': servicetype.ListServiceProvider,
-    'firewall-rule-list': firewallrule.ListFirewallRule,
-    'firewall-rule-show': firewallrule.ShowFirewallRule,
-    'firewall-rule-create': firewallrule.CreateFirewallRule,
-    'firewall-rule-update': firewallrule.UpdateFirewallRule,
-    'firewall-rule-delete': firewallrule.DeleteFirewallRule,
-    'firewall-policy-list': firewallpolicy.ListFirewallPolicy,
-    'firewall-policy-show': firewallpolicy.ShowFirewallPolicy,
-    'firewall-policy-create': firewallpolicy.CreateFirewallPolicy,
-    'firewall-policy-update': firewallpolicy.UpdateFirewallPolicy,
-    'firewall-policy-delete': firewallpolicy.DeleteFirewallPolicy,
-    'firewall-policy-insert-rule': firewallpolicy.FirewallPolicyInsertRule,
-    'firewall-policy-remove-rule': firewallpolicy.FirewallPolicyRemoveRule,
-    'firewall-list': firewall.ListFirewall,
-    'firewall-show': firewall.ShowFirewall,
-    'firewall-create': firewall.CreateFirewall,
-    'firewall-update': firewall.UpdateFirewall,
-    'firewall-delete': firewall.DeleteFirewall,
-    'ipsec-site-connection-list': (
-        ipsec_site_connection.ListIPsecSiteConnection
-    ),
-    'ipsec-site-connection-show': (
-        ipsec_site_connection.ShowIPsecSiteConnection
-    ),
-    'ipsec-site-connection-create': (
-        ipsec_site_connection.CreateIPsecSiteConnection
-    ),
-    'ipsec-site-connection-update': (
-        ipsec_site_connection.UpdateIPsecSiteConnection
-    ),
-    'ipsec-site-connection-delete': (
-        ipsec_site_connection.DeleteIPsecSiteConnection
-    ),
-    'vpn-endpoint-group-list': endpoint_group.ListEndpointGroup,
-    'vpn-endpoint-group-show': endpoint_group.ShowEndpointGroup,
-    'vpn-endpoint-group-create': endpoint_group.CreateEndpointGroup,
-    'vpn-endpoint-group-update': endpoint_group.UpdateEndpointGroup,
-    'vpn-endpoint-group-delete': endpoint_group.DeleteEndpointGroup,
-    'vpn-service-list': vpnservice.ListVPNService,
-    'vpn-service-show': vpnservice.ShowVPNService,
-    'vpn-service-create': vpnservice.CreateVPNService,
-    'vpn-service-update': vpnservice.UpdateVPNService,
-    'vpn-service-delete': vpnservice.DeleteVPNService,
-    'vpn-ipsecpolicy-list': ipsecpolicy.ListIPsecPolicy,
-    'vpn-ipsecpolicy-show': ipsecpolicy.ShowIPsecPolicy,
-    'vpn-ipsecpolicy-create': ipsecpolicy.CreateIPsecPolicy,
-    'vpn-ipsecpolicy-update': ipsecpolicy.UpdateIPsecPolicy,
-    'vpn-ipsecpolicy-delete': ipsecpolicy.DeleteIPsecPolicy,
-    'vpn-ikepolicy-list': ikepolicy.ListIKEPolicy,
-    'vpn-ikepolicy-show': ikepolicy.ShowIKEPolicy,
-    'vpn-ikepolicy-create': ikepolicy.CreateIKEPolicy,
-    'vpn-ikepolicy-update': ikepolicy.UpdateIKEPolicy,
-    'vpn-ikepolicy-delete': ikepolicy.DeleteIKEPolicy,
-    'meter-label-create': metering.CreateMeteringLabel,
-    'meter-label-list': metering.ListMeteringLabel,
-    'meter-label-show': metering.ShowMeteringLabel,
-    'meter-label-delete': metering.DeleteMeteringLabel,
-    'meter-label-rule-create': metering.CreateMeteringLabelRule,
-    'meter-label-rule-list': metering.ListMeteringLabelRule,
-    'meter-label-rule-show': metering.ShowMeteringLabelRule,
-    'meter-label-rule-delete': metering.DeleteMeteringLabelRule,
-    'rbac-create': rbac.CreateRBACPolicy,
-    'rbac-update': rbac.UpdateRBACPolicy,
-    'rbac-list': rbac.ListRBACPolicy,
-    'rbac-show': rbac.ShowRBACPolicy,
-    'rbac-delete': rbac.DeleteRBACPolicy,
-    'address-scope-list': address_scope.ListAddressScope,
-    'address-scope-show': address_scope.ShowAddressScope,
-    'address-scope-create': address_scope.CreateAddressScope,
-    'address-scope-delete': address_scope.DeleteAddressScope,
-    'address-scope-update': address_scope.UpdateAddressScope,
-    'qos-policy-list': qos_policy.ListQoSPolicy,
-    'qos-policy-show': qos_policy.ShowQoSPolicy,
-    'qos-policy-create': qos_policy.CreateQoSPolicy,
-    'qos-policy-update': qos_policy.UpdateQoSPolicy,
-    'qos-policy-delete': qos_policy.DeleteQoSPolicy,
-    'qos-bandwidth-limit-rule-create': (
-        bandwidth_limit_rule.CreateQoSBandwidthLimitRule
-    ),
-    'qos-bandwidth-limit-rule-show': (
-        bandwidth_limit_rule.ShowQoSBandwidthLimitRule
-    ),
-    'qos-bandwidth-limit-rule-list': (
-        bandwidth_limit_rule.ListQoSBandwidthLimitRules
-    ),
-    'qos-bandwidth-limit-rule-update': (
-        bandwidth_limit_rule.UpdateQoSBandwidthLimitRule
-    ),
-    'qos-bandwidth-limit-rule-delete': (
-        bandwidth_limit_rule.DeleteQoSBandwidthLimitRule
-    ),
-    'qos-dscp-marking-rule-create': (
-        dscp_marking_rule.CreateQoSDscpMarkingRule
-    ),
-    'qos-dscp-marking-rule-show': (
-        dscp_marking_rule.ShowQoSDscpMarkingRule
-    ),
-    'qos-dscp-marking-rule-list': (
-        dscp_marking_rule.ListQoSDscpMarkingRules
-    ),
-    'qos-dscp-marking-rule-update': (
-        dscp_marking_rule.UpdateQoSDscpMarkingRule
-    ),
-    'qos-dscp-marking-rule-delete': (
-        dscp_marking_rule.DeleteQoSDscpMarkingRule
-    ),
-    'qos-minimum-bandwidth-rule-create': (
-        minimum_bandwidth_rule.CreateQoSMinimumBandwidthRule
-    ),
-    'qos-minimum-bandwidth-rule-show': (
-        minimum_bandwidth_rule.ShowQoSMinimumBandwidthRule
-    ),
-    'qos-minimum-bandwidth-rule-list': (
-        minimum_bandwidth_rule.ListQoSMinimumBandwidthRules
-    ),
-    'qos-minimum-bandwidth-rule-update': (
-        minimum_bandwidth_rule.UpdateQoSMinimumBandwidthRule
-    ),
-    'qos-minimum-bandwidth-rule-delete': (
-        minimum_bandwidth_rule.DeleteQoSMinimumBandwidthRule
-    ),
-    'qos-available-rule-types': qos_rule.ListQoSRuleTypes,
-    'flavor-list': flavor.ListFlavor,
-    'flavor-show': flavor.ShowFlavor,
-    'flavor-create': flavor.CreateFlavor,
-    'flavor-delete': flavor.DeleteFlavor,
-    'flavor-update': flavor.UpdateFlavor,
-    'flavor-associate': flavor.AssociateFlavor,
-    'flavor-disassociate': flavor.DisassociateFlavor,
-    'flavor-profile-list': flavor_profile.ListFlavorProfile,
-    'flavor-profile-show': flavor_profile.ShowFlavorProfile,
-    'flavor-profile-create': flavor_profile.CreateFlavorProfile,
-    'flavor-profile-delete': flavor_profile.DeleteFlavorProfile,
-    'flavor-profile-update': flavor_profile.UpdateFlavorProfile,
-    'availability-zone-list': availability_zone.ListAvailabilityZone,
-    'auto-allocated-topology-show': (
-        auto_allocated_topology.ShowAutoAllocatedTopology),
-    'auto-allocated-topology-delete': (
-        auto_allocated_topology.DeleteAutoAllocatedTopology),
-    'bgp-dragent-speaker-add': (
-        bgp_drsched.AddBGPSpeakerToDRAgent
-    ),
-    'bgp-dragent-speaker-remove': (
-        bgp_drsched.RemoveBGPSpeakerFromDRAgent
-    ),
-    'bgp-speaker-list-on-dragent': (
-        bgp_drsched.ListBGPSpeakersOnDRAgent
-    ),
-    'bgp-dragent-list-hosting-speaker': (
-        bgp_drsched.ListDRAgentsHostingBGPSpeaker
-    ),
-    'bgp-speaker-list': bgp_speaker.ListSpeakers,
-    'bgp-speaker-advertiseroute-list': (
-        bgp_speaker.ListRoutesAdvertisedBySpeaker
-    ),
-    'bgp-speaker-show': bgp_speaker.ShowSpeaker,
-    'bgp-speaker-create': bgp_speaker.CreateSpeaker,
-    'bgp-speaker-update': bgp_speaker.UpdateSpeaker,
-    'bgp-speaker-delete': bgp_speaker.DeleteSpeaker,
-    'bgp-speaker-peer-add': bgp_speaker.AddPeerToSpeaker,
-    'bgp-speaker-peer-remove': bgp_speaker.RemovePeerFromSpeaker,
-    'bgp-speaker-network-add': bgp_speaker.AddNetworkToSpeaker,
-    'bgp-speaker-network-remove': bgp_speaker.RemoveNetworkFromSpeaker,
-    'bgp-peer-list': bgp_peer.ListPeers,
-    'bgp-peer-show': bgp_peer.ShowPeer,
-    'bgp-peer-create': bgp_peer.CreatePeer,
-    'bgp-peer-update': bgp_peer.UpdatePeer,
-    'bgp-peer-delete': bgp_peer.DeletePeer,
-    'net-ip-availability-list': network_ip_availability.ListIpAvailability,
-    'net-ip-availability-show': network_ip_availability.ShowIpAvailability,
-    'tag-add': tag.AddTag,
-    'tag-replace': tag.ReplaceTag,
-    'tag-remove': tag.RemoveTag,
-}
-
-COMMANDS = {'2.0': COMMAND_V2}
-
-
 class HelpAction(argparse.Action):
     """Print help message including sub-commands
 
@@ -508,13 +148,11 @@ class NeutronShell(app.App):
     log = logging.getLogger(__name__)
 
     def __init__(self, apiversion):
+        namespace = NAMESPACE_MAP[apiversion]
         super(NeutronShell, self).__init__(
             description=__doc__.strip(),
             version=VERSION,
-            command_manager=commandmanager.CommandManager('neutron.cli'), )
-        self.commands = COMMANDS
-        for k, v in self.commands[apiversion].items():
-            self.command_manager.add_command(k, v)
+            command_manager=commandmanager.CommandManager(namespace), )
 
         self._register_extensions(VERSION)
 
@@ -813,7 +451,6 @@ class NeutronShell(app.App):
                     cls.__doc__ = ("%s %s" % (name_prefix, cls.__doc__) if
                                    cls.__doc__ else name_prefix)
                     self.command_manager.add_command(cmd, cls)
-                    self.commands[version][cmd] = cls
                 except TypeError:
                     pass
 
@@ -832,15 +469,17 @@ class NeutronShell(app.App):
                 if arg == 'bash-completion' and help_command_pos == -1:
                     self._bash_completion()
                     return 0
-                if arg in self.commands[self.api_version]:
-                    if command_pos == -1:
-                        command_pos = index
-                elif arg in ('-h', '--help'):
+                if arg in ('-h', '--help'):
                     if help_pos == -1:
                         help_pos = index
+                # self.command_manager.commands contains 'help',
+                # so we need to check this first.
                 elif arg == 'help':
                     if help_command_pos == -1:
                         help_command_pos = index
+                elif arg in self.command_manager.commands:
+                    if command_pos == -1:
+                        command_pos = index
                 index = index + 1
             if command_pos > -1 and help_pos > command_pos:
                 argv = ['help', argv[command_pos]]
