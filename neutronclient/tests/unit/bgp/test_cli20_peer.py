@@ -148,7 +148,7 @@ class CLITestV20BGPPeerJSON(test_cli20.CLITestV20Base):
                 '--peer-ip', peerip,
                 '--remote-as', remote_asnum,
                 '--auth-type', authType]
-        position_names = ['name', 'peer_ip', 'remote_as', 'auth-type']
+        position_names = ['name', 'peer_ip', 'remote_as', 'auth_type']
         position_values = [name, peerip, remote_asnum, authType]
         exc = self.assertRaises(exceptions.CommandError,
                                 self._test_create_resource,
