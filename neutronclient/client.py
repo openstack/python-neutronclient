@@ -304,9 +304,6 @@ class HTTPClient(object):
 
 
 class SessionClient(adapter.Adapter):
-    def __init__(self, *args, **kwargs):
-        self.global_request_id = kwargs.pop("global_request_id", None)
-        super(SessionClient, self).__init__(*args, **kwargs)
 
     def request(self, *args, **kwargs):
         kwargs.setdefault('authenticated', False)
@@ -317,8 +314,6 @@ class SessionClient(adapter.Adapter):
         headers = kwargs.setdefault('headers', {})
         headers.setdefault('Accept', content_type)
 
-        if self.global_request_id:
-            headers.setdefault(REQ_ID_HEADER, self.global_request_id)
         # NOTE(dbelova): osprofiler_web.get_trace_id_headers does not add any
         # headers in case if osprofiler is not initialized.
         if osprofiler_web:
