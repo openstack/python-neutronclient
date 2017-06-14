@@ -37,7 +37,7 @@ class CLITestV20Quota(test_cli20.CLITestV20Base):
             test_cli20.MyApp(sys.stdout), None)
         args = ['--tenant-id', self.test_id, '--network', 'test']
         self.assertRaises(
-            exceptions.NeutronClientException, self._test_update_resource,
+            exceptions.CommandError, self._test_update_resource,
             resource, cmd, self.test_id, args=args,
             extrafields={'network': 'new'})
 
@@ -58,7 +58,7 @@ class CLITestV20Quota(test_cli20.CLITestV20Base):
             test_cli20.MyApp(sys.stdout), None)
         args = [self.test_id, '--network', 'test']
         self.assertRaises(
-            exceptions.NeutronClientException, self._test_update_resource,
+            exceptions.CommandError, self._test_update_resource,
             resource, cmd, self.test_id, args=args,
             extrafields={'network': 'new'})
 
