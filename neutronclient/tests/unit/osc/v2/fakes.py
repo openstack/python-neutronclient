@@ -26,6 +26,7 @@ class TestNeutronClientOSCV2(utils.TestCommand):
         self.app.client_manager.session = mock.Mock()
         self.app.client_manager.neutronclient = mock.Mock()
         self.neutronclient = self.app.client_manager.neutronclient
+        self.addCleanup(mock.patch.stopall)
 
     # TODO(amotoki): Move this to osc_lib
     def assertListItemEqual(self, expected, actual):
