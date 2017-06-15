@@ -11,11 +11,11 @@ oslo.i18n!=3.15.2,>=2.1.0 # Apache-2.0
 oslo.serialization>=1.10.0 # Apache-2.0
 oslo.utils>=3.20.0 # Apache-2.0
 os-client-config>=1.27.0 # Apache-2.0
-keystoneauth1>=2.20.0 # Apache-2.0
+keystoneauth1>=2.21.0 # Apache-2.0
 # keystoneclient is used only by neutronclient.osc.utils
 # TODO(amotoki): Drop this after osc.utils has no dependency on keystoneclient
 python-keystoneclient>=3.8.0 # Apache-2.0
-requests!=2.12.2,!=2.13.0,>=2.10.0 # Apache-2.0
+requests>=2.14.2 # Apache-2.0
 simplejson>=2.2.0 # MIT
 six>=1.9.0 # MIT
 Babel!=2.4.0,>=2.3.4 # BSD
