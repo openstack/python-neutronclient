@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 #
 
+import os
+
+import openstackdocstheme
+
+
 project = 'python-neutronclient'
 
 # -- General configuration ---------------------------------------------
@@ -8,7 +13,6 @@ project = 'python-neutronclient'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc',
-              'oslosphinx',
               'reno.sphinxext',
 ]
 
@@ -38,7 +42,21 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-# html_theme = 'nature'
+html_theme = 'openstackdocs'
+
+html_theme_path = [openstackdocstheme.get_html_theme_path()]
+
+gitsha = os.popen("/usr/bin/git rev-parse HEAD").read()
+giturl = ('https://git.openstack.org/cgit/openstack/%s/tree/doc/source'
+          % 'python-neutronclient')
+html_context = {
+    'gitsha': gitsha,
+    'giturl': giturl,
+    'bug_project': 'python-neutronclient',
+    'bug_tag': 'doc',
+}
+html_last_updated_fmt = os.popen("git log --pretty=format:'%ad' "
+                                 "--date=format:'%Y-%m-%d %H:%M' -n1").read()
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = '%sdoc' % project
