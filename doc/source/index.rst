@@ -19,44 +19,51 @@
       '''''''  Heading 4
       (Avoid deeper levels because they do not render well.)
 
-Python bindings to the OpenStack Networking API
-===============================================
+==================================
+python-neutronclient documentation
+==================================
 
-This is a client for OpenStack Networking API. There is a :doc:`Python API
-<usage/library>` (the neutronclient module), and a :doc:`command-line script
-<usage/cli>` (installed as **neutron**). Each implements the entire OpenStack
-Networking API.
+This is a client for OpenStack Networking API. It provides
+:doc:`Python API bindings <reference/index>` (the neutronclient module) and
+:doc:`command-line interface (CLI) <cli/index>`.
 
-Using neutronclient
--------------------
+There are two CLIs which support the Networking API:
+:doc:`neutron CLI <cli/neutron>` and
+`OpenStack Client (OSC) <https://docs.openstack.org/developer/python-openstackclient/>`__.
+OpenStack Client provides the basic network commands and
+python-neutronclient provides extensions (aka OSC plugins)
+for advanced networking services.
+
+User Documentation
+------------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   usage/cli
-   usage/library
-   usage/osc_cli_plugins
+   reference/index
+   cli/neutron
+   cli/osc_plugins
 
-Developer Guide
----------------
+Contributor Guide
+-----------------
 
-In the Developer Guide, you will find information on Neutron’s client
-lower level programming details or APIs as well as the transition to
-OpenStack client.
+In the :doc:`Contributor Guide <contributor/index>`, you will find
+information on neutronclient's lower level programming details or APIs
+as well as the transition to OpenStack client.
 
-.. note:
+.. toctree::
+   :maxdepth: 1
+
+   contributor/client_command_extensions
+   contributor/cli_option_guideline
+   contributor/transition_to_osc
+
+.. note::
 
    neutron CLI has been deprecated from Ocata release.
    We do not add, change and drop any existing commands any more.
    We only accept changes on OSC plugin, neutronclient python bindings
    and bug fixes on the deprecated CLI (``neutron`` command).
-
-.. toctree::
-   :maxdepth: 2
-
-   devref/client_command_extensions
-   devref/cli_option_guideline
-   devref/transition_to_osc
 
 History
 -------

@@ -20,8 +20,8 @@
       '''''''  Heading 4
       (Avoid deeper levels because they do not render well.)
 
-Command-line Interface
-======================
+Using neutron CLI
+=================
 
 The **neutron** shell utility interacts with OpenStack Networking API from the
 command-line. It supports the entire features of OpenStack Networking API.
