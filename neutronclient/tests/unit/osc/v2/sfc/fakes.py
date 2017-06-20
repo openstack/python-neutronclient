@@ -232,3 +232,48 @@ class FakeSfcPortChain(object):
         for _ in range(count):
             port_chains.append(FakeSfcPortChain.create_port_chain(attrs))
         return port_chains
+
+
+class FakeSfcServiceGraph(object):
+    """Fake service graph attributes."""
+
+    @staticmethod
+    def create_sfc_service_graph(attrs=None):
+        """Create a fake service graph.
+
+        :param Dictionary attrs:
+            A dictionary with all attributes
+        :return:
+            A Dictionary with faking service graph attributes
+        """
+        attrs = attrs or {}
+
+        # Set default attributes.
+        service_graph_attrs = {
+            'id': uuidutils.generate_uuid(),
+            'name': 'port-pair-group-name',
+            'description': 'description',
+            'port_chains': {uuidutils.generate_uuid(): [
+                uuidutils.generate_uuid()]},
+            'project_id': uuidutils.generate_uuid(),
+        }
+
+        service_graph_attrs.update(attrs)
+        return copy.deepcopy(service_graph_attrs)
+
+    @staticmethod
+    def create_sfc_service_graphs(attrs=None, count=1):
+        """Create multiple service graphs.
+
+        :param Dictionary attrs:
+            A dictionary with all attributes
+        :param int count:
+            The number of service graphs to fake
+        :return:
+            A list of dictionaries faking the service graphs.
+        """
+        service_graphs = []
+        for _ in range(count):
+            service_graphs.append(
+                FakeSfcServiceGraph.create_sfc_service_graph(attrs))
+        return service_graphs
