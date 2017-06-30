@@ -207,7 +207,7 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
         except Exception:
             message = (_('Quota limit for %(name)s must be an integer') %
                        {'name': name})
-            raise exceptions.NeutronClientException(message=message)
+            raise exceptions.CommandError(message=message)
         return return_value
 
     def args2body(self, parsed_args):
