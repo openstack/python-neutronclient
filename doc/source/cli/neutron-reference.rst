@@ -20,32 +20,9 @@
       '''''''  Heading 4
       (Avoid deeper levels because they do not render well.)
 
-=========
-Using CLI
-=========
-
-There are two CLIs which support the Networking API:
-`OpenStackClient (OSC)
-<https://docs.openstack.org/developer/python-openstackclient/>`__
-and :doc:`neutron CLI <neutron>` (deprecated).
-
-OpenStackClient
----------------
-
-OpenStackClient provides
-`the basic network commands <https://docs.openstack.org/python-openstackclient/latest/cli/command-list.html>`__
-and python-neutronclient provides :doc:`extensions <osc_plugins>`
-(aka OSC plugins) for advanced networking services.
-
-.. toctree::
-   :maxdepth: 1
-
-   Basic network commands <https://docs.openstack.org/python-openstackclient/latest/cli/command-list.html>
-   Network commands for advanced networking services <osc_plugins>
-   Mapping Guide from neutron CLI <https://docs.openstack.org/python-openstackclient/latest/cli/decoder.html#neutron-cli>
-
-neutron CLI
------------
+=====================
+neutron CLI reference
+=====================
 
 .. warning::
 
@@ -56,8 +33,16 @@ neutron CLI
    The command mapping from neutron CLI to openstack CLI is available
    `here <https://docs.openstack.org/python-openstackclient/latest/cli/decoder.html#neutron-cli>`__.
 
-.. toctree::
-   :maxdepth: 2
+neutron usage
+-------------
 
-   neutron CLI guide <neutron>
-   neutron CLI reference <neutron-reference>
+.. cliff-app:: neutronclient.shell.NeutronShell
+   :application: neutron
+   :arguments: 2.0
+
+neutron API v2.0 commands
+-------------------------
+
+.. autoprogram-cliff:: neutron.cli.v2
+   :application: neutron
+

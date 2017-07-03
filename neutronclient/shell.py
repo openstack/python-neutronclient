@@ -149,8 +149,10 @@ class NeutronShell(app.App):
 
     def __init__(self, apiversion):
         namespace = NAMESPACE_MAP[apiversion]
+        description = (__doc__.strip() +
+                       " (neutron CLI version: %s)" % __version__)
         super(NeutronShell, self).__init__(
-            description=__doc__.strip(),
+            description=description,
             version=VERSION,
             command_manager=commandmanager.CommandManager(namespace), )
 

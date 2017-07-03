@@ -20,6 +20,7 @@ from docutils import nodes
 from docutils.parsers import rst
 from docutils.parsers.rst import directives
 from docutils import statemachine
+from oslo_utils import importutils
 
 from cliff import commandmanager
 
@@ -301,7 +302,84 @@ class AutoprogramCliffDirective(rst.Directive):
         return output
 
 
+class CliffAppDirective(rst.Directive):
+    """Auto-document a `cliff.app.App`."""
+
+    has_content = False
+    required_arguments = 1
+    option_spec = {
+        'arguments': directives.unchanged,
+        'ignored': directives.unchanged,
+        'application': directives.unchanged,
+    }
+
+    def _generate_nodes(self, title, app, app_name, ignored_opts):
+        """Generate the relevant Sphinx nodes.
+
+        This is a little funky. Parts of this use raw docutils nodes while
+        other parts use reStructuredText and nested parsing. The reason for
+        this is simple: it avoids us having to reinvent the wheel. While raw
+        docutils nodes are helpful for the simpler elements of the output,
+        they don't provide an easy way to use Sphinx's own directives, such as
+        the 'option' directive. Refer to [1] for more information.
+
+        [1] http://www.sphinx-doc.org/en/stable/extdev/markupapi.html
+
+        :param title: Title of command
+        :param app: Subclass of :py:class`cliff.app.App`
+        :param app_name: The name of the cliff application.
+            This is used as the command name.
+        :param ignored_opts: A list of options to exclude from output, if any
+        :returns: A list of docutil nodes
+        """
+        parser = app.parser
+        ignored_opts = ignored_opts or []
+
+        # Drop the automatically-added help action
+        for action in list(parser._actions):
+            for option_string in action.option_strings:
+                if option_string in ignored_opts:
+                    del parser._actions[parser._actions.index(action)]
+                    break
+
+        parser.prog = app_name
+
+        source_name = '<{}>'.format(app.__class__.__name__)
+        result = statemachine.ViewList()
+        for line in _format_parser(parser):
+            result.append(line, source_name)
+
+        section = nodes.section()
+        self.state.nested_parse(result, 0, section)
+        return section.children
+
+    def run(self):
+        self.env = self.state.document.settings.env
+
+        cliff_app_class = importutils.import_class(self.arguments[0])
+        app_arguments = self.options.get('arguments', '').split()
+        cliff_app = cliff_app_class(*app_arguments)
+
+        application_name = (self.options.get('application')
+                            or self.env.config.autoprogram_cliff_application)
+
+        global_ignored = self.env.config.autoprogram_cliff_ignored
+        local_ignored = self.options.get('ignored', '')
+        local_ignored = [x.strip() for x in local_ignored.split(',')
+                         if x.strip()]
+        ignored_opts = list(set(global_ignored + local_ignored))
+
+        output = []
+        title = application_name
+        output.extend(self._generate_nodes(
+            title, cliff_app, application_name, ignored_opts))
+
+        return output
+
+
 def setup(app):
     app.add_directive('autoprogram-cliff', AutoprogramCliffDirective)
     app.add_config_value('autoprogram_cliff_application', '', True)
     app.add_config_value('autoprogram_cliff_ignored', ['--help'], True)
+
+    app.add_directive('cliff-app', CliffAppDirective)
