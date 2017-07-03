@@ -26,6 +26,15 @@ Using neutron CLI
 The **neutron** shell utility interacts with OpenStack Networking API from the
 command-line. It supports the entire features of OpenStack Networking API.
 
+.. warning::
+
+   neutron CLI is now deprecated and will be removed in the future.
+   Use openstack CLI instead. See `openstack CLI command list
+   <https://docs.openstack.org/python-openstackclient/latest/cli/command-list.html>`__
+   and :doc:`its extensions for advanced networking services <osc_plugins>`.
+   The command mapping from neutron CLI to openstack CLI is available
+   `here <https://docs.openstack.org/python-openstackclient/latest/cli/decoder.html#neutron-cli>`__.
+
 Basic Usage
 -----------
 

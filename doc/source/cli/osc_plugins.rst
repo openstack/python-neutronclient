@@ -20,11 +20,15 @@
       '''''''  Heading 4
       (Avoid deeper levels because they do not render well.)
 
-Using Network CLI extensions to OpenStack Client
-================================================
+Advanced Network Commands in OpenStack Client
+=============================================
 
-List of released CLI commands available in openstack client. These commands
-can be referenced by doing ``openstack help network``.
+The following list covers the extended commands for advanced network
+services available in ``openstack`` command.
+
+These commands can be referenced by doing ``openstack help`` and
+the detail of individual command can be referred by
+``openstack help <command-name>``.
 
 .. toctree::
    :glob:

@@ -1,10 +1,3 @@
-:orphan:
-
-.. This page is to provide the top page for the contributor guide.
-   On the other hand, it looks better that the top level document has
-   direct links to individual pages for better navigation.
-   From that reason, :orphan: is needed to silence sphinx warning.
-
 ..
       Licensed under the Apache License, Version 2.0 (the "License"); you may
       not use this file except in compliance with the License. You may obtain

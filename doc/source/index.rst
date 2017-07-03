@@ -38,11 +38,10 @@ User Documentation
 ------------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
+   cli/index
    reference/index
-   cli/neutron
-   cli/osc_plugins
 
 Contributor Guide
 -----------------
@@ -52,11 +51,9 @@ information on neutronclient's lower level programming details or APIs
 as well as the transition to OpenStack client.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   contributor/client_command_extensions
-   contributor/cli_option_guideline
-   contributor/transition_to_osc
+   contributor/index
 
 .. note::
 
