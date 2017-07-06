@@ -15,6 +15,7 @@
 #
 
 import copy
+
 import mock
 
 from neutronclient.osc import utils as nc_osc_utils

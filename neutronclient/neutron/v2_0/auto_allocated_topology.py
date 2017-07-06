@@ -17,6 +17,7 @@
 from __future__ import print_function
 
 import argparse
+
 from cliff import show
 from oslo_serialization import jsonutils
 

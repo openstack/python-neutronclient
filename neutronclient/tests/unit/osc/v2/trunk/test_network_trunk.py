@@ -15,13 +15,13 @@
 
 import argparse
 import copy
+
 import mock
 from mock import call
-import testtools
-
 from osc_lib.cli import format_columns
 from osc_lib import exceptions
 from osc_lib.tests import utils as tests_utils
+import testtools
 
 from neutronclient.osc.v2.trunk import network_trunk as trunk
 from neutronclient.osc.v2 import utils as v2_utils
