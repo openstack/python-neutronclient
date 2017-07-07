@@ -15,9 +15,9 @@
 #
 
 import copy
-import mock
 import re
 
+import mock
 from osc_lib import exceptions
 from osc_lib.tests import utils
 

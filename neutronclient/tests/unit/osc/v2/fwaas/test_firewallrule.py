@@ -15,12 +15,12 @@
 #
 
 import copy
-import mock
 import re
-import testtools
 
+import mock
 from osc_lib import exceptions
 from osc_lib.tests import utils
+import testtools
 
 from neutronclient.osc import utils as osc_utils
 from neutronclient.osc.v2.fwaas import constants as const

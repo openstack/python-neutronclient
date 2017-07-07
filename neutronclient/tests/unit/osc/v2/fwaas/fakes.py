@@ -16,8 +16,9 @@
 
 import collections
 import copy
-import mock
 import uuid
+
+import mock
 
 
 class FakeFWaaS(object):

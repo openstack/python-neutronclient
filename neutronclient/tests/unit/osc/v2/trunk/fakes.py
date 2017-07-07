@@ -11,8 +11,9 @@
 #   under the License.
 
 import copy
-import mock
 import uuid
+
+import mock
 
 
 class FakeTrunk(object):
