@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 #
 
-import os
-
-import openstackdocstheme
-
-
-project = 'python-neutronclient'
-
 # -- General configuration ---------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc',
               'reno.sphinxext',
+              'openstackdocstheme',
 ]
+
+# openstackdocstheme options
+repository_name = 'openstack/python-neutronclient'
+bug_project = 'python-neutronclient'
+bug_tag = 'doc'
+html_last_updated_fmt = '%Y-%m-%d %H:%M'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -44,30 +44,5 @@ pygments_style = 'sphinx'
 # Sphinx are currently 'default' and 'sphinxdoc'.
 html_theme = 'openstackdocs'
 
-html_theme_path = [openstackdocstheme.get_html_theme_path()]
-
-gitsha = os.popen("/usr/bin/git rev-parse HEAD").read()
-giturl = ('https://git.openstack.org/cgit/openstack/%s/tree/doc/source'
-          % 'python-neutronclient')
-html_context = {
-    'gitsha': gitsha,
-    'giturl': giturl,
-    'bug_project': 'python-neutronclient',
-    'bug_tag': 'doc',
-}
-html_last_updated_fmt = os.popen("git log --pretty=format:'%ad' "
-                                 "--date=format:'%Y-%m-%d %H:%M' -n1").read()
-
 # Output file base name for HTML help builder.
-htmlhelp_basename = '%sdoc' % project
-
-
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title, author,
-#  documentclass [howto/manual]).
-latex_documents = [
-  ('index',
-    '%s.tex' % project,
-    u'%s Documentation' % project,
-    u'OpenStack Foundation', 'manual'),
-]
+htmlhelp_basename = 'neutronclientdoc'
