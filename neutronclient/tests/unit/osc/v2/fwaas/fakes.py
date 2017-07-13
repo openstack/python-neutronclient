@@ -16,9 +16,9 @@
 
 import collections
 import copy
-import uuid
 
 import mock
+from oslo_utils import uuidutils
 
 
 class FakeFWaaS(object):
@@ -67,16 +67,20 @@ class FirewallGroup(FakeFWaaS):
     def __init__(self):
         super(FirewallGroup, self).__init__()
         self.ordered = collections.OrderedDict((
-            ('id', 'firewall-group-id-' + uuid.uuid4().hex),
-            ('name', 'my-group-' + uuid.uuid4().hex),
+            ('id', 'firewall-group-id-' +
+             uuidutils.generate_uuid(dashed=False)),
+            ('name', 'my-group-' +
+             uuidutils.generate_uuid(dashed=False)),
             ('ingress_firewall_policy_id', None),
             ('egress_firewall_policy_id', None),
-            ('description', 'my-desc-' + uuid.uuid4().hex),
+            ('description', 'my-desc-' +
+             uuidutils.generate_uuid(dashed=False)),
             ('status', 'INACTIVE'),
             ('ports', []),
             ('admin_state_up', True),
             ('public', False),
-            ('tenant_id', 'tenant-id-' + uuid.uuid4().hex),
+            ('tenant_id', 'tenant-id-' +
+             uuidutils.generate_uuid(dashed=False)),
         ))
 
 
@@ -86,13 +90,17 @@ class FirewallPolicy(FakeFWaaS):
     def __init__(self):
         super(FirewallPolicy, self).__init__()
         self.ordered = collections.OrderedDict((
-            ('id', 'firewall-policy-' + uuid.uuid4().hex),
-            ('name', 'my-policy-' + uuid.uuid4().hex),
+            ('id', 'firewall-policy-' +
+             uuidutils.generate_uuid(dashed=False)),
+            ('name', 'my-policy-' +
+             uuidutils.generate_uuid(dashed=False)),
             ('firewall_rules', []),
-            ('description', 'my-desc-' + uuid.uuid4().hex),
+            ('description', 'my-desc-' +
+             uuidutils.generate_uuid(dashed=False)),
             ('audited', True),
             ('public', False),
-            ('tenant_id', 'tenant-id-' + uuid.uuid4().hex),
+            ('tenant_id', 'tenant-id-' +
+             uuidutils.generate_uuid(dashed=False)),
         ))
 
 
@@ -102,10 +110,13 @@ class FirewallRule(FakeFWaaS):
     def __init__(self):
         super(FirewallRule, self).__init__()
         self.ordered = collections.OrderedDict((
-            ('id', 'firewall-rule-id-' + uuid.uuid4().hex),
-            ('name', 'my-rule-' + uuid.uuid4().hex),
+            ('id', 'firewall-rule-id-' +
+             uuidutils.generate_uuid(dashed=False)),
+            ('name', 'my-rule-' +
+             uuidutils.generate_uuid(dashed=False)),
             ('enabled', False),
-            ('description', 'my-desc-' + uuid.uuid4().hex),
+            ('description', 'my-desc-' +
+             uuidutils.generate_uuid(dashed=False)),
             ('ip_version', 4),
             ('action', 'deny'),
             ('protocol', None),
@@ -114,5 +125,6 @@ class FirewallRule(FakeFWaaS):
             ('destination_ip_address', '192.168.2.2'),
             ('destination_port', '2:22222'),
             ('public', False),
-            ('tenant_id', 'tenant-id-' + uuid.uuid4().hex),
+            ('tenant_id', 'tenant-id-' +
+             uuidutils.generate_uuid(dashed=False)),
         ))

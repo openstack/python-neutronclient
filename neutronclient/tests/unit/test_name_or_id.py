@@ -14,9 +14,9 @@
 #    under the License.
 #
 
-import uuid
 
 from mox3 import mox
+from oslo_utils import uuidutils
 import testtools
 
 from neutronclient.common import exceptions
@@ -38,7 +38,7 @@ class CLITestNameorID(testtools.TestCase):
         self.addCleanup(self.mox.UnsetStubs)
 
     def test_get_id_from_id(self):
-        _id = str(uuid.uuid4())
+        _id = uuidutils.generate_uuid()
         reses = {'networks': [{'id': _id, }, ], }
         resstr = self.client.serialize(reses)
         self.mox.StubOutWithMock(self.client.httpclient, "request")
@@ -57,7 +57,7 @@ class CLITestNameorID(testtools.TestCase):
         self.assertEqual(_id, returned_id)
 
     def test_get_id_from_id_then_name_empty(self):
-        _id = str(uuid.uuid4())
+        _id = uuidutils.generate_uuid()
         reses = {'networks': [{'id': _id, }, ], }
         resstr = self.client.serialize(reses)
         resstr1 = self.client.serialize({'networks': []})
@@ -86,7 +86,7 @@ class CLITestNameorID(testtools.TestCase):
 
     def test_get_id_from_name(self):
         name = 'myname'
-        _id = str(uuid.uuid4())
+        _id = uuidutils.generate_uuid()
         reses = {'networks': [{'id': _id, }, ], }
         resstr = self.client.serialize(reses)
         self.mox.StubOutWithMock(self.client.httpclient, "request")
@@ -106,8 +106,8 @@ class CLITestNameorID(testtools.TestCase):
 
     def test_get_id_from_name_multiple(self):
         name = 'myname'
-        reses = {'networks': [{'id': str(uuid.uuid4())},
-                              {'id': str(uuid.uuid4())}]}
+        reses = {'networks': [{'id': uuidutils.generate_uuid()},
+                              {'id': uuidutils.generate_uuid()}]}
         resstr = self.client.serialize(reses)
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         path = getattr(self.client, "networks_path")
@@ -148,8 +148,8 @@ class CLITestNameorID(testtools.TestCase):
 
     def test_get_id_from_name_multiple_with_project(self):
         name = 'web_server'
-        project = str(uuid.uuid4())
-        expect_id = str(uuid.uuid4())
+        project = uuidutils.generate_uuid()
+        expect_id = uuidutils.generate_uuid()
         reses = {'security_groups':
                  [{'id': expect_id, 'tenant_id': project}]}
         resstr = self.client.serialize(reses)
@@ -172,7 +172,7 @@ class CLITestNameorID(testtools.TestCase):
 
     def test_get_id_from_name_multiple_with_project_not_found(self):
         name = 'web_server'
-        project = str(uuid.uuid4())
+        project = uuidutils.generate_uuid()
         resstr_notfound = self.client.serialize({'security_groups': []})
         self.mox.StubOutWithMock(self.client.httpclient, "request")
         path = getattr(self.client, "security_groups_path")
@@ -192,7 +192,7 @@ class CLITestNameorID(testtools.TestCase):
         self.assertEqual(404, exc.status_code)
 
     def _test_get_resource_by_id(self, id_only=False):
-        _id = str(uuid.uuid4())
+        _id = uuidutils.generate_uuid()
         net = {'id': _id, 'name': 'test'}
         reses = {'networks': [net], }
         resstr = self.client.serialize(reses)

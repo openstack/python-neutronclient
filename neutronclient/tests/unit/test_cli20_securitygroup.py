@@ -15,9 +15,9 @@
 #    under the License.
 
 import sys
-import uuid
 
 from mox3 import mox
+from oslo_utils import uuidutils
 import six
 
 from neutronclient.common import exceptions
@@ -534,9 +534,9 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                       protocol=None, port_range_min=None, port_range_max=None,
                       remote_ip_prefix=None, remote_group_id=None,
                       filters=None):
-        rule = {'id': rule_id or str(uuid.uuid4()),
-                'tenant_id': tenant_id or str(uuid.uuid4()),
-                'security_group_id': sg_id or str(uuid.uuid4()),
+        rule = {'id': rule_id or uuidutils.generate_uuid(),
+                'tenant_id': tenant_id or uuidutils.generate_uuid(),
+                'security_group_id': sg_id or uuidutils.generate_uuid(),
                 'direction': direction or 'ingress',
                 'ethertype': ethertype or 'IPv4',
                 'protocol': protocol,
