@@ -11,9 +11,9 @@
 #   under the License.
 
 import copy
-import uuid
 
 import mock
+from oslo_utils import uuidutils
 
 
 class FakeTrunk(object):
@@ -32,14 +32,16 @@ class FakeTrunk(object):
 
         # Set default attributes.
         trunk_attrs = {
-            'id': 'trunk-id-' + uuid.uuid4().hex,
-            'name': 'trunk-name-' + uuid.uuid4().hex,
+            'id': 'trunk-id-' + uuidutils.generate_uuid(dashed=False),
+            'name': 'trunk-name-' + uuidutils.generate_uuid(dashed=False),
             'description': '',
-            'port_id': 'port-' + uuid.uuid4().hex,
+            'port_id': 'port-' + uuidutils.generate_uuid(dashed=False),
             'admin_state_up': True,
-            'project_id': 'project-id-' + uuid.uuid4().hex,
+            'project_id': 'project-id-' +
+            uuidutils.generate_uuid(dashed=False),
             'status': 'ACTIVE',
-            'sub_ports': [{'port_id': 'subport-' + uuid.uuid4().hex,
+            'sub_ports': [{'port_id': 'subport-' +
+                           uuidutils.generate_uuid(dashed=False),
                            'segmentation_type': 'vlan',
                            'segmentation_id': 100}],
         }

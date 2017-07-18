@@ -14,8 +14,8 @@
 #    under the License.
 
 import abc
-import uuid
 
+from oslo_utils import uuidutils
 import osprofiler.profiler
 import osprofiler.web
 from requests_mock.contrib import fixture as mock_fixture
@@ -128,7 +128,7 @@ class TestHTTPClientWithReqId(TestHTTPClientMixin, testtools.TestCase):
     """Tests for when global_request_id is set."""
 
     def initialize(self):
-        self.req_id = "req-%s" % uuid.uuid4()
+        self.req_id = "req-%s" % uuidutils.generate_uuid()
         return client.HTTPClient(token=AUTH_TOKEN, endpoint_url=END_URL,
                                  global_request_id=self.req_id)
 

@@ -10,10 +10,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import uuid
 
 from keystoneauth1 import plugin as ksa_plugin
 from keystoneauth1 import session
+from oslo_utils import uuidutils
 from tempest.lib import base
 import testtools
 
@@ -95,11 +95,11 @@ class LibraryTestCase(object):
         self.assertIsInstance(nets['networks'], list)
 
     def test_post_put_delete_network(self):
-        name = str(uuid.uuid4())
+        name = uuidutils.generate_uuid()
         net = self.client.create_network({'network': {'name': name}})
         net_id = net['network']['id']
         self.assertEqual(name, net['network']['name'])
-        name2 = str(uuid.uuid4())
+        name2 = uuidutils.generate_uuid()
         net = self.client.update_network(net_id, {'network': {'name': name2}})
         self.assertEqual(name2, net['network']['name'])
         self.client.delete_network(net_id)
