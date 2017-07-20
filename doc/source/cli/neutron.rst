@@ -76,7 +76,7 @@ Run **neutron help** to get a full list of all possible commands, and run
 Using with os-client-config
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`os-client-config <http://docs.openstack.org/developer/os-client-config/>`_
+`os-client-config <https://docs.openstack.org/os-client-config/latest/>`_
 provides more convenient way to manage a collection of client configurations
 and you can easily switch multiple OpenStack-based configurations.
 
@@ -114,7 +114,7 @@ Then, you need to specify a configuration name defined in the above clouds.yaml.
     export OS_CLOUD=devstack
 
 For more detail information, see the
-`os-client-config <http://docs.openstack.org/developer/os-client-config/>`_
+`os-client-config <https://docs.openstack.org/os-client-config/latest/>`_
 documentation.
 
 Using with keystone token

@@ -26,7 +26,7 @@ Using CLI
 
 There are two CLIs which support the Networking API:
 `OpenStackClient (OSC)
-<https://docs.openstack.org/developer/python-openstackclient/>`__
+<https://docs.openstack.org/python-openstackclient/latest/>`__
 and :doc:`neutron CLI <neutron>` (deprecated).
 
 OpenStackClient

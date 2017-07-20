@@ -29,7 +29,7 @@ This is a client for OpenStack Networking API. It provides
 
 There are two CLIs which support the Networking API:
 :doc:`neutron CLI <cli/neutron>` and
-`OpenStack Client (OSC) <https://docs.openstack.org/developer/python-openstackclient/>`__.
+`OpenStack Client (OSC) <https://docs.openstack.org/python-openstackclient/latest/>`__.
 OpenStack Client provides the basic network commands and
 python-neutronclient provides extensions (aka OSC plugins)
 for advanced networking services.
