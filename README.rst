@@ -32,7 +32,7 @@ provides a Python API (the ``neutronclient`` module) and a command-line tool
 * `Developer's Guide`_
 
 .. _PyPi: https://pypi.python.org/pypi/python-neutronclient
-.. _Online Documentation: http://docs.openstack.org/developer/python-neutronclient
+.. _Online Documentation: https://docs.openstack.org/python-neutronclient/latest/
 .. _Launchpad project: https://launchpad.net/python-neutronclient
 .. _Blueprints: https://blueprints.launchpad.net/python-neutronclient
 .. _Bugs: https://bugs.launchpad.net/python-neutronclient

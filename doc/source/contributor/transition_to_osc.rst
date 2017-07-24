@@ -47,7 +47,7 @@ It will be available along side the networking support provided by the
 OpenStack Python SDK.
 
 Users of the neutron client's command extensions will need to transition to the
-`OSC plugin system <http://docs.openstack.org/developer/python-openstackclient/plugins.html>`_
+`OSC plugin system <https://docs.openstack.org/python-openstackclient/latest/contributor/plugins.html>`_
 before the ``neutron`` CLI is removed. Such users will maintain their OSC plugin
 commands within their own project and will be responsible for deprecating and
 removing their ``neutron`` CLI extension.
@@ -59,7 +59,7 @@ Transition Steps
    patch set: https://review.openstack.org/#/c/138745/
 
 2. **Done:** OSC switches its networking support for the
-   `network <http://docs.openstack.org/developer/python-openstackclient/command-objects/network.html>`_
+   `network <https://docs.openstack.org/python-openstackclient/latest/cli/command-objects/network.html>`_
    command object to use the OpenStack Python SDK instead of the neutron
    client's Python library. See the following patch set:
    https://review.openstack.org/#/c/253348/
@@ -73,11 +73,11 @@ Transition Steps
    See the following blueprint: https://blueprints.launchpad.net/python-openstackclient/+spec/network-command-sdk-support
 
 5. **Done:** OSC switches its networking support for the
-   `ip floating <http://docs.openstack.org/developer/python-openstackclient/command-objects/ip-floating.html>`_,
-   `ip floating pool <http://docs.openstack.org/developer/python-openstackclient/command-objects/ip-floating-pool.html>`_,
-   `ip fixed <http://docs.openstack.org/developer/python-openstackclient/command-objects/ip-fixed.html>`_,
-   `security group <http://docs.openstack.org/developer/python-openstackclient/command-objects/security-group.html>`_, and
-   `security group rule <http://docs.openstack.org/developer/python-openstackclient/command-objects/security-group-rule.html>`_
+   `ip floating <https://docs.openstack.org/python-openstackclient/latest/cli/command-objects/ip-floating.html>`_,
+   `ip floating pool <https://docs.openstack.org/python-openstackclient/latest/cli/command-objects/ip-floating-pool.html>`_,
+   `ip fixed <https://docs.openstack.org/python-openstackclient/latest/cli/command-objects/ip-fixed.html>`_,
+   `security group <https://docs.openstack.org/python-openstackclient/latest/cli/command-objects/security-group.html>`_, and
+   `security group rule <https://docs.openstack.org/python-openstackclient/latest/cli/command-objects/security-group-rule.html>`_
    command objects to use the OpenStack Python SDK instead of the nova
    client's Python library when neutron is enabled. When nova network
    is enabled, then the nova client's Python library will continue to
@@ -112,8 +112,8 @@ Transition Steps
      equivalent to the ``neutron`` CLI and it contains sufficient functional
      and unit test coverage.
 
-   * `Neutron Stadium <http://docs.openstack.org/developer/neutron/stadium/sub_projects.html>`_
-     projects, Neutron documentation and `DevStack <http://docs.openstack.org/developer/devstack/>`_
+   * `Neutron Stadium <https://docs.openstack.org/neutron/latest/contributor/stadium/>`_
+     projects, Neutron documentation and `DevStack <https://docs.openstack.org/devstack/latest/>`_
      use ``openstack`` CLI instead of ``neutron`` CLI.
 
    * Most users of the neutron client's command extensions have transitioned
@@ -235,7 +235,7 @@ Developer References
   to determine if an ``openstack`` command exists.
 * See `OSC command spec list <https://github.com/openstack/python-openstackclient/tree/master/doc/source/specs/command-objects>`_
   to determine if an ``openstack`` command spec exists.
-* See `OSC plugin command list <http://docs.openstack.org/developer/python-openstackclient/plugin-commands.html>`_
+* See `OSC plugin command list <https://docs.openstack.org/python-openstackclient/latest/cli/plugin-commands.html>`_
   to determine if an ``openstack`` plugin command exists.
 * See `OSC command structure <https://github.com/openstack/python-openstackclient/blob/master/doc/source/commands.rst>`_
   to determine the current ``openstack`` command objects, plugin objects and actions.

@@ -29,7 +29,7 @@ Basic Usage
 First create a client instance using a keystoneauth Session. For more
 information on this keystoneauth API, see `Using Sessions`_.
 
-.. _Using Sessions: http://docs.openstack.org/developer/keystoneauth/using-sessions.html
+.. _Using Sessions: https://docs.openstack.org/keystoneauth/latest/using-sessions.html
 
 .. code-block:: python
 
