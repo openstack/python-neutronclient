@@ -194,7 +194,7 @@ class ListSfcFlowClassifier(command.Lister):
         if max_port is None:
             max_port = 'any'
         return '%s[port]: %s[%s:%s]' % (
-            type, ip_prefix, min_port, max_port)
+            val, ip_prefix, min_port, max_port)
 
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
