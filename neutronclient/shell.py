@@ -103,6 +103,14 @@ def check_non_negative_int(value):
     return value
 
 
+# NOTE(amotoki): This is only to provide compatibility
+# to existing neutron CLI extensions. See bug 1706573 for detail.
+def _set_commands_dict_for_compat(apiversion, command_manager):
+    global COMMANDS
+    COMMANDS = {apiversion: dict((cmd, command_manager.find_command([cmd])[0])
+                                 for cmd in command_manager.commands)}
+
+
 class BashCompletionCommand(command.Command):
     """Prints all of the commands and options for bash-completion."""
 
@@ -165,6 +173,8 @@ class NeutronShell(app.App):
         # password flow auth
         self.auth_client = None
         self.api_version = apiversion
+
+        _set_commands_dict_for_compat(apiversion, self.command_manager)
 
     def build_option_parser(self, description, version):
         """Return an argparse option parser for this application.

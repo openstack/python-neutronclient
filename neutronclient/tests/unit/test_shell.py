@@ -27,6 +27,7 @@ import testtools
 from testtools import matchers
 
 from neutronclient.common import clientmanager
+from neutronclient.neutron.v2_0 import network
 from neutronclient import shell as openstack_shell
 
 
@@ -348,3 +349,18 @@ class ShellTest(testtools.TestCase):
             os_token='token',
             insecure=True, cacert='cacert',
             expect_verify=False, expect_insecure=True)
+
+    def test_commands_dict_populated(self):
+        # neutron.shell.COMMANDS is populated once NeutronShell is initialized.
+        # To check COMMANDS during NeutronShell initialization,
+        # reset COMMANDS to some dummy value before calling NeutronShell().
+        self.useFixture(fixtures.MockPatchObject(openstack_shell,
+                                                 'COMMANDS', None))
+        openstack_shell.NeutronShell('2.0')
+        self.assertDictContainsSubset(
+            {'net-create': network.CreateNetwork,
+             'net-delete': network.DeleteNetwork,
+             'net-list': network.ListNetwork,
+             'net-show': network.ShowNetwork,
+             'net-update': network.UpdateNetwork},
+            openstack_shell.COMMANDS['2.0'])
