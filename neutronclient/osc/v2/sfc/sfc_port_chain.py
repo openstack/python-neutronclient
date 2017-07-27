@@ -68,7 +68,8 @@ class CreateSfcPortChain(command.ShowOne):
             action=parseractions.MultiKeyValueAction,
             optional_keys=['correlation', 'symmetric'],
             help=_('Dictionary of chain parameters. Supports '
-                   'correlation=mpls and symmetric=true|false.'))
+                   'correlation=(mpls|nsh) (default is mpls) '
+                   'and symmetric=(true|false).'))
         parser.add_argument(
             '--port-pair-group',
             metavar='<port-pair-group>',
