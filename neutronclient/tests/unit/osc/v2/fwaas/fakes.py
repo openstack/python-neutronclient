@@ -78,7 +78,7 @@ class FirewallGroup(FakeFWaaS):
             ('status', 'INACTIVE'),
             ('ports', []),
             ('admin_state_up', True),
-            ('public', False),
+            ('shared', False),
             ('tenant_id', 'tenant-id-' +
              uuidutils.generate_uuid(dashed=False)),
         ))
@@ -98,7 +98,7 @@ class FirewallPolicy(FakeFWaaS):
             ('description', 'my-desc-' +
              uuidutils.generate_uuid(dashed=False)),
             ('audited', True),
-            ('public', False),
+            ('shared', False),
             ('tenant_id', 'tenant-id-' +
              uuidutils.generate_uuid(dashed=False)),
         ))
@@ -124,7 +124,7 @@ class FirewallRule(FakeFWaaS):
             ('source_port', '1:11111'),
             ('destination_ip_address', '192.168.2.2'),
             ('destination_port', '2:22222'),
-            ('public', False),
+            ('shared', False),
             ('tenant_id', 'tenant-id-' +
              uuidutils.generate_uuid(dashed=False)),
         ))

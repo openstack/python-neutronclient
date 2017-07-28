@@ -106,6 +106,20 @@ class TestSetFWaaS(test_fakes.TestNeutronClientOSCV2):
             target, {self.res: {'description': update}})
         self.assertIsNone(result)
 
+    def test_set_shared(self):
+        target = self.resource['id']
+        arglist = [target, '--share']
+        verifylist = [
+            (self.res, target),
+            ('share', True),
+        ]
+        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+        result = self.cmd.take_action(parsed_args)
+
+        self.mocked.assert_called_once_with(
+            target, {self.res: {'shared': True}})
+        self.assertIsNone(result)
+
     def test_set_public(self):
         target = self.resource['id']
         arglist = [target, '--public']
@@ -117,70 +131,70 @@ class TestSetFWaaS(test_fakes.TestNeutronClientOSCV2):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'public': True}})
+            target, {self.res: {'shared': True}})
         self.assertIsNone(result)
 
-    def test_set_duplicate_public(self):
+    def test_set_duplicate_shared(self):
         target = self.resource['id']
-        arglist = [target, '--public', '--public']
+        arglist = [target, '--share', '--share']
         verifylist = [
             (self.res, target),
-            ('public', True),
+            ('share', True),
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'public': True}})
+            target, {self.res: {'shared': True}})
         self.assertIsNone(result)
 
-    def test_set_private(self):
+    def test_set_no_share(self):
         target = self.resource['id']
-        arglist = [target, '--private']
+        arglist = [target, '--no-share']
         verifylist = [
             (self.res, target),
-            ('public', False),
+            ('share', False),
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'public': False}})
+            target, {self.res: {'shared': False}})
         self.assertIsNone(result)
 
-    def test_set_duplicate_private(self):
+    def test_set_duplicate_no_share(self):
         target = self.resource['id']
-        arglist = [target, '--private', '--private']
+        arglist = [target, '--no-share', '--no-share']
         verifylist = [
             (self.res, target),
-            ('public', False),
+            ('no_share', True),
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'public': False}})
+            target, {self.res: {'shared': False}})
         self.assertIsNone(result)
 
-    def test_set_private_and_public(self):
+    def test_set_no_share_and_shared(self):
         target = self.resource['id']
-        arglist = [target, '--private', '--public']
+        arglist = [target, '--no-share', '--share']
         verifylist = [
             (self.res, target),
-            ('private', True),
-            ('public', True),
+            ('no_share', True),
+            ('share', True),
         ]
         self.assertRaises(
             utils.ParserException,
             self.check_parser, self.cmd, arglist, verifylist)
 
-    def test_set_public_and_priavte(self):
+    def test_set_shared_and_no_share(self):
         target = self.resource['id']
-        arglist = [target, '--public', '--private']
+        arglist = [target, '--share', '--no_share']
         verifylist = [
             (self.res, target),
-            ('public', True),
-            ('private', True),
+            ('share', True),
+            ('no_share', True),
         ]
         self.assertRaises(
             utils.ParserException,
@@ -265,45 +279,45 @@ class TestDeleteFWaaS(test_fakes.TestNeutronClientOSCV2):
 
 class TestUnsetFWaaS(test_fakes.TestNeutronClientOSCV2):
 
-    def test_unset_public(self):
+    def test_unset_shared(self):
         target = self.resource['id']
         arglist = [
             target,
-            '--public',
+            '--share',
         ]
         verifylist = [
             (self.res, target),
-            ('public', True),
+            ('share', True),
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
         self.mocked.assert_called_once_with(
-            target, {self.res: {'public': False}})
+            target, {self.res: {'shared': False}})
         self.assertIsNone(result)
 
-    def test_set_public_and_priavte(self):
+    def test_set_shared_and_no_shared(self):
         target = self.resource['id']
-        arglist = [target, '--public', '--private']
+        arglist = [target, '--share', '--no-share']
         verifylist = [
             (self.res, target),
-            ('public', True),
-            ('private', True),
+            ('share', True),
+            ('no_share', True),
         ]
-        # check_parser: error: unrecognized arguments: --private
+        # check_parser: error: unrecognized arguments: --no-share
         self.assertRaises(
             utils.ParserException,
             self.check_parser, self.cmd, arglist, verifylist)
 
-    def test_set_duplicate_public(self):
+    def test_set_duplicate_shared(self):
         target = self.resource['id']
-        arglist = [target, '--public', '--public']
+        arglist = [target, '--share', '--share']
         verifylist = [
             (self.res, target),
-            ('public', True),
+            ('share', True),
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'public': False}})
+            target, {self.res: {'shared': False}})
         self.assertIsNone(result)

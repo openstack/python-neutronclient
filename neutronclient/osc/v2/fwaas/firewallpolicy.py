@@ -37,7 +37,7 @@ _attr_map = (
     ('firewall_rules', 'Firewall Rules', osc_utils.LIST_BOTH),
     ('description', 'Description', osc_utils.LIST_LONG_ONLY),
     ('audited', 'Audited', osc_utils.LIST_LONG_ONLY),
-    ('public', 'Public', osc_utils.LIST_LONG_ONLY),
+    ('shared', 'Shared', osc_utils.LIST_LONG_ONLY),
     ('tenant_id', 'Project', osc_utils.LIST_LONG_ONLY),
 )
 
@@ -79,10 +79,10 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
         attrs['name'] = str(parsed_args.name)
     if parsed_args.description:
         attrs['description'] = str(parsed_args.description)
-    if parsed_args.public:
-        attrs['public'] = True
-    if parsed_args.private:
-        attrs['public'] = False
+    if parsed_args.share or parsed_args.public:
+        attrs['shared'] = True
+    if parsed_args.no_share or parsed_args.private:
+        attrs['shared'] = False
     return attrs
 
 
@@ -99,15 +99,28 @@ def _get_common_parser(parser):
         '--no-audited',
         action='store_true',
         help=_('Disable auditing for the policy'))
-    public_group = parser.add_mutually_exclusive_group()
-    public_group.add_argument(
+    shared_group = parser.add_mutually_exclusive_group()
+    shared_group.add_argument(
+        '--share',
+        action='store_true',
+        help=_('Share the firewall policy to be used in all projects '
+               '(by default, it is restricted to be used by the '
+               'current project).'))
+    shared_group.add_argument(
         '--public',
         action='store_true',
         help=_('Make the firewall policy public, which allows it to be '
-               'used in all projects (as opposed to the default, '
-               'which is to restrict its use to the current project)'))
-    public_group.add_argument(
+               'used in all projects (as opposed to the default, which '
+               'is to restrict its use to the current project.) This '
+               'option is deprecated and would be removed in R release.'))
+    shared_group.add_argument(
         '--private',
+        action='store_true',
+        help=_(
+            'Restrict use of the firewall policy to the current project.'
+            'This option is deprecated and would be removed in R release.'))
+    shared_group.add_argument(
+        '--no-share',
         action='store_true',
         help=_('Restrict use of the firewall policy to the '
                'current project'))
@@ -385,10 +398,16 @@ class UnsetFirewallPolicy(command.Command):
             action='store_true',
             help=_('Disable auditing for the policy'))
         parser.add_argument(
-            '--public',
+            '--share',
             action='store_true',
             help=_('Restrict use of the firewall policy to the '
                    'current project'))
+        parser.add_argument(
+            '--public',
+            action='store_true',
+            help=_('Restrict use of the firewall policy to the '
+                   'current project. This option is deprecated '
+                   'and would be removed in R release.'))
         return parser
 
     def _get_attrs(self, client_manager, parsed_args):
@@ -408,8 +427,8 @@ class UnsetFirewallPolicy(command.Command):
             attrs[const.FWRS] = []
         if parsed_args.audited:
             attrs['audited'] = False
-        if parsed_args.public:
-            attrs['public'] = False
+        if parsed_args.share or parsed_args.public:
+            attrs['shared'] = False
         return attrs
 
     def take_action(self, parsed_args):

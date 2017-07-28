@@ -40,7 +40,7 @@ _attr_map = (
     ('status', 'Status', osc_utils.LIST_LONG_ONLY),
     ('ports', 'Ports', osc_utils.LIST_LONG_ONLY),
     ('admin_state_up', 'State', osc_utils.LIST_LONG_ONLY),
-    ('public', 'Public', osc_utils.LIST_LONG_ONLY),
+    ('shared', 'Shared', osc_utils.LIST_LONG_ONLY),
     ('tenant_id', 'Project', osc_utils.LIST_LONG_ONLY),
 )
 
@@ -75,15 +75,29 @@ def _get_common_parser(parser):
         dest='no_egress_firewall_policy',
         action='store_true',
         help=_('Detach egress firewall policy from the firewall group'))
-    public_group = parser.add_mutually_exclusive_group()
-    public_group.add_argument(
+    shared_group = parser.add_mutually_exclusive_group()
+    shared_group.add_argument(
         '--public',
         action='store_true',
         help=_('Make the firewall group public, which allows it to be '
                'used in all projects (as opposed to the default, '
-               'which is to restrict its use to the current project)'))
-    public_group.add_argument(
+               'which is to restrict its use to the current project). '
+               'This option is deprecated and would be removed in R release.'))
+    shared_group.add_argument(
         '--private',
+        action='store_true',
+        help=_('Restrict use of the firewall group to the '
+               'current project. This option is deprecated '
+               'and would be removed in R release.'))
+
+    shared_group.add_argument(
+        '--share',
+        action='store_true',
+        help=_('Share the firewall group to be used in all projects '
+               '(by default, it is restricted to be used by the '
+               'current project).'))
+    shared_group.add_argument(
+        '--no-share',
         action='store_true',
         help=_('Restrict use of the firewall group to the '
                'current project'))
@@ -132,10 +146,10 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
             cmd_resource=const.CMD_FWP)['id']
     elif parsed_args.no_egress_firewall_policy:
         attrs['egress_firewall_policy_id'] = None
-    if parsed_args.public:
-        attrs['public'] = True
-    if parsed_args.private:
-        attrs['public'] = False
+    if parsed_args.share or parsed_args.public:
+        attrs['shared'] = True
+    if parsed_args.no_share or parsed_args.private:
+        attrs['shared'] = False
     if parsed_args.enable:
         attrs['admin_state_up'] = True
     if parsed_args.disable:
@@ -333,8 +347,17 @@ class UnsetFirewallGroup(command.Command):
             action='store_true',
             dest='egress_firewall_policy',
             help=_('Egress firewall policy (name or ID) to delete'))
-        parser.add_argument(
+        shared_group = parser.add_mutually_exclusive_group()
+        shared_group.add_argument(
             '--public',
+            action='store_true',
+            help=_('Make the firewall group public, which allows it to be '
+                   'used in all projects (as opposed to the default, '
+                   'which is to restrict its use to the current project). '
+                   'This option is deprecated and would be removed in R'
+                   ' release.'))
+        shared_group.add_argument(
+            '--share',
             action='store_true',
             help=_('Restrict use of the firewall group to the '
                    'current project'))
@@ -351,8 +374,8 @@ class UnsetFirewallGroup(command.Command):
             attrs['ingress_firewall_policy_id'] = None
         if parsed_args.egress_firewall_policy:
             attrs['egress_firewall_policy_id'] = None
-        if parsed_args.public:
-            attrs['public'] = False
+        if parsed_args.share or parsed_args.public:
+            attrs['shared'] = False
         if parsed_args.enable:
             attrs['admin_state_up'] = False
         if parsed_args.port:

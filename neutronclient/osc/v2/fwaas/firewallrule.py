@@ -44,7 +44,7 @@ _attr_map = (
     ('destination_ip_address', 'Destination IP Address',
         osc_utils.LIST_LONG_ONLY),
     ('destination_port', 'Destination Port', osc_utils.LIST_LONG_ONLY),
-    ('public', 'Public', osc_utils.LIST_LONG_ONLY),
+    ('shared', 'Shared', osc_utils.LIST_LONG_ONLY),
     ('tenant_id', 'Project', osc_utils.LIST_LONG_ONLY),
 )
 
@@ -111,15 +111,28 @@ def _get_common_parser(parser):
         '--no-destination-port',
         action='store_true',
         help=_('Detach destination port number or range'))
-    public_group = parser.add_mutually_exclusive_group()
-    public_group.add_argument(
+    shared_group = parser.add_mutually_exclusive_group()
+    shared_group.add_argument(
         '--public',
         action='store_true',
-        help=_('Make the firewall rule public, which allows it to be '
+        help=_('Make the firewall policy public, which allows it to be '
                'used in all projects (as opposed to the default, '
-               'which is to restrict its use to the current project)'))
-    public_group.add_argument(
+               'which is to restrict its use to the current project). '
+               'This option is deprecated and would be removed in R Release'))
+    shared_group.add_argument(
         '--private',
+        action='store_true',
+        help=_(
+            'Restrict use of the firewall rule to the current project.'
+            'This option is deprecated and would be removed in R release.'))
+    shared_group.add_argument(
+        '--share',
+        action='store_true',
+        help=_('Share the firewall rule to be used in all projects '
+               '(by default, it is restricted to be used by the '
+               'current project).'))
+    shared_group.add_argument(
+        '--no-share',
         action='store_true',
         help=_('Restrict use of the firewall rule to the current project'))
     enable_group = parser.add_mutually_exclusive_group()
@@ -175,10 +188,10 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
         attrs['enabled'] = True
     if parsed_args.disable_rule:
         attrs['enabled'] = False
-    if parsed_args.public:
-        attrs['public'] = True
-    if parsed_args.private:
-        attrs['public'] = False
+    if parsed_args.share or parsed_args.public:
+        attrs['shared'] = True
+    if parsed_args.no_share or parsed_args.private:
+        attrs['shared'] = False
     return attrs
 
 
@@ -364,9 +377,15 @@ class UnsetFirewallRule(command.Command):
             help=_('Destination port number or range'
                    '(integer in [1, 65535] or range like 123:456)'))
         parser.add_argument(
-            '--public',
+            '--share',
             action='store_true',
             help=_('Restrict use of the firewall rule to the current project'))
+        parser.add_argument(
+            '--public',
+            action='store_true',
+            help=_('Restrict use of the firewall rule to the current project. '
+                   'This option is deprecated and would be removed in '
+                   'R Release.'))
         parser.add_argument(
             '--enable-rule',
             action='store_true',
@@ -383,8 +402,8 @@ class UnsetFirewallRule(command.Command):
             attrs['destination_ip_address'] = None
         if parsed_args.destination_port:
             attrs['destination_port'] = None
-        if parsed_args.public:
-            attrs['public'] = False
+        if parsed_args.share or parsed_args.public:
+            attrs['shared'] = False
         if parsed_args.enable_rule:
             attrs['enabled'] = False
         return attrs

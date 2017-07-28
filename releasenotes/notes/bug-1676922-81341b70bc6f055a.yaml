@@ -1,0 +1,19 @@
+---
+deprecations:
+  - |
+    The ``--public`` and ``--private`` attribute of Firewall-as-a-Service v2
+    have been deprecated. While the ``--public`` attribute will now be replaced
+    by ``--share``, the ``--private`` attribute will be replaced by
+    ``--no-share``.  This is because of the similarity between the behavior of
+    ``--public`` attribute in FireWall-as-a-Service and the ``--share``
+    attribute used in OpenStack.  This deprecation affects the following CLIs.
+
+    * openstack firewall group create
+    * openstack firewall group set
+    * openstack firewall group unset
+    * openstack firewall policy create
+    * openstack firewall policy set
+    * openstack firewall policy unset
+    * openstack firewall rule create
+    * openstack firewall rule set
+    * openstack firewall rule unset
