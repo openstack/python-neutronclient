@@ -33,17 +33,19 @@ class TestCreateSfcPortPairGroup(fakes.TestNeutronClientOSCV2):
                'Name',
                'Port Pair',
                'Port Pair Group Parameters',
-               'Project')
+               'Project',
+               'Tap Enabled')
 
-    def get_data(self):
+    def get_data(self, ppg):
         return (
-            self._port_pair_group['description'],
-            self._port_pair_group['id'],
-            self._port_pair_group['group_id'],
-            self._port_pair_group['name'],
-            self._port_pair_group['port_pairs'],
-            self._port_pair_group['port_pair_group_parameters'],
-            self._port_pair_group['project_id']
+            ppg['description'],
+            ppg['id'],
+            ppg['group_id'],
+            ppg['name'],
+            ppg['port_pairs'],
+            ppg['port_pair_group_parameters'],
+            ppg['project_id'],
+            ppg['tap_enabled']
         )
 
     def setUp(self):
@@ -53,7 +55,7 @@ class TestCreateSfcPortPairGroup(fakes.TestNeutronClientOSCV2):
             new=_get_id).start()
         self.neutronclient.create_sfc_port_pair_group = mock.Mock(
             return_value={'port_pair_group': self._port_pair_group})
-        self.data = self.get_data()
+        self.data = self.get_data(self._port_pair_group)
         # Get the command object to test
         self.cmd = sfc_port_pair_group.CreateSfcPortPairGroup(self.app,
                                                               self.namespace)
@@ -73,7 +75,8 @@ class TestCreateSfcPortPairGroup(fakes.TestNeutronClientOSCV2):
         self.neutronclient.create_sfc_port_pair_group.assert_called_once_with({
             'port_pair_group': {
                 'name': self._port_pair_group['name'],
-                'port_pairs': [self._port_pair_group['port_pairs']]}
+                'port_pairs': [self._port_pair_group['port_pairs']]
+            }
         })
         self.assertEqual(self.columns, columns)
         self.assertEqual(self.data, data)
@@ -101,6 +104,46 @@ class TestCreateSfcPortPairGroup(fakes.TestNeutronClientOSCV2):
         })
         self.assertEqual(self.columns, columns)
         self.assertEqual(self.data, data)
+
+    def test_create_tap_enabled_port_pair_group(self):
+        arglist = [
+            "--description", self._port_pair_group['description'],
+            "--port-pair", self._port_pair_group['port_pairs'],
+            self._port_pair_group['name'],
+            "--enable-tap"
+        ]
+        verifylist = [
+            ('port_pairs', [self._port_pair_group['port_pairs']]),
+            ('name', self._port_pair_group['name']),
+            ('description', self._port_pair_group['description']),
+            ('enable_tap', True)
+        ]
+
+        expected_data = self._update_expected_response_data(
+            data={
+                'tap_enabled': True
+            }
+        )
+        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+        columns, data = (self.cmd.take_action(parsed_args))
+
+        self.neutronclient.create_sfc_port_pair_group.assert_called_once_with({
+            'port_pair_group': {
+                'name': self._port_pair_group['name'],
+                'port_pairs': [self._port_pair_group['port_pairs']],
+                'description': self._port_pair_group['description'],
+                'tap_enabled': True
+            }
+        })
+        self.assertEqual(self.columns, columns)
+        self.assertEqual(expected_data, data)
+
+    def _update_expected_response_data(self, data):
+        # REVISIT(vks1) - This method can be common for other test functions.
+        ppg = fakes.FakeSfcPortPairGroup.create_port_pair_group(data)
+        self.neutronclient.create_sfc_port_pair_group.return_value = {
+            'port_pair_group': ppg}
+        return self.get_data(ppg)
 
 
 class TestDeleteSfcPortPairGroup(fakes.TestNeutronClientOSCV2):
@@ -136,22 +179,25 @@ class TestDeleteSfcPortPairGroup(fakes.TestNeutronClientOSCV2):
 
 class TestListSfcPortPairGroup(fakes.TestNeutronClientOSCV2):
     _ppgs = fakes.FakeSfcPortPairGroup.create_port_pair_groups(count=1)
-    columns = ('ID', 'Name', 'Port Pair', 'Port Pair Group Parameters')
+    columns = ('ID', 'Name', 'Port Pair', 'Port Pair Group Parameters',
+               'Tap Enabled')
     columns_long = ('ID', 'Name', 'Port Pair', 'Port Pair Group Parameters',
-                    'Description', 'Loadbalance ID', 'Project')
+                    'Description', 'Loadbalance ID', 'Project', 'Tap Enabled')
     _port_pair_group = _ppgs[0]
     data = [
         _port_pair_group['id'],
         _port_pair_group['name'],
         _port_pair_group['port_pairs'],
-        _port_pair_group['port_pair_group_parameters']
+        _port_pair_group['port_pair_group_parameters'],
+        _port_pair_group['tap_enabled']
     ]
     data_long = [
         _port_pair_group['id'],
         _port_pair_group['name'],
         _port_pair_group['port_pairs'],
         _port_pair_group['port_pair_group_parameters'],
-        _port_pair_group['description']
+        _port_pair_group['description'],
+        _port_pair_group['tap_enabled']
     ]
     _port_pair_group1 = {'port_pair_groups': _port_pair_group}
     _port_pair_id = _port_pair_group['id']
@@ -181,7 +227,8 @@ class TestListSfcPortPairGroup(fakes.TestNeutronClientOSCV2):
             ppg['id'],
             ppg['name'],
             ppg['port_pairs'],
-            ppg['port_pair_group_parameters']
+            ppg['port_pair_group_parameters'],
+            ppg['tap_enabled']
         ]
         self.assertEqual(list(self.columns), columns)
         self.assertEqual(self.data, data)
@@ -197,7 +244,8 @@ class TestListSfcPortPairGroup(fakes.TestNeutronClientOSCV2):
             ppg['name'],
             ppg['port_pairs'],
             ppg['port_pair_group_parameters'],
-            ppg['description']
+            ppg['description'],
+            ppg['tap_enabled']
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         columns_long = self.cmd.take_action(parsed_args)[0]
@@ -301,7 +349,8 @@ class TestShowSfcPortPairGroup(fakes.TestNeutronClientOSCV2):
         _ppg['name'],
         _ppg['port_pairs'],
         _ppg['port_pair_group_parameters'],
-        _ppg['project_id'])
+        _ppg['project_id'],
+        _ppg['tap_enabled'])
     _port_pair_group = {'port_pair_group': _ppg}
     _port_pair_group_id = _ppg['id']
     columns = (
@@ -311,7 +360,9 @@ class TestShowSfcPortPairGroup(fakes.TestNeutronClientOSCV2):
         'Name',
         'Port Pair',
         'Port Pair Group Parameters',
-        'Project')
+        'Project',
+        'Tap Enabled'
+    )
 
     def setUp(self):
         super(TestShowSfcPortPairGroup, self).setUp()

@@ -36,6 +36,7 @@ _attr_map = (
     ('description', 'Description', nc_osc_utils.LIST_LONG_ONLY),
     ('group_id', 'Loadbalance ID', nc_osc_utils.LIST_LONG_ONLY),
     ('project_id', 'Project',  nc_osc_utils.LIST_LONG_ONLY),
+    ('tap_enabled', 'Tap Enabled', nc_osc_utils.LIST_BOTH)
 )
 
 
@@ -60,6 +61,19 @@ class CreateSfcPortPairGroup(command.ShowOne):
             action='append',
             help=_('Port pair (name or ID). '
                    'This option can be repeated.'))
+        tap_enable = parser.add_mutually_exclusive_group()
+        tap_enable.add_argument(
+            '--enable-tap',
+            action='store_true',
+            help=_('Port pairs of this port pair group are deployed as '
+                   'passive tap service function')
+        )
+        tap_enable.add_argument(
+            '--disable-tap',
+            action='store_true',
+            help=_('Port pairs of this port pair group are deployed as l3 '
+                   'service function (default)')
+        )
         parser.add_argument(
             '--port-pair-group-parameters',
             metavar='lb-fields=<lb-fields>',
@@ -285,6 +299,10 @@ def _get_attrs(attrs, parsed_args):
             parsed_args.port_pair_group_parameters is not None):
         attrs['port_pair_group_parameters'] = (
             _get_ppg_param(attrs, parsed_args.port_pair_group_parameters))
+    if parsed_args.enable_tap:
+        attrs['tap_enabled'] = True
+    if parsed_args.disable_tap:
+        attrs['tap_enabled'] = False
 
 
 def _get_id(client, id_or_name, resource):
