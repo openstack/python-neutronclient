@@ -81,16 +81,17 @@ class TestCreateSfcPortPair(fakes.TestNeutronClientOSCV2):
         self.assertEqual(self.columns, columns)
         self.assertEqual(self.data, data)
 
-    def test_create_port_pair_all_options(self):
+    def _test_create_port_pair_all_options(self, correlation):
         arglist = [
             "--description", self._port_pair['description'],
             "--egress", self._port_pair['egress'],
             "--ingress", self._port_pair['ingress'],
             self._port_pair['name'],
-            "--service-function-parameters", 'correlation=None,weight=1',
+            "--service-function-parameters",
+            'correlation=%s,weight=1' % correlation,
         ]
 
-        sfp = [{'correlation': 'None', 'weight': '1'}]
+        sfp = [{'correlation': correlation, 'weight': '1'}]
 
         verifylist = [
             ('ingress', self._port_pair['ingress']),
@@ -109,11 +110,18 @@ class TestCreateSfcPortPair(fakes.TestNeutronClientOSCV2):
                           'egress': self._port_pair['egress'],
                           'description': self._port_pair['description'],
                           'service_function_parameters':
-                              [{'correlation': 'None', 'weight': '1'}],
+                              [{'correlation': correlation, 'weight':
+                                  '1'}],
                           }
         })
         self.assertEqual(self.columns, columns)
         self.assertEqual(self.data, data)
+
+    def test_create_port_pair_all_options(self):
+        self._test_create_port_pair_all_options('None')
+
+    def test_create_port_pair_all_options_mpls(self):
+        self._test_create_port_pair_all_options('mpls')
 
 
 class TestDeleteSfcPortPair(fakes.TestNeutronClientOSCV2):

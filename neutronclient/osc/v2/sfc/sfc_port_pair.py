@@ -58,8 +58,8 @@ class CreateSfcPortPair(command.ShowOne):
             action=parseractions.MultiKeyValueAction,
             optional_keys=['correlation', 'weight'],
             help=_('Dictionary of service function parameters. '
-                   'Currently, only correlation=None and weight '
-                   'is supported. Weight is an integer that influences '
+                   'Currently, correlation=(None|mpls) and weight '
+                   'are supported. Weight is an integer that influences '
                    'the selection of a port pair within a port pair group '
                    'for a flow. The higher the weight, the more flows will '
                    'hash to the port pair. The default weight is 1.'))
