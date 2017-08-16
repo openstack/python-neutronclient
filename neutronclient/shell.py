@@ -103,6 +103,9 @@ def check_non_negative_int(value):
     return value
 
 
+COMMANDS = {}
+
+
 # NOTE(amotoki): This is only to provide compatibility
 # to existing neutron CLI extensions. See bug 1706573 for detail.
 def _set_commands_dict_for_compat(apiversion, command_manager):
