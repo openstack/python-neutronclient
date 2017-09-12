@@ -40,6 +40,7 @@ _attr_map = (
      nc_osc_utils.LIST_LONG_ONLY),
     ('networks', 'Associated Networks', nc_osc_utils.LIST_LONG_ONLY),
     ('routers', 'Associated Routers', nc_osc_utils.LIST_LONG_ONLY),
+    ('vni', 'VNI', nc_osc_utils.LIST_LONG_ONLY),
 )
 _formatters = {
     'route_targets': format_columns.ListColumn,
@@ -144,6 +145,10 @@ def _get_common_parser(parser, update=None):
             action='store_true',
             help=_('Empty route distinguisher list'),
         )
+    parser.add_argument(
+        '--vni', type=int,
+        help=_('VXLAN Network Identifier to be used for this BGPVPN '
+               'when a VXLAN encapsulation is used'))
 
 
 def _args2body(client_manager, id, action, args):
@@ -158,6 +163,9 @@ def _args2body(client_manager, id, action, args):
 
     if 'name' in args and args.name is not None:
         attrs['name'] = str(args.name)
+
+    if 'vni' in args and args.vni is not None:
+        attrs['vni'] = args.vni
 
     if args.purge_route_target:
         attrs['route_targets'] = []
@@ -235,6 +243,8 @@ class CreateBgpvpn(command.ShowOne):
             attrs['export_targets'] = parsed_args.export_targets
         if parsed_args.route_distinguishers is not None:
             attrs['route_distinguishers'] = parsed_args.route_distinguishers
+        if parsed_args.vni is not None:
+            attrs['vni'] = parsed_args.vni
         if 'project' in parsed_args and parsed_args.project is not None:
             project_id = nc_osc_utils.find_project(
                 self.app.client_manager.identity,

@@ -63,6 +63,7 @@ class TestCreateBgpvpn(fakes.TestNeutronClientBgpvpn):
             ('project', None),
             ('name', None),
             ('type', 'l3'),
+            ('vni', None),
             ('route_targets', None),
             ('import_targets', None),
             ('export_targets', None),
@@ -83,6 +84,7 @@ class TestCreateBgpvpn(fakes.TestNeutronClientBgpvpn):
             'tenant_id': 'new_fake_project_id',
             'name': 'fake_name',
             'type': 'l2',
+            'vni': 100,
             'route_targets': ['fake_rt1', 'fake_rt2', 'fake_rt3'],
             'import_targets': ['fake_irt1', 'fake_irt2', 'fake_irt3'],
             'export_targets': ['fake_ert1', 'fake_ert2', 'fake_ert3'],
@@ -95,6 +97,7 @@ class TestCreateBgpvpn(fakes.TestNeutronClientBgpvpn):
             '--project', fake_bgpvpn['tenant_id'],
             '--name', fake_bgpvpn['name'],
             '--type', fake_bgpvpn['type'],
+            '--vni', str(fake_bgpvpn['vni']),
         ]
         for rt in fake_bgpvpn['route_targets']:
             arglist.extend(['--route-target', rt])
@@ -108,6 +111,7 @@ class TestCreateBgpvpn(fakes.TestNeutronClientBgpvpn):
             ('project', fake_bgpvpn['tenant_id']),
             ('name', fake_bgpvpn['name']),
             ('type', fake_bgpvpn['type']),
+            ('vni', fake_bgpvpn['vni']),
             ('route_targets', fake_bgpvpn['route_targets']),
             ('import_targets', fake_bgpvpn['import_targets']),
             ('export_targets', fake_bgpvpn['export_targets']),
