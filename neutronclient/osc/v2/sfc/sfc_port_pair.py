@@ -206,9 +206,22 @@ def _get_attrs(client_manager, attrs, parsed_args):
     if parsed_args.egress is not None:
         attrs['egress'] = _get_id(client_manager.neutronclient,
                                   parsed_args.egress, 'port')
-    if 'service_function_parameters' in parsed_args:
-        attrs['service_function_parameters'] = (
+    if parsed_args.service_function_parameters is not None:
+        attrs['service_function_parameters'] = _get_service_function_params(
             parsed_args.service_function_parameters)
+
+
+def _get_service_function_params(sf_params):
+    attrs = {}
+    for sf_param in sf_params:
+        if 'correlation' in sf_param:
+            if sf_param['correlation'] == 'None':
+                attrs['correlation'] = None
+            else:
+                attrs['correlation'] = sf_param['correlation']
+        if 'weight' in sf_param:
+            attrs['weight'] = sf_param['weight']
+    return attrs
 
 
 def _get_id(client, id_or_name, resource):
