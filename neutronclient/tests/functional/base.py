@@ -64,6 +64,13 @@ class ClientTestBase(base.ClientTestBase):
         return self._get_clients_from_os_cloud_config()
 
     def neutron(self, *args, **kwargs):
+        # Workaround until tempest.lib.cli.base provdes fully
+        # keystone v3 support. It assumes the default domain.
+        # TODO(amotoki): Once a new tempest with a fix for bug 1719687
+        # is released, this should be claen up.
+        kwargs['flags'] = ' '.join([kwargs.get('flags', ''),
+                                    '--os-project-domain-id default',
+                                    '--os-user-domain-id default'])
         return self.clients.neutron(*args,
                                     **kwargs)
 
@@ -71,6 +78,13 @@ class ClientTestBase(base.ClientTestBase):
         if not hasattr(self, '_non_admin_clients'):
             self._non_admin_clients = self._get_clients_from_os_cloud_config(
                 cloud='devstack')
+        # Workaround until tempest.lib.cli.base provdes fully
+        # keystone v3 support. It assumes the default domain.
+        # TODO(amotoki): Once a new tempest with a fix for bug 1719687
+        # is released, this should be claen up.
+        kwargs['flags'] = ' '.join([kwargs.get('flags', ''),
+                                    '--os-project-domain-id default',
+                                    '--os-user-domain-id default'])
         return self._non_admin_clients.neutron(*args, **kwargs)
 
     def is_extension_enabled(self, extension_alias):
