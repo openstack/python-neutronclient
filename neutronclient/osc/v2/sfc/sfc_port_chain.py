@@ -83,7 +83,7 @@ class CreateSfcPortChain(command.ShowOne):
         client = self.app.client_manager.neutronclient
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         body = {resource: attrs}
-        obj = client.create_port_chain(body)[resource]
+        obj = client.create_sfc_port_chain(body)[resource]
         columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
@@ -106,7 +106,7 @@ class DeleteSfcPortChain(command.Command):
         client = self.app.client_manager.neutronclient
         pc_id = _get_id(client, parsed_args.port_chain, resource)
         try:
-            client.delete_port_chain(pc_id)
+            client.delete_sfc_port_chain(pc_id)
         except Exception as e:
             msg = (_("Failed to delete port chain with name "
                      "or ID '%(pc)s': %(e)s")
@@ -129,7 +129,7 @@ class ListSfcPortChain(command.Lister):
 
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
-        data = client.list_port_chain()
+        data = client.list_sfc_port_chains()
         headers, columns = nc_osc_utils.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers,
@@ -221,7 +221,7 @@ class SetSfcPortChain(command.Command):
                 attrs['port_pair_groups'] = sorted(list(set(existing_ppg)))
         body = {resource: attrs}
         try:
-            client.update_port_chain(pc_id, body)
+            client.update_sfc_port_chain(pc_id, body)
         except Exception as e:
             msg = (_("Failed to update port chain '%(pc)s': %(e)s")
                    % {'pc': parsed_args.port_chain, 'e': e})
@@ -243,7 +243,7 @@ class ShowSfcPortChain(command.ShowOne):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         pc_id = _get_id(client, parsed_args.port_chain, resource)
-        obj = client.show_port_chain(pc_id)[resource]
+        obj = client.show_sfc_port_chain(pc_id)[resource]
         columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
@@ -310,7 +310,7 @@ class UnsetSfcPortChain(command.Command):
                 raise exceptions.CommandError(message)
         body = {resource: attrs}
         try:
-            client.update_port_chain(pc_id, body)
+            client.update_sfc_port_chain(pc_id, body)
         except Exception as e:
             msg = (_("Failed to unset port chain '%(pc)s': %(e)s")
                    % {'pc': parsed_args.port_chain, 'e': e})

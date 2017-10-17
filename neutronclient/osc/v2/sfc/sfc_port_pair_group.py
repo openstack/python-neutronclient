@@ -74,7 +74,7 @@ class CreateSfcPortPairGroup(command.ShowOne):
         client = self.app.client_manager.neutronclient
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         body = {resource: attrs}
-        obj = client.create_port_pair_group(body)[resource]
+        obj = client.create_sfc_port_pair_group(body)[resource]
         columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
@@ -97,7 +97,7 @@ class DeleteSfcPortPairGroup(command.Command):
         client = self.app.client_manager.neutronclient
         ppg_id = _get_id(client,  parsed_args.port_pair_group, resource)
         try:
-            client.delete_port_pair_group(ppg_id)
+            client.delete_sfc_port_pair_group(ppg_id)
         except Exception as e:
             msg = (_("Failed to delete port pair group with name "
                      "or ID '%(ppg)s': %(e)s")
@@ -120,7 +120,7 @@ class ListSfcPortPairGroup(command.Lister):
 
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
-        data = client.list_port_pair_group()
+        data = client.list_sfc_port_pair_groups()
         headers, columns = nc_osc_utils.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers,
@@ -180,7 +180,7 @@ class SetSfcPortPairGroup(command.Command):
             attrs['port_pairs'] = sorted(list(set(existing) | set(added)))
         body = {resource: attrs}
         try:
-            client.update_port_pair_group(ppg_id, body)
+            client.update_sfc_port_pair_group(ppg_id, body)
         except Exception as e:
             msg = (_("Failed to update port pair group '%(ppg)s': %(e)s")
                    % {'ppg': parsed_args.port_pair_group, 'e': e})
@@ -202,7 +202,7 @@ class ShowSfcPortPairGroup(command.ShowOne):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         ppg_id = _get_id(client, parsed_args.port_pair_group, resource)
-        obj = client.show_port_pair_group(ppg_id)[resource]
+        obj = client.show_sfc_port_pair_group(ppg_id)[resource]
         columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
@@ -247,7 +247,7 @@ class UnsetSfcPortPairGroup(command.Command):
             attrs['port_pairs'] = []
         body = {resource: attrs}
         try:
-            client.update_port_pair_group(ppg_id, body)
+            client.update_sfc_port_pair_group(ppg_id, body)
         except Exception as e:
             msg = (_("Failed to unset port pair group '%(ppg)s': %(e)s")
                    % {'ppg': parsed_args.port_pair_group, 'e': e})

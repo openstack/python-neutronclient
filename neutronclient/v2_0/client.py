@@ -2171,91 +2171,91 @@ class Client(ClientBase):
         return self.delete(
             self.bgpvpn_router_association_path % (bgpvpn, router_assoc))
 
-    def create_port_pair(self, body=None):
+    def create_sfc_port_pair(self, body=None):
         """Creates a new Port Pair."""
         return self.post(self.sfc_port_pairs_path, body=body)
 
-    def update_port_pair(self, port_pair, body=None):
+    def update_sfc_port_pair(self, port_pair, body=None):
         """Update a Port Pair."""
         return self.put(self.sfc_port_pair_path % port_pair, body=body)
 
-    def delete_port_pair(self, port_pair):
+    def delete_sfc_port_pair(self, port_pair):
         """Deletes the specified Port Pair."""
         return self.delete(self.sfc_port_pair_path % (port_pair))
 
-    def list_port_pair(self, retrieve_all=True, **_params):
+    def list_sfc_port_pairs(self, retrieve_all=True, **_params):
         """Fetches a list of all Port Pairs."""
         return self.list('port_pairs', self.sfc_port_pairs_path, retrieve_all,
                          **_params)
 
-    def show_port_pair(self, port_pair, **_params):
+    def show_sfc_port_pair(self, port_pair, **_params):
         """Fetches information of a certain Port Pair."""
         return self.get(self.sfc_port_pair_path % (port_pair), params=_params)
 
-    def create_port_pair_group(self, body=None):
+    def create_sfc_port_pair_group(self, body=None):
         """Creates a new Port Pair Group."""
         return self.post(self.sfc_port_pair_groups_path, body=body)
 
-    def update_port_pair_group(self, port_pair_group, body=None):
+    def update_sfc_port_pair_group(self, port_pair_group, body=None):
         """Update a Port Pair Group."""
         return self.put(self.sfc_port_pair_group_path % port_pair_group,
                         body=body)
 
-    def delete_port_pair_group(self, port_pair_group):
+    def delete_sfc_port_pair_group(self, port_pair_group):
         """Deletes the specified Port Pair Group."""
         return self.delete(self.sfc_port_pair_group_path % (port_pair_group))
 
-    def list_port_pair_group(self, retrieve_all=True, **_params):
+    def list_sfc_port_pair_groups(self, retrieve_all=True, **_params):
         """Fetches a list of all Port Pair Groups."""
         return self.list('port_pair_groups', self.sfc_port_pair_groups_path,
                          retrieve_all, **_params)
 
-    def show_port_pair_group(self, port_pair_group, **_params):
+    def show_sfc_port_pair_group(self, port_pair_group, **_params):
         """Fetches information of a certain Port Pair Group."""
         return self.get(self.sfc_port_pair_group_path % (port_pair_group),
                         params=_params)
 
-    def create_port_chain(self, body=None):
+    def create_sfc_port_chain(self, body=None):
         """Creates a new Port Chain."""
         return self.post(self.sfc_port_chains_path, body=body)
 
-    def update_port_chain(self, port_chain, body=None):
+    def update_sfc_port_chain(self, port_chain, body=None):
         """Update a Port Chain."""
         return self.put(self.sfc_port_chain_path % port_chain, body=body)
 
-    def delete_port_chain(self, port_chain):
+    def delete_sfc_port_chain(self, port_chain):
         """Deletes the specified Port Chain."""
         return self.delete(self.sfc_port_chain_path % (port_chain))
 
-    def list_port_chain(self, retrieve_all=True, **_params):
+    def list_sfc_port_chains(self, retrieve_all=True, **_params):
         """Fetches a list of all Port Chains."""
         return self.list('port_chains', self.sfc_port_chains_path,
                          retrieve_all, **_params)
 
-    def show_port_chain(self, port_chain, **_params):
+    def show_sfc_port_chain(self, port_chain, **_params):
         """Fetches information of a certain Port Chain."""
         return self.get(self.sfc_port_chain_path % (port_chain),
                         params=_params)
 
-    def create_flow_classifier(self, body=None):
+    def create_sfc_flow_classifier(self, body=None):
         """Creates a new Flow Classifier."""
         return self.post(self.sfc_flow_classifiers_path, body=body)
 
-    def update_flow_classifier(self, flow_classifier, body=None):
+    def update_sfc_flow_classifier(self, flow_classifier, body=None):
         """Update a Flow Classifier."""
         return self.put(self.sfc_flow_classifier_path % flow_classifier,
                         body=body)
 
-    def delete_flow_classifier(self, flow_classifier):
+    def delete_sfc_flow_classifier(self, flow_classifier):
         """Deletes the specified Flow Classifier."""
         return self.delete(self.sfc_flow_classifier_path % (flow_classifier))
 
-    def list_flow_classifier(self, retrieve_all=True, **_params):
+    def list_sfc_flow_classifiers(self, retrieve_all=True, **_params):
         """Fetches a list of all Flow Classifiers."""
         return self.list('flow_classifiers', self.sfc_flow_classifiers_path,
                          retrieve_all, **_params)
 
-    def show_flow_classifier(self, flow_classifier, **_params):
+    def show_sfc_flow_classifier(self, flow_classifier, **_params):
         """Fetches information of a certain Flow Classifier."""
         return self.get(self.sfc_flow_classifier_path % (flow_classifier),
                         params=_params)

@@ -117,7 +117,7 @@ class CreateSfcFlowClassifier(command.ShowOne):
         client = self.app.client_manager.neutronclient
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         body = {resource: attrs}
-        obj = client.create_flow_classifier(body)[resource]
+        obj = client.create_sfc_flow_classifier(body)[resource]
         columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
@@ -140,7 +140,7 @@ class DeleteSfcFlowClassifier(command.Command):
         client = self.app.client_manager.neutronclient
         fc_id = _get_id(client, parsed_args.flow_classifier, resource)
         try:
-            client.delete_flow_classifier(fc_id)
+            client.delete_sfc_flow_classifier(fc_id)
         except Exception as e:
             msg = (_("Failed to delete flow classifier with name "
                      "or ID '%(fc)s': %(e)s")
@@ -198,7 +198,7 @@ class ListSfcFlowClassifier(command.Lister):
 
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
-        obj = client.list_flow_classifier()
+        obj = client.list_sfc_flow_classifiers()
         obj_extend = self.extend_list(obj, parsed_args)
         headers, columns = nc_osc_utils.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
@@ -233,7 +233,7 @@ class SetSfcFlowClassifier(command.Command):
                                   is_create=False)
         body = {resource: attrs}
         try:
-            client.update_flow_classifier(fc_id, body)
+            client.update_sfc_flow_classifier(fc_id, body)
         except Exception as e:
             msg = (_("Failed to update flow classifier '%(fc)s': %(e)s")
                    % {'fc': parsed_args.flow_classifier, 'e': e})
@@ -255,7 +255,7 @@ class ShowSfcFlowClassifier(command.ShowOne):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         fc_id = _get_id(client, parsed_args.flow_classifier, resource)
-        obj = client.show_flow_classifier(fc_id)[resource]
+        obj = client.show_sfc_flow_classifier(fc_id)[resource]
         columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data

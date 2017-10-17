@@ -55,7 +55,7 @@ class TestCreateSfcPortChain(fakes.TestNeutronClientOSCV2):
         mock.patch(
             'neutronclient.osc.v2.sfc.sfc_port_chain._get_id',
             new=_get_id).start()
-        self.neutronclient.create_port_chain = mock.Mock(
+        self.neutronclient.create_sfc_port_chain = mock.Mock(
             return_value={'port_chain': self._port_chain})
         self.data = self.get_data()
 
@@ -77,7 +77,7 @@ class TestCreateSfcPortChain(fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         columns, data = (self.cmd.take_action(parsed_args))
 
-        self.neutronclient.create_port_chain.assert_called_once_with({
+        self.neutronclient.create_sfc_port_chain.assert_called_once_with({
             'port_chain': {
                 'name': self._port_chain['name'],
                 'port_pair_groups': [self._port_chain['port_pair_groups']],
@@ -109,7 +109,7 @@ class TestCreateSfcPortChain(fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         columns, data = (self.cmd.take_action(parsed_args))
 
-        self.neutronclient.create_port_chain.assert_called_once_with({
+        self.neutronclient.create_sfc_port_chain.assert_called_once_with({
             'port_chain': {
                 'name': self._port_chain['name'],
                 'port_pair_groups': [self._port_chain['port_pair_groups']],
@@ -131,12 +131,12 @@ class TestDeleteSfcPortChain(fakes.TestNeutronClientOSCV2):
         mock.patch(
             'neutronclient.osc.v2.sfc.sfc_port_chain._get_id',
             new=_get_id).start()
-        self.neutronclient.delete_port_chain = mock.Mock(return_value=None)
+        self.neutronclient.delete_sfc_port_chain = mock.Mock(return_value=None)
         self.cmd = sfc_port_chain.DeleteSfcPortChain(self.app, self.namespace)
 
     def test_delete_port_chain(self):
         client = self.app.client_manager.neutronclient
-        mock_port_chain_delete = client.delete_port_chain
+        mock_port_chain_delete = client.delete_sfc_port_chain
         arglist = [
             self._port_chain[0]['id'],
         ]
@@ -183,18 +183,18 @@ class TestListSfcPortChain(fakes.TestNeutronClientOSCV2):
         mock.patch(
             'neutronclient.osc.v2.sfc.sfc_port_chain._get_id',
             new=_get_id).start()
-        self.neutronclient.list_port_chain = mock.Mock(
+        self.neutronclient.list_sfc_port_chains = mock.Mock(
             return_value={'port_chains': self._port_chains}
         )
         # Get the command object to test
         self.cmd = sfc_port_chain.ListSfcPortChain(self.app, self.namespace)
 
-    def test_list_port_chain(self):
+    def test_list_port_chains(self):
         arglist = []
         verifylist = []
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         columns = self.cmd.take_action(parsed_args)[0]
-        pcs = self.neutronclient.list_port_chain()['port_chains']
+        pcs = self.neutronclient.list_sfc_port_chains()['port_chains']
         pc = pcs[0]
         data = [
             pc['id'],
@@ -212,7 +212,7 @@ class TestListSfcPortChain(fakes.TestNeutronClientOSCV2):
         verifylist = [('long', True)]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         columns = self.cmd.take_action(parsed_args)[0]
-        pcs = self.neutronclient.list_port_chain()['port_chains']
+        pcs = self.neutronclient.list_sfc_port_chains()['port_chains']
         pc = pcs[0]
         data = [
             pc['id'],
@@ -242,12 +242,12 @@ class TestSetSfcPortChain(fakes.TestNeutronClientOSCV2):
         mock.patch(
             'neutronclient.osc.v2.sfc.sfc_port_chain._get_id',
             new=_get_id).start()
-        self.mocked = self.neutronclient.update_port_chain
+        self.mocked = self.neutronclient.update_sfc_port_chain
         self.cmd = sfc_port_chain.SetSfcPortChain(self.app, self.namespace)
 
     def test_set_port_chain(self):
         client = self.app.client_manager.neutronclient
-        mock_port_chain_update = client.update_port_chain
+        mock_port_chain_update = client.update_sfc_port_chain
         arglist = [
             self._port_chain_name,
             '--name', 'name_updated',
@@ -299,7 +299,7 @@ class TestSetSfcPortChain(fakes.TestNeutronClientOSCV2):
 
     def test_set_no_flow_classifier(self):
         client = self.app.client_manager.neutronclient
-        mock_port_chain_update = client.update_port_chain
+        mock_port_chain_update = client.update_sfc_port_chain
         arglist = [
             self._port_chain_name,
             '--no-flow-classifier',
@@ -429,7 +429,7 @@ class TestShowSfcPortChain(fakes.TestNeutronClientOSCV2):
         mock.patch(
             'neutronclient.osc.v2.sfc.sfc_port_chain._get_id',
             new=_get_id).start()
-        self.neutronclient.show_port_chain = mock.Mock(
+        self.neutronclient.show_sfc_port_chain = mock.Mock(
             return_value=self._port_chain
         )
         # Get the command object to test
@@ -437,7 +437,7 @@ class TestShowSfcPortChain(fakes.TestNeutronClientOSCV2):
 
     def test_show_port_chain(self):
         client = self.app.client_manager.neutronclient
-        mock_port_chain_show = client.show_port_chain
+        mock_port_chain_show = client.show_sfc_port_chain
         arglist = [
             self._port_chain_id,
         ]
@@ -466,9 +466,9 @@ class TestUnsetSfcPortChain(fakes.TestNeutronClientOSCV2):
         mock.patch(
             'neutronclient.osc.v2.sfc.sfc_port_chain._get_id',
             new=_get_id).start()
-        self.neutronclient.update_port_chain = mock.Mock(
+        self.neutronclient.update_sfc_port_chain = mock.Mock(
             return_value=None)
-        self.mocked = self.neutronclient.update_port_chain
+        self.mocked = self.neutronclient.update_sfc_port_chain
         self.cmd = sfc_port_chain.UnsetSfcPortChain(self.app, self.namespace)
 
     def test_unset_port_pair_group(self):
@@ -539,7 +539,7 @@ class TestUnsetSfcPortChain(fakes.TestNeutronClientOSCV2):
     def test_unset_all_flow_classifier(self):
         client = self.app.client_manager.neutronclient
         target = self.resource['id']
-        mock_port_chain_update = client.update_port_chain
+        mock_port_chain_update = client.update_sfc_port_chain
         arglist = [
             target,
             '--all-flow-classifier',
