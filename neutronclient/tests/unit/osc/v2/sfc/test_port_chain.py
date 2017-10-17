@@ -297,7 +297,7 @@ class TestSetSfcPortChain(fakes.TestNeutronClientOSCV2):
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
-        expect = {'flow_classifiers': sorted([self.pc_fc, fc1, fc2])}
+        expect = {'flow_classifiers': [self.pc_fc, fc1, fc2]}
         self.mocked.assert_called_once_with(target, {self.res: expect})
         self.assertEqual(3, self.neutronclient.find_resource.call_count)
         self.assertIsNone(result)
@@ -356,7 +356,7 @@ class TestSetSfcPortChain(fakes.TestNeutronClientOSCV2):
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
-        expect = {'port_pair_groups': sorted([existing_ppg, ppg1, ppg2])}
+        expect = {'port_pair_groups': [existing_ppg, ppg1, ppg2]}
         self.mocked.assert_called_once_with(target, {self.res: expect})
         self.assertEqual(3, self.neutronclient.find_resource.call_count)
         self.assertIsNone(result)
@@ -484,7 +484,7 @@ class TestUnsetSfcPortChain(fakes.TestNeutronClientOSCV2):
             if self.neutronclient.find_resource.call_count == 1:
                 self.neutronclient.find_resource.assert_called_with(
                     self.res, target, cmd_resource='sfc_port_chain')
-                return {'port_pair_groups': self.pc_ppg}
+                return {'port_pair_groups': [self.pc_ppg]}
 
             if self.neutronclient.find_resource.call_count == 2:
                 self.neutronclient.find_resource.assert_called_with(
@@ -507,7 +507,7 @@ class TestUnsetSfcPortChain(fakes.TestNeutronClientOSCV2):
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
-        expect = {'port_pair_groups': sorted([self.pc_ppg])}
+        expect = {'port_pair_groups': [self.pc_ppg]}
         self.mocked.assert_called_once_with(target, {self.res: expect})
         self.assertIsNone(result)
 
@@ -519,7 +519,7 @@ class TestUnsetSfcPortChain(fakes.TestNeutronClientOSCV2):
             if self.neutronclient.find_resource.call_count == 1:
                 self.neutronclient.find_resource.assert_called_with(
                     self.res, target, cmd_resource='sfc_port_chain')
-                return {'flow_classifiers': self.pc_fc}
+                return {'flow_classifiers': [self.pc_fc]}
 
             if self.neutronclient.find_resource.call_count == 2:
                 self.neutronclient.find_resource.assert_called_with(
@@ -537,7 +537,7 @@ class TestUnsetSfcPortChain(fakes.TestNeutronClientOSCV2):
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
-        expect = {'flow_classifiers': sorted([self.pc_fc])}
+        expect = {'flow_classifiers': [self.pc_fc]}
         self.mocked.assert_called_once_with(target, {self.res: expect})
         self.assertIsNone(result)
 
