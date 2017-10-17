@@ -188,37 +188,38 @@ class SetSfcPortChain(command.Command):
         if parsed_args.no_flow_classifier:
             attrs['flow_classifiers'] = []
         if parsed_args.flow_classifiers:
-            for fc in parsed_args.flow_classifiers:
-                added = [client.find_resource(
-                    'flow_classifier', fc,
-                    cmd_resource='sfc_flow_classifier')['id']]
             if parsed_args.no_flow_classifier:
-                existing = []
+                fc_list = []
             else:
-                existing = [client.find_resource(
+                fc_list = client.find_resource(
                     resource, parsed_args.port_chain,
-                    cmd_resource='sfc_port_chain')['flow_classifiers']]
-            attrs['flow_classifiers'] = sorted(list(
-                set(existing) | set(added)))
+                    cmd_resource='sfc_port_chain')['flow_classifiers']
+            for fc in parsed_args.flow_classifiers:
+                fc_list.append(client.find_resource(
+                    'flow_classifier', fc,
+                    cmd_resource='sfc_flow_classifier')['id'])
+            attrs['flow_classifiers'] = sorted(list(set(fc_list)))
         if (parsed_args.no_port_pair_group and not
                 parsed_args.port_pair_groups):
             message = _('At least one --port-pair-group must be specified.')
             raise exceptions.CommandError(message)
         if parsed_args.no_port_pair_group and parsed_args.port_pair_groups:
+            ppg_list = []
             for ppg in parsed_args.port_pair_groups:
-                attrs['port_pair_groups'] = [client.find_resource(
-                    'port_pair_group', ppg,
-                    cmd_resource='sfc_port_pair_group')['id']]
-        if (parsed_args.port_pair_groups and
-                not parsed_args.no_port_pair_group):
-            existing_ppg = [client.find_resource(
-                resource, parsed_args.port_chain,
-                cmd_resource='sfc_port_chain')['port_pair_groups']]
-            for ppg in parsed_args.port_pair_groups:
-                existing_ppg.append(client.find_resource(
+                ppg_list.append(client.find_resource(
                     'port_pair_group', ppg,
                     cmd_resource='sfc_port_pair_group')['id'])
-                attrs['port_pair_groups'] = sorted(list(set(existing_ppg)))
+            attrs['port_pair_groups'] = sorted(list(set(ppg_list)))
+        if (parsed_args.port_pair_groups and
+                not parsed_args.no_port_pair_group):
+            ppg_list = client.find_resource(
+                resource, parsed_args.port_chain,
+                cmd_resource='sfc_port_chain')['port_pair_groups']
+            for ppg in parsed_args.port_pair_groups:
+                ppg_list.append(client.find_resource(
+                    'port_pair_group', ppg,
+                    cmd_resource='sfc_port_pair_group')['id'])
+            attrs['port_pair_groups'] = sorted(list(set(ppg_list)))
         body = {resource: attrs}
         try:
             client.update_sfc_port_chain(pc_id, body)
