@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Juniper Routerworks Inc.
+# Copyright (c) 2016 Juniper networks Inc.
 # All Rights Reserved.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License"); you may

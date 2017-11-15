@@ -40,6 +40,7 @@ _attr_map = (
      nc_osc_utils.LIST_LONG_ONLY),
     ('networks', 'Associated Networks', nc_osc_utils.LIST_LONG_ONLY),
     ('routers', 'Associated Routers', nc_osc_utils.LIST_LONG_ONLY),
+    ('ports', 'Associated Ports', nc_osc_utils.LIST_LONG_ONLY),
     ('vni', 'VNI', nc_osc_utils.LIST_LONG_ONLY),
 )
 _formatters = {
@@ -49,6 +50,7 @@ _formatters = {
     'route_distinguishers': format_columns.ListColumn,
     'networks': format_columns.ListColumn,
     'routers': format_columns.ListColumn,
+    'ports': format_columns.ListColumn,
 }
 
 

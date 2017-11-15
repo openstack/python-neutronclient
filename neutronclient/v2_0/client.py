@@ -651,6 +651,8 @@ class Client(ClientBase):
     bgpvpn_router_associations_path = "/bgpvpn/bgpvpns/%s/router_associations"
     bgpvpn_router_association_path =\
         "/bgpvpn/bgpvpns/%s/router_associations/%s"
+    bgpvpn_port_associations_path = "/bgpvpn/bgpvpns/%s/port_associations"
+    bgpvpn_port_association_path = "/bgpvpn/bgpvpns/%s/port_associations/%s"
     network_logs_path = "/log/logs"
     network_log_path = "/log/logs/%s"
     network_loggables_path = "/log/loggable-resources"
@@ -707,6 +709,7 @@ class Client(ClientBase):
                      'bgpvpns': 'bgpvpn',
                      'network_associations': 'network_association',
                      'router_associations': 'router_association',
+                     'port_associations': 'port_association',
                      'flow_classifiers': 'flow_classifier',
                      'port_pairs': 'port_pair',
                      'port_pair_groups': 'port_pair_group',
@@ -2192,6 +2195,34 @@ class Client(ClientBase):
         """Deletes the specified BGP VPN router association"""
         return self.delete(
             self.bgpvpn_router_association_path % (bgpvpn, router_assoc))
+
+    def list_bgpvpn_port_assocs(self, bgpvpn, retrieve_all=True, **_params):
+        """Fetches a list of port associations for a given BGP VPN."""
+        return self.list('port_associations',
+                         self.bgpvpn_port_associations_path % bgpvpn,
+                         retrieve_all, **_params)
+
+    def show_bgpvpn_port_assoc(self, bgpvpn, port_assoc, **_params):
+        """Fetches information of a certain BGP VPN's port association"""
+        return self.get(
+            self.bgpvpn_port_association_path % (bgpvpn, port_assoc),
+            params=_params)
+
+    def create_bgpvpn_port_assoc(self, bgpvpn, body=None):
+        """Creates a new BGP VPN port association"""
+        return self.post(self.bgpvpn_port_associations_path % bgpvpn,
+                         body=body)
+
+    def update_bgpvpn_port_assoc(self, bgpvpn, port_assoc, body=None):
+        """Updates a BGP VPN port association"""
+        return self.put(
+            self.bgpvpn_port_association_path % (bgpvpn, port_assoc),
+            body=body)
+
+    def delete_bgpvpn_port_assoc(self, bgpvpn, port_assoc):
+        """Deletes the specified BGP VPN port association"""
+        return self.delete(
+            self.bgpvpn_port_association_path % (bgpvpn, port_assoc))
 
     def create_sfc_port_pair(self, body=None):
         """Creates a new Port Pair."""

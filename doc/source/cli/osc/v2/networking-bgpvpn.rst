@@ -32,3 +32,6 @@ Network v2
 
 .. autoprogram-cliff:: openstack.neutronclient.v2
    :command: bgpvpn router association *
+
+.. autoprogram-cliff:: openstack.neutronclient.v2
+   :command: bgpvpn port association *

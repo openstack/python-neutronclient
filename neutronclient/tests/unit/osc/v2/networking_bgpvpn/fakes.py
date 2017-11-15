@@ -27,8 +27,15 @@ from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
 from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
     ListBgpvpnResAssoc
 from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
+    SetBgpvpnResAssoc
+from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
     ShowBgpvpnResAssoc
+from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
+    UnsetBgpvpnResAssoc
 from neutronclient.tests.unit.osc.v2 import fakes as test_fakes
+
+
+_FAKE_PROJECT_ID = 'fake_project_id'
 
 
 class TestNeutronClientBgpvpn(test_fakes.TestNeutronClientOSCV2):
@@ -38,11 +45,11 @@ class TestNeutronClientBgpvpn(test_fakes.TestNeutronClientOSCV2):
         self.neutronclient.find_resource = mock.Mock(
             side_effect=lambda resource, name_or_id, project_id=None,
             cmd_resource=None, parent_id=None, fields=None:
-            {'id': name_or_id})
+            {'id': name_or_id, 'tenant_id': _FAKE_PROJECT_ID})
         self.neutronclient.find_resource_by_id = mock.Mock(
             side_effect=lambda resource, resource_id, cmd_resource=None,
             parent_id=None, fields=None:
-            {'id': resource_id})
+            {'id': resource_id, 'tenant_id': _FAKE_PROJECT_ID})
         nc_osc_utils.find_project = mock.Mock(
             side_effect=lambda _, name_or_id, __: mock.Mock(id=name_or_id))
 
@@ -59,7 +66,7 @@ class FakeBgpvpn(object):
         # Set default attributes.
         bgpvpn_attrs = {
             'id': 'fake_bgpvpn_id',
-            'tenant_id': 'fake_project_id',
+            'tenant_id': _FAKE_PROJECT_ID,
             'name': '',
             'type': 'l3',
             'route_targets': [],
@@ -68,11 +75,13 @@ class FakeBgpvpn(object):
             'route_distinguishers': [],
             'networks': [],
             'routers': [],
+            'ports': [],
             'vni': 100,
         }
 
         # Overwrite default attributes.
         bgpvpn_attrs.update(attrs)
+
         return copy.deepcopy(bgpvpn_attrs)
 
     @staticmethod
@@ -108,6 +117,14 @@ class CreateBgpvpnFakeResAssoc(BgpvpnFakeAssoc, CreateBgpvpnResAssoc):
     pass
 
 
+class SetBgpvpnFakeResAssoc(BgpvpnFakeAssoc, SetBgpvpnResAssoc):
+    pass
+
+
+class UnsetBgpvpnFakeResAssoc(BgpvpnFakeAssoc, UnsetBgpvpnResAssoc):
+    pass
+
+
 class DeleteBgpvpnFakeResAssoc(BgpvpnFakeAssoc, DeleteBgpvpnResAssoc):
     pass
 
@@ -132,7 +149,7 @@ class FakeResource(object):
         # Set default attributes.
         res_attrs = {
             'id': 'fake_resource_id',
-            'tenant_id': 'fake_project_id',
+            'tenant_id': _FAKE_PROJECT_ID,
         }
 
         # Overwrite default attributes.

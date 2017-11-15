@@ -81,12 +81,43 @@ class TestCreateResAssoc(fakes.TestNeutronClientBgpvpn):
 
         fake_res_assoc_call = copy.deepcopy(fake_res_assoc)
         fake_res_assoc_call.pop('id')
+
         self.neutronclient.create_bgpvpn_fake_resource_assoc.\
             assert_called_once_with(
                 fake_bgpvpn['id'],
                 {fakes.BgpvpnFakeAssoc._resource: fake_res_assoc_call})
         self.assertEqual(sorted_headers, cols)
         self.assertEqual(_get_data(fake_res_assoc), data)
+
+
+class TestSetResAssoc(fakes.TestNeutronClientBgpvpn):
+    def setUp(self):
+        super(TestSetResAssoc, self).setUp()
+        self.cmd = fakes.SetBgpvpnFakeResAssoc(self.app, self.namespace)
+
+    def test_set_resource_association(self):
+        fake_bgpvpn = fakes.FakeBgpvpn.create_one_bgpvpn()
+        fake_res = fakes.FakeResource.create_one_resource()
+        fake_res_assoc = fakes.FakeResAssoc.create_one_resource_association(
+            fake_res)
+        self.neutronclient.update_bgpvpn_fake_resource_assoc = mock.Mock(
+            return_value={fakes.BgpvpnFakeAssoc._resource: fake_res_assoc})
+        arglist = [
+            fake_res_assoc['id'],
+            fake_bgpvpn['id'],
+        ]
+        verifylist = [
+            ('resource_association_id', fake_res_assoc['id']),
+            ('bgpvpn', fake_bgpvpn['id']),
+        ]
+
+        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+
+        result = self.cmd.take_action(parsed_args)
+
+        self.neutronclient.update_bgpvpn_fake_resource_assoc.\
+            assert_not_called()
+        self.assertIsNone(result)
 
 
 class TestDeleteResAssoc(fakes.TestNeutronClientBgpvpn):
