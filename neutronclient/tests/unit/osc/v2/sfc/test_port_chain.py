@@ -62,7 +62,7 @@ class TestCreateSfcPortChain(fakes.TestNeutronClientOSCV2):
         # Get the command object to test
         self.cmd = sfc_port_chain.CreateSfcPortChain(self.app, self.namespace)
 
-    def test_create_port_chain_dafault_options(self):
+    def test_create_port_chain_default_options(self):
         arglist = [
             self._port_chain['name'],
             "--port-pair-group", self._port_chain['port_pair_groups']
@@ -80,9 +80,7 @@ class TestCreateSfcPortChain(fakes.TestNeutronClientOSCV2):
         self.neutronclient.create_sfc_port_chain.assert_called_once_with({
             'port_chain': {
                 'name': self._port_chain['name'],
-                'port_pair_groups': [self._port_chain['port_pair_groups']],
-                'flow_classifiers': [],
-                'chain_parameters': None}
+                'port_pair_groups': [self._port_chain['port_pair_groups']]}
         })
         self.assertEqual(self.columns, columns)
         self.assertEqual(self.data, data)
@@ -96,14 +94,14 @@ class TestCreateSfcPortChain(fakes.TestNeutronClientOSCV2):
             "--chain-parameters", 'correlation=mpls,symmetric=true',
         ]
 
-        cp = [{'correlation': 'mpls', 'symmetric': 'true'}]
+        cp = {'correlation': 'mpls', 'symmetric': 'true'}
 
         verifylist = [
             ('port_pair_groups', [self._port_chain['port_pair_groups']]),
             ('name', self._port_chain['name']),
             ('description', self._port_chain['description']),
             ('flow_classifiers', [self._port_chain['flow_classifiers']]),
-            ('chain_parameters', cp)
+            ('chain_parameters', [cp])
         ]
 
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)

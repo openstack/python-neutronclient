@@ -324,13 +324,11 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
         attrs['name'] = parsed_args.name
     if parsed_args.description is not None:
         attrs['description'] = parsed_args.description
-    if ('port_pair_groups' in parsed_args and
-            parsed_args.port_pair_groups is not None):
+    if parsed_args.port_pair_groups:
         attrs['port_pair_groups'] = [(_get_id(client_manager.neutronclient,
                                               ppg, 'port_pair_group'))
                                      for ppg in parsed_args.port_pair_groups]
-    if ('flow_classifiers' in parsed_args and
-            parsed_args.flow_classifiers is not None):
+    if parsed_args.flow_classifiers:
         attrs['flow_classifiers'] = [(_get_id(client_manager.neutronclient, fc,
                                       'flow_classifier'))
                                      for fc in parsed_args.flow_classifiers]
@@ -340,8 +338,14 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
 
 
 def _get_attrs(attrs, parsed_args):
-    if 'chain_parameters' in parsed_args:
-        attrs['chain_parameters'] = parsed_args.chain_parameters
+    if parsed_args.chain_parameters is not None:
+        chain_params = {}
+        for chain_param in parsed_args.chain_parameters:
+            if 'correlation' in chain_param:
+                chain_params['correlation'] = chain_param['correlation']
+            if 'symmetric' in chain_param:
+                chain_params['symmetric'] = chain_param['symmetric']
+        attrs['chain_parameters'] = chain_params
 
 
 def _get_id(client, id_or_name, resource):

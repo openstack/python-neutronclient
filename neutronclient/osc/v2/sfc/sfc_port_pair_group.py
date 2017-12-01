@@ -257,8 +257,8 @@ class UnsetSfcPortPairGroup(command.Command):
 def _get_ppg_param(attrs, ppg):
     attrs['port_pair_group_parameters'] = {}
     for key, value in ppg.items():
-        if key == 'lb_fields':
-            attrs['port_pair_group_parameters'][key] = ([
+        if key == 'lb-fields':
+            attrs['port_pair_group_parameters']['lb_fields'] = ([
                 field for field in value.split('&') if field])
         else:
             attrs['port_pair_group_parameters'][key] = value
@@ -281,8 +281,7 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
 
 
 def _get_attrs(attrs, parsed_args):
-    if ('port_pair_group_parameters' in parsed_args and
-            parsed_args.port_pair_group_parameters is not None):
+    if parsed_args.port_pair_group_parameters is not None:
         attrs['port_pair_group_parameters'] = (
             _get_ppg_param(attrs, parsed_args.port_pair_group_parameters))
 
