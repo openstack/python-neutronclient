@@ -266,35 +266,42 @@ class TestSetSfcPortChain(fakes.TestNeutronClientOSCV2):
                                                        attrs)
         self.assertIsNone(result)
 
-    def test_set_flow_classifier(self):
+    def test_set_flow_classifiers(self):
         target = self.resource['id']
         fc1 = 'flow_classifier1'
+        fc2 = 'flow_classifier2'
 
         def _mock_flow_classifier(*args, **kwargs):
-
             if self.neutronclient.find_resource.call_count == 1:
+                self.neutronclient.find_resource.assert_called_with(
+                    self.res, target, cmd_resource='sfc_port_chain')
+                return {'flow_classifiers': [self.pc_fc]}
+
+            if self.neutronclient.find_resource.call_count == 2:
                 self.neutronclient.find_resource.assert_called_with(
                     'flow_classifier', fc1, cmd_resource='sfc_flow_classifier')
                 return {'id': args[1]}
 
-            if self.neutronclient.find_resource.call_count == 2:
+            if self.neutronclient.find_resource.call_count == 3:
                 self.neutronclient.find_resource.assert_called_with(
-                    self.res, target, cmd_resource='sfc_port_chain')
-                return {'flow_classifiers': self.pc_fc}
+                    'flow_classifier', fc2, cmd_resource='sfc_flow_classifier')
+                return {'id': args[1]}
+
         self.neutronclient.find_resource.side_effect = _mock_flow_classifier
         arglist = [
             target,
             '--flow-classifier', fc1,
+            '--flow-classifier', fc2,
         ]
         verifylist = [
             (self.res, target),
-            ('flow_classifiers', [fc1])
+            ('flow_classifiers', [fc1, fc2])
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
-        expect = {'flow_classifiers': sorted([self.pc_fc, fc1])}
+        expect = {'flow_classifiers': sorted([self.pc_fc, fc1, fc2])}
         self.mocked.assert_called_once_with(target, {self.res: expect})
-        self.assertEqual(2, self.neutronclient.find_resource.call_count)
+        self.assertEqual(3, self.neutronclient.find_resource.call_count)
         self.assertIsNone(result)
 
     def test_set_no_flow_classifier(self):
@@ -325,7 +332,7 @@ class TestSetSfcPortChain(fakes.TestNeutronClientOSCV2):
             if self.neutronclient.find_resource.call_count == 1:
                 self.neutronclient.find_resource.assert_called_with(
                     self.res, target, cmd_resource='sfc_port_chain')
-                return {'port_pair_groups': self.pc_ppg}
+                return {'port_pair_groups': [self.pc_ppg]}
 
             if self.neutronclient.find_resource.call_count == 2:
                 self.neutronclient.find_resource.assert_called_with(
