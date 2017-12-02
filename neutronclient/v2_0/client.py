@@ -518,6 +518,8 @@ class Client(ClientBase):
     sfc_port_pair_group_path = "/sfc/port_pair_groups/%s"
     sfc_port_chains_path = "/sfc/port_chains"
     sfc_port_chain_path = "/sfc/port_chains/%s"
+    sfc_service_graphs_path = "/sfc/service_graphs"
+    sfc_service_graph_path = "/sfc/service_graphs/%s"
 
     endpoint_groups_path = "/vpn/endpoint-groups"
     endpoint_group_path = "/vpn/endpoint-groups/%s"
@@ -704,6 +706,7 @@ class Client(ClientBase):
                      'port_pairs': 'port_pair',
                      'port_pair_groups': 'port_pair_group',
                      'port_chains': 'port_chain',
+                     'service_graphs': 'service_graph',
                      }
 
     def list_ext(self, collection, path, retrieve_all, **_params):
@@ -2258,6 +2261,29 @@ class Client(ClientBase):
     def show_sfc_flow_classifier(self, flow_classifier, **_params):
         """Fetches information of a certain Flow Classifier."""
         return self.get(self.sfc_flow_classifier_path % (flow_classifier),
+                        params=_params)
+
+    def create_sfc_service_graph(self, body=None):
+        """Create the specified Service Graph."""
+        return self.post(self.sfc_service_graphs_path, body=body)
+
+    def update_sfc_service_graph(self, service_graph, body=None):
+        """Update a Service Graph."""
+        return self.put(self.sfc_service_graph_path % service_graph,
+                        body=body)
+
+    def delete_sfc_service_graph(self, service_graph):
+        """Deletes the specified Service Graph."""
+        return self.delete(self.sfc_service_graph_path % service_graph)
+
+    def list_sfc_service_graphs(self, retrieve_all=True, **_params):
+        """Fetches a list of all Service Graphs."""
+        return self.list('service_graphs', self.sfc_service_graphs_path,
+                         retrieve_all, **_params)
+
+    def show_sfc_service_graph(self, service_graph, **_params):
+        """Fetches information of a certain Service Graph."""
+        return self.get(self.sfc_service_graph_path % service_graph,
                         params=_params)
 
     def __init__(self, **kwargs):

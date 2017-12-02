@@ -34,3 +34,6 @@ Network v2
 
 .. autoprogram-cliff:: openstack.neutronclient.v2
    :command: sfc port pair group *
+
+.. autoprogram-cliff:: openstack.neutronclient.v2
+   :command: sfc service graph *
