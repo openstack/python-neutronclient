@@ -107,7 +107,8 @@ class FakeSfcPortPairGroup(object):
             'description': 'description',
             'port_pairs': uuidutils.generate_uuid(),
             'port_pair_group_parameters': '{"lb_fields": []}',
-            'project_id': uuidutils.generate_uuid()
+            'project_id': uuidutils.generate_uuid(),
+            'tap_enabled': False
         }
 
         # port_pair_group_attrs default attributes.
