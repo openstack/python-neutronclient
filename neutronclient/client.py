@@ -190,7 +190,7 @@ class HTTPClient(object):
         # might be because the auth token expired, so try to
         # re-authenticate and try again. If it still fails, bail.
         try:
-            kwargs.setdefault('headers', {})
+            kwargs['headers'] = kwargs.get('headers') or {}
             if self.auth_token is None:
                 self.auth_token = ""
             kwargs['headers']['X-Auth-Token'] = self.auth_token
@@ -199,7 +199,7 @@ class HTTPClient(object):
             return resp, body
         except exceptions.Unauthorized:
             self.authenticate()
-            kwargs.setdefault('headers', {})
+            kwargs['headers'] = kwargs.get('headers') or {}
             kwargs['headers']['X-Auth-Token'] = self.auth_token
             resp, body = self._cs_request(
                 self.endpoint_url + url, method, **kwargs)
@@ -311,7 +311,7 @@ class SessionClient(adapter.Adapter):
 
         content_type = kwargs.pop('content_type', None) or 'application/json'
 
-        headers = kwargs.setdefault('headers', {})
+        headers = kwargs.get('headers') or {}
         headers.setdefault('Accept', content_type)
 
         # NOTE(dbelova): osprofiler_web.get_trace_id_headers does not add any
@@ -327,6 +327,7 @@ class SessionClient(adapter.Adapter):
         if kwargs.get('data'):
             headers.setdefault('Content-Type', content_type)
 
+        kwargs['headers'] = headers
         resp = super(SessionClient, self).request(*args, **kwargs)
         return resp, resp.text
 

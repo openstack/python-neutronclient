@@ -277,7 +277,8 @@ class ClientBase(object):
         if body:
             body = self.serialize(body)
 
-        resp, replybody = self.httpclient.do_request(action, method, body=body)
+        resp, replybody = self.httpclient.do_request(action, method, body=body,
+                                                     headers=headers)
 
         status_code = resp.status_code
         if status_code in (requests.codes.ok,
