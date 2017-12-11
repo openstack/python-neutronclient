@@ -805,6 +805,56 @@ class ClientV2TestJson(CLITestV20Base):
         result = self.client.deserialize(data, 200)
         self.assertEqual(data, result)
 
+    def test_update_resource(self):
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        params = {'test': 'value'}
+        expect_query = six.moves.urllib.parse.urlencode(params)
+        self.client.httpclient.auth_token = 'token'
+        body = params
+        expect_body = self.client.serialize(body)
+        resp_headers = {'x-openstack-request-id': REQUEST_ID}
+        self.client.httpclient.request(
+            MyUrlComparator(end_url('/test', query=expect_query), self.client),
+            'PUT', body=expect_body,
+            headers=mox.And(
+                mox.ContainsKeyValue('X-Auth-Token', 'token'),
+                mox.Not(mox.In('If-Match')))
+        ).AndReturn((MyResp(200, resp_headers), expect_body))
+
+        self.mox.ReplayAll()
+        result = self.client._update_resource('/test', body=body,
+                                              params=params)
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
+
+        self.assertEqual(body, result)
+        self.assertEqual([REQUEST_ID], result.request_ids)
+
+    def test_update_resource_with_revision_number(self):
+        self.mox.StubOutWithMock(self.client.httpclient, "request")
+        params = {'test': 'value'}
+        expect_query = six.moves.urllib.parse.urlencode(params)
+        self.client.httpclient.auth_token = 'token'
+        body = params
+        expect_body = self.client.serialize(body)
+        resp_headers = {'x-openstack-request-id': REQUEST_ID}
+        self.client.httpclient.request(
+            MyUrlComparator(end_url('/test', query=expect_query), self.client),
+            'PUT', body=expect_body,
+            headers=mox.And(
+                mox.ContainsKeyValue('X-Auth-Token', 'token'),
+                mox.ContainsKeyValue('If-Match', 'revision_number=1'))
+        ).AndReturn((MyResp(200, resp_headers), expect_body))
+
+        self.mox.ReplayAll()
+        result = self.client._update_resource('/test', body=body,
+                                              params=params, revision_number=1)
+        self.mox.VerifyAll()
+        self.mox.UnsetStubs()
+
+        self.assertEqual(body, result)
+        self.assertEqual([REQUEST_ID], result.request_ids)
+
 
 class CLITestV20ExceptionHandler(CLITestV20Base):
 
