@@ -48,11 +48,6 @@ def _generate_data(ordered_dict=None, data=None):
 
 
 def _replace_display_columns(key, val):
-    # TODO(amotoki): This is required because of the logic of
-    # osc_lib.utils.get_dict_properties().
-    # It needs to be fixed in osc-lib first.
-    if val is None:
-        return val
     if key == 'protocol':
         return firewallrule.ProtocolColumn(val)
     return val
