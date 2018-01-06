@@ -19,24 +19,24 @@ from osc_lib.cli import parseractions
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
-from neutronclient.osc import utils as nc_osc_utils
 
 LOG = logging.getLogger(__name__)
 
 resource = 'port_pair_group'
 
 _attr_map = (
-    ('id', 'ID', nc_osc_utils.LIST_BOTH),
-    ('name', 'Name', nc_osc_utils.LIST_BOTH),
-    ('port_pairs', 'Port Pair', nc_osc_utils.LIST_BOTH),
+    ('id', 'ID', column_util.LIST_BOTH),
+    ('name', 'Name', column_util.LIST_BOTH),
+    ('port_pairs', 'Port Pair', column_util.LIST_BOTH),
     ('port_pair_group_parameters', 'Port Pair Group Parameters',
-     nc_osc_utils.LIST_BOTH),
-    ('description', 'Description', nc_osc_utils.LIST_LONG_ONLY),
-    ('group_id', 'Loadbalance ID', nc_osc_utils.LIST_LONG_ONLY),
-    ('project_id', 'Project',  nc_osc_utils.LIST_LONG_ONLY),
-    ('tap_enabled', 'Tap Enabled', nc_osc_utils.LIST_BOTH)
+     column_util.LIST_BOTH),
+    ('description', 'Description', column_util.LIST_LONG_ONLY),
+    ('group_id', 'Loadbalance ID', column_util.LIST_LONG_ONLY),
+    ('project_id', 'Project',  column_util.LIST_LONG_ONLY),
+    ('tap_enabled', 'Tap Enabled', column_util.LIST_BOTH)
 )
 
 
@@ -89,7 +89,7 @@ class CreateSfcPortPairGroup(command.ShowOne):
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         body = {resource: attrs}
         obj = client.create_sfc_port_pair_group(body)[resource]
-        columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -135,7 +135,7 @@ class ListSfcPortPairGroup(command.Lister):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         data = client.list_sfc_port_pair_groups()
-        headers, columns = nc_osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers,
                 (utils.get_dict_properties(
@@ -217,7 +217,7 @@ class ShowSfcPortPairGroup(command.ShowOne):
         client = self.app.client_manager.neutronclient
         ppg_id = _get_id(client, parsed_args.port_pair_group, resource)
         obj = client.show_sfc_port_pair_group(ppg_id)[resource]
-        columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 

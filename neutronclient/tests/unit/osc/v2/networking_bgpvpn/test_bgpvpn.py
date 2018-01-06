@@ -20,25 +20,25 @@ import operator
 import mock
 from osc_lib import exceptions
 from osc_lib import utils as osc_utils
+from osc_lib.utils import columns as column_util
 
-from neutronclient.osc import utils as nc_osc_utils
 from neutronclient.osc.v2.networking_bgpvpn import bgpvpn
 from neutronclient.osc.v2.networking_bgpvpn import constants
 from neutronclient.tests.unit.osc.v2.networking_bgpvpn import fakes
 
 
 columns_short = tuple(col for col, _, listing_mode in bgpvpn._attr_map
-                      if listing_mode in (nc_osc_utils.LIST_BOTH,
-                                          nc_osc_utils.LIST_SHORT_ONLY))
+                      if listing_mode in (column_util.LIST_BOTH,
+                                          column_util.LIST_SHORT_ONLY))
 columns_long = tuple(col for col, _, listing_mode in bgpvpn._attr_map
-                     if listing_mode in (nc_osc_utils.LIST_BOTH,
-                                         nc_osc_utils.LIST_LONG_ONLY))
+                     if listing_mode in (column_util.LIST_BOTH,
+                                         column_util.LIST_LONG_ONLY))
 headers_short = tuple(head for _, head, listing_mode in bgpvpn._attr_map
-                      if listing_mode in (nc_osc_utils.LIST_BOTH,
-                                          nc_osc_utils.LIST_SHORT_ONLY))
+                      if listing_mode in (column_util.LIST_BOTH,
+                                          column_util.LIST_SHORT_ONLY))
 headers_long = tuple(head for _, head, listing_mode in bgpvpn._attr_map
-                     if listing_mode in (nc_osc_utils.LIST_BOTH,
-                                         nc_osc_utils.LIST_LONG_ONLY))
+                     if listing_mode in (column_util.LIST_BOTH,
+                                         column_util.LIST_LONG_ONLY))
 sorted_attr_map = sorted(bgpvpn._attr_map, key=operator.itemgetter(1))
 sorted_columns = tuple(col for col, _, _ in sorted_attr_map)
 sorted_headers = tuple(head for _, head, _ in sorted_attr_map)

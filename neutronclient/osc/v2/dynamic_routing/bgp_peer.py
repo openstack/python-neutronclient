@@ -13,6 +13,7 @@
 
 from osc_lib.command import command
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
 from neutronclient.common import exceptions
@@ -99,7 +100,7 @@ class CreateBgpPeer(command.ShowOne):
         attrs = _get_attrs(self.app.client_manager, parsed_args)
         body = {constants.BGP_PEER: attrs}
         obj = client.create_bgp_peer(body)[constants.BGP_PEER]
-        columns, display_columns = nc_osc_utils.get_columns(obj)
+        columns, display_columns = column_util.get_columns(obj)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -183,6 +184,6 @@ class ShowBgpPeer(command.ShowOne):
         id = client.find_resource(constants.BGP_PEER,
                                   parsed_args.bgp_peer)['id']
         obj = client.show_bgp_peer(id)[constants.BGP_PEER]
-        columns, display_columns = nc_osc_utils.get_columns(obj)
+        columns, display_columns = column_util.get_columns(obj)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data

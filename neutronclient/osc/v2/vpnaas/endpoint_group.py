@@ -17,6 +17,7 @@
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 from oslo_log import log as logging
 
 from neutronclient._i18n import _
@@ -26,12 +27,12 @@ from neutronclient.osc import utils as osc_utils
 LOG = logging.getLogger(__name__)
 
 _attr_map = (
-    ('id', 'ID', osc_utils.LIST_BOTH),
-    ('name', 'Name', osc_utils.LIST_BOTH),
-    ('type', 'Type', osc_utils.LIST_BOTH),
-    ('endpoints', 'Endpoints', osc_utils.LIST_BOTH),
-    ('description', 'Description', osc_utils.LIST_LONG_ONLY),
-    ('tenant_id', 'Project', osc_utils.LIST_LONG_ONLY),
+    ('id', 'ID', column_util.LIST_BOTH),
+    ('name', 'Name', column_util.LIST_BOTH),
+    ('type', 'Type', column_util.LIST_BOTH),
+    ('endpoints', 'Endpoints', column_util.LIST_BOTH),
+    ('description', 'Description', column_util.LIST_LONG_ONLY),
+    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
 )
 
 
@@ -98,7 +99,7 @@ class CreateEndpointGroup(command.ShowOne):
             attrs['endpoints'] = parsed_args.endpoints
         obj = client.create_endpoint_group(
             {'endpoint_group': attrs})['endpoint_group']
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -154,7 +155,7 @@ class ListEndpointGroup(command.Lister):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         obj = client.list_endpoint_groups()['endpoint_groups']
-        headers, columns = osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(s, columns) for s in obj))
 
@@ -211,6 +212,6 @@ class ShowEndpointGroup(command.ShowOne):
             'endpoint_group', parsed_args.endpoint_group,
             cmd_resource='endpoint_group')['id']
         obj = client.show_endpoint_group(endpoint_id)['endpoint_group']
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return (display_columns, data)

@@ -19,25 +19,25 @@ from osc_lib.cli import parseractions
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
-from neutronclient.osc import utils as nc_osc_utils
 
 LOG = logging.getLogger(__name__)
 
 resource = 'port_chain'
 
 _attr_map = (
-    ('id', 'ID', nc_osc_utils.LIST_BOTH),
-    ('name', 'Name', nc_osc_utils.LIST_BOTH),
-    ('port_pair_groups', 'Port Pair Groups', nc_osc_utils.LIST_BOTH),
+    ('id', 'ID', column_util.LIST_BOTH),
+    ('name', 'Name', column_util.LIST_BOTH),
+    ('port_pair_groups', 'Port Pair Groups', column_util.LIST_BOTH),
     ('flow_classifiers', 'Flow Classifiers',
-     nc_osc_utils.LIST_BOTH),
+     column_util.LIST_BOTH),
     ('chain_parameters', 'Chain Parameters',
-     nc_osc_utils.LIST_BOTH),
-    ('description', 'Description', nc_osc_utils.LIST_LONG_ONLY),
-    ('chain_id', 'Chain ID',  nc_osc_utils.LIST_BOTH),
-    ('project_id', 'Project', nc_osc_utils.LIST_LONG_ONLY),
+     column_util.LIST_BOTH),
+    ('description', 'Description', column_util.LIST_LONG_ONLY),
+    ('chain_id', 'Chain ID',  column_util.LIST_BOTH),
+    ('project_id', 'Project', column_util.LIST_LONG_ONLY),
 )
 
 
@@ -85,7 +85,7 @@ class CreateSfcPortChain(command.ShowOne):
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         body = {resource: attrs}
         obj = client.create_sfc_port_chain(body)[resource]
-        columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -131,7 +131,7 @@ class ListSfcPortChain(command.Lister):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         data = client.list_sfc_port_chains()
-        headers, columns = nc_osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers,
                 (utils.get_dict_properties(s, columns)
@@ -254,7 +254,7 @@ class ShowSfcPortChain(command.ShowOne):
         client = self.app.client_manager.neutronclient
         pc_id = _get_id(client, parsed_args.port_chain, resource)
         obj = client.show_sfc_port_chain(pc_id)[resource]
-        columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 

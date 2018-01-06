@@ -19,6 +19,7 @@ import copy
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 from oslo_log import log as logging
 
 from neutronclient._i18n import _
@@ -29,20 +30,20 @@ from neutronclient.osc import utils as osc_utils
 LOG = logging.getLogger(__name__)
 
 _attr_map = (
-    ('id', 'ID', osc_utils.LIST_BOTH),
-    ('description', 'Description', osc_utils.LIST_LONG_ONLY),
-    ('enabled', 'Enabled', osc_utils.LIST_BOTH),
-    ('name', 'Name', osc_utils.LIST_BOTH),
-    ('target_id', 'Target', osc_utils.LIST_LONG_ONLY),
-    ('project_id', 'Project', osc_utils.LIST_LONG_ONLY),
-    ('resource_id', 'Resource', osc_utils.LIST_LONG_ONLY),
-    ('resource_type', 'Type', osc_utils.LIST_BOTH),
-    ('event', 'Event', osc_utils.LIST_LONG_ONLY),
-    ('summary', 'Summary', osc_utils.LIST_SHORT_ONLY),
+    ('id', 'ID', column_util.LIST_BOTH),
+    ('description', 'Description', column_util.LIST_LONG_ONLY),
+    ('enabled', 'Enabled', column_util.LIST_BOTH),
+    ('name', 'Name', column_util.LIST_BOTH),
+    ('target_id', 'Target', column_util.LIST_LONG_ONLY),
+    ('project_id', 'Project', column_util.LIST_LONG_ONLY),
+    ('resource_id', 'Resource', column_util.LIST_LONG_ONLY),
+    ('resource_type', 'Type', column_util.LIST_BOTH),
+    ('event', 'Event', column_util.LIST_LONG_ONLY),
+    ('summary', 'Summary', column_util.LIST_SHORT_ONLY),
 )
 
 _attr_map_for_loggable = (
-    ('type', 'Supported types', osc_utils.LIST_BOTH),
+    ('type', 'Supported types', column_util.LIST_BOTH),
 )
 
 NET_LOG = 'network_log'
@@ -142,7 +143,7 @@ class CreateNetworkLog(command.ShowOne):
         client = self.app.client_manager.neutronclient
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         obj = client.create_network_log({'log': attrs})['log']
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return (display_columns, data)
 
@@ -195,7 +196,7 @@ class ListLoggableResource(command.Lister):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         obj = client.list_network_loggable_resources()['loggable_resources']
-        headers, columns = osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map_for_loggable, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(s, columns) for s in obj))
 
@@ -232,7 +233,7 @@ class ListNetworkLog(command.Lister):
         client = self.app.client_manager.neutronclient
         obj = client.list_network_logs()['logs']
         obj_extend = self._extend_list(obj, parsed_args)
-        headers, columns = osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (
             utils.get_dict_properties(s, columns) for s in obj_extend))
@@ -284,6 +285,6 @@ class ShowNetworkLog(command.ShowOne):
         log_id = client.find_resource(
             'log', parsed_args.network_log, cmd_resource=NET_LOG)['id']
         obj = client.show_network_log(log_id)['log']
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return (display_columns, data)

@@ -19,40 +19,40 @@ import logging
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
 from neutronclient.common import exceptions as nc_exc
-from neutronclient.osc import utils as nc_osc_utils
 
 LOG = logging.getLogger(__name__)
 
 resource = 'flow_classifier'
 
 _attr_map = (
-    ('id', 'ID', nc_osc_utils.LIST_BOTH),
-    ('name', 'Name', nc_osc_utils.LIST_BOTH),
-    ('summary', 'Summary', nc_osc_utils.LIST_SHORT_ONLY),
-    ('protocol', 'Protocol', nc_osc_utils.LIST_LONG_ONLY),
-    ('ethertype', 'Ethertype', nc_osc_utils.LIST_LONG_ONLY),
+    ('id', 'ID', column_util.LIST_BOTH),
+    ('name', 'Name', column_util.LIST_BOTH),
+    ('summary', 'Summary', column_util.LIST_SHORT_ONLY),
+    ('protocol', 'Protocol', column_util.LIST_LONG_ONLY),
+    ('ethertype', 'Ethertype', column_util.LIST_LONG_ONLY),
     ('source_ip_prefix', 'Source IP',
-     nc_osc_utils.LIST_LONG_ONLY),
+     column_util.LIST_LONG_ONLY),
     ('destination_ip_prefix', 'Destination IP',
-     nc_osc_utils.LIST_LONG_ONLY),
+     column_util.LIST_LONG_ONLY),
     ('logical_source_port', 'Logical Source Port',
-     nc_osc_utils.LIST_LONG_ONLY),
+     column_util.LIST_LONG_ONLY),
     ('logical_destination_port', 'Logical Destination Port',
-     nc_osc_utils.LIST_LONG_ONLY),
+     column_util.LIST_LONG_ONLY),
     ('source_port_range_min', 'Source Port Range Min',
-     nc_osc_utils.LIST_LONG_ONLY),
+     column_util.LIST_LONG_ONLY),
     ('source_port_range_max', 'Source Port Range Max',
-     nc_osc_utils.LIST_LONG_ONLY),
+     column_util.LIST_LONG_ONLY),
     ('destination_port_range_min', 'Destination Port Range Min',
-     nc_osc_utils.LIST_LONG_ONLY),
+     column_util.LIST_LONG_ONLY),
     ('destination_port_range_max', 'Destination Port Range Max',
-     nc_osc_utils.LIST_LONG_ONLY),
-    ('l7_parameters', 'L7 Parameters', nc_osc_utils.LIST_LONG_ONLY),
-    ('description', 'Description', nc_osc_utils.LIST_LONG_ONLY),
-    ('project_id', 'Project', nc_osc_utils.LIST_LONG_ONLY),
+     column_util.LIST_LONG_ONLY),
+    ('l7_parameters', 'L7 Parameters', column_util.LIST_LONG_ONLY),
+    ('description', 'Description', column_util.LIST_LONG_ONLY),
+    ('project_id', 'Project', column_util.LIST_LONG_ONLY),
 )
 
 
@@ -118,7 +118,7 @@ class CreateSfcFlowClassifier(command.ShowOne):
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         body = {resource: attrs}
         obj = client.create_sfc_flow_classifier(body)[resource]
-        columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -200,7 +200,7 @@ class ListSfcFlowClassifier(command.Lister):
         client = self.app.client_manager.neutronclient
         obj = client.list_sfc_flow_classifiers()
         obj_extend = self.extend_list(obj, parsed_args)
-        headers, columns = nc_osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(
             s, columns) for s in obj_extend))
@@ -256,7 +256,7 @@ class ShowSfcFlowClassifier(command.ShowOne):
         client = self.app.client_manager.neutronclient
         fc_id = _get_id(client, parsed_args.flow_classifier, resource)
         obj = client.show_sfc_flow_classifier(fc_id)[resource]
-        columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 

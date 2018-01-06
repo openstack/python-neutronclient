@@ -18,6 +18,7 @@ from osc_lib.cli import format_columns
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 from oslo_log import log as logging
 
 from neutronclient._i18n import _
@@ -35,26 +36,27 @@ _formatters = {
 
 
 _attr_map = (
-    ('id', 'ID', osc_utils.LIST_BOTH),
-    ('name', 'Name', osc_utils.LIST_BOTH),
-    ('peer_address', 'Peer Address', osc_utils.LIST_BOTH),
-    ('auth_mode', 'Authentication Algorithm', osc_utils.LIST_BOTH),
-    ('status', 'Status', osc_utils.LIST_BOTH),
-    ('tenant_id', 'Project', osc_utils.LIST_LONG_ONLY),
-    ('peer_cidrs', 'Peer CIDRs', osc_utils.LIST_LONG_ONLY),
-    ('vpnservice_id', 'VPN Service', osc_utils.LIST_LONG_ONLY),
-    ('ipsecpolicy_id', 'IPSec Policy', osc_utils.LIST_LONG_ONLY),
-    ('ikepolicy_id', 'IKE Policy', osc_utils.LIST_LONG_ONLY),
-    ('mtu', 'MTU', osc_utils.LIST_LONG_ONLY),
-    ('initiator', 'Initiator', osc_utils.LIST_LONG_ONLY),
-    ('admin_state_up', 'State', osc_utils.LIST_LONG_ONLY),
-    ('description', 'Description', osc_utils.LIST_LONG_ONLY),
-    ('psk', 'Pre-shared Key', osc_utils.LIST_LONG_ONLY),
-    ('route_mode', 'Route Mode', osc_utils.LIST_LONG_ONLY),
-    ('local_id', 'Local ID', osc_utils.LIST_LONG_ONLY),
-    ('peer_id', 'Peer ID', osc_utils.LIST_LONG_ONLY),
-    ('local_ep_group_id', 'Local Endpoint Group ID', osc_utils.LIST_LONG_ONLY),
-    ('peer_ep_group_id', 'Peer Endpoint Group ID', osc_utils.LIST_LONG_ONLY),
+    ('id', 'ID', column_util.LIST_BOTH),
+    ('name', 'Name', column_util.LIST_BOTH),
+    ('peer_address', 'Peer Address', column_util.LIST_BOTH),
+    ('auth_mode', 'Authentication Algorithm', column_util.LIST_BOTH),
+    ('status', 'Status', column_util.LIST_BOTH),
+    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
+    ('peer_cidrs', 'Peer CIDRs', column_util.LIST_LONG_ONLY),
+    ('vpnservice_id', 'VPN Service', column_util.LIST_LONG_ONLY),
+    ('ipsecpolicy_id', 'IPSec Policy', column_util.LIST_LONG_ONLY),
+    ('ikepolicy_id', 'IKE Policy', column_util.LIST_LONG_ONLY),
+    ('mtu', 'MTU', column_util.LIST_LONG_ONLY),
+    ('initiator', 'Initiator', column_util.LIST_LONG_ONLY),
+    ('admin_state_up', 'State', column_util.LIST_LONG_ONLY),
+    ('description', 'Description', column_util.LIST_LONG_ONLY),
+    ('psk', 'Pre-shared Key', column_util.LIST_LONG_ONLY),
+    ('route_mode', 'Route Mode', column_util.LIST_LONG_ONLY),
+    ('local_id', 'Local ID', column_util.LIST_LONG_ONLY),
+    ('peer_id', 'Peer ID', column_util.LIST_LONG_ONLY),
+    ('local_ep_group_id', 'Local Endpoint Group ID',
+     column_util.LIST_LONG_ONLY),
+    ('peer_ep_group_id', 'Peer Endpoint Group ID', column_util.LIST_LONG_ONLY),
 )
 
 
@@ -239,7 +241,7 @@ class CreateIPsecSiteConnection(command.ShowOne):
             raise exceptions.CommandError(message)
         obj = client.create_ipsec_site_connection(
             {'ipsec_site_connection': attrs})['ipsec_site_connection']
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
         return display_columns, data
 
@@ -296,7 +298,7 @@ class ListIPsecSiteConnection(command.Lister):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         obj = client.list_ipsec_site_connections()['ipsec_site_connections']
-        headers, columns = osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(
             s, columns, formatters=_formatters) for s in obj))
@@ -367,6 +369,6 @@ class ShowIPsecSiteConnection(command.ShowOne):
             cmd_resource='ipsec_site_connection')['id']
         obj = client.show_ipsec_site_connection(
             ipsec_site_id)['ipsec_site_connection']
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
         return (display_columns, data)

@@ -20,6 +20,7 @@ from osc_lib.cli import parseractions
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils as osc_utils
+from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
 from neutronclient.osc import utils as nc_osc_utils
@@ -83,8 +84,7 @@ class CreateBgpvpnResAssoc(command.ShowOne):
         transform = getattr(self, '_transform_resource', None)
         if callable(transform):
             transform(obj)
-        columns, display_columns = nc_osc_utils.get_columns(obj,
-                                                            self._attr_map)
+        columns, display_columns = column_util.get_columns(obj, self._attr_map)
         data = osc_utils.get_dict_properties(obj, columns,
                                              formatters=self._formatters)
         return display_columns, data
@@ -218,7 +218,7 @@ class ListBgpvpnResAssoc(command.Lister):
         transform = getattr(self, '_transform_resource', None)
         if callable(transform):
             [transform(obj) for obj in objs]
-        headers, columns = nc_osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             self._attr_map, long_listing=parsed_args.long)
         return (headers, (osc_utils.get_dict_properties(
             s, columns, formatters=self._formatters) for s in objs))
@@ -256,8 +256,7 @@ class ShowBgpvpnResAssoc(command.ShowOne):
         transform = getattr(self, '_transform_resource', None)
         if callable(transform):
             transform(obj)
-        columns, display_columns = nc_osc_utils.get_columns(obj,
-                                                            self._attr_map)
+        columns, display_columns = column_util.get_columns(obj, self._attr_map)
         data = osc_utils.get_dict_properties(obj, columns,
                                              formatters=self._formatters)
         return display_columns, data
