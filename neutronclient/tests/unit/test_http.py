@@ -123,6 +123,24 @@ class TestHTTPClient(TestHTTPClientMixin, testtools.TestCase):
         self.assertEqual(403, resp.status_code)
         self.assertEqual(text, resp_text)
 
+    def test_do_request_success(self):
+        text = 'test content'
+        self.requests.register_uri(METHOD, END_URL + URL, text=text)
+
+        resp, resp_text = self.http.do_request(URL, METHOD)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(text, resp_text)
+
+    def test_do_request_with_headers_success(self):
+        text = 'test content'
+        self.requests.register_uri(METHOD, END_URL + URL, text=text,
+                                   request_headers={'key': 'value'})
+
+        resp, resp_text = self.http.do_request(URL, METHOD,
+                                               headers={'key': 'value'})
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(text, resp_text)
+
 
 class TestHTTPClientWithReqId(TestHTTPClientMixin, testtools.TestCase):
     """Tests for when global_request_id is set."""
