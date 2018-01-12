@@ -1,5 +1,6 @@
 # Copyright 2012 OpenStack Foundation.
 # Copyright 2015 Hewlett-Packard Development Company, L.P.
+# Copyright 2017 FUJITSU LIMITED
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -650,6 +651,9 @@ class Client(ClientBase):
     bgpvpn_router_associations_path = "/bgpvpn/bgpvpns/%s/router_associations"
     bgpvpn_router_association_path =\
         "/bgpvpn/bgpvpns/%s/router_associations/%s"
+    network_logs_path = "/log/logs"
+    network_log_path = "/log/logs/%s"
+    network_loggables_path = "/log/loggable-resources"
 
     # API has no way to report plurals, so we have to hard code them
     EXTED_PLURALS = {'routers': 'router',
@@ -708,6 +712,8 @@ class Client(ClientBase):
                      'port_pair_groups': 'port_pair_group',
                      'port_chains': 'port_chain',
                      'service_graphs': 'service_graph',
+                     'logs': 'log',
+                     'loggable_resources': 'loggable_resource',
                      }
 
     def list_ext(self, collection, path, retrieve_all, **_params):
@@ -2286,6 +2292,32 @@ class Client(ClientBase):
         """Fetches information of a certain Service Graph."""
         return self.get(self.sfc_service_graph_path % service_graph,
                         params=_params)
+
+    def create_network_log(self, body=None):
+        """Create a network log."""
+        return self.post(self.network_logs_path, body=body)
+
+    def delete_network_log(self, net_log):
+        """Delete a network log."""
+        return self.delete(self.network_log_path % net_log)
+
+    def list_network_logs(self, retrieve_all=True, **_params):
+        """Fetch a list of all network logs."""
+        return self.list(
+            'logs', self.network_logs_path, retrieve_all, **_params)
+
+    def show_network_log(self, net_log, **_params):
+        """Fetch information for a certain network log."""
+        return self.get(self.network_log_path % net_log, params=_params)
+
+    def update_network_log(self, net_log, body=None):
+        """Update a network log."""
+        return self.put(self.network_log_path % net_log, body=body)
+
+    def list_network_loggable_resources(self, retrieve_all=True, **_params):
+        """Fetch a list of supported resource types for network log."""
+        return self.list('loggable_resources', self.network_loggables_path,
+                         retrieve_all, **_params)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
