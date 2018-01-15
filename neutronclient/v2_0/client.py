@@ -790,9 +790,10 @@ class Client(ClientBase):
         """Creates a new port."""
         return self.post(self.ports_path, body=body)
 
-    def update_port(self, port, body=None):
+    def update_port(self, port, body=None, revision_number=None):
         """Updates a port."""
-        return self.put(self.port_path % (port), body=body)
+        return self._update_resource(self.port_path % (port), body=body,
+                                     revision_number=revision_number)
 
     def delete_port(self, port):
         """Deletes the specified port."""
@@ -812,9 +813,10 @@ class Client(ClientBase):
         """Creates a new network."""
         return self.post(self.networks_path, body=body)
 
-    def update_network(self, network, body=None):
+    def update_network(self, network, body=None, revision_number=None):
         """Updates a network."""
-        return self.put(self.network_path % (network), body=body)
+        return self._update_resource(self.network_path % (network), body=body,
+                                     revision_number=revision_number)
 
     def delete_network(self, network):
         """Deletes the specified network."""
@@ -833,9 +835,10 @@ class Client(ClientBase):
         """Creates a new subnet."""
         return self.post(self.subnets_path, body=body)
 
-    def update_subnet(self, subnet, body=None):
+    def update_subnet(self, subnet, body=None, revision_number=None):
         """Updates a subnet."""
-        return self.put(self.subnet_path % (subnet), body=body)
+        return self._update_resource(self.subnet_path % (subnet), body=body,
+                                     revision_number=revision_number)
 
     def delete_subnet(self, subnet):
         """Deletes the specified subnet."""
@@ -854,9 +857,11 @@ class Client(ClientBase):
         """Creates a new subnetpool."""
         return self.post(self.subnetpools_path, body=body)
 
-    def update_subnetpool(self, subnetpool, body=None):
+    def update_subnetpool(self, subnetpool, body=None, revision_number=None):
         """Updates a subnetpool."""
-        return self.put(self.subnetpool_path % (subnetpool), body=body)
+        return self._update_resource(self.subnetpool_path % (subnetpool),
+                                     body=body,
+                                     revision_number=revision_number)
 
     def delete_subnetpool(self, subnetpool):
         """Deletes the specified subnetpool."""
@@ -876,9 +881,10 @@ class Client(ClientBase):
         """Creates a new router."""
         return self.post(self.routers_path, body=body)
 
-    def update_router(self, router, body=None):
+    def update_router(self, router, body=None, revision_number=None):
         """Updates a router."""
-        return self.put(self.router_path % (router), body=body)
+        return self._update_resource(self.router_path % (router), body=body,
+                                     revision_number=revision_number)
 
     def delete_router(self, router):
         """Deletes the specified router."""
@@ -940,9 +946,11 @@ class Client(ClientBase):
         """Creates a new floatingip."""
         return self.post(self.floatingips_path, body=body)
 
-    def update_floatingip(self, floatingip, body=None):
+    def update_floatingip(self, floatingip, body=None, revision_number=None):
         """Updates a floatingip."""
-        return self.put(self.floatingip_path % (floatingip), body=body)
+        return self._update_resource(self.floatingip_path % (floatingip),
+                                     body=body,
+                                     revision_number=revision_number)
 
     def delete_floatingip(self, floatingip):
         """Deletes the specified floatingip."""
@@ -952,10 +960,12 @@ class Client(ClientBase):
         """Creates a new security group."""
         return self.post(self.security_groups_path, body=body)
 
-    def update_security_group(self, security_group, body=None):
+    def update_security_group(self, security_group, body=None,
+                              revision_number=None):
         """Updates a security group."""
-        return self.put(self.security_group_path %
-                        security_group, body=body)
+        return self._update_resource(self.security_group_path %
+                                     security_group, body=body,
+                                     revision_number=revision_number)
 
     def list_security_groups(self, retrieve_all=True, **_params):
         """Fetches a list of all security groups for a project."""
@@ -1799,10 +1809,11 @@ class Client(ClientBase):
         """Creates a new qos policy."""
         return self.post(self.qos_policies_path, body=body)
 
-    def update_qos_policy(self, qos_policy, body=None):
+    def update_qos_policy(self, qos_policy, body=None, revision_number=None):
         """Updates a qos policy."""
-        return self.put(self.qos_policy_path % qos_policy,
-                        body=body)
+        return self._update_resource(self.qos_policy_path % qos_policy,
+                                     body=body,
+                                     revision_number=revision_number)
 
     def delete_qos_policy(self, qos_policy):
         """Deletes the specified qos policy."""
@@ -2076,9 +2087,10 @@ class Client(ClientBase):
         """Create a trunk port."""
         return self.post(self.trunks_path, body=body)
 
-    def update_trunk(self, trunk, body=None):
+    def update_trunk(self, trunk, body=None, revision_number=None):
         """Update a trunk port."""
-        return self.put(self.trunk_path % trunk, body=body)
+        return self._update_resource(self.trunk_path % trunk, body=body,
+                                     revision_number=revision_number)
 
     def delete_trunk(self, trunk):
         """Delete a trunk port."""
@@ -2323,6 +2335,13 @@ class Client(ClientBase):
         """Initialize a new client for the Neutron v2.0 API."""
         super(Client, self).__init__(**kwargs)
         self._register_extensions(self.version)
+
+    def _update_resource(self, path, **kwargs):
+        revision_number = kwargs.pop('revision_number', None)
+        if revision_number:
+            headers = kwargs.setdefault('headers', {})
+            headers['If-Match'] = 'revision_number=%s' % revision_number
+        return self.put(path, **kwargs)
 
     def extend_show(self, resource_singular, path, parent_resource):
         def _fx(obj, **_params):
