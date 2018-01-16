@@ -36,7 +36,7 @@ neutron CLI reference
 neutron usage
 -------------
 
-.. cliff-app:: neutronclient.shell.NeutronShell
+.. autoprogram-cliff:: neutronclient.shell.NeutronShell
    :application: neutron
    :arguments: 2.0
 

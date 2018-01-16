@@ -9,10 +9,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'reno.sphinxext',
     'openstackdocstheme',
-    # 'cliff.sphinxext',
-    # TODO(amotoki): Switch to cliff.sphinxext once cliff bug is fixed.
-    # https://bugs.launchpad.net/python-cliff/+bug/1692018
-    'neutronclient.cliff_sphinxext',
+    'cliff.sphinxext',
 ]
 
 # openstackdocstheme options
