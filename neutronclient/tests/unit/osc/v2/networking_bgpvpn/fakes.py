@@ -68,6 +68,7 @@ class FakeBgpvpn(object):
             'route_distinguishers': [],
             'networks': [],
             'routers': [],
+            'vni': 100,
         }
 
         # Overwrite default attributes.

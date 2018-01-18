@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    CLI support for VXLAN VNI ID attribute in bgpvpn.
+    An optional argument ``--vni`` is added to ``openstack bgpvpn``
+    commands to configure VXLAN Network Identifier when VXLAN
+    encapsulation is used for the bgpvpn.
