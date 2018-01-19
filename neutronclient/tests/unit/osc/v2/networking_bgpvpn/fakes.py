@@ -77,6 +77,7 @@ class FakeBgpvpn(object):
             'routers': [],
             'ports': [],
             'vni': 100,
+            'local_pref': 777,
         }
 
         # Overwrite default attributes.

@@ -64,6 +64,7 @@ class TestCreateBgpvpn(fakes.TestNeutronClientBgpvpn):
             ('name', None),
             ('type', 'l3'),
             ('vni', None),
+            ('local_pref', None),
             ('route_targets', None),
             ('import_targets', None),
             ('export_targets', None),
@@ -85,6 +86,7 @@ class TestCreateBgpvpn(fakes.TestNeutronClientBgpvpn):
             'name': 'fake_name',
             'type': 'l2',
             'vni': 100,
+            'local_pref': 777,
             'route_targets': ['fake_rt1', 'fake_rt2', 'fake_rt3'],
             'import_targets': ['fake_irt1', 'fake_irt2', 'fake_irt3'],
             'export_targets': ['fake_ert1', 'fake_ert2', 'fake_ert3'],
@@ -98,6 +100,7 @@ class TestCreateBgpvpn(fakes.TestNeutronClientBgpvpn):
             '--name', fake_bgpvpn['name'],
             '--type', fake_bgpvpn['type'],
             '--vni', str(fake_bgpvpn['vni']),
+            '--local-pref', str(fake_bgpvpn['local_pref']),
         ]
         for rt in fake_bgpvpn['route_targets']:
             arglist.extend(['--route-target', rt])
@@ -112,6 +115,7 @@ class TestCreateBgpvpn(fakes.TestNeutronClientBgpvpn):
             ('name', fake_bgpvpn['name']),
             ('type', fake_bgpvpn['type']),
             ('vni', fake_bgpvpn['vni']),
+            ('local_pref', fake_bgpvpn['local_pref']),
             ('route_targets', fake_bgpvpn['route_targets']),
             ('import_targets', fake_bgpvpn['import_targets']),
             ('export_targets', fake_bgpvpn['export_targets']),
