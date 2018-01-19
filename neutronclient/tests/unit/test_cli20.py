@@ -911,6 +911,8 @@ class CLITestV20ExceptionHandler(CLITestV20Base):
             ('OverQuota', exceptions.OverQuotaClient, 409),
             ('InvalidIpForNetwork', exceptions.InvalidIpForNetworkClient, 400),
             ('InvalidIpForSubnet', exceptions.InvalidIpForSubnetClient, 400),
+            ('IpAddressAlreadyAllocated',
+             exceptions.IpAddressAlreadyAllocatedClient, 400),
         ]
 
         error_msg = 'dummy exception message'
