@@ -1,0 +1,6 @@
+---
+other:
+  - |
+    Define a new exception type ``IpAddressAlreadyAllocatedClient``.
+    Users can catch this specific exception instead of the generic
+    ``NeutronClientException``.

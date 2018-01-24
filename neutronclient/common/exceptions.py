@@ -162,6 +162,10 @@ class IpAddressInUseClient(Conflict):
     pass
 
 
+class IpAddressAlreadyAllocatedClient(Conflict):
+    pass
+
+
 class InvalidIpForNetworkClient(BadRequest):
     pass
 
