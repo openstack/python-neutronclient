@@ -217,11 +217,11 @@ file.
 
 When adding an ``openstack`` networking command to python-openstackclient,
 you can optionally propose an
-`OSC command spec <https://github.com/openstack/python-openstackclient/blob/master/doc/source/specs/commands.rst>`_
+`OSC command spec <https://github.com/openstack/python-openstackclient/blob/master/doc/source/contributor/specs/commands.rst>`_
 which documents the new command interface before proceeding with the implementation.
 
 Users of the neutron client's command extensions must adopt the
-`OSC plugin <https://github.com/openstack/python-openstackclient/blob/master/doc/source/plugins.rst>`_
+`OSC plugin <https://github.com/openstack/python-openstackclient/blob/master/doc/source/contributor/plugins.rst>`_
 system for this transition. Such users will maintain their OSC plugin within their
 own project and should follow the guidance in the table above to determine
 which command to change.
@@ -231,17 +231,17 @@ Developer References
 
 * See `OSC neutron support etherpad <https://etherpad.openstack.org/p/osc-neutron-support>`_
   to determine if an ``openstack`` command is in progress.
-* See `OSC command list <https://github.com/openstack/python-openstackclient/tree/master/doc/source/command-objects>`_
+* See `OSC command list <https://github.com/openstack/python-openstackclient/tree/master/doc/source/cli/command-objects>`_
   to determine if an ``openstack`` command exists.
-* See `OSC command spec list <https://github.com/openstack/python-openstackclient/tree/master/doc/source/specs/command-objects>`_
+* See `OSC command spec list <https://github.com/openstack/python-openstackclient/tree/master/doc/source/contributor/specs/command-objects>`_
   to determine if an ``openstack`` command spec exists.
 * See `OSC plugin command list <https://docs.openstack.org/python-openstackclient/latest/cli/plugin-commands.html>`_
   to determine if an ``openstack`` plugin command exists.
-* See `OSC command structure <https://github.com/openstack/python-openstackclient/blob/master/doc/source/commands.rst>`_
+* See `OSC command structure <https://github.com/openstack/python-openstackclient/blob/master/doc/source/cli/commands.rst>`_
   to determine the current ``openstack`` command objects, plugin objects and actions.
-* See `OSC human interface guide <https://github.com/openstack/python-openstackclient/blob/master/doc/source/humaninterfaceguide.rst>`_
+* See `OSC human interface guide <https://github.com/openstack/python-openstackclient/blob/master/doc/source/contributor/humaninterfaceguide.rst>`_
   for guidance on creating new OSC command interfaces.
-* See `OSC plugin <https://github.com/openstack/python-openstackclient/blob/master/doc/source/plugins.rst>`_
+* See `OSC plugin <https://github.com/openstack/python-openstackclient/blob/master/doc/source/contributor/plugins.rst>`_
   for information on the OSC plugin system to be used for ``neutron`` CLI extensions.
 * Create an OSC blueprint: https://blueprints.launchpad.net/python-openstackclient/
 * Report an OSC bug: https://bugs.launchpad.net/python-openstackclient/+filebug
