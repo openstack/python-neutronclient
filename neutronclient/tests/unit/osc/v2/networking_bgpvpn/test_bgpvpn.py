@@ -126,6 +126,8 @@ class TestCreateBgpvpn(fakes.TestNeutronClientBgpvpn):
         fake_bgpvpn_call.pop('id')
         fake_bgpvpn_call.pop('networks')
         fake_bgpvpn_call.pop('routers')
+        fake_bgpvpn_call.pop('ports')
+
         self.neutronclient.create_bgpvpn.assert_called_once_with(
             {constants.BGPVPN: fake_bgpvpn_call})
         self.assertEqual(sorted_headers, cols)

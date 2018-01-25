@@ -16,6 +16,7 @@
 
 import logging
 
+from osc_lib.cli import parseractions
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils as osc_utils
@@ -29,6 +30,7 @@ LOG = logging.getLogger(__name__)
 
 class CreateBgpvpnResAssoc(command.ShowOne):
     """Create a BGP VPN resource association"""
+    _action = 'create'
 
     def get_parser(self, prog_name):
         parser = super(CreateBgpvpnResAssoc, self).get_parser(prog_name)
@@ -45,6 +47,11 @@ class CreateBgpvpnResAssoc(command.ShowOne):
             help=(_("%s to associate the BGP VPN (name or ID)") %
                   self._assoc_res_name.capitalize()),
         )
+
+        get_common_parser = getattr(self, '_get_common_parser', None)
+        if callable(get_common_parser):
+            get_common_parser(parser)
+
         return parser
 
     def take_action(self, parsed_args):
@@ -66,12 +73,63 @@ class CreateBgpvpnResAssoc(command.ShowOne):
                 parsed_args.project_domain,
             ).id
             body[self._resource]['tenant_id'] = project_id
+
+        arg2body = getattr(self, '_args2body', None)
+        if callable(arg2body):
+            body[self._resource].update(
+                arg2body(bgpvpn['id'], parsed_args)[self._resource])
+
         obj = create_method(bgpvpn['id'], body)[self._resource]
+        transform = getattr(self, '_transform_resource', None)
+        if callable(transform):
+            transform(obj)
         columns, display_columns = nc_osc_utils.get_columns(obj,
                                                             self._attr_map)
         data = osc_utils.get_dict_properties(obj, columns,
                                              formatters=self._formatters)
         return display_columns, data
+
+
+class SetBgpvpnResAssoc(command.Command):
+    """Set BGP VPN resource association properties"""
+    _action = 'set'
+
+    def get_parser(self, prog_name):
+        parser = super(SetBgpvpnResAssoc, self).get_parser(prog_name)
+        parser.add_argument(
+            'resource_association_id',
+            metavar="<%s association ID>" % self._assoc_res_name,
+            help=(_("%s association ID to update") %
+                  self._assoc_res_name.capitalize()),
+        )
+        parser.add_argument(
+            'bgpvpn',
+            metavar="<bgpvpn>",
+            help=(_("BGP VPN the %s association belongs to (name or ID)") %
+                  self._assoc_res_name),
+        )
+
+        get_common_parser = getattr(self, '_get_common_parser', None)
+        if callable(get_common_parser):
+            get_common_parser(parser)
+
+        return parser
+
+    def take_action(self, parsed_args):
+        client = self.app.client_manager.neutronclient
+        update_method = getattr(
+            client, 'update_bgpvpn_%s_assoc' % self._assoc_res_name)
+        bgpvpn = client.find_resource(constants.BGPVPN, parsed_args.bgpvpn)
+        arg2body = getattr(self, '_args2body', None)
+        if callable(arg2body):
+            body = arg2body(bgpvpn['id'], parsed_args)
+            update_method(bgpvpn['id'], parsed_args.resource_association_id,
+                          body)
+
+
+class UnsetBgpvpnResAssoc(SetBgpvpnResAssoc):
+    """Unset BGP VPN resource association properties"""
+    _action = 'unset'
 
 
 class DeleteBgpvpnResAssoc(command.Command):
@@ -89,7 +147,8 @@ class DeleteBgpvpnResAssoc(command.Command):
         parser.add_argument(
             'bgpvpn',
             metavar="<bgpvpn>",
-            help=_("BGP VPN the association belongs to (name or ID)"),
+            help=(_("BGP VPN the %s association belongs to (name or ID)") %
+                  self._assoc_res_name),
         )
         return parser
 
@@ -137,6 +196,13 @@ class ListBgpvpnResAssoc(command.Lister):
             action='store_true',
             help=_("List additional fields in output"),
         )
+        parser.add_argument(
+            '--property',
+            metavar="<key=value>",
+            help=_("Filter property to apply on returned BGP VPNs (repeat to "
+                   "filter on multiple properties)"),
+            action=parseractions.KeyValueAction,
+        )
         return parser
 
     def take_action(self, parsed_args):
@@ -144,8 +210,14 @@ class ListBgpvpnResAssoc(command.Lister):
         list_method = getattr(client,
                               'list_bgpvpn_%s_assocs' % self._assoc_res_name)
         bgpvpn = client.find_resource(constants.BGPVPN, parsed_args.bgpvpn)
+        params = {}
+        if parsed_args.property:
+            params.update(parsed_args.property)
         objs = list_method(bgpvpn['id'],
-                           retrieve_all=True)[self._resource_plural]
+                           retrieve_all=True, **params)[self._resource_plural]
+        transform = getattr(self, '_transform_resource', None)
+        if callable(transform):
+            [transform(obj) for obj in objs]
         headers, columns = nc_osc_utils.get_column_definitions(
             self._attr_map, long_listing=parsed_args.long)
         return (headers, (osc_utils.get_dict_properties(
@@ -181,6 +253,9 @@ class ShowBgpvpnResAssoc(command.ShowOne):
             cmd_resource='bgpvpn_%s_assoc' % self._assoc_res_name,
             parent_id=bgpvpn['id'])
         obj = show_method(bgpvpn['id'], assoc['id'])[self._resource]
+        transform = getattr(self, '_transform_resource', None)
+        if callable(transform):
+            transform(obj)
         columns, display_columns = nc_osc_utils.get_columns(obj,
                                                             self._attr_map)
         data = osc_utils.get_dict_properties(obj, columns,

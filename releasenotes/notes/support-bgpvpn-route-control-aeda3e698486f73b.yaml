@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Add BGP VPN `port association <https://developer.openstack.org/api-ref/network/v2/index.html#port-associations>`_
+    support to the CLI, which are introduced for BGP VPN interconnections by the
+    ``bgpvpn-routes-control`` API extension.
