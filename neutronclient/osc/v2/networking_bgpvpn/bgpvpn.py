@@ -42,6 +42,7 @@ _attr_map = (
     ('routers', 'Associated Routers', nc_osc_utils.LIST_LONG_ONLY),
     ('ports', 'Associated Ports', nc_osc_utils.LIST_LONG_ONLY),
     ('vni', 'VNI', nc_osc_utils.LIST_LONG_ONLY),
+    ('local_pref', 'Local Pref', nc_osc_utils.LIST_LONG_ONLY),
 )
 _formatters = {
     'route_targets': format_columns.ListColumn,
@@ -151,6 +152,11 @@ def _get_common_parser(parser, update=None):
         '--vni', type=int,
         help=_('VXLAN Network Identifier to be used for this BGPVPN '
                'when a VXLAN encapsulation is used'))
+    parser.add_argument(
+        '--local-pref', type=int,
+        dest='local_pref',
+        help=_('Default BGP LOCAL_PREF to use in route advertisements'
+               'towards this BGPVPN.'))
 
 
 def _args2body(client_manager, id, action, args):
@@ -168,6 +174,9 @@ def _args2body(client_manager, id, action, args):
 
     if 'vni' in args and args.vni is not None:
         attrs['vni'] = args.vni
+
+    if 'local_pref' in args and args.local_pref is not None:
+        attrs['local_pref'] = args.local_pref
 
     if args.purge_route_target:
         attrs['route_targets'] = []
@@ -247,6 +256,8 @@ class CreateBgpvpn(command.ShowOne):
             attrs['route_distinguishers'] = parsed_args.route_distinguishers
         if parsed_args.vni is not None:
             attrs['vni'] = parsed_args.vni
+        if parsed_args.local_pref is not None:
+            attrs['local_pref'] = parsed_args.local_pref
         if 'project' in parsed_args and parsed_args.project is not None:
             project_id = nc_osc_utils.find_project(
                 self.app.client_manager.identity,
