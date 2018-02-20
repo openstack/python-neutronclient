@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Add optional flag to control the advertisement in BGPVPNs
+    of the routes defined on a Router resource
+    (``bgpvpn-routes-control`` API extension).

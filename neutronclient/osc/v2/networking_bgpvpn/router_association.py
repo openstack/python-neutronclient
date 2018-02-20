@@ -25,7 +25,11 @@ from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
 from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
     ListBgpvpnResAssoc
 from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
+    SetBgpvpnResAssoc
+from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
     ShowBgpvpnResAssoc
+from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
+    UnsetBgpvpnResAssoc
 
 
 class BgpvpnRouterAssoc(object):
@@ -38,13 +42,60 @@ class BgpvpnRouterAssoc(object):
         ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
         ('%s_id' % _assoc_res_name, '%s ID' % _assoc_res_name.capitalize(),
          column_util.LIST_BOTH),
+        ('advertise_extra_routes', 'Advertise extra routes',
+         column_util.LIST_LONG_ONLY),
     )
     _formatters = {}
+
+    def _get_common_parser(self, parser):
+        """Adds to parser arguments common to create, set and unset commands.
+
+        :params ArgumentParser parser: argparse object contains all command's
+                                       arguments
+        """
+        ADVERTISE_ROUTES = _("Routes will be advertised to the "
+                             "BGP VPN%s") % (
+                                 _(' (default)') if self._action == 'create'
+                                 else "")
+        NOT_ADVERTISE_ROUTES = _("Routes from the router will not be "
+                                 "advertised to the BGP VPN")
+
+        group_advertise_extra_routes = parser.add_mutually_exclusive_group()
+        group_advertise_extra_routes.add_argument(
+            '--advertise_extra_routes',
+            action='store_true',
+            help=NOT_ADVERTISE_ROUTES if self._action == 'unset'
+            else ADVERTISE_ROUTES,
+        )
+        group_advertise_extra_routes.add_argument(
+            '--no-advertise_extra_routes',
+            action='store_true',
+            help=ADVERTISE_ROUTES if self._action == 'unset'
+            else NOT_ADVERTISE_ROUTES,
+        )
+
+    def _args2body(self, _, args):
+        attrs = {}
+
+        if args.advertise_extra_routes:
+            attrs['advertise_extra_routes'] = self._action != 'unset'
+        elif args.no_advertise_extra_routes:
+            attrs['advertise_extra_routes'] = self._action == 'unset'
+
+        return {self._resource: attrs}
 
 
 class CreateBgpvpnRouterAssoc(BgpvpnRouterAssoc, CreateBgpvpnResAssoc):
     _description = _("Create a BGP VPN router association")
     pass
+
+
+class SetBgpvpnRouterAssoc(BgpvpnRouterAssoc, SetBgpvpnResAssoc):
+    _description = _("Set BGP VPN router association properties")
+
+
+class UnsetBgpvpnRouterAssoc(BgpvpnRouterAssoc, UnsetBgpvpnResAssoc):
+    _description = _("Unset BGP VPN router association properties")
 
 
 class DeleteBgpvpnRouterAssoc(BgpvpnRouterAssoc, DeleteBgpvpnResAssoc):
