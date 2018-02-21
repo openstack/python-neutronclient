@@ -20,87 +20,12 @@ Stuffs specific to neutronclient OSC plugin should not be added
 to this module. They should go to neutronclient.osc.v2.utils.
 """
 
-import operator
-
 from keystoneclient import exceptions as identity_exc
 from keystoneclient.v3 import domains
 from keystoneclient.v3 import projects
 from osc_lib import utils
 
 from neutronclient._i18n import _
-
-
-LIST_BOTH = 'both'
-LIST_SHORT_ONLY = 'short_only'
-LIST_LONG_ONLY = 'long_only'
-
-
-def get_column_definitions(attr_map, long_listing):
-    """Return table headers and column names for a listing table.
-
-    :param attr_map: a list of table entry definitions.
-      Each entry should be a tuple consisting of
-      (API attribute name, header name, listing mode). For example:
-      (('id', 'ID', LIST_BOTH),
-       ('name', 'Name', LIST_BOTH),
-       ('tenant_id', 'Project', LIST_LONG_ONLY))
-      The third field of each tuple must be one of LIST_BOTH,
-      LIST_LONG_ONLY (a corresponding column is shown only in a long mode), or
-      LIST_SHORT_ONLY (a corresponding column is shown only in a short mode).
-    :param long_listing: A boolean value which indicates a long listing
-      or not. In most cases, parsed_args.long is passed to this argument.
-    :return: A tuple of a list of table headers and a list of column names.
-    """
-
-    if long_listing:
-        headers = [hdr for col, hdr, listing_mode in attr_map
-                   if listing_mode in (LIST_BOTH, LIST_LONG_ONLY)]
-        columns = [col for col, hdr, listing_mode in attr_map
-                   if listing_mode in (LIST_BOTH, LIST_LONG_ONLY)]
-    else:
-        headers = [hdr for col, hdr, listing_mode in attr_map if listing_mode
-                   if listing_mode in (LIST_BOTH, LIST_SHORT_ONLY)]
-        columns = [col for col, hdr, listing_mode in attr_map if listing_mode
-                   if listing_mode in (LIST_BOTH, LIST_SHORT_ONLY)]
-
-    return headers, columns
-
-
-def get_columns(item, attr_map=None):
-    """Return pair of resource attributes and corresponding display names.
-
-    Assume the following item and attr_map are passed.
-    item: {'id': 'myid', 'name': 'myname',
-           'foo': 'bar', 'tenant_id': 'mytenan'}
-    attr_map:
-      (('id', 'ID', LIST_BOTH),
-       ('name', 'Name', LIST_BOTH),
-       ('tenant_id', 'Project', LIST_LONG_ONLY))
-
-    This method returns:
-
-       (('id', 'name', 'tenant_id', 'foo'),  # attributes
-        ('ID', 'Name', 'Project', 'foo')     # display names
-
-    Both tuples of attributes and display names are sorted by display names
-    in the alphabetical order.
-    Attributes not found in a given attr_map are kept as-is.
-
-    :param item: a dictionary which represents a resource.
-      Keys of the dictionary are expected to be attributes of the resource.
-      Values are not referred to by this method.
-    :param attr_map: a list of mapping from attribute to display name.
-      The same format is used as for get_column_definitions attr_map.
-    :return: A pair of tuple of attributes and tuple of display names.
-    """
-    attr_map = attr_map or tuple([])
-    _attr_map_dict = dict((col, hdr) for col, hdr, listing_mode in attr_map)
-
-    columns = [(column, _attr_map_dict.get(column, column))
-               for column in item.keys()]
-    columns = sorted(columns, key=operator.itemgetter(1))
-    return (tuple(col[0] for col in columns),
-            tuple(col[1] for col in columns))
 
 
 # TODO(amotoki): Use osc-lib version once osc-lib provides this.

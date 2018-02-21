@@ -21,6 +21,7 @@ import logging
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
 from neutronclient.osc import utils as osc_utils
@@ -32,13 +33,13 @@ LOG = logging.getLogger(__name__)
 _formatters = {}
 
 _attr_map = (
-    ('id', 'ID', osc_utils.LIST_BOTH),
-    ('name', 'Name', osc_utils.LIST_BOTH),
-    ('firewall_rules', 'Firewall Rules', osc_utils.LIST_BOTH),
-    ('description', 'Description', osc_utils.LIST_LONG_ONLY),
-    ('audited', 'Audited', osc_utils.LIST_LONG_ONLY),
-    ('shared', 'Shared', osc_utils.LIST_LONG_ONLY),
-    ('tenant_id', 'Project', osc_utils.LIST_LONG_ONLY),
+    ('id', 'ID', column_util.LIST_BOTH),
+    ('name', 'Name', column_util.LIST_BOTH),
+    ('firewall_rules', 'Firewall Rules', column_util.LIST_BOTH),
+    ('description', 'Description', column_util.LIST_LONG_ONLY),
+    ('audited', 'Audited', column_util.LIST_LONG_ONLY),
+    ('shared', 'Shared', column_util.LIST_LONG_ONLY),
+    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
 )
 
 
@@ -155,7 +156,7 @@ class CreateFirewallPolicy(command.ShowOne):
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         obj = client.create_fwaas_firewall_policy(
             {const.FWP: attrs})[const.FWP]
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
         return (display_columns, data)
 
@@ -297,7 +298,7 @@ class ListFirewallPolicy(command.Lister):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         obj = client.list_fwaas_firewall_policies()[const.FWPS]
-        headers, columns = osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(
             s, columns, formatters=_formatters) for s in obj))
@@ -360,7 +361,7 @@ class ShowFirewallPolicy(command.ShowOne):
                                       parsed_args.firewall_policy,
                                       cmd_resource=const.CMD_FWP)['id']
         obj = client.show_fwaas_firewall_policy(fwp_id)[const.FWP]
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
         return (display_columns, data)
 

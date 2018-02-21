@@ -17,6 +17,7 @@
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 from oslo_log import log as logging
 
 from neutronclient._i18n import _
@@ -28,17 +29,17 @@ from neutronclient.osc.v2.vpnaas import utils as vpn_utils
 LOG = logging.getLogger(__name__)
 
 _attr_map = (
-    ('id', 'ID', osc_utils.LIST_BOTH),
-    ('name', 'Name', osc_utils.LIST_BOTH),
-    ('auth_algorithm', 'Authentication Algorithm', osc_utils.LIST_BOTH),
-    ('encryption_algorithm', 'Encryption Algorithm', osc_utils.LIST_BOTH),
-    ('ike_version', 'IKE Version', osc_utils.LIST_BOTH),
-    ('pfs', 'Perfect Forward Secrecy (PFS)', osc_utils.LIST_BOTH),
-    ('description', 'Description', osc_utils.LIST_LONG_ONLY),
+    ('id', 'ID', column_util.LIST_BOTH),
+    ('name', 'Name', column_util.LIST_BOTH),
+    ('auth_algorithm', 'Authentication Algorithm', column_util.LIST_BOTH),
+    ('encryption_algorithm', 'Encryption Algorithm', column_util.LIST_BOTH),
+    ('ike_version', 'IKE Version', column_util.LIST_BOTH),
+    ('pfs', 'Perfect Forward Secrecy (PFS)', column_util.LIST_BOTH),
+    ('description', 'Description', column_util.LIST_LONG_ONLY),
     ('phase1_negotiation_mode', 'Phase1 Negotiation Mode',
-        osc_utils.LIST_LONG_ONLY),
-    ('tenant_id', 'Project', osc_utils.LIST_LONG_ONLY),
-    ('lifetime', 'Lifetime', osc_utils.LIST_LONG_ONLY),
+        column_util.LIST_LONG_ONLY),
+    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
+    ('lifetime', 'Lifetime', column_util.LIST_LONG_ONLY),
 )
 
 
@@ -130,7 +131,7 @@ class CreateIKEPolicy(command.ShowOne):
         if parsed_args.name:
             attrs['name'] = str(parsed_args.name)
         obj = client.create_ikepolicy({'ikepolicy': attrs})['ikepolicy']
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -183,7 +184,7 @@ class ListIKEPolicy(command.Lister):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         obj = client.list_ikepolicies()['ikepolicies']
-        headers, columns = osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(s, columns) for s in obj))
 
@@ -238,6 +239,6 @@ class ShowIKEPolicy(command.ShowOne):
             'ikepolicy', parsed_args.ikepolicy,
             cmd_resource='ikepolicy')['id']
         obj = client.show_ikepolicy(ike_id)['ikepolicy']
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return (display_columns, data)

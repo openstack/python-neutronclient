@@ -18,9 +18,9 @@ import logging
 
 from osc_lib.cli import format_columns
 from osc_lib.cli import parseractions
+from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
-from neutronclient.osc import utils as nc_osc_utils
 from neutronclient.osc.v2.networking_bgpvpn import constants
 from neutronclient.osc.v2.networking_bgpvpn import resource_association
 
@@ -33,16 +33,16 @@ class BgpvpnPortAssoc(object):
     _resource_plural = constants.PORT_ASSOCS
 
     _attr_map = (
-        ('id', 'ID', nc_osc_utils.LIST_BOTH),
-        ('tenant_id', 'Project', nc_osc_utils.LIST_LONG_ONLY),
+        ('id', 'ID', column_util.LIST_BOTH),
+        ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
         ('%s_id' % _assoc_res_name, '%s ID' % _assoc_res_name.capitalize(),
-         nc_osc_utils.LIST_BOTH),
+         column_util.LIST_BOTH),
         ('prefix_routes', 'Prefix Routes (BGP LOCAL_PREF)',
-         nc_osc_utils.LIST_LONG_ONLY),
+         column_util.LIST_LONG_ONLY),
         ('bgpvpn_routes', 'BGP VPN Routes (BGP LOCAL_PREF)',
-         nc_osc_utils.LIST_LONG_ONLY),
+         column_util.LIST_LONG_ONLY),
         ('advertise_fixed_ips', "Advertise Port's Fixed IPs",
-         nc_osc_utils.LIST_LONG_ONLY),
+         column_util.LIST_LONG_ONLY),
     )
     _formatters = {
         'prefix_routes': format_columns.ListColumn,

@@ -17,20 +17,20 @@ import logging
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
-from neutronclient.osc import utils as nc_osc_utils
 
 LOG = logging.getLogger(__name__)
 
 resource = 'service_graph'
 
 _attr_map = (
-    ('id', 'ID', nc_osc_utils.LIST_BOTH),
-    ('name', 'Name', nc_osc_utils.LIST_BOTH),
-    ('port_chains', 'Branching Points', nc_osc_utils.LIST_BOTH),
-    ('description', 'Description', nc_osc_utils.LIST_LONG_ONLY),
-    ('project_id', 'Project', nc_osc_utils.LIST_LONG_ONLY),
+    ('id', 'ID', column_util.LIST_BOTH),
+    ('name', 'Name', column_util.LIST_BOTH),
+    ('port_chains', 'Branching Points', column_util.LIST_BOTH),
+    ('description', 'Description', column_util.LIST_LONG_ONLY),
+    ('project_id', 'Project', column_util.LIST_LONG_ONLY),
 )
 
 
@@ -62,7 +62,7 @@ class CreateSfcServiceGraph(command.ShowOne):
         try:
             body = {resource: attrs}
             obj = client.create_sfc_service_graph(body)[resource]
-            columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
+            columns, display_columns = column_util.get_columns(obj, _attr_map)
             data = utils.get_dict_properties(obj, columns)
             return display_columns, data
         except Exception as e:
@@ -140,7 +140,7 @@ class ListSfcServiceGraph(command.Lister):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         data = client.list_sfc_service_graphs()
-        headers, columns = nc_osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers,
                 (utils.get_dict_properties(s, columns)
@@ -163,7 +163,7 @@ class ShowSfcServiceGraph(command.ShowOne):
         client = self.app.client_manager.neutronclient
         sg_id = _get_id(client, parsed_args.service_graph, resource)
         obj = client.show_sfc_service_graph(sg_id)[resource]
-        columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 

@@ -13,6 +13,7 @@
 
 from osc_lib.command import command
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
 from neutronclient.osc import utils as nc_osc_utils
@@ -149,7 +150,7 @@ class CreateBgpSpeaker(command.ShowOne):
         body = {}
         body[constants.BGP_SPEAKER] = attrs
         obj = client.create_bgp_speaker(body)[constants.BGP_SPEAKER]
-        columns, display_columns = nc_osc_utils.get_columns(obj)
+        columns, display_columns = column_util.get_columns(obj)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -315,6 +316,6 @@ class ShowBgpSpeaker(command.ShowOne):
         id = client.find_resource(constants.BGP_SPEAKER,
                                   parsed_args.bgp_speaker)['id']
         obj = client.show_bgp_speaker(id)[constants.BGP_SPEAKER]
-        columns, display_columns = nc_osc_utils.get_columns(obj)
+        columns, display_columns = column_util.get_columns(obj)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data

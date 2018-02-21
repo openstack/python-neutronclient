@@ -20,6 +20,7 @@ from cliff import columns as cliff_columns
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
 from neutronclient.common import utils as nc_utils
@@ -31,21 +32,21 @@ LOG = logging.getLogger(__name__)
 
 
 _attr_map = (
-    ('id', 'ID', osc_utils.LIST_BOTH),
-    ('name', 'Name', osc_utils.LIST_BOTH),
-    ('enabled', 'Enabled', osc_utils.LIST_BOTH),
-    ('summary', 'Summary', osc_utils.LIST_SHORT_ONLY),
-    ('description', 'Description', osc_utils.LIST_LONG_ONLY),
-    ('ip_version', 'IP Version', osc_utils.LIST_LONG_ONLY),
-    ('action', 'Action', osc_utils.LIST_LONG_ONLY),
-    ('protocol', 'Protocol', osc_utils.LIST_LONG_ONLY),
-    ('source_ip_address', 'Source IP Address', osc_utils.LIST_LONG_ONLY),
-    ('source_port', 'Source Port', osc_utils.LIST_LONG_ONLY),
+    ('id', 'ID', column_util.LIST_BOTH),
+    ('name', 'Name', column_util.LIST_BOTH),
+    ('enabled', 'Enabled', column_util.LIST_BOTH),
+    ('summary', 'Summary', column_util.LIST_SHORT_ONLY),
+    ('description', 'Description', column_util.LIST_LONG_ONLY),
+    ('ip_version', 'IP Version', column_util.LIST_LONG_ONLY),
+    ('action', 'Action', column_util.LIST_LONG_ONLY),
+    ('protocol', 'Protocol', column_util.LIST_LONG_ONLY),
+    ('source_ip_address', 'Source IP Address', column_util.LIST_LONG_ONLY),
+    ('source_port', 'Source Port', column_util.LIST_LONG_ONLY),
     ('destination_ip_address', 'Destination IP Address',
-        osc_utils.LIST_LONG_ONLY),
-    ('destination_port', 'Destination Port', osc_utils.LIST_LONG_ONLY),
-    ('shared', 'Shared', osc_utils.LIST_LONG_ONLY),
-    ('tenant_id', 'Project', osc_utils.LIST_LONG_ONLY),
+        column_util.LIST_LONG_ONLY),
+    ('destination_port', 'Destination Port', column_util.LIST_LONG_ONLY),
+    ('shared', 'Shared', column_util.LIST_LONG_ONLY),
+    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
 )
 
 
@@ -217,7 +218,7 @@ class CreateFirewallRule(command.ShowOne):
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         obj = client.create_fwaas_firewall_rule(
             {const.FWR: attrs})[const.FWR]
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
         return display_columns, data
 
@@ -294,7 +295,7 @@ class ListFirewallRule(command.Lister):
         client = self.app.client_manager.neutronclient
         obj = client.list_fwaas_firewall_rules()[const.FWRS]
         obj_extend = self.extend_list(obj, parsed_args)
-        headers, columns = osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(
             s, columns, formatters=_formatters) for s in obj_extend))
@@ -344,7 +345,7 @@ class ShowFirewallRule(command.ShowOne):
             const.FWR, parsed_args.firewall_rule,
             cmd_resource=const.CMD_FWR)['id']
         obj = client.show_fwaas_firewall_rule(fwr_id)[const.FWR]
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
         return (display_columns, data)
 

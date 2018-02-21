@@ -21,6 +21,7 @@ from osc_lib.cli.parseractions import KeyValueAction
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils as osc_utils
+from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
 from neutronclient.osc import utils as nc_osc_utils
@@ -29,20 +30,20 @@ from neutronclient.osc.v2.networking_bgpvpn import constants
 LOG = logging.getLogger(__name__)
 
 _attr_map = (
-    ('id', 'ID', nc_osc_utils.LIST_BOTH),
-    ('tenant_id', 'Project', nc_osc_utils.LIST_LONG_ONLY),
-    ('name', 'Name', nc_osc_utils.LIST_BOTH),
-    ('type', 'Type', nc_osc_utils.LIST_BOTH),
-    ('route_targets', 'Route Targets', nc_osc_utils.LIST_LONG_ONLY),
-    ('import_targets', 'Import Targets', nc_osc_utils.LIST_LONG_ONLY),
-    ('export_targets', 'Export Targets', nc_osc_utils.LIST_LONG_ONLY),
+    ('id', 'ID', column_util.LIST_BOTH),
+    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
+    ('name', 'Name', column_util.LIST_BOTH),
+    ('type', 'Type', column_util.LIST_BOTH),
+    ('route_targets', 'Route Targets', column_util.LIST_LONG_ONLY),
+    ('import_targets', 'Import Targets', column_util.LIST_LONG_ONLY),
+    ('export_targets', 'Export Targets', column_util.LIST_LONG_ONLY),
     ('route_distinguishers', 'Route Distinguishers',
-     nc_osc_utils.LIST_LONG_ONLY),
-    ('networks', 'Associated Networks', nc_osc_utils.LIST_LONG_ONLY),
-    ('routers', 'Associated Routers', nc_osc_utils.LIST_LONG_ONLY),
-    ('ports', 'Associated Ports', nc_osc_utils.LIST_LONG_ONLY),
-    ('vni', 'VNI', nc_osc_utils.LIST_LONG_ONLY),
-    ('local_pref', 'Local Pref', nc_osc_utils.LIST_LONG_ONLY),
+     column_util.LIST_LONG_ONLY),
+    ('networks', 'Associated Networks', column_util.LIST_LONG_ONLY),
+    ('routers', 'Associated Routers', column_util.LIST_LONG_ONLY),
+    ('ports', 'Associated Ports', column_util.LIST_LONG_ONLY),
+    ('vni', 'VNI', column_util.LIST_LONG_ONLY),
+    ('local_pref', 'Local Pref', column_util.LIST_LONG_ONLY),
 )
 _formatters = {
     'route_targets': format_columns.ListColumn,
@@ -267,7 +268,7 @@ class CreateBgpvpn(command.ShowOne):
             attrs['tenant_id'] = project_id
         body = {constants.BGPVPN: attrs}
         obj = client.create_bgpvpn(body)[constants.BGPVPN]
-        columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = osc_utils.get_dict_properties(obj, columns,
                                              formatters=_formatters)
         return display_columns, data
@@ -379,7 +380,7 @@ class ListBgpvpn(command.Lister):
         if parsed_args.property:
             params.update(parsed_args.property)
         objs = client.list_bgpvpns(**params)[constants.BGPVPNS]
-        headers, columns = nc_osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (osc_utils.get_dict_properties(
             s, columns, formatters=_formatters) for s in objs))
@@ -401,7 +402,7 @@ class ShowBgpvpn(command.ShowOne):
         client = self.app.client_manager.neutronclient
         id = client.find_resource(constants.BGPVPN, parsed_args.bgpvpn)['id']
         obj = client.show_bgpvpn(id)[constants.BGPVPN]
-        columns, display_columns = nc_osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = osc_utils.get_dict_properties(obj, columns,
                                              formatters=_formatters)
         return display_columns, data

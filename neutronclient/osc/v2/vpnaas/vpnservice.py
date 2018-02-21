@@ -17,6 +17,7 @@
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 from oslo_log import log as logging
 
 from neutronclient._i18n import _
@@ -26,15 +27,15 @@ from neutronclient.osc import utils as osc_utils
 LOG = logging.getLogger(__name__)
 
 _attr_map = (
-    ('id', 'ID', osc_utils.LIST_BOTH),
-    ('name', 'Name', osc_utils.LIST_BOTH),
-    ('router_id', 'Router', osc_utils.LIST_BOTH),
-    ('subnet_id', 'Subnet', osc_utils.LIST_BOTH),
-    ('flavor_id', 'Flavor', osc_utils.LIST_BOTH),
-    ('admin_state_up', 'State', osc_utils.LIST_BOTH),
-    ('status', 'Status', osc_utils.LIST_BOTH),
-    ('description', 'Description', osc_utils.LIST_LONG_ONLY),
-    ('tenant_id', 'Project', osc_utils.LIST_LONG_ONLY),
+    ('id', 'ID', column_util.LIST_BOTH),
+    ('name', 'Name', column_util.LIST_BOTH),
+    ('router_id', 'Router', column_util.LIST_BOTH),
+    ('subnet_id', 'Subnet', column_util.LIST_BOTH),
+    ('flavor_id', 'Flavor', column_util.LIST_BOTH),
+    ('admin_state_up', 'State', column_util.LIST_BOTH),
+    ('status', 'Status', column_util.LIST_BOTH),
+    ('description', 'Description', column_util.LIST_LONG_ONLY),
+    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
 )
 
 
@@ -121,7 +122,7 @@ class CreateVPNService(command.ShowOne):
                 parsed_args.router).id
             attrs['router_id'] = _router_id
         obj = client.create_vpnservice({'vpnservice': attrs})['vpnservice']
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -175,7 +176,7 @@ class ListVPNService(command.Lister):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         obj = client.list_vpnservices()['vpnservices']
-        headers, columns = osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(s, columns) for s in obj))
 
@@ -230,6 +231,6 @@ class ShowVPNService(command.ShowOne):
             'vpnservice', parsed_args.vpnservice,
             cmd_resource='vpnservice')['id']
         obj = client.show_vpnservice(vpn_id)['vpnservice']
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns)
         return (display_columns, data)

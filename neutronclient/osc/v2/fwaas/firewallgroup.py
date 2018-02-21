@@ -18,6 +18,7 @@ import logging
 from osc_lib.command import command
 from osc_lib import exceptions
 from osc_lib import utils
+from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
 from neutronclient.osc import utils as osc_utils
@@ -32,16 +33,16 @@ _formatters = {
 }
 
 _attr_map = (
-    ('id', 'ID', osc_utils.LIST_BOTH),
-    ('name', 'Name', osc_utils.LIST_BOTH),
-    ('ingress_firewall_policy_id', 'Ingress Policy ID', osc_utils.LIST_BOTH),
-    ('egress_firewall_policy_id', 'Egress Policy ID', osc_utils.LIST_BOTH),
-    ('description', 'Description', osc_utils.LIST_LONG_ONLY),
-    ('status', 'Status', osc_utils.LIST_LONG_ONLY),
-    ('ports', 'Ports', osc_utils.LIST_LONG_ONLY),
-    ('admin_state_up', 'State', osc_utils.LIST_LONG_ONLY),
-    ('shared', 'Shared', osc_utils.LIST_LONG_ONLY),
-    ('tenant_id', 'Project', osc_utils.LIST_LONG_ONLY),
+    ('id', 'ID', column_util.LIST_BOTH),
+    ('name', 'Name', column_util.LIST_BOTH),
+    ('ingress_firewall_policy_id', 'Ingress Policy ID', column_util.LIST_BOTH),
+    ('egress_firewall_policy_id', 'Egress Policy ID', column_util.LIST_BOTH),
+    ('description', 'Description', column_util.LIST_LONG_ONLY),
+    ('status', 'Status', column_util.LIST_LONG_ONLY),
+    ('ports', 'Ports', column_util.LIST_LONG_ONLY),
+    ('admin_state_up', 'State', column_util.LIST_LONG_ONLY),
+    ('shared', 'Shared', column_util.LIST_LONG_ONLY),
+    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
 )
 
 
@@ -201,7 +202,7 @@ class CreateFirewallGroup(command.ShowOne):
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         obj = client.create_fwaas_firewall_group(
             {const.FWG: attrs})[const.FWG]
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
         return (display_columns, data)
 
@@ -254,7 +255,7 @@ class ListFirewallGroup(command.Lister):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         obj = client.list_fwaas_firewall_groups()[const.FWGS]
-        headers, columns = osc_utils.get_column_definitions(
+        headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(
             s, columns, formatters=_formatters) for s in obj))
@@ -313,7 +314,7 @@ class ShowFirewallGroup(command.ShowOne):
         fwg_id = client.find_resource(const.FWG, parsed_args.firewall_group,
                                       cmd_resource=const.CMD_FWG)['id']
         obj = client.show_fwaas_firewall_group(fwg_id)[const.FWG]
-        columns, display_columns = osc_utils.get_columns(obj, _attr_map)
+        columns, display_columns = column_util.get_columns(obj, _attr_map)
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
         return (display_columns, data)
 
