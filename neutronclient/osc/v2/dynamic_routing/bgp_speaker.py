@@ -215,8 +215,8 @@ class ListRoutesAdvertisedBySpeaker(command.Lister):
         speaker_id = client.find_resource(constants.BGP_SPEAKER,
                                           parsed_args.bgp_speaker)['id']
         data = client.list_route_advertised_from_bgp_speaker(speaker_id)
-        headers = ('ID', 'Destination', 'Nexthop')
-        columns = ('id', 'destination', 'next_hop')
+        headers = ('Destination', 'Nexthop')
+        columns = ('destination', 'next_hop')
         return (headers, (utils.get_dict_properties(s, columns)
                           for s in data['advertised_routes']))
 
