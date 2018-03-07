@@ -170,6 +170,32 @@ class MyComparator(mox.Comparator):
         return str(self.lhs)
 
 
+class ContainsKeyValue(object):
+    """Checks whether key/value pair(s) are included in a dict parameter.
+
+    This class just checks whether specifid key/value pairs passed in
+    __init__() are included in a dict parameter. The comparison does not
+    fail even if other key/value pair(s) exists in a target dict.
+    """
+
+    def __init__(self, expected):
+        self._expected = expected
+
+    def __eq__(self, other):
+        if not isinstance(other, dict):
+            return False
+        for key, value in self._expected.items():
+            if key not in other:
+                return False
+            if other[key] != value:
+                return False
+        return True
+
+    def __repr__(self):
+        return ('<%s (expected: %s)>' %
+                (self.__class__.__name__, self._expected))
+
+
 class CLITestV20Base(base.BaseTestCase):
 
     test_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
