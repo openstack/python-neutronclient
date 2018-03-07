@@ -12,7 +12,7 @@
 
 import sys
 
-from mox3 import mox
+import mock
 
 from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0 import network
@@ -24,43 +24,43 @@ from neutronclient.tests.unit import test_cli20
 class CLITestV20Tag(test_cli20.CLITestV20Base):
     def _test_tag_operation(self, cmd, path, method, args, prog_name,
                             body=None):
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
-        if body:
-            body = test_cli20.MyComparator(body, self.client)
-        self.client.httpclient.request(
+        with mock.patch.object(cmd, 'get_client',
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, 'request',
+                                  return_value=(test_cli20.MyResp(204), None)
+                                  ) as mock_request:
+            if body:
+                body = test_cli20.MyComparator(body, self.client)
+            cmd_parser = cmd.get_parser(prog_name)
+            shell.run_command(cmd, cmd_parser, args)
+
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_called_once_with(
             test_cli20.MyUrlComparator(test_cli20.end_url(path), self.client),
             method, body=body,
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(
-                    (test_cli20.MyResp(204), None))
-        self.mox.ReplayAll()
-        cmd_parser = cmd.get_parser(prog_name)
-        shell.run_command(cmd, cmd_parser, args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
 
     def _test_tags_query(self, cmd, resources, args, query):
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
         path = getattr(self.client, resources + "_path")
         res = {resources: [{'id': 'myid'}]}
         resstr = self.client.serialize(res)
-        self.client.httpclient.request(
-            test_cli20.MyUrlComparator(
-                test_cli20.end_url(path, query),
-                self.client),
+        with mock.patch.object(cmd, 'get_client',
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, 'request',
+                                  return_value=(test_cli20.MyResp(200), resstr)
+                                  ) as mock_request:
+            cmd_parser = cmd.get_parser("list_networks")
+            shell.run_command(cmd, cmd_parser, args)
+
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_called_once_with(
+            test_cli20.MyUrlComparator(test_cli20.end_url(path, query),
+                                       self.client),
             'GET', body=None,
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(
-                    (test_cli20.MyResp(200), resstr))
-        self.mox.ReplayAll()
-        cmd_parser = cmd.get_parser("list_networks")
-        shell.run_command(cmd, cmd_parser, args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
+
         _str = self.fake_stdout.make_string()
         self.assertIn('myid', _str)
 
@@ -124,9 +124,8 @@ class CLITestV20Tag(test_cli20.CLITestV20Base):
         # is not converted to '_'.
         resources = 'networks'
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
-        self.mox.StubOutWithMock(network.ListNetwork, "extend_list")
-        network.ListNetwork.extend_list(mox.IsA(list), mox.IgnoreArg())
-        args = ['--not-tags', 'red,blue', '--tags-any', 'green',
-                '--not-tags-any', 'black']
-        query = "not-tags=red,blue&tags-any=green&not-tags-any=black"
-        self._test_tags_query(cmd, resources, args, query)
+        with mock.patch.object(network.ListNetwork, 'extend_list'):
+            args = ['--not-tags', 'red,blue', '--tags-any', 'green',
+                    '--not-tags-any', 'black']
+            query = "not-tags=red,blue&tags-any=green&not-tags-any=black"
+            self._test_tags_query(cmd, resources, args, query)
