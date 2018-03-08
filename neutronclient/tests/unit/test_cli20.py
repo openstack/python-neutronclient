@@ -589,6 +589,11 @@ class CLITestV20Base(base.BaseTestCase):
         _str = self.fake_stdout.make_string()
         self.assertIn(myid, _str)
 
+    def _assert_mock_multiple_calls_with_same_arguments(
+            self, mocked_method, count, expected_call):
+        self.assertEqual(count, mocked_method.call_count)
+        mocked_method.assert_has_calls([expected_call] * count)
+
 
 class TestListCommand(neutronV2_0.ListCommand):
     resource = 'test_resource'

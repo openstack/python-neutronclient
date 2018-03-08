@@ -17,7 +17,7 @@
 import itertools
 import sys
 
-from mox3 import mox
+import mock
 
 from neutronclient.neutron.v2_0 import port
 from neutronclient import shell
@@ -460,14 +460,10 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
     def _test_list_router_port(self, resources, cmd,
                                myid, detail=False, tags=(),
                                fields_1=(), fields_2=()):
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
         reses = {resources: [{'id': 'myid1', },
                              {'id': 'myid2', }, ], }
 
         resstr = self.client.serialize(reses)
-
         # url method body
         query = ""
         args = detail and ['-D', ] or []
@@ -503,19 +499,23 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
             query = query and query + '&verbose=True' or 'verbose=True'
         query = query and query + '&device_id=%s' or 'device_id=%s'
         path = getattr(self.client, resources + "_path")
-        self.client.httpclient.request(
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=(test_cli20.MyResp(200),
+                                                resstr)) as mock_request:
+            cmd_parser = cmd.get_parser("list_" + resources)
+            shell.run_command(cmd, cmd_parser, args)
+
+        self._assert_mock_multiple_calls_with_same_arguments(
+            mock_get_client, 2, mock.call())
+        mock_request.assert_called_once_with(
             test_cli20.MyUrlComparator(
-                test_cli20.end_url(path, query % myid),
-                self.client),
+                test_cli20.end_url(path, query % myid), self.client),
             'GET',
             body=None,
-            headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
-        ).AndReturn((test_cli20.MyResp(200), resstr))
-        self.mox.ReplayAll()
-        cmd_parser = cmd.get_parser("list_" + resources)
-        shell.run_command(cmd, cmd_parser, args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
         _str = self.fake_stdout.make_string()
 
         self.assertIn('myid1', _str)
