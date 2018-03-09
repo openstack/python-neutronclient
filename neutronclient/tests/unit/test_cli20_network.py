@@ -16,7 +16,7 @@
 import itertools
 import sys
 
-from mox3 import mox
+import mock
 from oslo_serialization import jsonutils
 
 from neutronclient.common import exceptions
@@ -159,31 +159,32 @@ class CLITestV20ListNetworkJSON(test_cli20.CLITestV20Base):
     def test_list_nets_empty_with_column(self):
         resources = "networks"
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        self.mox.StubOutWithMock(network.ListNetwork, "extend_list")
-        network.ListNetwork.extend_list(mox.IsA(list), mox.IgnoreArg())
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
         reses = {resources: []}
         resstr = self.client.serialize(reses)
+        resp = (test_cli20.MyResp(200), resstr)
         # url method body
         query = "id=myfakeid"
         args = ['-c', 'id', '--', '--id', 'myfakeid']
         path = getattr(self.client, resources + "_path")
-        self.client.httpclient.request(
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=resp) as mock_request, \
+                mock.patch.object(network.ListNetwork, "extend_list",
+                                  return_value=None) as mock_extend_list:
+            cmd_parser = cmd.get_parser("list_" + resources)
+            shell.run_command(cmd, cmd_parser, args)
+
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_called_once_with(
             test_cli20.MyUrlComparator(test_cli20.end_url(path, query),
                                        self.client),
             'GET',
             body=None,
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token',
-                test_cli20.TOKEN)).AndReturn(
-                    (test_cli20.MyResp(200), resstr))
-        self.mox.ReplayAll()
-        cmd_parser = cmd.get_parser("list_" + resources)
-        shell.run_command(cmd, cmd_parser, args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
         _str = self.fake_stdout.make_string()
         self.assertEqual('\n', _str)
 
@@ -192,18 +193,22 @@ class CLITestV20ListNetworkJSON(test_cli20.CLITestV20Base):
                             sort_key=(), sort_dir=(), base_args=None,
                             query=''):
         resources = "networks"
-        self.mox.StubOutWithMock(network.ListNetwork, "extend_list")
-        network.ListNetwork.extend_list(mox.IsA(list), mox.IgnoreArg())
-        self._test_list_resources(resources, cmd, detail, tags,
-                                  fields_1, fields_2, page_size=page_size,
-                                  sort_key=sort_key, sort_dir=sort_dir,
-                                  base_args=base_args, query=query)
+        with mock.patch.object(network.ListNetwork, "extend_list",
+                               return_value=None) as mock_extend_list:
+            self._test_list_resources(resources, cmd, detail, tags,
+                                      fields_1, fields_2, page_size=page_size,
+                                      sort_key=sort_key, sort_dir=sort_dir,
+                                      base_args=base_args, query=query)
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
 
     def test_list_nets_pagination(self):
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
-        self.mox.StubOutWithMock(network.ListNetwork, "extend_list")
-        network.ListNetwork.extend_list(mox.IsA(list), mox.IgnoreArg())
-        self._test_list_resources_with_pagination("networks", cmd)
+        with mock.patch.object(network.ListNetwork, "extend_list",
+                               return_value=None) as mock_extend_list:
+            self._test_list_resources_with_pagination("networks", cmd)
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
 
     def test_list_nets_sort(self):
         # list nets:
@@ -250,41 +255,51 @@ class CLITestV20ListNetworkJSON(test_cli20.CLITestV20Base):
         self._test_list_networks(cmd, detail=True, tags=['a', 'b'])
 
     def _test_list_nets_extend_subnets(self, data, expected):
-        def setup_list_stub(resources, data, query):
-            reses = {resources: data}
-            resstr = self.client.serialize(reses)
-            resp = (test_cli20.MyResp(200), resstr)
-            path = getattr(self.client, resources + '_path')
-            self.client.httpclient.request(
-                test_cli20.MyUrlComparator(
-                    test_cli20.end_url(path, query), self.client),
-                'GET',
-                body=None,
-                headers=mox.ContainsKeyValue(
-                    'X-Auth-Token', test_cli20.TOKEN)).AndReturn(resp)
-
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
-        self.mox.StubOutWithMock(cmd, 'get_client')
-        self.mox.StubOutWithMock(self.client.httpclient, 'request')
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
-        setup_list_stub('networks', data, '')
+        nets_path = getattr(self.client, 'networks_path')
+        subnets_path = getattr(self.client, 'subnets_path')
+        nets_query = ''
         filters = ''
         for n in data:
             for s in n['subnets']:
                 filters = filters + "&id=%s" % s
-        setup_list_stub('subnets',
-                        [{'id': 'mysubid1', 'cidr': '192.168.1.0/24'},
+        subnets_query = 'fields=id&fields=cidr' + filters
+        with mock.patch.object(cmd, 'get_client',
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient,
+                                  "request") as mock_request:
+            resp1 = (test_cli20.MyResp(200),
+                     self.client.serialize({'networks': data}))
+            resp2 = (test_cli20.MyResp(200),
+                     self.client.serialize({'subnets': [
+                         {'id': 'mysubid1', 'cidr': '192.168.1.0/24'},
                          {'id': 'mysubid2', 'cidr': '172.16.0.0/24'},
-                         {'id': 'mysubid3', 'cidr': '10.1.1.0/24'}],
-                        query='fields=id&fields=cidr' + filters)
-        self.mox.ReplayAll()
+                         {'id': 'mysubid3', 'cidr': '10.1.1.0/24'}]}))
+            mock_request.side_effect = [resp1, resp2]
+            args = []
+            cmd_parser = cmd.get_parser('list_networks')
+            parsed_args = cmd_parser.parse_args(args)
+            result = cmd.take_action(parsed_args)
 
-        args = []
-        cmd_parser = cmd.get_parser('list_networks')
-        parsed_args = cmd_parser.parse_args(args)
-        result = cmd.take_action(parsed_args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+        mock_get_client.assert_called_with()
+        self.assertEqual(2, mock_request.call_count)
+        mock_request.assert_has_calls([
+            mock.call(
+                test_cli20.MyUrlComparator(
+                    test_cli20.end_url(nets_path, nets_query),
+                    self.client),
+                'GET',
+                body=None,
+                headers=test_cli20.ContainsKeyValue(
+                    {'X-Auth-Token': test_cli20.TOKEN})),
+            mock.call(
+                test_cli20.MyUrlComparator(
+                    test_cli20.end_url(subnets_path, subnets_query),
+                    self.client),
+                'GET',
+                body=None,
+                headers=test_cli20.ContainsKeyValue(
+                    {'X-Auth-Token': test_cli20.TOKEN}))])
         _result = [x for x in result[1]]
         self.assertEqual(len(expected), len(_result))
         for res, exp in zip(_result, expected):
@@ -319,9 +334,11 @@ class CLITestV20ListNetworkJSON(test_cli20.CLITestV20Base):
     def _test_list_nets_columns(self, cmd, returned_body,
                                 args=('-f', 'json')):
         resources = 'networks'
-        self.mox.StubOutWithMock(network.ListNetwork, "extend_list")
-        network.ListNetwork.extend_list(mox.IsA(list), mox.IgnoreArg())
-        self._test_list_columns(cmd, resources, returned_body, args=args)
+        with mock.patch.object(network.ListNetwork, "extend_list",
+                               return_value=None) as mock_extend_list:
+            self._test_list_columns(cmd, resources, returned_body, args=args)
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
 
     def test_list_nets_defined_column(self):
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
@@ -355,46 +372,43 @@ class CLITestV20ListNetworkJSON(test_cli20.CLITestV20Base):
     def test_list_external_nets_empty_with_column(self):
         resources = "networks"
         cmd = network.ListExternalNetwork(test_cli20.MyApp(sys.stdout), None)
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        self.mox.StubOutWithMock(network.ListNetwork, "extend_list")
-        network.ListNetwork.extend_list(mox.IsA(list), mox.IgnoreArg())
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
         reses = {resources: []}
         resstr = self.client.serialize(reses)
         # url method body
         query = "router%3Aexternal=True&id=myfakeid"
         args = ['-c', 'id', '--', '--id', 'myfakeid']
         path = getattr(self.client, resources + "_path")
-        self.client.httpclient.request(
+        resp = (test_cli20.MyResp(200), resstr)
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=resp) as mock_request, \
+                mock.patch.object(network.ListNetwork, "extend_list",
+                                  return_value=None) as mock_extend_list:
+            cmd_parser = cmd.get_parser("list_" + resources)
+            shell.run_command(cmd, cmd_parser, args)
+
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_called_once_with(
             test_cli20.MyUrlComparator(
                 test_cli20.end_url(path, query), self.client),
             'GET',
             body=None,
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token',
-                test_cli20.TOKEN)).AndReturn(
-                    (test_cli20.MyResp(200), resstr))
-        self.mox.ReplayAll()
-        cmd_parser = cmd.get_parser("list_" + resources)
-        shell.run_command(cmd, cmd_parser, args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
         _str = self.fake_stdout.make_string()
         self.assertEqual('\n', _str)
 
     def _test_list_external_nets(self, resources, cmd,
                                  detail=False, tags=(),
                                  fields_1=(), fields_2=()):
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        self.mox.StubOutWithMock(network.ListNetwork, "extend_list")
-        network.ListNetwork.extend_list(mox.IsA(list), mox.IgnoreArg())
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
         reses = {resources: [{'id': 'myid1', },
                              {'id': 'myid2', }, ], }
 
         resstr = self.client.serialize(reses)
+        resp = (test_cli20.MyResp(200), resstr)
 
         # url method body
         query = ""
@@ -432,18 +446,25 @@ class CLITestV20ListNetworkJSON(test_cli20.CLITestV20Base):
             query = query and query + '&verbose=True' or 'verbose=True'
         path = getattr(self.client, resources + "_path")
 
-        self.client.httpclient.request(
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=resp) as mock_request, \
+                mock.patch.object(network.ListNetwork, "extend_list",
+                                  return_value=None) as mock_extend_list:
+            cmd_parser = cmd.get_parser("list_" + resources)
+            shell.run_command(cmd, cmd_parser, args)
+
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_called_once_with(
             test_cli20.MyUrlComparator(
                 test_cli20.end_url(path, query), self.client),
             'GET',
             body=None,
-            headers=mox.ContainsKeyValue('X-Auth-Token', test_cli20.TOKEN)
-        ).AndReturn((test_cli20.MyResp(200), resstr))
-        self.mox.ReplayAll()
-        cmd_parser = cmd.get_parser("list_" + resources)
-        shell.run_command(cmd, cmd_parser, args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
         _str = self.fake_stdout.make_string()
 
         self.assertIn('myid1', _str)
@@ -589,21 +610,6 @@ class CLITestV20DeleteNetworkJSON(test_cli20.CLITestV20Base):
 
 
 class CLITestV20ExtendListNetworkJSON(test_cli20.CLITestV20Base):
-    def _test_extend_list(self, mox_calls):
-        data = [{'id': 'netid%d' % i, 'name': 'net%d' % i,
-                 'subnets': ['mysubid%d' % i]}
-                for i in range(10)]
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        path = getattr(self.client, 'subnets_path')
-        cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
-        self.mox.StubOutWithMock(cmd, "get_client")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
-        mox_calls(path, data)
-        self.mox.ReplayAll()
-        known_args, _vs = cmd.get_parser('create_subnets').parse_known_args()
-        cmd.extend_list(data, known_args)
-        self.mox.VerifyAll()
-
     def _build_test_data(self, data):
         subnet_ids = []
         response = []
@@ -620,41 +626,69 @@ class CLITestV20ExtendListNetworkJSON(test_cli20.CLITestV20Base):
         return filters, resp
 
     def test_extend_list(self):
-        def mox_calls(path, data):
-            filters, response = self._build_test_data(data)
-            self.client.httpclient.request(
-                test_cli20.MyUrlComparator(test_cli20.end_url(
-                    path, 'fields=id&fields=cidr' + filters), self.client),
-                'GET',
-                body=None,
-                headers=mox.ContainsKeyValue(
-                    'X-Auth-Token', test_cli20.TOKEN)).AndReturn(response)
+        data = [{'id': 'netid%d' % i, 'name': 'net%d' % i,
+                 'subnets': ['mysubid%d' % i]}
+                for i in range(10)]
+        filters, response = self._build_test_data(data)
+        path = getattr(self.client, 'subnets_path')
+        cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=response) as mock_request:
+            known_args, _vs = cmd.get_parser('create_subnets')\
+                .parse_known_args()
+            cmd.extend_list(data, known_args)
 
-        self._test_extend_list(mox_calls)
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_called_once_with(
+            test_cli20.MyUrlComparator(test_cli20.end_url(
+                path, 'fields=id&fields=cidr' + filters), self.client),
+            'GET',
+            body=None,
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
 
     def test_extend_list_exceed_max_uri_len(self):
-        def mox_calls(path, data):
-            sub_data_lists = [data[:len(data) - 1], data[len(data) - 1:]]
-            filters, response = self._build_test_data(data)
-
+        data = [{'id': 'netid%d' % i, 'name': 'net%d' % i,
+                 'subnets': ['mysubid%d' % i]}
+                for i in range(10)]
+        filters1, response1 = self._build_test_data(data[:len(data) - 1])
+        filters2, response2 = self._build_test_data(data[len(data) - 1:])
+        path = getattr(self.client, 'subnets_path')
+        cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient,
+                                  "request") as mock_request, \
+                mock.patch.object(self.client.httpclient, "_check_uri_length",
+                                  return_value=None) as mock_check_uri_length:
             # 1 char of extra URI len will cause a split in 2 requests
-            self.mox.StubOutWithMock(self.client.httpclient,
-                                     "_check_uri_length")
-            self.client.httpclient._check_uri_length(mox.IgnoreArg()).AndRaise(
-                exceptions.RequestURITooLong(excess=1))
+            mock_check_uri_length.side_effect = [
+                exceptions.RequestURITooLong(excess=1), None, None]
+            mock_request.side_effect = [response1, response2]
+            known_args, _vs = cmd.get_parser('create_subnets')\
+                .parse_known_args()
+            cmd.extend_list(data, known_args)
 
-            for data in sub_data_lists:
-                filters, response = self._build_test_data(data)
-                self.client.httpclient._check_uri_length(
-                    mox.IgnoreArg()).AndReturn(None)
-                self.client.httpclient.request(
-                    test_cli20.MyUrlComparator(
-                        test_cli20.end_url(
-                            path, 'fields=id&fields=cidr%s' % filters),
-                        self.client),
-                    'GET',
-                    body=None,
-                    headers=mox.ContainsKeyValue(
-                        'X-Auth-Token', test_cli20.TOKEN)).AndReturn(response)
-
-        self._test_extend_list(mox_calls)
+        mock_get_client.assert_called_once_with()
+        self.assertEqual(2, mock_request.call_count)
+        mock_request.assert_has_calls([
+            mock.call(
+                test_cli20.MyUrlComparator(
+                    test_cli20.end_url(
+                        path, 'fields=id&fields=cidr%s' % filters1),
+                    self.client),
+                'GET',
+                body=None,
+                headers=test_cli20.ContainsKeyValue(
+                    {'X-Auth-Token': test_cli20.TOKEN})),
+            mock.call(
+                test_cli20.MyUrlComparator(
+                    test_cli20.end_url(
+                        path, 'fields=id&fields=cidr%s' % filters2),
+                    self.client),
+                'GET',
+                body=None,
+                headers=test_cli20.ContainsKeyValue(
+                    {'X-Auth-Token': test_cli20.TOKEN}))])
