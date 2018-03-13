@@ -16,7 +16,7 @@
 
 import sys
 
-from mox3 import mox
+import mock
 
 from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0 import quota as test_quota
@@ -67,26 +67,24 @@ class CLITestV20Quota(test_cli20.CLITestV20Base):
         cmd = test_quota.ShowQuotaDefault(
             test_cli20.MyApp(sys.stdout), None)
         args = ['--tenant-id', self.test_id]
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
         expected_res = {'quota': {'port': 50, 'network': 10, 'subnet': 10}}
         resstr = self.client.serialize(expected_res)
         path = getattr(self.client, "quota_default_path")
         return_tup = (test_cli20.MyResp(200), resstr)
-        self.client.httpclient.request(
+        with mock.patch.object(cmd, 'get_client',
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, 'request',
+                                  return_value=return_tup) as mock_request:
+            cmd_parser = cmd.get_parser("test_" + resource)
+            parsed_args = cmd_parser.parse_args(args)
+            cmd.run(parsed_args)
+
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_called_once_with(
             test_cli20.end_url(path % self.test_id), 'GET',
             body=None,
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(return_tup)
-        self.mox.ReplayAll()
-
-        cmd_parser = cmd.get_parser("test_" + resource)
-        parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
-
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
         _str = self.fake_stdout.make_string()
         self.assertIn('network', _str)
         self.assertIn('subnet', _str)
