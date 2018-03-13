@@ -95,7 +95,7 @@ class ShellTest(testtools.TestCase):
         self.useFixture(fixtures.FakeLogger(level=logging.DEBUG))
         stdout, stderr = self.shell('fake', check=True)
         self.assertFalse(stdout)
-        self.assertEqual("Unknown command ['fake']", stderr.strip())
+        self.assertIn("Unknown command ['fake']", stderr.strip())
 
     def test_help(self):
         required = 'usage:'
