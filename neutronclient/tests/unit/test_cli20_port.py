@@ -507,8 +507,8 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
             cmd_parser = cmd.get_parser("list_" + resources)
             shell.run_command(cmd, cmd_parser, args)
 
-        self._assert_mock_multiple_calls_with_same_arguments(
-            mock_get_client, 2, mock.call())
+        self.assert_mock_multiple_calls_with_same_arguments(
+            mock_get_client, mock.call(), 2)
         mock_request.assert_called_once_with(
             test_cli20.MyUrlComparator(
                 test_cli20.end_url(path, query % myid), self.client),
