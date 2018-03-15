@@ -16,7 +16,7 @@
 
 import sys
 
-from mox3 import mox
+import mock
 
 from neutronclient.common import exceptions
 from neutronclient.neutron import v2_0 as neutronV20
@@ -418,12 +418,11 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         args = ['--gateway', gateway, netid, cidr]
         position_names = ['ip_version', 'network_id', 'cidr', 'gateway_ip']
         position_values = [4, netid, cidr, gateway]
-        self.mox.StubOutWithMock(cmd.log, 'warning')
-        cmd.log.warning(mox.IgnoreArg(), {'ip': 4, 'cidr': '/32'})
-        self._test_create_resource(resource, cmd, name, myid, args,
-                                   position_names, position_values)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+        with mock.patch.object(cmd.log, 'warning') as mock_warning:
+            self._test_create_resource(resource, cmd, name, myid, args,
+                                       position_names, position_values)
+        mock_warning.assert_called_once_with(mock.ANY,
+                                             {'ip': 4, 'cidr': '/32'})
 
     def test_create_subnet_with_ipv6_ra_mode(self):
         resource = 'subnet'
@@ -520,7 +519,9 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
             position_values, tenant_id='tenantid',
             no_api_call=True, expected_exception=exceptions.CommandError)
 
-    def test_create_subnet_with_subnetpool_ipv6_and_ip_ver_ignored(self):
+    @mock.patch.object(neutronV20, 'find_resource_by_name_or_id')
+    def test_create_subnet_with_subnetpool_ipv6_and_ip_ver_ignored(
+            self, mock_find_resource):
         resource = 'subnet'
         cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -532,17 +533,17 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
                 netid]
         position_names = ['ip_version', 'network_id', 'subnetpool_id']
         position_values = [6, netid, 'subnetpool_id']
-        self.mox.StubOutWithMock(neutronV20, 'find_resource_by_name_or_id')
-        neutronV20.find_resource_by_name_or_id(
-            self.client,
-            'subnetpool',
-            'subnetpool_id').AndReturn({'id': 'subnetpool_id',
-                                        'ip_version': 6})
+        mock_find_resource.return_value = {
+            'id': 'subnetpool_id', 'ip_version': 6}
         self._test_create_resource(
             resource, cmd, name, myid, args, position_names,
             position_values, tenant_id='tenantid')
+        mock_find_resource.assert_called_once_with(
+            self.client, 'subnetpool', 'subnetpool_id')
 
-    def test_create_subnet_with_subnetpool_ipv4_with_cidr_wildcard(self):
+    @mock.patch.object(neutronV20, 'find_resource_by_name_or_id')
+    def test_create_subnet_with_subnetpool_ipv4_with_cidr_wildcard(
+            self, mock_find_resource):
         resource = 'subnet'
         cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -557,18 +558,18 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         position_names = ['ip_version', 'ipv6_address_mode',
                           'network_id', 'subnetpool_id', 'cidr']
         position_values = [4, None, netid, 'subnetpool_id', cidr]
-        self.mox.StubOutWithMock(neutronV20, 'find_resource_by_name_or_id')
-        neutronV20.find_resource_by_name_or_id(
-            self.client,
-            'subnetpool',
-            'subnetpool_id').AndReturn({'id': 'subnetpool_id',
-                                        'ip_version': 4})
+        mock_find_resource.return_value = {'id': 'subnetpool_id',
+                                           'ip_version': 4}
         self._test_create_resource(
             resource, cmd, name, myid, args, position_names,
             position_values, tenant_id='tenantid',
             no_api_call=True, expected_exception=exceptions.CommandError)
+        mock_find_resource.assert_called_once_with(
+            self.client, 'subnetpool', 'subnetpool_id')
 
-    def test_create_subnet_with_subnetpool_ipv4_with_prefixlen(self):
+    @mock.patch.object(neutronV20, 'find_resource_by_name_or_id')
+    def test_create_subnet_with_subnetpool_ipv4_with_prefixlen(
+            self, mock_find_resource):
         resource = 'subnet'
         cmd = subnet.CreateSubnet(test_cli20.MyApp(sys.stdout), None)
         name = 'myname'
@@ -583,16 +584,14 @@ class CLITestV20SubnetJSON(test_cli20.CLITestV20Base):
         position_names = ['ip_version', 'ipv6_address_mode',
                           'network_id', 'subnetpool_id']
         position_values = [4, None, netid, 'subnetpool_id']
-        self.mox.StubOutWithMock(neutronV20, 'find_resource_by_name_or_id')
-        neutronV20.find_resource_by_name_or_id(
-            self.client,
-            'subnetpool',
-            'subnetpool_id').AndReturn({'id': 'subnetpool_id',
-                                        'ip_version': 4})
+        mock_find_resource.return_value = {'id': 'subnetpool_id',
+                                           'ip_version': 4}
         self._test_create_resource(
             resource, cmd, name, myid, args, position_names,
             position_values, tenant_id='tenantid',
             no_api_call=True, expected_exception=exceptions.CommandError)
+        mock_find_resource.assert_called_once_with(
+            self.client, 'subnetpool', 'subnetpool_id')
 
     def test_list_subnets_detail(self):
         # List subnets: -D.
