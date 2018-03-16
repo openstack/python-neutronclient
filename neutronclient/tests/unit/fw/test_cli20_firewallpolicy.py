@@ -16,7 +16,7 @@
 
 import sys
 
-from mox3 import mox
+import mock
 
 from neutronclient.neutron.v2_0.fw import firewallpolicy
 from neutronclient import shell
@@ -166,24 +166,25 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
                        'insert_before': 'rule2',
                        'insert_after': 'rule1'}
 
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
         body = extrafields
         path = getattr(self.client, resource + "_insert_path")
-        self.client.httpclient.request(
+        cmd_parser = cmd.get_parser(resource + "_insert_rule")
+        resp = (test_cli20.MyResp(204), None)
+
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=resp) as mock_request:
+            shell.run_command(cmd, cmd_parser, args)
+        self.assert_mock_multiple_calls_with_same_arguments(
+            mock_get_client, mock.call(), 4)
+        mock_request.assert_called_once_with(
             test_cli20.MyUrlComparator(
                 test_cli20.end_url(path % myid),
                 self.client),
             'PUT', body=test_cli20.MyComparator(body, self.client),
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token',
-                test_cli20.TOKEN)).AndReturn((test_cli20.MyResp(204), None))
-        self.mox.ReplayAll()
-        cmd_parser = cmd.get_parser(resource + "_insert_rule")
-        shell.run_command(cmd, cmd_parser, args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
 
     def test_remove_firewall_rule(self):
         # firewall-policy-remove-rule myid ruleid
@@ -195,24 +196,25 @@ class CLITestV20FirewallPolicyJSON(test_cli20.CLITestV20Base):
         args = ['myid', 'removerule']
         extrafields = {'firewall_rule_id': 'removerule', }
 
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
         body = extrafields
         path = getattr(self.client, resource + "_remove_path")
-        self.client.httpclient.request(
+        cmd_parser = cmd.get_parser(resource + "_remove_rule")
+        resp = (test_cli20.MyResp(204), None)
+
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=resp) as mock_request:
+            shell.run_command(cmd, cmd_parser, args)
+        self.assert_mock_multiple_calls_with_same_arguments(
+            mock_get_client, mock.call(), 2)
+        mock_request.assert_called_once_with(
             test_cli20.MyUrlComparator(
                 test_cli20.end_url(path % myid),
                 self.client),
             'PUT', body=test_cli20.MyComparator(body, self.client),
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token',
-                test_cli20.TOKEN)).AndReturn((test_cli20.MyResp(204), None))
-        self.mox.ReplayAll()
-        cmd_parser = cmd.get_parser(resource + "_remove_rule")
-        shell.run_command(cmd, cmd_parser, args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
 
     def test_update_firewall_policy_name_shared_audited(self):
         # firewall-policy-update myid --name newname2 --shared --audited
