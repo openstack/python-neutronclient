@@ -16,7 +16,7 @@
 
 import sys
 
-from mox3 import mox
+import mock
 
 from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0 import address_scope
@@ -127,18 +127,15 @@ class CLITestV20AddressScopeJSON(test_cli20.CLITestV20Base):
                                              None)
         self._test_list_resources(resources, cmd, True)
 
-    def test_list_address_scope_pagination(self):
+    @mock.patch.object(address_scope.ListAddressScope, "extend_list")
+    def test_list_address_scope_pagination(self, mock_extend_list):
         # address_scope-list.
         cmd = address_scope.ListAddressScope(test_cli20.MyApp(sys.stdout),
                                              None)
-        self.mox.StubOutWithMock(address_scope.ListAddressScope,
-                                 "extend_list")
-        address_scope.ListAddressScope.extend_list(mox.IsA(list),
-                                                   mox.IgnoreArg())
         self._test_list_resources_with_pagination("address_scopes",
                                                   cmd)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
 
     def test_list_address_scope_sort(self):
         # sorted list:
