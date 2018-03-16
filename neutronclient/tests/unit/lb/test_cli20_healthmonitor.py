@@ -16,7 +16,7 @@
 
 import sys
 
-from mox3 import mox
+import mock
 
 from neutronclient.neutron.v2_0.lb import healthmonitor
 from neutronclient.tests.unit import test_cli20
@@ -149,10 +149,6 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
         pool_id = 'p_id'
         args = [health_monitor_id, pool_id]
 
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
-
         body = {resource: {'id': health_monitor_id}}
         result = {resource: {'id': health_monitor_id}, }
         result_str = self.client.serialize(result)
@@ -160,17 +156,21 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
         path = getattr(self.client,
                        "associate_pool_health_monitors_path") % pool_id
         return_tup = (test_cli20.MyResp(200), result_str)
-        self.client.httpclient.request(
-            test_cli20.end_url(path), 'POST',
-            body=test_cli20.MyComparator(body, self.client),
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(return_tup)
-        self.mox.ReplayAll()
         cmd_parser = cmd.get_parser('test_' + resource)
         parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=return_tup) as mock_request:
+            cmd.run(parsed_args)
+
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_called_once_with(
+            test_cli20.end_url(path), 'POST',
+            body=test_cli20.MyComparator(body, self.client),
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
 
     def test_disassociate_healthmonitor(self):
         cmd = healthmonitor.DisassociateHealthMonitor(
@@ -181,22 +181,22 @@ class CLITestV20LbHealthmonitorJSON(test_cli20.CLITestV20Base):
         pool_id = 'p_id'
         args = [health_monitor_id, pool_id]
 
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
-
         path = (getattr(self.client,
                         "disassociate_pool_health_monitors_path") %
                 {'pool': pool_id, 'health_monitor': health_monitor_id})
         return_tup = (test_cli20.MyResp(204), None)
-        self.client.httpclient.request(
-            test_cli20.end_url(path), 'DELETE',
-            body=None,
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(return_tup)
-        self.mox.ReplayAll()
         cmd_parser = cmd.get_parser('test_' + resource)
         parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=return_tup) as mock_request:
+            cmd.run(parsed_args)
+
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_called_once_with(
+            test_cli20.end_url(path), 'DELETE',
+            body=None,
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))

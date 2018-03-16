@@ -16,7 +16,7 @@
 
 import sys
 
-from mox3 import mox
+import mock
 
 from neutronclient.neutron.v2_0.lb.v2 import loadbalancer as lb
 from neutronclient.tests.unit import test_cli20
@@ -150,27 +150,27 @@ class CLITestV20LbLoadBalancerJSON(test_cli20.CLITestV20Base):
         fields = ['bytes_in', 'bytes_out']
         args = ['--fields', 'bytes_in', '--fields', 'bytes_out', my_id]
 
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
         query = "&".join(["fields=%s" % field for field in fields])
         expected_res = {'stats': {'bytes_in': '1234', 'bytes_out': '4321'}}
         resstr = self.client.serialize(expected_res)
         path = getattr(self.client, "lbaas_loadbalancer_path_stats")
         return_tup = (test_cli20.MyResp(200), resstr)
-        self.client.httpclient.request(
-            test_cli20.end_url(path % my_id, query), 'GET',
-            body=None,
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(return_tup)
-        self.mox.ReplayAll()
 
         cmd_parser = cmd.get_parser("test_" + resource)
         parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=return_tup) as mock_request:
+            cmd.run(parsed_args)
 
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+        self.assert_mock_multiple_calls_with_same_arguments(
+            mock_get_client, mock.call(), 2)
+        mock_request.assert_called_once_with(
+            test_cli20.end_url(path % my_id, query), 'GET',
+            body=None,
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
         _str = self.fake_stdout.make_string()
         self.assertIn('bytes_in', _str)
         self.assertIn('1234', _str)
@@ -184,10 +184,6 @@ class CLITestV20LbLoadBalancerJSON(test_cli20.CLITestV20Base):
         my_id = self.test_id
         args = [my_id]
 
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
-
         expected_res = {'statuses': {'operating_status': 'ONLINE',
                                      'provisioning_status': 'ACTIVE'}}
 
@@ -195,19 +191,21 @@ class CLITestV20LbLoadBalancerJSON(test_cli20.CLITestV20Base):
 
         path = getattr(self.client, "lbaas_loadbalancer_path_status")
         return_tup = (test_cli20.MyResp(200), resstr)
-        self.client.httpclient.request(
-            test_cli20.end_url(path % my_id), 'GET',
-            body=None,
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(return_tup)
-        self.mox.ReplayAll()
 
         cmd_parser = cmd.get_parser("test_" + resource)
         parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=return_tup) as mock_request:
+            cmd.run(parsed_args)
 
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_called_once_with(
+            test_cli20.end_url(path % my_id), 'GET',
+            body=None,
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
         _str = self.fake_stdout.make_string()
         self.assertIn('operating_status', _str)
         self.assertIn('ONLINE', _str)

@@ -16,7 +16,7 @@
 
 import sys
 
-from mox3 import mox
+import mock
 
 from neutronclient.neutron.v2_0.lb import pool
 from neutronclient.tests.unit import test_cli20
@@ -139,27 +139,28 @@ class CLITestV20LbPoolJSON(test_cli20.CLITestV20Base):
         fields = ['bytes_in', 'bytes_out']
         args = ['--fields', 'bytes_in', '--fields', 'bytes_out', my_id]
 
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
         query = "&".join(["fields=%s" % field for field in fields])
         expected_res = {'stats': {'bytes_in': '1234', 'bytes_out': '4321'}}
         resstr = self.client.serialize(expected_res)
         path = getattr(self.client, "pool_path_stats")
         return_tup = (test_cli20.MyResp(200), resstr)
-        self.client.httpclient.request(
-            test_cli20.end_url(path % my_id, query), 'GET',
-            body=None,
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(return_tup)
-        self.mox.ReplayAll()
 
         cmd_parser = cmd.get_parser("test_" + resource)
         parsed_args = cmd_parser.parse_args(args)
-        cmd.run(parsed_args)
 
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=return_tup) as mock_request:
+            cmd.run(parsed_args)
+
+        self.assert_mock_multiple_calls_with_same_arguments(
+            mock_get_client, mock.call(), 2)
+        mock_request.assert_called_once_with(
+            test_cli20.end_url(path % my_id, query), 'GET',
+            body=None,
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
         _str = self.fake_stdout.make_string()
         self.assertIn('bytes_in', _str)
         self.assertIn('bytes_out', _str)
