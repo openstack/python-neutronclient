@@ -16,7 +16,7 @@
 
 import sys
 
-from mox3 import mox
+import mock
 
 from neutronclient.neutron.v2_0 import agentscheduler
 from neutronclient.neutron.v2_0 import network
@@ -34,43 +34,43 @@ class CLITestV20AgentScheduler(test_cli20.CLITestV20Base):
         path = ((self.client.agent_path + destination) %
                 cmd_args[0])
 
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
         result_str = self.client.serialize(result)
         return_tup = (test_cli20.MyResp(200), result_str)
 
-        self.client.httpclient.request(
-            test_cli20.end_url(path), 'POST',
-            body=test_cli20.MyComparator(body, self.client),
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(return_tup)
-        self.mox.ReplayAll()
         cmd_parser = cmd.get_parser('test_' + resource)
         parsed_args = cmd_parser.parse_args(cmd_args)
-        cmd.run(parsed_args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=return_tup) as mock_request:
+            cmd.run(parsed_args)
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_called_once_with(
+            test_cli20.end_url(path), 'POST',
+            body=test_cli20.MyComparator(body, self.client),
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
 
     def _test_remove_from_agent(self, resource, cmd, cmd_args, destination):
         path = ((self.client.agent_path + destination + '/%s') %
                 cmd_args)
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
 
         return_tup = (test_cli20.MyResp(204), None)
-        self.client.httpclient.request(
-            test_cli20.end_url(path), 'DELETE',
-            body=None,
-            headers=mox.ContainsKeyValue(
-                'X-Auth-Token', test_cli20.TOKEN)).AndReturn(return_tup)
-        self.mox.ReplayAll()
         cmd_parser = cmd.get_parser('test_' + resource)
         parsed_args = cmd_parser.parse_args(cmd_args)
-        cmd.run(parsed_args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=return_tup) as mock_request:
+            cmd.run(parsed_args)
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_called_once_with(
+            test_cli20.end_url(path), 'DELETE',
+            body=None,
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
 
 
 class CLITestV20DHCPAgentScheduler(CLITestV20AgentScheduler):
@@ -93,17 +93,18 @@ class CLITestV20DHCPAgentScheduler(CLITestV20AgentScheduler):
         self._test_remove_from_agent(resource, cmd, args,
                                      self.client.DHCP_NETS)
 
-    def test_list_networks_on_agent(self):
+    @mock.patch.object(network.ListNetwork, "extend_list")
+    def test_list_networks_on_agent(self, mock_extend_list):
         resources = 'networks'
         cmd = agentscheduler.ListNetworksOnDhcpAgent(
             test_cli20.MyApp(sys.stdout), None)
         agent_id = 'agent_id1'
         path = ((self.client.agent_path + self.client.DHCP_NETS) %
                 agent_id)
-        self.mox.StubOutWithMock(network.ListNetwork, "extend_list")
-        network.ListNetwork.extend_list(mox.IsA(list), mox.IgnoreArg())
         self._test_list_resources(resources, cmd, base_args=[agent_id],
                                   path=path)
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
 
     def test_list_agents_hosting_network(self):
         resources = 'agent'
