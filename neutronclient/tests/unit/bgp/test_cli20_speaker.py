@@ -16,7 +16,7 @@
 
 import sys
 
-from mox3 import mox
+import mock
 
 from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0.bgp import speaker as bgp_speaker
@@ -155,18 +155,15 @@ class CLITestV20BGPSpeakerJSON(test_cli20.CLITestV20Base):
                                        None)
         self._test_list_resources(resources, cmd, True)
 
-    def test_list_bgp_speaker_pagination(self):
+    @mock.patch.object(bgp_speaker.ListSpeakers, "extend_list")
+    def test_list_bgp_speaker_pagination(self, mock_extend_list):
         # List all BGP Speakers with pagination support.
         cmd = bgp_speaker.ListSpeakers(test_cli20.MyApp(sys.stdout),
                                        None)
-        self.mox.StubOutWithMock(bgp_speaker.ListSpeakers,
-                                 "extend_list")
-        bgp_speaker.ListSpeakers.extend_list(mox.IsA(list),
-                                             mox.IgnoreArg())
         self._test_list_resources_with_pagination("bgp_speakers",
                                                   cmd)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
 
     def test_list_bgp_speaker_sort(self):
         # sorted list: bgp-speaker-list --sort-key name --sort-key id
