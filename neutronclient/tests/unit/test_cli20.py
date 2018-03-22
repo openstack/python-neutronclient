@@ -196,6 +196,20 @@ class ContainsKeyValue(object):
                 (self.__class__.__name__, self._expected))
 
 
+class IsA(object):
+    """Checks whether the parameter is of specific type."""
+
+    def __init__(self, expected_type):
+        self._expected_type = expected_type
+
+    def __eq__(self, other):
+        return isinstance(other, self._expected_type)
+
+    def __repr__(self):
+        return ('<%s (expected: %s)>' %
+                (self.__class__.__name__, self._expected_type))
+
+
 class CLITestV20Base(base.BaseTestCase):
 
     test_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
