@@ -185,6 +185,14 @@ def parse_args_to_dict(values_specs):
     current_item = None
     # the str after 'type='
     current_type_str = None
+    # dict of allowed types
+    allowed_type_dict = {
+        'bool': utils.str2bool,
+        'dict': utils.str2dict,
+        'int': int,
+        'str': str,
+    }
+
     for _item in values_specs_copy:
         if _item.startswith('--'):
             # Deal with previous argument if any
@@ -215,12 +223,16 @@ def parse_args_to_dict(values_specs):
                     _("Invalid values_specs %s") % ' '.join(values_specs))
             if 'type' not in current_arg:
                 current_type_str = _item.split('=', 2)[1]
-                current_arg.update({'type': eval(current_type_str)})
-                if current_type_str == 'bool':
-                    current_arg.update({'type': utils.str2bool})
-                elif current_type_str == 'dict':
-                    current_arg.update({'type': utils.str2dict})
-                continue
+                if current_type_str in allowed_type_dict:
+                    current_arg['type'] = allowed_type_dict[current_type_str]
+                    continue
+                else:
+                    raise exceptions.CommandError(
+                        _("Invalid value_specs {valspec}: type {curtypestr}"
+                            " is not supported").format(
+                            valspec=' '.join(values_specs),
+                            curtypestr=current_type_str))
+
         elif _item == 'list=true':
             _list_flag = True
             continue
@@ -240,7 +252,6 @@ def parse_args_to_dict(values_specs):
         if _item.startswith('---'):
             raise exceptions.CommandError(
                 _("Invalid values_specs %s") % ' '.join(values_specs))
-
         _values_specs.append(_item)
 
     # Deal with last one argument

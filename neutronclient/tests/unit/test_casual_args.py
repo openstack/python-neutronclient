@@ -14,6 +14,7 @@
 #    under the License.
 #
 
+import six
 import testtools
 
 from neutronclient.common import exceptions
@@ -40,6 +41,13 @@ class CLITestArgs(testtools.TestCase):
         _specs = ['--my_bool', 'type=bool', 'false', '--arg1', 'value1']
         _mydict = neutronV20.parse_args_to_dict(_specs)
         self.assertFalse(_mydict['my_bool'])
+
+    def test_int_and_str(self):
+        _specs = ['--my-int', 'type=int', '10',
+                  '--my-str', 'type=str', 'value1']
+        _mydict = neutronV20.parse_args_to_dict(_specs)
+        self.assertEqual(10, _mydict['my_int'])
+        self.assertEqual('value1', _mydict['my_str'])
 
     def test_nargs(self):
         _specs = ['--tag', 'x', 'y', '--arg1', 'value1']
@@ -102,15 +110,25 @@ class CLITestArgs(testtools.TestCase):
         self.assertEqual('value1', arg1[0]['key1'])
         self.assertEqual('value2', arg1[0]['key2'])
 
+    def test_parse_args_to_dict_bad_type(self):
+        _specs = ['--badtypearg', 'type=badtype', 'val1']
+        ex = self.assertRaises(exceptions.CommandError,
+                               neutronV20.parse_args_to_dict, _specs)
+        self.assertEqual('Invalid value_specs --badtypearg type=badtype val1: '
+                         'type badtype is not supported',
+                         six.text_type(ex))
+
     def test_clear_action(self):
         _specs = ['--anyarg', 'action=clear']
         args = neutronV20.parse_args_to_dict(_specs)
         self.assertIsNone(args['anyarg'])
 
-    def test_bad_values_str(self):
+    def test_bad_values_str_without_value(self):
         _specs = ['--strarg', 'type=str']
-        self.assertRaises(exceptions.CommandError,
-                          neutronV20.parse_args_to_dict, _specs)
+        ex = self.assertRaises(exceptions.CommandError,
+                               neutronV20.parse_args_to_dict, _specs)
+        self.assertEqual('Invalid values_specs --strarg type=str',
+                         six.text_type(ex))
 
     def test_bad_values_list(self):
         _specs = ['--listarg', 'list=true', 'type=str']
