@@ -16,7 +16,7 @@
 
 import sys
 
-from mox3 import mox
+import mock
 
 from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0 import subnetpool
@@ -135,13 +135,12 @@ class CLITestV20SubnetPoolJSON(test_cli20.CLITestV20Base):
                           cmd, name, myid, args, position_names,
                           position_values)
 
-    def test_list_subnetpool_pagination(self):
+    @mock.patch.object(subnetpool.ListSubnetPool, "extend_list")
+    def test_list_subnetpool_pagination(self, mock_extend_list):
         cmd = subnetpool.ListSubnetPool(test_cli20.MyApp(sys.stdout), None)
-        self.mox.StubOutWithMock(subnetpool.ListSubnetPool, "extend_list")
-        subnetpool.ListSubnetPool.extend_list(mox.IsA(list), mox.IgnoreArg())
         self._test_list_resources_with_pagination("subnetpools", cmd)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
 
     def test_list_subnetpools_sort(self):
         # List subnetpools:
