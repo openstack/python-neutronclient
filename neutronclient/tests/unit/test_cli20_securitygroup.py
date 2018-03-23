@@ -16,7 +16,7 @@
 
 import sys
 
-from mox3 import mox
+import mock
 from oslo_utils import uuidutils
 import six
 
@@ -211,34 +211,14 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         args = [myid]
         self._test_delete_resource(resource, cmd, myid, args)
 
-    def test_list_security_group_rules(self):
+    @mock.patch.object(securitygroup.ListSecurityGroupRule, "extend_list")
+    def test_list_security_group_rules(self, mock_extend_list):
         resources = "security_group_rules"
         cmd = securitygroup.ListSecurityGroupRule(
             test_cli20.MyApp(sys.stdout), None)
-        self.mox.StubOutWithMock(securitygroup.ListSecurityGroupRule,
-                                 "extend_list")
-        securitygroup.ListSecurityGroupRule.extend_list(mox.IsA(list),
-                                                        mox.IgnoreArg())
         self._test_list_resources(resources, cmd, True)
-
-    def _test_extend_list(self, mox_calls, data):
-        resources = "security_groups"
-
-        cmd = securitygroup.ListSecurityGroupRule(
-            test_cli20.MyApp(sys.stdout), None)
-        self.mox.StubOutWithMock(cmd, "get_client")
-        self.mox.StubOutWithMock(self.client.httpclient, "request")
-
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
-        path = getattr(self.client, resources + '_path')
-        mox_calls(path, data)
-        self.mox.ReplayAll()
-        known_args, _vs = cmd.get_parser(
-            'list' + resources).parse_known_args()
-
-        cmd.extend_list(data, known_args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
 
     def _build_test_data(self, data, excess=0):
         # Length of a query filter on security group rule id
@@ -277,44 +257,37 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         return result
 
     def test_extend_list(self):
-        def mox_calls(path, data):
-            responses = self._build_test_data(data)
-            self.client.httpclient.request(
-                test_cli20.MyUrlComparator(test_cli20.end_url(
-                    path, responses[0]['filter']), self.client),
-                'GET',
-                body=None,
-                headers=mox.ContainsKeyValue(
-                    'X-Auth-Token', test_cli20.TOKEN)).AndReturn(
-                        responses[0]['response'])
-
         data = [{'name': 'default',
                  'remote_group_id': 'remgroupid%02d' % i}
                 for i in range(10)]
         data.append({'name': 'default', 'remote_group_id': None})
-        self._test_extend_list(mox_calls, data)
+        resources = "security_groups"
+
+        cmd = securitygroup.ListSecurityGroupRule(
+            test_cli20.MyApp(sys.stdout), None)
+
+        path = getattr(self.client, resources + '_path')
+        responses = self._build_test_data(data)
+        known_args, _vs = cmd.get_parser(
+            'list' + resources).parse_known_args()
+        resp = responses[0]['response']
+
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient, "request",
+                                  return_value=resp) as mock_request:
+            cmd.extend_list(data, known_args)
+
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_called_once_with(
+            test_cli20.MyUrlComparator(test_cli20.end_url(
+                path, responses[0]['filter']), self.client),
+            'GET',
+            body=None,
+            headers=test_cli20.ContainsKeyValue(
+                {'X-Auth-Token': test_cli20.TOKEN}))
 
     def test_extend_list_exceed_max_uri_len(self):
-        def mox_calls(path, data):
-            # 1 char of extra URI len will cause a split in 2 requests
-            self.mox.StubOutWithMock(self.client.httpclient,
-                                     '_check_uri_length')
-            self.client.httpclient._check_uri_length(mox.IgnoreArg()).AndRaise(
-                exceptions.RequestURITooLong(excess=1))
-            responses = self._build_test_data(data, excess=1)
-
-            for item in responses:
-                self.client.httpclient._check_uri_length(
-                    mox.IgnoreArg()).AndReturn(None)
-                self.client.httpclient.request(
-                    test_cli20.MyUrlComparator(
-                        test_cli20.end_url(path, item['filter']), self.client),
-                    'GET',
-                    body=None,
-                    headers=mox.ContainsKeyValue(
-                        'X-Auth-Token', test_cli20.TOKEN)).AndReturn(
-                            item['response'])
-
         data = [{'name': 'default',
                  'security_group_id': 'secgroupid%02d' % i,
                  'remote_group_id': 'remgroupid%02d' % i}
@@ -322,39 +295,75 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
         data.append({'name': 'default',
                      'security_group_id': 'secgroupid10',
                      'remote_group_id': None})
-        self._test_extend_list(mox_calls, data)
+        resources = "security_groups"
 
-    def test_list_security_group_rules_pagination(self):
+        cmd = securitygroup.ListSecurityGroupRule(
+            test_cli20.MyApp(sys.stdout), None)
+        path = getattr(self.client, resources + '_path')
+        responses = self._build_test_data(data, excess=1)
+
+        known_args, _vs = cmd.get_parser(
+            'list' + resources).parse_known_args()
+        mock_request_side_effects = []
+        mock_request_calls = []
+        mock_check_uri_side_effects = [exceptions.RequestURITooLong(excess=1)]
+        mock_check_uri_calls = [mock.call(mock.ANY)]
+        for item in responses:
+            mock_request_side_effects.append(item['response'])
+            mock_request_calls.append(mock.call(
+                test_cli20.MyUrlComparator(
+                    test_cli20.end_url(path, item['filter']), self.client),
+                'GET',
+                body=None,
+                headers=test_cli20.ContainsKeyValue(
+                    {'X-Auth-Token': test_cli20.TOKEN})))
+            mock_check_uri_side_effects.append(None)
+            mock_check_uri_calls.append(mock.call(mock.ANY))
+
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient,
+                                  "request") as mock_request, \
+                mock.patch.object(self.client.httpclient,
+                                  "_check_uri_length") as mock_check_uri:
+            mock_request.side_effect = mock_request_side_effects
+            mock_check_uri.side_effect = mock_check_uri_side_effects
+            cmd.extend_list(data, known_args)
+
+        mock_get_client.assert_called_once_with()
+        mock_request.assert_has_calls(mock_request_calls)
+        mock_check_uri.assert_has_calls(mock_check_uri_calls)
+        self.assertEqual(len(mock_request_calls), mock_request.call_count)
+        self.assertEqual(len(mock_check_uri_calls), mock_check_uri.call_count)
+
+    @mock.patch.object(securitygroup.ListSecurityGroupRule, "extend_list")
+    def test_list_security_group_rules_pagination(self, mock_extend_list):
         resources = "security_group_rules"
         cmd = securitygroup.ListSecurityGroupRule(
             test_cli20.MyApp(sys.stdout), None)
-        self.mox.StubOutWithMock(securitygroup.ListSecurityGroupRule,
-                                 "extend_list")
-        securitygroup.ListSecurityGroupRule.extend_list(mox.IsA(list),
-                                                        mox.IgnoreArg())
         self._test_list_resources_with_pagination(resources, cmd)
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
 
-    def test_list_security_group_rules_sort(self):
+    @mock.patch.object(securitygroup.ListSecurityGroupRule, "extend_list")
+    def test_list_security_group_rules_sort(self, mock_extend_list):
         resources = "security_group_rules"
         cmd = securitygroup.ListSecurityGroupRule(
             test_cli20.MyApp(sys.stdout), None)
-        self.mox.StubOutWithMock(securitygroup.ListSecurityGroupRule,
-                                 "extend_list")
-        securitygroup.ListSecurityGroupRule.extend_list(mox.IsA(list),
-                                                        mox.IgnoreArg())
         self._test_list_resources(resources, cmd,
                                   sort_key=["name", "id"],
                                   sort_dir=["asc", "desc"])
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
 
-    def test_list_security_group_rules_limit(self):
+    @mock.patch.object(securitygroup.ListSecurityGroupRule, "extend_list")
+    def test_list_security_group_rules_limit(self, mock_extend_list):
         resources = "security_group_rules"
         cmd = securitygroup.ListSecurityGroupRule(
             test_cli20.MyApp(sys.stdout), None)
-        self.mox.StubOutWithMock(securitygroup.ListSecurityGroupRule,
-                                 "extend_list")
-        securitygroup.ListSecurityGroupRule.extend_list(mox.IsA(list),
-                                                        mox.IgnoreArg())
         self._test_list_resources(resources, cmd, page_size=1000)
+        mock_extend_list.assert_called_once_with(test_cli20.IsA(list),
+                                                 mock.ANY)
 
     def test_show_security_group_rule(self):
         resource = 'security_group_rule'
@@ -367,29 +376,30 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
     def _test_list_security_group_rules_extend(self, api_data, expected,
                                                args=(), conv=True,
                                                query_fields=None):
-        def setup_list_stub(resources, data, query):
+        def setup_list_stub(resources, data, query, mock_calls, mock_returns):
             reses = {resources: data}
             resstr = self.client.serialize(reses)
             resp = (test_cli20.MyResp(200), resstr)
             path = getattr(self.client, resources + '_path')
-            self.client.httpclient.request(
+            mock_calls.append(mock.call(
                 test_cli20.MyUrlComparator(
                     test_cli20.end_url(path, query),
                     self.client),
                 'GET',
                 body=None,
-                headers=mox.ContainsKeyValue(
-                    'X-Auth-Token', test_cli20.TOKEN)).AndReturn(resp)
+                headers=test_cli20.ContainsKeyValue(
+                    {'X-Auth-Token': test_cli20.TOKEN})))
+            mock_returns.append(resp)
 
         cmd = securitygroup.ListSecurityGroupRule(
             test_cli20.MyApp(sys.stdout), None)
-        self.mox.StubOutWithMock(cmd, 'get_client')
-        self.mox.StubOutWithMock(self.client.httpclient, 'request')
-        cmd.get_client().MultipleTimes().AndReturn(self.client)
         query = ''
         if query_fields:
             query = '&'.join(['fields=' + f for f in query_fields])
-        setup_list_stub('security_group_rules', api_data, query)
+        mock_request_calls = []
+        mock_request_returns = []
+        setup_list_stub('security_group_rules', api_data, query,
+                        mock_request_calls, mock_request_returns)
         if conv:
             sec_ids = set()
             for n in api_data:
@@ -403,15 +413,24 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
                             [{'id': 'myid1', 'name': 'group1'},
                              {'id': 'myid2', 'name': 'group2'},
                              {'id': 'myid3', 'name': 'group3'}],
-                            query='fields=id&fields=name' + filters)
-        self.mox.ReplayAll()
+                            'fields=id&fields=name' + filters,
+                            mock_request_calls,
+                            mock_request_returns)
 
         cmd_parser = cmd.get_parser('list_security_group_rules')
         parsed_args = cmd_parser.parse_args(args)
-        result = cmd.take_action(parsed_args)
-        self.mox.VerifyAll()
-        self.mox.UnsetStubs()
-        # Check columns
+
+        with mock.patch.object(cmd, "get_client",
+                               return_value=self.client) as mock_get_client, \
+                mock.patch.object(self.client.httpclient,
+                                  "request") as mock_request:
+            mock_request.side_effect = mock_request_returns
+            result = cmd.take_action(parsed_args)
+
+        self.assert_mock_multiple_calls_with_same_arguments(
+            mock_get_client, mock.call(), None)
+        mock_request.assert_has_calls(mock_request_calls)
+        self.assertEqual(len(mock_request_calls), mock_request.call_count)
         self.assertEqual(expected['cols'], result[0])
         # Check data
         _result = [x for x in result[1]]
