@@ -27,7 +27,7 @@ This document details the transition roadmap for moving the neutron client's
 OpenStack Networking API support, both the Python library and the ``neutron``
 command-line interface (CLI), to the
 `OpenStack Client (OSC) <https://github.com/openstack/python-openstackclient>`_
-and the `OpenStack Python SDK <https://github.com/openstack/python-openstacksdk>`_.
+and the `OpenStack Python SDK <https://github.com/openstack/openstacksdk>`_.
 This transition is being guided by the
 `Deprecate individual CLIs in favour of OSC <https://review.openstack.org/#/c/243348/>`_
 OpenStack spec. See the `Neutron RFE <https://bugs.launchpad.net/neutron/+bug/1521291>`_,
@@ -184,7 +184,7 @@ is not required as the neutronclient is already deprecated on its own.
 +-------------------------------------------------+-----------------------------------------------+
 | OpenStack Project for ``openstack`` Commands    | Python Library to Change                      |
 +=================================================+===============================================+
-| python-openstackclient                          | python-openstacksdk                           |
+| python-openstackclient                          | openstacksdk                                  |
 +-------------------------------------------------+-----------------------------------------------+
 | python-neutronclient                            | python-neutronclient                          |
 +-------------------------------------------------+-----------------------------------------------+
