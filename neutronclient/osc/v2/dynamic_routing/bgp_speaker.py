@@ -188,7 +188,7 @@ class ListBgpSpeaker(command.Lister):
     def take_action(self, parsed_args):
         client = self.app.client_manager.neutronclient
         if parsed_args.agent is not None:
-            data = client.list_bgp_speaker_on_dragent(parsed_args.agent_id)
+            data = client.list_bgp_speaker_on_dragent(parsed_args.agent)
         else:
             data = client.list_bgp_speakers()
 
