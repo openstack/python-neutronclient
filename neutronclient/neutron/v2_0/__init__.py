@@ -720,8 +720,8 @@ class ListCommand(NeutronCommand, lister.Lister):
 
         if parsed_args.formatter == 'table':
             formatters = self._formatters
-        elif (parsed_args.formatter == 'csv'
-              and hasattr(self, '_formatters_csv')):
+        elif (parsed_args.formatter == 'csv' and
+              hasattr(self, '_formatters_csv')):
             formatters = self._formatters_csv
         else:
             # For other formatters, we use raw value returned from neutron
