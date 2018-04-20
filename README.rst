@@ -11,11 +11,11 @@ Python bindings to the Neutron API
 ==================================
 
 .. image:: https://img.shields.io/pypi/v/python-neutronclient.svg
-    :target: https://pypi.python.org/pypi/python-neutronclient/
+    :target: https://pypi.org/project/python-neutronclient/
     :alt: Latest Version
 
 .. image:: https://img.shields.io/pypi/dm/python-neutronclient.svg
-    :target: https://pypi.python.org/pypi/python-neutronclient/
+    :target: https://pypi.org/project/python-neutronclient/
     :alt: Downloads
 
 This is a client library for Neutron built on the Neutron API. It
@@ -31,7 +31,7 @@ provides a Python API (the ``neutronclient`` module) and a command-line tool
 * `Source`_
 * `Developer's Guide`_
 
-.. _PyPi: https://pypi.python.org/pypi/python-neutronclient
+.. _PyPi: https://pypi.org/project/python-neutronclient
 .. _Online Documentation: https://docs.openstack.org/python-neutronclient/latest/
 .. _Launchpad project: https://launchpad.net/python-neutronclient
 .. _Blueprints: https://blueprints.launchpad.net/python-neutronclient
