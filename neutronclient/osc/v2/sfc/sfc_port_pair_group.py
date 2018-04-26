@@ -188,9 +188,9 @@ class SetSfcPortPairGroup(command.Command):
             if parsed_args.no_port_pair:
                 existing = []
             else:
-                existing = [client.find_resource(
+                existing = client.find_resource(
                     resource, parsed_args.port_pair_group,
-                    cmd_resource='sfc_port_pair_group')['port_pairs']]
+                    cmd_resource='sfc_port_pair_group')['port_pairs']
             attrs['port_pairs'] = sorted(list(set(existing) | set(added)))
         body = {resource: attrs}
         try:
@@ -250,12 +250,12 @@ class UnsetSfcPortPairGroup(command.Command):
         ppg_id = _get_id(client, parsed_args.port_pair_group, resource)
         attrs = {}
         if parsed_args.port_pairs:
-            existing = [client.find_resource(
+            existing = client.find_resource(
                 resource, parsed_args.port_pair_group,
-                cmd_resource='sfc_port_pair_group')['port_pairs']]
-            for pp in parsed_args.port_pairs:
-                removed = [client.find_resource(
-                    'port_pair', pp, cmd_resource='sfc_port_pair')['id']]
+                cmd_resource='sfc_port_pair_group')['port_pairs']
+            removed = [client.find_resource('port_pair', pp,
+                       cmd_resource='sfc_port_pair')['id']
+                       for pp in parsed_args.port_pairs]
             attrs['port_pairs'] = list(set(existing) - set(removed))
         if parsed_args.all_port_pair:
             attrs['port_pairs'] = []

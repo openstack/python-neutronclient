@@ -293,7 +293,7 @@ class TestSetSfcPortPairGroup(fakes.TestNeutronClientOSCV2):
             if self.neutronclient.find_resource.call_count == 3:
                 self.neutronclient.find_resource.assert_called_with(
                     self.res, target, cmd_resource='sfc_port_pair_group')
-                return {'port_pairs': self.ppg_pp}
+                return {'port_pairs': [self.ppg_pp]}
 
         self.neutronclient.find_resource.side_effect = _mock_port_pair_group
 
@@ -423,7 +423,7 @@ class TestUnsetSfcPortPairGroup(fakes.TestNeutronClientOSCV2):
             if self.neutronclient.find_resource.call_count == 1:
                 self.neutronclient.find_resource.assert_called_with(
                     self.res, target, cmd_resource='sfc_port_pair_group')
-                return {'port_pairs': self.ppg_pp}
+                return {'port_pairs': [self.ppg_pp]}
 
             if self.neutronclient.find_resource.call_count == 2:
                 self.neutronclient.find_resource.assert_called_with(
