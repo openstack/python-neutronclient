@@ -127,4 +127,8 @@ class FirewallRule(FakeFWaaS):
             ('shared', False),
             ('tenant_id', 'tenant-id-' +
              uuidutils.generate_uuid(dashed=False)),
+            ('source_firewall_group_id', 'firewall-group-id-' +
+             uuidutils.generate_uuid(dashed=False)),
+            ('destination_firewall_group_id', 'firewall-group-id-' +
+             uuidutils.generate_uuid(dashed=False)),
         ))

@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adds the remote source firewall group and the remote destination
+    firewall group field to the firewall rules.

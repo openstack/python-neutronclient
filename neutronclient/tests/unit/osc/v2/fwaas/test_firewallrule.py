@@ -37,6 +37,10 @@ CONVERT_MAP = {
     'disable_rule': 'enabled',
     'share': 'shared',
     'no_share': 'shared',
+    'source_firewall_group': 'source_firewall_group_id',
+    'destination_firewall_group': 'destination_firewall_group_id',
+    'no_source_firewall_group': 'source_firewall_group_id',
+    'no_destination_firewall_group': 'destination_firewall_group_id',
 }
 
 
@@ -114,11 +118,14 @@ class TestFirewallRule(test_fakes.TestNeutronClientOSCV2):
             'Destination Port',
             'Shared',
             'Project',
+            'Source Firewall Group ID',
+            'Destination Firewall Group ID',
         )
         self.data = _generate_data()
         self.ordered_headers = (
             'Action',
             'Description',
+            'Destination Firewall Group ID',
             'Destination IP Address',
             'Destination Port',
             'Enabled',
@@ -128,12 +135,14 @@ class TestFirewallRule(test_fakes.TestNeutronClientOSCV2):
             'Project',
             'Protocol',
             'Shared',
+            'Source Firewall Group ID',
             'Source IP Address',
             'Source Port',
         )
         self.ordered_data = (
             _fwr['action'],
             _fwr['description'],
+            _fwr['destination_firewall_group_id'],
             _fwr['destination_ip_address'],
             _fwr['destination_port'],
             _fwr['enabled'],
@@ -143,12 +152,14 @@ class TestFirewallRule(test_fakes.TestNeutronClientOSCV2):
             _fwr['tenant_id'],
             _replace_display_columns('protocol', _fwr['protocol']),
             _fwr['shared'],
+            _fwr['source_firewall_group_id'],
             _fwr['source_ip_address'],
             _fwr['source_port'],
         )
         self.ordered_columns = (
             'action',
             'description',
+            'destination_firewall_group_id',
             'destination_ip_address',
             'destination_port',
             'enabled',
@@ -158,6 +169,7 @@ class TestFirewallRule(test_fakes.TestNeutronClientOSCV2):
             'tenant_id',
             'protocol',
             'shared',
+            'source_firewall_group_id',
             'source_ip_address',
             'source_port',
         )
@@ -201,6 +213,10 @@ class TestCreateFirewallRule(TestFirewallRule, common.TestCreateFWaaS):
         action = args.get('action') or 'deny'
         ip_version = args.get('ip_version') or '4'
         destination_port = args.get('destination_port') or '0:65535'
+        destination_firewall_group = args.get(
+            'destination_firewall_group') or 'my-dst-fwg'
+        source_firewall_group = args.get(
+            'source_firewall_group') or 'my-src-fwg'
         tenant_id = args.get('tenant_id') or 'my-tenant'
         arglist = [
             '--description', description,
@@ -215,7 +231,10 @@ class TestCreateFirewallRule(TestFirewallRule, common.TestCreateFWaaS):
             '--project', tenant_id,
             '--disable-rule',
             '--share',
+            '--source-firewall-group', source_firewall_group,
+            '--destination-firewall-group', destination_firewall_group
         ]
+
         verifylist = [
             ('name', name),
             ('description', description),
@@ -229,10 +248,23 @@ class TestCreateFirewallRule(TestFirewallRule, common.TestCreateFWaaS):
             ('action', action),
             ('disable_rule', True),
             ('project', tenant_id),
+            ('source_firewall_group', source_firewall_group),
+            ('destination_firewall_group', destination_firewall_group)
         ]
         return arglist, verifylist
 
     def _test_create_with_all_params(self, args={}):
+        def _mock_fwr(*args, **kwargs):
+            if self.neutronclient.find_resource.call_count == 1:
+                self.neutronclient.find_resource.assert_called_once_with(
+                    const.FWG, 'my-src-fwg', cmd_resource=const.CMD_FWG)
+            if self.neutronclient.find_resource.call_count == 2:
+                self.neutronclient.find_resource.assert_called_with(
+                    const.FWG, 'my-dst-fwg', cmd_resource=const.CMD_FWG)
+            return {'id': args[1]}
+
+        self.neutronclient.find_resource.side_effect = mock.Mock(
+            side_effect=_mock_fwr)
         arglist, verifylist = self._set_all_params(args)
         request, response = _generate_req_and_res(verifylist)
         self._update_expect_response(request, response)
@@ -277,6 +309,34 @@ class TestCreateFirewallRule(TestFirewallRule, common.TestCreateFWaaS):
             self.assertRaises(
                 testtools.matchers._impl.MismatchError,
                 self.check_parser, self.cmd, arglist, verifylist)
+
+    def test_create_with_src_fwg_and_no(self):
+        fwg = 'my-fwg'
+        arglist = [
+            '--source-firewall-group', fwg,
+            '--no-source-firewall-group',
+        ]
+        verifylist = [
+            ('source_firewall_group', fwg),
+            ('no_source_firewall_group', True),
+        ]
+        self.assertRaises(
+            utils.ParserException,
+            self.check_parser, self.cmd, arglist, verifylist)
+
+    def test_create_with_dst_fwg_and_no(self):
+        fwg = 'my-fwg'
+        arglist = [
+            '--destination-firewall-group', fwg,
+            '--no-destination-firewall-group',
+        ]
+        verifylist = [
+            ('destination_firewall_group', fwg),
+            ('no_destination_firewall_group', True),
+        ]
+        self.assertRaises(
+            utils.ParserException,
+            self.check_parser, self.cmd, arglist, verifylist)
 
 
 class TestListFirewallRule(TestFirewallRule):
@@ -326,7 +386,8 @@ class TestListFirewallRule(TestFirewallRule):
 
         self.mocked.assert_called_once_with()
         self.assertEqual(list(self.headers), headers)
-        self.assertListItemEqual([self.data], list(data))
+        m = list(data)
+        self.assertListItemEqual([self.data], m)
 
     def test_list_with_no_option(self):
         arglist = []
@@ -645,6 +706,74 @@ class TestSetFirewallRule(TestFirewallRule, common.TestSetFWaaS):
 
         self.assertRaises(
             exceptions.CommandError, self.cmd.take_action, parsed_args)
+
+    def test_set_no_destination_fwg(self):
+        target = self.resource['id']
+        arglist = [
+            target,
+            '--no-destination-firewall-group',
+        ]
+        verifylist = [
+            (self.res, target),
+            ('no_destination_firewall_group', True),
+        ]
+        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+        result = self.cmd.take_action(parsed_args)
+
+        self.mocked.assert_called_once_with(
+            target, {self.res: {'destination_firewall_group_id': None}})
+        self.assertIsNone(result)
+
+    def test_set_no_source_fwg(self):
+        target = self.resource['id']
+        arglist = [
+            target,
+            '--no-source-firewall-group',
+        ]
+        verifylist = [
+            (self.res, target),
+            ('no_source_firewall_group', True),
+        ]
+        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+        result = self.cmd.take_action(parsed_args)
+
+        self.mocked.assert_called_once_with(
+            target, {self.res: {'source_firewall_group_id': None}})
+        self.assertIsNone(result)
+
+    def test_create_with_src_fwg_and_no(self):
+        target = self.resource['id']
+        fwg = 'my-fwg'
+        arglist = [
+            target,
+            '--source-firewall-group', fwg,
+            '--no-source-firewall-group',
+        ]
+        verifylist = [
+            (self.res, target),
+            ('source_firewall_group', fwg),
+            ('no_source_firewall_group', True),
+        ]
+        self.assertRaises(
+            utils.ParserException,
+            self.check_parser, self.cmd, arglist, verifylist)
+
+    def test_create_with_dst_fwg_and_no(self):
+        target = self.resource['id']
+        fwg = 'my-fwg'
+        arglist = [
+            target,
+            '--destination-firewall-group', fwg,
+            '--no-destination-firewall-group',
+        ]
+        verifylist = [
+            (self.res, target),
+            ('destination_firewall_group', fwg),
+            ('no_destination_firewall_group', True),
+        ]
+        self.assertRaises(
+            utils.ParserException,
+            self.check_parser, self.cmd, arglist, verifylist)
 
 
 class TestUnsetFirewallRule(TestFirewallRule, common.TestUnsetFWaaS):

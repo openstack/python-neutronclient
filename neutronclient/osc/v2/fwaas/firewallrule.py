@@ -47,6 +47,10 @@ _attr_map = (
     ('destination_port', 'Destination Port', column_util.LIST_LONG_ONLY),
     ('shared', 'Shared', column_util.LIST_LONG_ONLY),
     ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
+    ('source_firewall_group_id', 'Source Firewall Group ID',
+     column_util.LIST_LONG_ONLY),
+    ('destination_firewall_group_id', 'Destination Firewall Group ID',
+     column_util.LIST_LONG_ONLY),
 )
 
 
@@ -145,11 +149,30 @@ def _get_common_parser(parser):
         '--disable-rule',
         action='store_true',
         help=_('Disable this rule'))
+    src_fwg_group = parser.add_mutually_exclusive_group()
+    src_fwg_group.add_argument(
+        '--source-firewall-group',
+        metavar='<source-firewall-group>',
+        help=_('Source firewall group (name or ID)'))
+    src_fwg_group.add_argument(
+        '--no-source-firewall-group',
+        action='store_true',
+        help=_('No associated destination firewall group'))
+    dst_fwg_group = parser.add_mutually_exclusive_group()
+    dst_fwg_group.add_argument(
+        '--destination-firewall-group',
+        metavar='<destination-firewall-group>',
+        help=_('Destination firewall group (name or ID)'))
+    dst_fwg_group.add_argument(
+        '--no-destination-firewall-group',
+        action='store_true',
+        help=_('No associated destination firewall group'))
     return parser
 
 
 def _get_common_attrs(client_manager, parsed_args, is_create=True):
     attrs = {}
+    client = client_manager.neutronclient
     if is_create:
         if 'project' in parsed_args and parsed_args.project is not None:
             attrs['tenant_id'] = osc_utils.find_project(
@@ -193,6 +216,18 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
         attrs['shared'] = True
     if parsed_args.no_share or parsed_args.private:
         attrs['shared'] = False
+    if parsed_args.source_firewall_group:
+        attrs['source_firewall_group_id'] = client.find_resource(
+            const.FWG, parsed_args.source_firewall_group,
+            cmd_resource=const.CMD_FWG)['id']
+    if parsed_args.no_source_firewall_group:
+        attrs['source_firewall_group_id'] = None
+    if parsed_args.destination_firewall_group:
+        attrs['destination_firewall_group_id'] = client.find_resource(
+            const.FWG, parsed_args.destination_firewall_group,
+            cmd_resource=const.CMD_FWG)['id']
+    if parsed_args.no_destination_firewall_group:
+        attrs['destination_firewall_group_id'] = None
     return attrs
 
 
@@ -391,6 +426,16 @@ class UnsetFirewallRule(command.Command):
             '--enable-rule',
             action='store_true',
             help=_('Disable this rule'))
+
+        parser.add_argument(
+            '--source-firewall-group',
+            action='store_true',
+            help=_('Source firewall group (name or ID)'))
+
+        parser.add_argument(
+            '--destination-firewall-group',
+            action='store_true',
+            help=_('Destination firewall group (name or ID)'))
         return parser
 
     def _get_attrs(self, client_manager, parsed_args):
@@ -407,6 +452,10 @@ class UnsetFirewallRule(command.Command):
             attrs['shared'] = False
         if parsed_args.enable_rule:
             attrs['enabled'] = False
+        if parsed_args.source_firewall_group:
+            attrs['source_firewall_group_id'] = None
+        if parsed_args.source_firewall_group:
+            attrs['destination_firewall_group_id'] = None
         return attrs
 
     def take_action(self, parsed_args):
