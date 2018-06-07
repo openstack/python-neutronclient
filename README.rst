@@ -14,10 +14,6 @@ Python bindings to the Neutron API
     :target: https://pypi.org/project/python-neutronclient/
     :alt: Latest Version
 
-.. image:: https://img.shields.io/pypi/dm/python-neutronclient.svg
-    :target: https://pypi.org/project/python-neutronclient/
-    :alt: Downloads
-
 This is a client library for Neutron built on the Neutron API. It
 provides a Python API (the ``neutronclient`` module) and a command-line tool
 (``neutron``).
