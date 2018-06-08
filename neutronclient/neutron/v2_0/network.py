@@ -44,6 +44,9 @@ class ListNetwork(neutronV20.ListCommand):
     # Length of a query filter on subnet id
     # id=<uuid>& (with len(uuid)=36)
     subnet_id_filter_len = 40
+    # Length of a marker in pagination
+    # &marker=<uuid> (with len(uuid)=36)
+    marker_len = 44
     resource = 'network'
     _formatters = {'subnets': _format_subnets, }
     list_columns = ['id', 'name', 'subnets']
@@ -115,6 +118,8 @@ class ListNetwork(neutronV20.ListCommand):
             subnet_count = len(subnet_ids)
             max_size = ((self.subnet_id_filter_len * subnet_count) -
                         uri_len_exc.excess)
+            if self.pagination_support:
+                max_size -= self.marker_len
             chunk_size = max_size // self.subnet_id_filter_len
             subnets = []
             for i in range(0, subnet_count, chunk_size):

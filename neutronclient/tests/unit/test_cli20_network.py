@@ -653,8 +653,12 @@ class CLITestV20ExtendListNetworkJSON(test_cli20.CLITestV20Base):
         data = [{'id': 'netid%d' % i, 'name': 'net%d' % i,
                  'subnets': ['mysubid%d' % i]}
                 for i in range(10)]
-        filters1, response1 = self._build_test_data(data[:len(data) - 1])
-        filters2, response2 = self._build_test_data(data[len(data) - 1:])
+        # Since in pagination we add &marker=<uuid> (44 symbols), total change
+        # is 45 symbols. Single subnet takes 40 symbols (id=<uuid>&).
+        # Because of it marker will take more space than single subnet filter,
+        # and we expect neutron to send last 2 subnets in separate response.
+        filters1, response1 = self._build_test_data(data[:len(data) - 2])
+        filters2, response2 = self._build_test_data(data[len(data) - 2:])
         path = getattr(self.client, 'subnets_path')
         cmd = network.ListNetwork(test_cli20.MyApp(sys.stdout), None)
         with mock.patch.object(cmd, "get_client",
