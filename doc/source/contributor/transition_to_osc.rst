@@ -151,7 +151,7 @@ dual maintenance.
 
 **Where does my CLI belong?**
 
-If you are developing an API in any of the `neutron repos <http://governance.openstack.org/reference/projects/neutron.html>`_
+If you are developing an API in any of the `neutron repos <https://governance.openstack.org/tc/reference/projects/neutron.html>`_
 the client-side support must be generally located in either the openstackclient or neutronclient
 repos. Whether the actual code goes into one or the other repo it depends on the nature of the
 feature, its maturity level, and/or the depth of feedback required during the development.
