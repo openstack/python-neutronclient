@@ -1,4 +1,4 @@
-# Copyright 2017 FUJITSU LIMITED
+# Copyright 2017-2018 FUJITSU LIMITED
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -29,6 +29,7 @@ from neutronclient.tests.unit.osc.v2.logging import fakes
 
 _log = fakes.NetworkLog().create()
 RES_TYPE_SG = 'security_group'
+RES_TYPE_FWG = 'firewall_group'
 CONVERT_MAP = {
     'project': 'project_id',
     'enable': 'enabled',
@@ -137,6 +138,12 @@ class TestCreateNetworkLog(TestNetworkLog):
             return_value={'log': _log})
         self.mocked = self.neutronclient.create_network_log
         self.cmd = network_log.CreateNetworkLog(self.app, self.namespace)
+        loggables = {
+            "loggable_resources": [{"type": RES_TYPE_SG,
+                                    "type": RES_TYPE_FWG}]
+        }
+        self.neutronclient.list_network_loggable_resources = mock.Mock(
+            return_value=loggables)
 
     def _update_expect_response(self, request, response):
         """Set expected request and response
@@ -278,6 +285,90 @@ class TestCreateNetworkLog(TestNetworkLog):
             self.assertRaises(
                 testtools.matchers._impl.MismatchError,
                 self.check_parser, self.cmd, arglist, verifylist)
+
+    def test_create_with_valid_fwg_resource(self):
+        name = self.res['name']
+        resource_id = 'valid_fwg_id'
+        resource_type = RES_TYPE_FWG
+        # Test with valid FWG ID
+        with mock.patch.object(self.neutronclient, 'find_resource',
+                               return_value={'id': resource_id}):
+            arglist = [name,
+                       '--resource-type', resource_type,
+                       '--resource', resource_id
+                       ]
+            verifylist = [
+                ('name', name),
+                ('resource_type', resource_type),
+                ('resource', resource_id)
+            ]
+
+            parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+            headers, data = self.cmd.take_action(parsed_args)
+            expect = {
+                'name': self.res['name'],
+                'resource_type': RES_TYPE_FWG,
+                'resource_id': 'valid_fwg_id',
+            }
+            self.neutronclient.find_resource.assert_called_with(
+                resource_type,
+                resource_id,
+                cmd_resource='fwaas_firewall_group')
+            self.mocked.assert_called_once_with({'log': expect})
+            self.assertEqual(self.ordered_headers, headers)
+            self.assertEqual(self.ordered_data, data)
+
+    def test_create_with_invalid_fwg_resource(self):
+        name = self.res['name']
+        resource_id = 'invalid_fwg_id'
+        resource_type = RES_TYPE_FWG
+        # Test with invalid FWG ID
+        with mock.patch.object(self.neutronclient, 'find_resource',
+                               side_effect=exceptions.NotFound(code=0)):
+            arglist = [name,
+                       '--resource-type', resource_type,
+                       '--resource', resource_id
+                       ]
+            verifylist = [
+                ('name', name),
+                ('resource_type', resource_type),
+                ('resource', resource_id)
+            ]
+
+            parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+            self.assertRaises(exceptions.NotFound,
+                              self.cmd.take_action,
+                              parsed_args)
+            self.neutronclient.find_resource.assert_called_with(
+                resource_type,
+                resource_id,
+                cmd_resource='fwaas_firewall_group')
+            self.mocked.assert_not_called()
+
+    def test_create_with_invalid_resource_type(self):
+        name = self.res['name']
+        resource_type = 'invalid_resource_type'
+        resource_id = 'valid_fwg_id'
+        with mock.patch.object(self.neutronclient, 'find_resource',
+                               side_effect=exceptions.NotFound(code=0)):
+            arglist = [name,
+                       '--resource-type', resource_type,
+                       '--resource', resource_id
+                       ]
+            verifylist = [
+                ('name', name),
+                ('resource_type', resource_type),
+                ('resource', resource_id)
+            ]
+            parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+            self.assertRaises(exceptions.NotFound,
+                              self.cmd.take_action,
+                              parsed_args)
+            self.neutronclient.find_resource.assert_called_with(
+                resource_type,
+                resource_id,
+                cmd_resource=None)
+            self.mocked.assert_not_called()
 
 
 class TestListNetworkLog(TestNetworkLog):

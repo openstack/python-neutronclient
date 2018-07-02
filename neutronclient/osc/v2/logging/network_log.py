@@ -1,4 +1,4 @@
-# Copyright 2017 FUJTISU LIMITED.
+# Copyright 2017-2018 FUJTISU LIMITED.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -25,7 +25,7 @@ from oslo_log import log as logging
 from neutronclient._i18n import _
 from neutronclient.common import utils as nc_utils
 from neutronclient.osc import utils as osc_utils
-
+from neutronclient.osc.v2.fwaas import constants as fwaas_const
 
 LOG = logging.getLogger(__name__)
 
@@ -77,17 +77,23 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
                 parsed_args.project,
                 parsed_args.project_domain,
             ).id
+        resource_type = parsed_args.resource_type
+        attrs['resource_type'] = resource_type
         if parsed_args.resource:
+            cmd_resource = None
+            if resource_type == fwaas_const.FWG:
+                cmd_resource = fwaas_const.CMD_FWG
             attrs['resource_id'] = client.find_resource(
-                'security_group', parsed_args.resource)['id']
+                resource_type,
+                parsed_args.resource,
+                cmd_resource=cmd_resource)['id']
+
         if parsed_args.target:
             # NOTE(yushiro) Currently, we're supporting only port
             attrs['target_id'] = client.find_resource(
                 'port', parsed_args.target)['id']
         if parsed_args.event:
             attrs['event'] = parsed_args.event
-        if parsed_args.resource_type:
-            attrs['resource_type'] = parsed_args.resource_type
     if parsed_args.enable:
         attrs['enabled'] = True
     if parsed_args.disable:
@@ -117,8 +123,8 @@ class CreateNetworkLog(command.ShowOne):
             type=nc_utils.convert_to_uppercase,
             help=_('An event to store with log'))
         # NOTE(yushiro) '--resource-type' is managed by following command:
-        # "openstack network loggable resource list". Therefore, this option
-        # shouldn't have "choices" like ['security_group']
+        # "openstack network loggable resources list". Therefore, this option
+        # shouldn't have "choices" like ['security_group', 'firewall_group']
         parser.add_argument(
             '--resource-type',
             metavar='<resource-type>',
@@ -126,12 +132,13 @@ class CreateNetworkLog(command.ShowOne):
             type=nc_utils.convert_to_lowercase,
             help=_('Network log type(s). '
                    'You can see supported type(s) with following command:\n'
-                   '$ openstack network loggable resource list'))
+                   '$ openstack network loggable resources list'))
         parser.add_argument(
             '--resource',
             metavar='<resource>',
-            help=_('Security group (name or ID) for logging. You can control '
-                   'for logging target combination with --target option.'))
+            help=_('Name or ID of resource (security group or firewall group) '
+                   'that used for logging. You can control for logging target '
+                   'combination with --target option.'))
         parser.add_argument(
             '--target',
             metavar='<target>',
@@ -171,13 +178,13 @@ class DeleteNetworkLog(command.Command):
             except Exception as e:
                 result += 1
                 LOG.error(_("Failed to delete network log with "
-                          "name or ID '%(network_log)s': %(e)s"),
+                            "name or ID '%(network_log)s': %(e)s"),
                           {'network_log': log_res, 'e': e})
 
         if result > 0:
             total = len(parsed_args.network_log)
             msg = (_("%(result)s of %(total)s network log(s) "
-                   "failed to delete") % {'result': result, 'total': total})
+                     "failed to delete") % {'result': result, 'total': total})
             raise exceptions.CommandError(msg)
 
 
@@ -221,10 +228,17 @@ class ListNetworkLog(command.Lister):
             if d['event']:
                 event = e_prefix + d['event'].upper()
             port = '(port) ' + d['target_id'] if d['target_id'] else ''
-            sg = ('(security_group) ' + d['resource_id']
-                  if d['resource_id'] else '')
+            resource_type = d['resource_type']
+            if d['resource_id']:
+                res = '(%s) %s' % (resource_type, d['resource_id'])
+            else:
+                res = ''
             t_prefix = 'Logged: '
-            t = sg + ' on ' + port if port and sg else sg + port
+            if port and res:
+                t = '%s on %s' % (res, port)
+            else:
+                # Either of res and port is empty, so concatenation works fine
+                t = res + port
             target = t_prefix + t if t else t_prefix + '(None specified)'
             d['summary'] = ',\n'.join([event, target])
         return ext_data

@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    CLI support for the "firewal_group" as a loggable resource type for logging
+    feature, which is enhanced FWaaS functionality, as OSC plugin commands.
