@@ -77,7 +77,7 @@ class TestHTTPClientMixin(object):
 
     def test_osprofiler_headers_are_injected(self):
         osprofiler.profiler.init('SWORDFISH')
-        self.addCleanup(osprofiler.profiler._clean)
+        self.addCleanup(osprofiler.profiler.clean)
 
         headers = {'Accept': 'application/json'}
         headers.update(osprofiler.web.get_trace_id_headers())
