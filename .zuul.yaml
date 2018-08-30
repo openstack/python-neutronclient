@@ -13,32 +13,20 @@
       jobs:
         - openstack-tox-lower-constraints
         - legacy-neutronclient-test-dsvm-functional:
-            irrelevant-files:
+            irrelevant-files: &project-irrelevant-files
               - ^.*\.rst$
               - ^doc/.*$
               - ^neutron/locale/.*$
               - ^releasenotes/.*$
         - legacy-neutronclient-test-dsvm-functional-adv-svcs:
-            irrelevant-files:
-              - ^.*\.rst$
-              - ^doc/.*$
-              - ^neutron/locale/.*$
-              - ^releasenotes/.*$
+            irrelevant-files: *project-irrelevant-files
     gate:
       jobs:
         - openstack-tox-lower-constraints
         - legacy-neutronclient-test-dsvm-functional:
-            irrelevant-files:
-              - ^.*\.rst$
-              - ^doc/.*$
-              - ^neutron/locale/.*$
-              - ^releasenotes/.*$
+            irrelevant-files: *project-irrelevant-files
         - legacy-neutronclient-test-dsvm-functional-adv-svcs:
-            irrelevant-files:
-              - ^.*\.rst$
-              - ^doc/.*$
-              - ^neutron/locale/.*$
-              - ^releasenotes/.*$
+            irrelevant-files: *project-irrelevant-files
     post:
       jobs:
         - openstack-tox-cover
