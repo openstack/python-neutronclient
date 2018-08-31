@@ -269,8 +269,8 @@ class AutoprogramCliffDirective(rst.Directive):
         self.env = self.state.document.settings.env
 
         command_pattern = self.options.get('command')
-        application_name = (self.options.get('application')
-                            or self.env.config.autoprogram_cliff_application)
+        application_name = (self.options.get('application') or
+                            self.env.config.autoprogram_cliff_application)
 
         global_ignored = self.env.config.autoprogram_cliff_ignored
         local_ignored = self.options.get('ignored', '')
@@ -360,8 +360,8 @@ class CliffAppDirective(rst.Directive):
         app_arguments = self.options.get('arguments', '').split()
         cliff_app = cliff_app_class(*app_arguments)
 
-        application_name = (self.options.get('application')
-                            or self.env.config.autoprogram_cliff_application)
+        application_name = (self.options.get('application') or
+                            self.env.config.autoprogram_cliff_application)
 
         global_ignored = self.env.config.autoprogram_cliff_ignored
         local_ignored = self.options.get('ignored', '')
