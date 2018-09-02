@@ -1,7 +1,49 @@
 - project:
+    templates:
+      - openstack-python-jobs
+      - openstack-python35-jobs
+      - publish-openstack-sphinx-docs
+      - check-requirements
+      - lib-forward-testing
+      - release-notes-jobs
+      - openstackclient-plugin-jobs
     check:
       jobs:
         - openstack-tox-lower-constraints
+        - legacy-neutronclient-test-dsvm-functional:
+            irrelevant-files:
+              - ^.*\.rst$
+              - ^doc/.*$
+              - ^neutron/locale/.*$
+              - ^releasenotes/.*$
+        - legacy-neutronclient-test-dsvm-functional-adv-svcs:
+            irrelevant-files:
+              - ^.*\.rst$
+              - ^doc/.*$
+              - ^neutron/locale/.*$
+              - ^releasenotes/.*$
     gate:
       jobs:
         - openstack-tox-lower-constraints
+        - legacy-neutronclient-test-dsvm-functional:
+            irrelevant-files:
+              - ^.*\.rst$
+              - ^doc/.*$
+              - ^neutron/locale/.*$
+              - ^releasenotes/.*$
+        - legacy-neutronclient-test-dsvm-functional-adv-svcs:
+            irrelevant-files:
+              - ^.*\.rst$
+              - ^doc/.*$
+              - ^neutron/locale/.*$
+              - ^releasenotes/.*$
+    post:
+      jobs:
+        - openstack-tox-cover
+    experimental:
+      jobs:
+        - legacy-grenade-dsvm-neutron-libs:
+            irrelevant-files:
+              - ^(test-|)requirements.txt$
+              - ^setup.cfg$
+
