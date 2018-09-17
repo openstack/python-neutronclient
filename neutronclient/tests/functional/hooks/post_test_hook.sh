@@ -31,8 +31,8 @@ function generate_test_logs {
 
 function generate_testr_results {
     # Give job user rights to access tox logs
-    sudo -H -u $owner chmod o+rw .
-    sudo -H -u $owner chmod o+rw -R .testrepository
+    sudo -H -u $USER chmod o+rw .
+    sudo -H -u $USER chmod o+rw -R .testrepository
     if [ -f ".testrepository/0" ] ; then
         .tox/$VENV/bin/subunit-1to2 < .testrepository/0 > ./testrepository.subunit
         $SCRIPTS_DIR/subunit2html ./testrepository.subunit testr_results.html
@@ -48,9 +48,8 @@ function generate_testr_results {
 }
 
 export NEUTRONCLIENT_DIR="$BASE/new/python-neutronclient"
-owner=jenkins
 
-sudo chown -R $owner:stack $NEUTRONCLIENT_DIR
+sudo chown -R $USER:stack $NEUTRONCLIENT_DIR
 
 # Go to the neutronclient dir
 cd $NEUTRONCLIENT_DIR
@@ -60,7 +59,7 @@ VENV=${1:-"functional"}
 echo "Running neutronclient functional test suite"
 set +e
 # Preserve env for OS_ credentials
-sudo -E -H -u $owner tox -e $VENV
+sudo -E -H -u $USER tox -e $VENV
 EXIT_CODE=$?
 set -e
 
