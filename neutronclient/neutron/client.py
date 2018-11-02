@@ -28,7 +28,7 @@ def make_client(instance):
     """Returns an neutron client."""
     neutron_client = utils.get_client_class(
         API_NAME,
-        instance._api_version[API_NAME],
+        instance._api_version,
         API_VERSIONS,
     )
     instance.initialize()
