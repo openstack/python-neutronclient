@@ -1514,7 +1514,7 @@ class Client(ClientBase):
                         params=_params)
 
     def list_routers_on_l3_agent(self, l3_agent, **_params):
-        """Fetches a list of L3 agents hosting a router."""
+        """Fetches a list of routers hosted on an L3 agent."""
         return self.get((self.agent_path + self.L3_ROUTERS) % l3_agent,
                         params=_params)
 
