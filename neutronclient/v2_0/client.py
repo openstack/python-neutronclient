@@ -1494,7 +1494,7 @@ class Client(ClientBase):
                         params=_params)
 
     def list_networks_on_dhcp_agent(self, dhcp_agent, **_params):
-        """Fetches a list of dhcp agents hosting a network."""
+        """Fetches a list of networks hosted on a DHCP agent."""
         return self.get((self.agent_path + self.DHCP_NETS) % dhcp_agent,
                         params=_params)
 
