@@ -33,6 +33,12 @@ from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
     ShowBgpvpnResAssoc
 from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
     UnsetBgpvpnResAssoc
+from neutronclient.osc.v2.networking_bgpvpn.router_association import\
+    CreateBgpvpnRouterAssoc
+from neutronclient.osc.v2.networking_bgpvpn.router_association import\
+    SetBgpvpnRouterAssoc
+from neutronclient.osc.v2.networking_bgpvpn.router_association import\
+    ShowBgpvpnRouterAssoc
 from neutronclient.tests.unit.osc.v2 import fakes as test_fakes
 
 
@@ -139,6 +145,35 @@ class ShowBgpvpnFakeResAssoc(BgpvpnFakeAssoc, ShowBgpvpnResAssoc):
     pass
 
 
+class BgpvpnFakeRouterAssoc(object):
+    _assoc_res_name = 'fake_resource'
+    _resource = '%s_association' % _assoc_res_name
+    _resource_plural = '%ss' % _resource
+
+    _attr_map = (
+        ('id', 'ID', column_util.LIST_BOTH),
+        ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
+        ('%s_id' % _assoc_res_name, '%s ID' % _assoc_res_name.capitalize(),
+         column_util.LIST_BOTH),
+        ('advertise_extra_routes', 'Advertise extra routes',
+         column_util.LIST_LONG_ONLY),
+    )
+    _formatters = {}
+
+
+class CreateBgpvpnFakeRouterAssoc(BgpvpnFakeRouterAssoc,
+                                  CreateBgpvpnRouterAssoc):
+    pass
+
+
+class SetBgpvpnFakeRouterAssoc(BgpvpnFakeRouterAssoc, SetBgpvpnRouterAssoc):
+    pass
+
+
+class ShowBgpvpnFakeRouterAssoc(BgpvpnFakeRouterAssoc, ShowBgpvpnRouterAssoc):
+    pass
+
+
 class FakeResource(object):
     """Fake resource with minimal attributes."""
 
@@ -177,14 +212,19 @@ class FakeResAssoc(object):
     """Fake resource association with minimal attributes."""
 
     @staticmethod
-    def create_one_resource_association(resource):
+    def create_one_resource_association(resource, attrs=None):
         """Create a fake resource association."""
+
+        attrs = attrs or {}
 
         res_assoc_attrs = {
             'id': 'fake_association_id',
             'tenant_id': resource['tenant_id'],
             'fake_resource_id': resource['id'],
         }
+
+        # Overwrite default attributes.
+        res_assoc_attrs.update(attrs)
         return copy.deepcopy(res_assoc_attrs)
 
     @staticmethod
