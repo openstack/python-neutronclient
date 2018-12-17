@@ -501,6 +501,7 @@ class Client(ClientBase):
     quotas_path = "/quotas"
     quota_path = "/quotas/%s"
     quota_default_path = "/quotas/%s/default"
+    quota_details_path = "/quotas/%s/details.json"
     extensions_path = "/extensions"
     extension_path = "/extensions/%s"
     routers_path = "/routers"
@@ -752,6 +753,13 @@ class Client(ClientBase):
     def show_quota(self, project_id, **_params):
         """Fetch information of a certain project's quotas."""
         return self.get(self.quota_path % (project_id), params=_params)
+
+    @debtcollector.renames.renamed_kwarg(
+        'tenant_id', 'project_id', replace=True)
+    def show_quota_details(self, project_id, **_params):
+        """Fetch information of a certain project's quota details."""
+        return self.get(self.quota_details_path % (project_id),
+                        params=_params)
 
     @debtcollector.renames.renamed_kwarg(
         'tenant_id', 'project_id', replace=True)
