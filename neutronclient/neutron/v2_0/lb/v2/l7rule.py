@@ -39,32 +39,32 @@ class LbaasL7RuleMixin(object):
 
 
 def _add_common_args(parser, is_create=True):
-        parser.add_argument(
-            '--type',
-            required=is_create,
-            type=utils.convert_to_uppercase,
-            choices=['HOST_NAME', 'PATH', 'FILE_TYPE', 'HEADER', 'COOKIE'],
-            help=_('Rule type.'))
-        parser.add_argument(
-            '--compare-type',
-            required=is_create,
-            type=utils.convert_to_uppercase,
-            choices=['REGEX', 'STARTS_WITH', 'ENDS_WITH',
-                     'CONTAINS', 'EQUAL_TO'],
-            help=_('Rule compare type.'))
-        parser.add_argument(
-            '--invert-compare',
-            dest='invert',
-            action='store_true',
-            help=_('Invert the compare type.'))
-        parser.add_argument(
-            '--key',
-            help=_('Key to compare.'
-                   ' Relevant for HEADER and COOKIE types only.'))
-        parser.add_argument(
-            '--value',
-            required=is_create,
-            help=_('Value to compare.'))
+    parser.add_argument(
+        '--type',
+        required=is_create,
+        type=utils.convert_to_uppercase,
+        choices=['HOST_NAME', 'PATH', 'FILE_TYPE', 'HEADER', 'COOKIE'],
+        help=_('Rule type.'))
+    parser.add_argument(
+        '--compare-type',
+        required=is_create,
+        type=utils.convert_to_uppercase,
+        choices=['REGEX', 'STARTS_WITH', 'ENDS_WITH',
+                 'CONTAINS', 'EQUAL_TO'],
+        help=_('Rule compare type.'))
+    parser.add_argument(
+        '--invert-compare',
+        dest='invert',
+        action='store_true',
+        help=_('Invert the compare type.'))
+    parser.add_argument(
+        '--key',
+        help=_('Key to compare.'
+               ' Relevant for HEADER and COOKIE types only.'))
+    parser.add_argument(
+        '--value',
+        required=is_create,
+        help=_('Value to compare.'))
 
 
 def _common_args2body(client, parsed_args, is_create=True):

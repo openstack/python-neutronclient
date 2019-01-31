@@ -38,17 +38,16 @@ class LbaasMemberMixin(object):
 
 
 def _add_common_args(parser):
-        parser.add_argument(
-            '--name',
-            help=_('Name of the member.'))
-        parser.add_argument(
-            '--weight',
-            help=_('Weight of the member in the pool (default:1, [0..256]).'))
+    parser.add_argument(
+        '--name',
+        help=_('Name of the member.'))
+    parser.add_argument(
+        '--weight',
+        help=_('Weight of the member in the pool (default:1, [0..256]).'))
 
 
 def _parse_common_args(body, parsed_args):
-        neutronV20.update_dict(parsed_args, body,
-                               ['weight', 'name'])
+    neutronV20.update_dict(parsed_args, body, ['weight', 'name'])
 
 
 class ListMember(LbaasMemberMixin, neutronV20.ListCommand):
