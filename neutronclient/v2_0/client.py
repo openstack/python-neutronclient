@@ -494,6 +494,7 @@ class Client(ClientBase):
     port_path = "/ports/%s"
     subnets_path = "/subnets"
     subnet_path = "/subnets/%s"
+    onboard_network_subnets_path = "/subnetpools/%s/onboard_network_subnets"
     subnetpools_path = "/subnetpools"
     subnetpool_path = "/subnetpools/%s"
     address_scopes_path = "/address-scopes"
@@ -2369,6 +2370,11 @@ class Client(ClientBase):
         """Fetch a list of supported resource types for network log."""
         return self.list('loggable_resources', self.network_loggables_path,
                          retrieve_all, **_params)
+
+    def onboard_network_subnets(self, subnetpool, body=None):
+        """Onboard the specified network's subnets into a subnet pool."""
+        return self.put(self.onboard_network_subnets_path % (subnetpool),
+                        body=body)
 
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""

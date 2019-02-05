@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Add ``network onboard subnets`` OSC command to enable subnet onboard support from the CLI
+    [Blueprint `subnet-onboard <https://blueprints.launchpad.net/neutron/+spec/subnet-onboard>`_]
