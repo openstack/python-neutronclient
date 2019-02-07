@@ -110,7 +110,7 @@ class SimpleReadOnlyNeutronClientTest(base.ClientTestBase):
 
         commands = []
         cmds_start = lines.index('Commands for API v2.0:')
-        command_pattern = re.compile('^ {2}([a-z0-9\-\_]+)')
+        command_pattern = re.compile(r'^ {2}([a-z0-9\-\_]+)')
         for line in lines[cmds_start:]:
             match = command_pattern.match(line)
             if match:

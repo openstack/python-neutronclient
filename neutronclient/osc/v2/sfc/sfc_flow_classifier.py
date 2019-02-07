@@ -300,20 +300,20 @@ def _get_attrs(client_manager, attrs, parsed_args):
 
 
 def _fill_protocol_port_info(attrs, port_type, port_val):
-        min_port, sep, max_port = port_val.partition(":")
-        if not min_port:
-            msg = ("Invalid port value '%s', expected format is "
-                   "min-port:max-port or min-port.")
-            raise argparse.ArgumentTypeError(msg % port_val)
-        if not max_port:
-            max_port = min_port
-        try:
-            attrs[port_type + '_port_range_min'] = int(min_port)
-            attrs[port_type + '_port_range_max'] = int(max_port)
-        except ValueError:
-            message = (_("Protocol port value %s must be an integer "
-                         "or integer:integer.") % port_val)
-            raise nc_exc.CommandError(message=message)
+    min_port, sep, max_port = port_val.partition(":")
+    if not min_port:
+        msg = ("Invalid port value '%s', expected format is "
+               "min-port:max-port or min-port.")
+        raise argparse.ArgumentTypeError(msg % port_val)
+    if not max_port:
+        max_port = min_port
+    try:
+        attrs[port_type + '_port_range_min'] = int(min_port)
+        attrs[port_type + '_port_range_max'] = int(max_port)
+    except ValueError:
+        message = (_("Protocol port value %s must be an integer "
+                     "or integer:integer.") % port_val)
+        raise nc_exc.CommandError(message=message)
 
 
 def _get_id(client, id_or_name, resource):
