@@ -31,7 +31,7 @@ def add_minimum_bandwidth_arguments(parser):
         help=_('QoS minimum bandwidth assurance, expressed in kilobits '
                'per second.'))
     # NOTE(ralonsoh): the only direction implemented is "egress". Please,
-    # refer to the spec (https://review.openstack.org/#/c/316082/).
+    # refer to the spec (https://review.opendev.org/#/c/316082/).
     parser.add_argument(
         '--direction',
         # NOTE(ihrachys): though server picks the default for us (egress), it's

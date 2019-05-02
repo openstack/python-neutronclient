@@ -29,7 +29,7 @@ command-line interface (CLI), to the
 `OpenStack Client (OSC) <https://github.com/openstack/python-openstackclient>`_
 and the `OpenStack Python SDK <https://github.com/openstack/openstacksdk>`_.
 This transition is being guided by the
-`Deprecate individual CLIs in favour of OSC <https://review.openstack.org/#/c/243348/>`_
+`Deprecate individual CLIs in favour of OSC <https://review.opendev.org/#/c/243348/>`_
 OpenStack spec. See the `Neutron RFE <https://bugs.launchpad.net/neutron/+bug/1521291>`_,
 `OSC neutron support etherpad <https://etherpad.openstack.org/p/osc-neutron-support>`_ and
 details below for the overall progress of this transition.
@@ -56,16 +56,16 @@ Transition Steps
 ----------------
 
 1. **Done:** OSC adds OpenStack Python SDK as a dependency. See the following
-   patch set: https://review.openstack.org/#/c/138745/
+   patch set: https://review.opendev.org/#/c/138745/
 
 2. **Done:** OSC switches its networking support for the
    `network <https://docs.openstack.org/python-openstackclient/latest/cli/command-objects/network.html>`_
    command object to use the OpenStack Python SDK instead of the neutron
    client's Python library. See the following patch set:
-   https://review.openstack.org/#/c/253348/
+   https://review.opendev.org/#/c/253348/
 
 3. **Done:** OSC removes its python-neutronclient dependency.
-   See the following patch set: https://review.openstack.org/#/c/255545/
+   See the following patch set: https://review.opendev.org/#/c/255545/
 
 4. **In Progress:** OpenStack Python SDK releases version 1.0 to guarantee
    backwards compatibility of its networking support and OSC updates
@@ -99,7 +99,7 @@ Transition Steps
    developer guide section below for more information on this step.
 
 7. **In Progress:** Deprecate the ``neutron`` CLI. Running the CLI after
-   it has been `deprecated <https://review.openstack.org/#/c/393903/>`_
+   it has been `deprecated <https://review.opendev.org/#/c/393903/>`_
    will issue a warning message:
    ``neutron CLI is deprecated and will be removed in the future. Use openstack CLI instead.``
    In addition, no new features will be added to the CLI, though fixes to

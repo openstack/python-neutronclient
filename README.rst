@@ -32,6 +32,6 @@ provides a Python API (the ``neutronclient`` module) and a command-line tool
 .. _Launchpad project: https://launchpad.net/python-neutronclient
 .. _Blueprints: https://blueprints.launchpad.net/python-neutronclient
 .. _Bugs: https://bugs.launchpad.net/python-neutronclient
-.. _Source: https://git.openstack.org/cgit/openstack/python-neutronclient
+.. _Source: https://opendev.org/openstack/python-neutronclient
 .. _Developer's Guide: http://docs.openstack.org/infra/manual/developers.html
 .. _Release Notes: https://docs.openstack.org/releasenotes/python-neutronclient
