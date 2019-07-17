@@ -118,7 +118,7 @@ class CreateNetworkLog(command.ShowOne):
             help=_('Name for the network log'))
         parser.add_argument(
             '--event',
-            metavar='<event>',
+            metavar='{ALL,ACCEPT,DROP}',
             choices=['ALL', 'ACCEPT', 'DROP'],
             type=nc_utils.convert_to_uppercase,
             help=_('An event to store with log'))
