@@ -12,20 +12,10 @@
       - openstackclient-plugin-jobs
     check:
       jobs:
-        - legacy-neutronclient-test-dsvm-functional:
-            irrelevant-files: &project-irrelevant-files
-              - ^.*\.rst$
-              - ^doc/.*$
-              - ^neutron/locale/.*$
-              - ^releasenotes/.*$
-        - legacy-neutronclient-test-dsvm-functional-adv-svcs:
-            irrelevant-files: *project-irrelevant-files
+        - neutronclient-functional
     gate:
       jobs:
-        - legacy-neutronclient-test-dsvm-functional:
-            irrelevant-files: *project-irrelevant-files
-        - legacy-neutronclient-test-dsvm-functional-adv-svcs:
-            irrelevant-files: *project-irrelevant-files
+        - neutronclient-functional
     experimental:
       jobs:
         - legacy-grenade-dsvm-neutron-libs:
@@ -33,3 +23,24 @@
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
 
+- job:
+    name: neutronclient-functional
+    parent: devstack-tox-functional
+    irrelevant-files:
+      - ^.*\.rst$
+      - ^doc/.*$
+      - ^releasenotes/.*$
+    required-projects:
+      - openstack/python-neutronclient
+      - openstack/neutron
+      - openstack/neutron-vpnaas
+    vars:
+      tox_envlist: functional
+      devstack_services:
+        # NOTE: neutronclient.tests.functional.base.ClientTestBase does not
+        # support HTTPS endpoints now, so tls-proxy needs to be disabled.
+        tls-proxy: false
+      devstack_localrc:
+        LIBS_FROM_GIT: python-neutronclient
+      devstack_plugins:
+        neutron-vpnaas: https://opendev.org/openstack/neutron-vpnaas
