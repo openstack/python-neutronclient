@@ -76,7 +76,5 @@ class ClientTestBase(base.ClientTestBase):
 
     def is_extension_enabled(self, extension_alias):
         extensions = self.parser.listing(self.neutron('ext-list'))
-        for extension in extensions:
-            if extension_alias in extension['alias']:
-                return True
-        return False
+        aliases = [e['alias'] for e in extensions]
+        return extension_alias in aliases
