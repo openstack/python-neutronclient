@@ -183,7 +183,7 @@ def http_log_req(_logger, args, kwargs):
     for (key, value) in six.iteritems(kwargs['headers']):
         if key in SENSITIVE_HEADERS:
             v = value.encode('utf-8')
-            h = hashlib.sha1(v)
+            h = hashlib.sha256(v)
             d = h.hexdigest()
             value = "{SHA1}%s" % d
         header = ' -H "%s: %s"' % (key, value)
