@@ -185,7 +185,7 @@ def http_log_req(_logger, args, kwargs):
             v = value.encode('utf-8')
             h = hashlib.sha256(v)
             d = h.hexdigest()
-            value = "{SHA1}%s" % d
+            value = "{SHA256}%s" % d
         header = ' -H "%s: %s"' % (key, value)
         string_parts.append(header)
 
