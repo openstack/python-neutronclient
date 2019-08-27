@@ -49,6 +49,25 @@ html_theme = 'openstackdocs'
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'neutronclientdoc'
 
+# -- Options for LaTeX output ------------------------------------------------
+
+latex_documents = [
+    ('index', 'doc-python-neutronclient.tex',
+     u'python-neutronclient Documentation',
+     u'Neutron Contributors', 'manual'),
+]
+
+# Disable usage of xindy https://bugzilla.redhat.com/show_bug.cgi?id=1643664
+latex_use_xindy = False
+
+latex_domain_indices = False
+
+latex_elements = {
+    'makeindex': '',
+    'printindex': '',
+    'preamble': r'\setcounter{tocdepth}{5}',
+}
+
 # -- Options for cliff.sphinxext plugin ---------------------------------------
 
 autoprogram_cliff_application = 'openstack'
