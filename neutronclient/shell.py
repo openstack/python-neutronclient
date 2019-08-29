@@ -222,7 +222,7 @@ class NeutronShell(app.App):
             type=check_non_negative_int,
             default=0,
             help=_("How many times the request to the Neutron server should "
-                   "be retried if it fails."))
+                   "be retried if it fails. Defaults to 0."))
         # FIXME(bklei): this method should come from keystoneauth1
         self._append_global_identity_args(parser)
 
@@ -241,12 +241,12 @@ class NeutronShell(app.App):
         parser.add_argument(
             '--os-service-type', metavar='<os-service-type>',
             default=env('OS_NETWORK_SERVICE_TYPE', default='network'),
-            help=_('Defaults to env[OS_NETWORK_SERVICE_TYPE] or network.'))
+            help=_('Defaults to env[OS_NETWORK_SERVICE_TYPE] or "network".'))
 
         parser.add_argument(
             '--os-endpoint-type', metavar='<os-endpoint-type>',
             default=env('OS_ENDPOINT_TYPE', default='public'),
-            help=_('Defaults to env[OS_ENDPOINT_TYPE] or public.'))
+            help=_('Defaults to env[OS_ENDPOINT_TYPE] or "public".'))
 
         # FIXME(bklei): --service-type is deprecated but kept in for
         # backward compatibility.
