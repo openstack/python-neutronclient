@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    New client methods: ``add_extra_routes_to_router`` and
+    ``remove_extra_routes_from_router``.

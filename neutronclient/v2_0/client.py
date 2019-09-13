@@ -934,6 +934,16 @@ class Client(ClientBase):
         return self.put((self.router_path % router) +
                         "/remove_router_interface", body=body)
 
+    def add_extra_routes_to_router(self, router, body=None):
+        """Adds extra routes to the specified router."""
+        return self.put((self.router_path % router) + "/add_extraroutes",
+                        body=body)
+
+    def remove_extra_routes_from_router(self, router, body=None):
+        """Removes extra routes from the specified router."""
+        return self.put((self.router_path % router) + "/remove_extraroutes",
+                        body=body)
+
     def add_gateway_router(self, router, body=None):
         """Adds an external network gateway to the specified router."""
         return self.put((self.router_path % router),
