@@ -118,19 +118,6 @@ def _get_common_parser(parser):
         help=_('Detach destination port number or range'))
     shared_group = parser.add_mutually_exclusive_group()
     shared_group.add_argument(
-        '--public',
-        action='store_true',
-        help=_('Make the firewall policy public, which allows it to be '
-               'used in all projects (as opposed to the default, '
-               'which is to restrict its use to the current project). '
-               'This option is deprecated and would be removed in R Release'))
-    shared_group.add_argument(
-        '--private',
-        action='store_true',
-        help=_(
-            'Restrict use of the firewall rule to the current project.'
-            'This option is deprecated and would be removed in R release.'))
-    shared_group.add_argument(
         '--share',
         action='store_true',
         help=_('Share the firewall rule to be used in all projects '
@@ -212,9 +199,9 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
         attrs['enabled'] = True
     if parsed_args.disable_rule:
         attrs['enabled'] = False
-    if parsed_args.share or parsed_args.public:
+    if parsed_args.share:
         attrs['shared'] = True
-    if parsed_args.no_share or parsed_args.private:
+    if parsed_args.no_share:
         attrs['shared'] = False
     if parsed_args.source_firewall_group:
         attrs['source_firewall_group_id'] = client.find_resource(
@@ -417,12 +404,6 @@ class UnsetFirewallRule(command.Command):
             action='store_true',
             help=_('Restrict use of the firewall rule to the current project'))
         parser.add_argument(
-            '--public',
-            action='store_true',
-            help=_('Restrict use of the firewall rule to the current project. '
-                   'This option is deprecated and would be removed in '
-                   'R Release.'))
-        parser.add_argument(
             '--enable-rule',
             action='store_true',
             help=_('Disable this rule'))
@@ -448,7 +429,7 @@ class UnsetFirewallRule(command.Command):
             attrs['destination_ip_address'] = None
         if parsed_args.destination_port:
             attrs['destination_port'] = None
-        if parsed_args.share or parsed_args.public:
+        if parsed_args.share:
             attrs['shared'] = False
         if parsed_args.enable_rule:
             attrs['enabled'] = False

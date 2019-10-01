@@ -77,19 +77,6 @@ def _get_common_parser(parser):
         action='store_true',
         help=_('Detach egress firewall policy from the firewall group'))
     shared_group = parser.add_mutually_exclusive_group()
-    shared_group.add_argument(
-        '--public',
-        action='store_true',
-        help=_('Make the firewall group public, which allows it to be '
-               'used in all projects (as opposed to the default, '
-               'which is to restrict its use to the current project). '
-               'This option is deprecated and would be removed in R release.'))
-    shared_group.add_argument(
-        '--private',
-        action='store_true',
-        help=_('Restrict use of the firewall group to the '
-               'current project. This option is deprecated '
-               'and would be removed in R release.'))
 
     shared_group.add_argument(
         '--share',
@@ -147,9 +134,9 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
             cmd_resource=const.CMD_FWP)['id']
     elif parsed_args.no_egress_firewall_policy:
         attrs['egress_firewall_policy_id'] = None
-    if parsed_args.share or parsed_args.public:
+    if parsed_args.share:
         attrs['shared'] = True
-    if parsed_args.no_share or parsed_args.private:
+    if parsed_args.no_share:
         attrs['shared'] = False
     if parsed_args.enable:
         attrs['admin_state_up'] = True
@@ -350,14 +337,6 @@ class UnsetFirewallGroup(command.Command):
             help=_('Egress firewall policy (name or ID) to delete'))
         shared_group = parser.add_mutually_exclusive_group()
         shared_group.add_argument(
-            '--public',
-            action='store_true',
-            help=_('Make the firewall group public, which allows it to be '
-                   'used in all projects (as opposed to the default, '
-                   'which is to restrict its use to the current project). '
-                   'This option is deprecated and would be removed in R'
-                   ' release.'))
-        shared_group.add_argument(
             '--share',
             action='store_true',
             help=_('Restrict use of the firewall group to the '
@@ -375,7 +354,7 @@ class UnsetFirewallGroup(command.Command):
             attrs['ingress_firewall_policy_id'] = None
         if parsed_args.egress_firewall_policy:
             attrs['egress_firewall_policy_id'] = None
-        if parsed_args.share or parsed_args.public:
+        if parsed_args.share:
             attrs['shared'] = False
         if parsed_args.enable:
             attrs['admin_state_up'] = False

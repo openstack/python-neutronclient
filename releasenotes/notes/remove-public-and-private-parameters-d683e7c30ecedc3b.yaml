@@ -1,0 +1,6 @@
+---
+upgrade:
+  - |
+    The deprecated options ``--public`` and ``--private`` were
+    dropped in FWaaS v2 related commands. Use ``--share`` and
+    ``--no-share`` instead.

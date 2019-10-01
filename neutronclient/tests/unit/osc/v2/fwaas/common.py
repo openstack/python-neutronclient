@@ -120,20 +120,6 @@ class TestSetFWaaS(test_fakes.TestNeutronClientOSCV2):
             target, {self.res: {'shared': True}})
         self.assertIsNone(result)
 
-    def test_set_public(self):
-        target = self.resource['id']
-        arglist = [target, '--public']
-        verifylist = [
-            (self.res, target),
-            ('public', True),
-        ]
-        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
-        result = self.cmd.take_action(parsed_args)
-
-        self.mocked.assert_called_once_with(
-            target, {self.res: {'shared': True}})
-        self.assertIsNone(result)
-
     def test_set_duplicate_shared(self):
         target = self.resource['id']
         arglist = [target, '--share', '--share']
