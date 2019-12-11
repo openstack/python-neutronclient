@@ -18,7 +18,7 @@
         - neutronclient-functional
     experimental:
       jobs:
-        - legacy-grenade-dsvm-neutron-libs:
+        - neutron-lib-grenade-dsvm:
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
@@ -45,3 +45,29 @@
         LIBS_FROM_GIT: python-neutronclient
       devstack_plugins:
         neutron-vpnaas: https://opendev.org/openstack/neutron-vpnaas
+
+- job:
+    name: neutron-lib-grenade-dsvm
+    # Old name: legacy-grenade-dsvm-neutron-libs
+    parent: legacy-dsvm-base
+    run: playbooks/legacy/grenade-dsvm-neutron-libs/run.yaml
+    post-run: playbooks/legacy/grenade-dsvm-neutron-libs/post.yaml
+    timeout: 10800
+    required-projects:
+      - openstack/grenade
+      - openstack/devstack-gate
+      - openstack/keystoneauth
+      - openstack/neutron
+      - openstack/neutron-lib
+      - openstack/os-client-config
+      - openstack/python-cinderclient
+      - openstack/python-glanceclient
+      - openstack/python-ironicclient
+      - openstack/python-keystoneclient
+      - openstack/python-neutronclient
+      - openstack/python-novaclient
+    # This is py3 version for ussuri onwards rest all branch needs to be py2
+    # version which is present in openstack-zuul-jobs.
+    # We need to take care of this branch variant and python version while
+    # migrating these jobs to zuulv3.
+    branches: ^(?!(stable/(ocata|pike|queens|rocky|stein|train))).*$
