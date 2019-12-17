@@ -20,10 +20,6 @@ from neutronclient._i18n import _
 from neutronclient.common import exceptions as exception
 
 
-if six.PY3:
-    long = int
-
-
 class ActionDispatcher(object):
     """Maps method name to local methods through action name."""
 
