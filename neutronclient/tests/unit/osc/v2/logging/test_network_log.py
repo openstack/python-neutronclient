@@ -139,8 +139,8 @@ class TestCreateNetworkLog(TestNetworkLog):
         self.mocked = self.neutronclient.create_network_log
         self.cmd = network_log.CreateNetworkLog(self.app, self.namespace)
         loggables = {
-            "loggable_resources": [{"type": RES_TYPE_SG,
-                                    "type": RES_TYPE_FWG}]
+            "loggable_resources": [{"type": RES_TYPE_SG},
+                                   {"type": RES_TYPE_FWG}]
         }
         self.neutronclient.list_network_loggable_resources = mock.Mock(
             return_value=loggables)

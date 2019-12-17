@@ -33,9 +33,9 @@ class CLITestV20QoSRuleJSON(test_cli20.CLITestV20Base):
         # qos_rule_types.
         resources = 'rule_types'
         cmd_resources = 'qos_rule_types'
-        response_contents = [{'type': 'bandwidth_limit',
-                              'type': 'dscp_marking',
-                              'type': 'minimum_bandwidth'}]
+        response_contents = [{'type': 'bandwidth_limit'},
+                             {'type': 'dscp_marking'},
+                             {'type': 'minimum_bandwidth'}]
 
         cmd = qos_rule.ListQoSRuleTypes(test_cli20.MyApp(sys.stdout),
                                         None)
