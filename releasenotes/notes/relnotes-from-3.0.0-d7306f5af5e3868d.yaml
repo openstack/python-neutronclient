@@ -2,7 +2,7 @@
 features:
   - Support os-client-config. OS_CLOUD environment variable is used for
     selecting named cloud configuration.
-  - Support keystoneauth1 library which brings us better kyestone v3 support.
+  - Support keystoneauth1 library which brings us better keystone v3 support.
   - Client command extension now supports a child resource.
   - New CLI for VPNaaS multiple local subnets.
   - New CLI for VPNaaS endpoint group API.
