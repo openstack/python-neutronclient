@@ -1,0 +1,10 @@
+---
+deprecations:
+  - |
+    The ``openstack bgp speaker show dragents`` CLI is deprecated and
+    will be removed in the future. Use ``openstack bgp dragent list
+    --bgp-speaker <bgp-speaker>`` CLI instead.
+features:
+  - |
+    The ``openstack bgp dragent list`` CLI is added to support showing
+    the list of dynamic routing agents.

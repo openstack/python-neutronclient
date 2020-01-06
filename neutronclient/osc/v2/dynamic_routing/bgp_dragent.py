@@ -70,18 +70,25 @@ class RemoveBgpSpeakerFromDRAgent(command.Command):
 
 
 class ListDRAgentsHostingBgpSpeaker(command.Lister):
-    """List dynamic routing agents hosting a BGP speaker"""
+    """(Deprecated) List dynamic routing agents hosting a BGP speaker
+
+       (Use "bgp dragent list" instead)
+    """
 
     resource = 'agent'
     list_columns = ['id', 'host', 'admin_state_up', 'alive']
     unknown_parts_flag = False
 
     def get_parser(self, prog_name):
+        self.log.warning("The 'openstack bgp speaker show dragents' CLI is "
+                         "deprecated and will be removed in the future. Use "
+                         "'openstack bgp dragent list' CLI instead.")
         parser = super(ListDRAgentsHostingBgpSpeaker,
                        self).get_parser(prog_name)
         parser.add_argument('bgp_speaker',
                             metavar='<bgp-speaker>',
-                            help=_("ID or name of the BGP speaker"))
+                            help=_("List dynamic routing agents hosting a "
+                                   "BGP speaker (name or ID)"))
         return parser
 
     def take_action(self, parsed_args):
@@ -91,6 +98,42 @@ class ListDRAgentsHostingBgpSpeaker(command.Lister):
                                           parsed_args.bgp_speaker)['id']
         search_opts['bgp_speaker'] = speaker_id
         data = client.list_dragents_hosting_bgp_speaker(**search_opts)
+        headers = ('ID', 'Host', 'State', 'Alive')
+        columns = ('id', 'host', 'admin_state_up', 'alive')
+        return (headers,
+                (utils.get_dict_properties(
+                    s, columns, formatters=_formatters,
+                ) for s in data['agents']))
+
+
+class ListDRAgent(command.Lister):
+    """List dynamic routing agents"""
+
+    resource = 'agent'
+    list_columns = ['id', 'host', 'admin_state_up', 'alive']
+    unknown_parts_flag = False
+
+    def get_parser(self, prog_name):
+        parser = super(ListDRAgent,
+                       self).get_parser(prog_name)
+        parser.add_argument('--bgp-speaker',
+                            metavar='<bgp-speaker>',
+                            help=_("List dynamic routing agents hosting a "
+                                   "BGP speaker (name or ID)"))
+        return parser
+
+    def take_action(self, parsed_args):
+        search_opts = {}
+        client = self.app.client_manager.neutronclient
+        if parsed_args.bgp_speaker is not None:
+            search_opts = {}
+            speaker_id = client.find_resource(constants.BGP_SPEAKER,
+                                              parsed_args.bgp_speaker)['id']
+            search_opts['bgp_speaker'] = speaker_id
+            data = client.list_dragents_hosting_bgp_speaker(**search_opts)
+        else:
+            attrs = {'agent_type': 'BGP dynamic routing agent'}
+            data = client.list_agents(**attrs)
         headers = ('ID', 'Host', 'State', 'Alive')
         columns = ('id', 'host', 'admin_state_up', 'alive')
         return (headers,

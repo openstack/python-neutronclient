@@ -57,7 +57,7 @@ class FakeBgpSpeaker(object):
 
         """
         bgp_speakers = []
-        for i in range(0, count):
+        for i in range(count):
             bgp_speaker = FakeBgpSpeaker.create_one_bgp_speaker(attrs)
             bgp_speakers.append(bgp_speaker)
 
@@ -89,8 +89,42 @@ class FakeBgpPeer(object):
     def create_bgp_peers(attrs=None, count=1):
         """Create one or multiple fake bgp peers."""
         bgp_peers = []
-        for i in range(0, count):
+        for i in range(count):
             bgp_peer = FakeBgpPeer.create_one_bgp_peer(attrs)
             bgp_peers.append(bgp_peer)
 
         return {'bgp_peers': bgp_peers}
+
+
+class FakeDRAgent(object):
+    """Fake one or more dynamic routing agents."""
+
+    @staticmethod
+    def create_one_dragent(attrs=None):
+        attrs = attrs or {}
+        # Set default attributes.
+        dragent_attrs = {
+            'binary': 'neutron-bgp-dragent',
+            'admin_state_up': True,
+            'alive': True,
+            'topic': 'bgp_dragent',
+            'host': 'network-' + uuid.uuid4().hex,
+            'name': 'bgp-dragent-' + uuid.uuid4().hex,
+            'agent_type': 'BGP dynamic routing agent',
+            'id': uuid.uuid4().hex,
+        }
+
+        # Overwrite default attributes.
+        dragent_attrs.update(attrs)
+
+        return copy.deepcopy(dragent_attrs)
+
+    @staticmethod
+    def create_dragents(attrs=None, count=1):
+        """Create one or multiple fake dynamic routing agents."""
+        agents = []
+        for i in range(count):
+            agent = FakeDRAgent.create_one_dragent(attrs)
+            agents.append(agent)
+
+        return {'agents': agents}
