@@ -104,13 +104,13 @@ class HTTPClient(object):
         try:
             resp, body = self.request(*args, **kargs)
         except requests.exceptions.SSLError as e:
-            raise exceptions.SslCertificateValidationError(reason=e)
+            raise exceptions.SslCertificateValidationError(reason=str(e))
         except Exception as e:
             # Wrap the low-level connection error (socket timeout, redirect
             # limit, decompression error, etc) into our custom high-level
             # connection exception (it is excepted in the upper layers of code)
             _logger.debug("throwing ConnectionFailed : %s", e)
-            raise exceptions.ConnectionFailed(reason=e)
+            raise exceptions.ConnectionFailed(reason=str(e))
         utils.http_log_resp(_logger, resp, body)
 
         # log request-id for each api call
