@@ -12,7 +12,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import fixtures
+import sys
+
+import mock
 from oslo_utils import encodeutils
 import six
 import testtools
@@ -30,12 +32,11 @@ class TestExceptions(testtools.TestCase):
         multibyte_unicode_string = u'\uff21\uff22\uff23'
         e = TestException(reason=multibyte_unicode_string)
 
-        fixture = fixtures.StringStream('stdout')
-        self.useFixture(fixture)
-        with fixtures.MonkeyPatch('sys.stdout', fixture.stream):
+        with mock.patch.object(sys, 'stdout') as mock_stdout:
             print(e)
-        self.assertEqual('Exception with %s' % multibyte_unicode_string,
-                         fixture.getDetails().get('stdout').as_text())
+
+        exc_str = 'Exception with %s' % multibyte_unicode_string
+        mock_stdout.assert_has_calls([mock.call.write(exc_str)])
 
     def test_exception_message_with_encoded_unicode(self):
         class TestException(exceptions.NeutronException):
