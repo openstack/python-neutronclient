@@ -5,7 +5,6 @@
       - openstack-python3-ussuri-jobs
       - publish-openstack-docs-pti
       - check-requirements
-      - lib-forward-testing
       - lib-forward-testing-python3
       - release-notes-jobs-python3
       - openstackclient-plugin-jobs
