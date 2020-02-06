@@ -492,6 +492,9 @@ class Client(ClientBase):
     network_path = "/networks/%s"
     ports_path = "/ports"
     port_path = "/ports/%s"
+    port_bindings_path = "/ports/%s/bindings"
+    port_binding_path = "/ports/%s/bindings/%s"
+    port_binding_path_activate = "/ports/%s/bindings/%s/activate"
     subnets_path = "/subnets"
     subnet_path = "/subnets/%s"
     onboard_network_subnets_path = "/subnetpools/%s/onboard_network_subnets"
@@ -810,6 +813,28 @@ class Client(ClientBase):
     def delete_port(self, port):
         """Deletes the specified port."""
         return self.delete(self.port_path % (port))
+
+    def create_port_binding(self, port_id, body=None):
+        """Creates a new port binding."""
+        return self.post(self.port_bindings_path % port_id, body=body)
+
+    def delete_port_binding(self, port_id, host_id):
+        """Deletes the specified port binding."""
+        return self.delete(self.port_binding_path % (port_id, host_id))
+
+    def show_port_binding(self, port_id, host_id, **_params):
+        """Fetches information for a certain port binding."""
+        return self.get(self.port_binding_path % (port_id, host_id),
+                        params=_params)
+
+    def list_port_bindings(self, port_id, retrieve_all=True, **_params):
+        """Fetches a list of all bindings for a certain port."""
+        return self.list('port_bindings', self.port_bindings_path % port_id,
+                         retrieve_all, **_params)
+
+    def activate_port_binding(self, port_id, host_id):
+        """Activates a port binding."""
+        return self.put(self.port_binding_path_activate % (port_id, host_id))
 
     def list_networks(self, retrieve_all=True, **_params):
         """Fetches a list of all networks for a project."""

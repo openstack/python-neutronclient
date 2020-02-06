@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    New client methods: ``create_port_binding``, ``delete_port_binding``,
+    ``show_port_binding``, ``list_port_bindings`` and ``activate_port_binding``.
