@@ -19,10 +19,10 @@ import logging
 import os
 import re
 import sys
+from unittest import mock
 
 import fixtures
 from keystoneauth1 import session
-import mock
 import testtools
 from testtools import matchers
 

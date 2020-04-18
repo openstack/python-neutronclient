@@ -15,9 +15,9 @@
 #    under the License.
 
 import sys
+from unittest import mock
 import urllib.parse as urlparse
 
-import mock
 from oslo_utils import uuidutils
 
 from neutronclient.common import exceptions

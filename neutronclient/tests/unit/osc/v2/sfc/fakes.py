@@ -15,8 +15,8 @@
 
 import argparse
 import copy
+from unittest import mock
 
-import mock
 
 from osc_lib.tests import utils
 from oslo_utils import uuidutils

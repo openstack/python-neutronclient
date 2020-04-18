@@ -15,8 +15,8 @@
 #    under the License.
 
 import sys
+from unittest import mock
 
-import mock
 
 from neutronclient.common import exceptions
 from neutronclient.neutron.v2_0 import quota as test_quota

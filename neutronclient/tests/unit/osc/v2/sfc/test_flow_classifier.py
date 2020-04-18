@@ -13,7 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import mock
+from unittest import mock
 
 from neutronclient.osc.v2.sfc import sfc_flow_classifier
 from neutronclient.tests.unit.osc.v2.sfc import fakes

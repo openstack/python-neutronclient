@@ -16,8 +16,8 @@
 
 import itertools
 import sys
+from unittest import mock
 
-import mock
 
 from neutronclient.neutron.v2_0 import port
 from neutronclient import shell

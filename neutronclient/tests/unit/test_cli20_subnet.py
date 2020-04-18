@@ -15,8 +15,8 @@
 #
 
 import sys
+from unittest import mock
 
-import mock
 
 from neutronclient.common import exceptions
 from neutronclient.neutron import v2_0 as neutronV20

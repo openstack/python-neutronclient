@@ -15,8 +15,8 @@
 #
 
 import copy
+from unittest import mock
 
-import mock
 from osc_lib import exceptions
 from osc_lib.tests import utils
 import testtools

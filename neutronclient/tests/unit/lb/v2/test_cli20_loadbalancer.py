@@ -15,8 +15,8 @@
 #
 
 import sys
+from unittest import mock
 
-import mock
 
 from neutronclient.neutron.v2_0.lb.v2 import loadbalancer as lb
 from neutronclient.tests.unit import test_cli20

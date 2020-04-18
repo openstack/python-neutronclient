@@ -12,9 +12,9 @@
 #
 
 import argparse
+from unittest import mock
 
 from cliff import columns as cliff_columns
-import mock
 from osc_lib.tests import utils
 
 
