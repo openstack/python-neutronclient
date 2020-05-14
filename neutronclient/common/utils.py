@@ -25,7 +25,6 @@ import os
 
 from oslo_utils import encodeutils
 from oslo_utils import importutils
-import six
 
 from neutronclient._i18n import _
 from neutronclient.common import exceptions
@@ -180,7 +179,7 @@ def http_log_req(_logger, args, kwargs):
         else:
             string_parts.append(' %s' % element)
 
-    for (key, value) in six.iteritems(kwargs['headers']):
+    for (key, value) in kwargs['headers'].items():
         if key in SENSITIVE_HEADERS:
             v = value.encode('utf-8')
             h = hashlib.sha256(v)
@@ -205,7 +204,7 @@ def http_log_resp(_logger, resp, body):
 
 
 def _safe_encode_without_obj(data):
-    if isinstance(data, six.string_types):
+    if isinstance(data, str):
         return encodeutils.safe_encode(data)
     return data
 

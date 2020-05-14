@@ -25,7 +25,6 @@ from cliff import command
 from cliff import lister
 from cliff import show
 from oslo_serialization import jsonutils
-import six
 
 from neutronclient._i18n import _
 from neutronclient.common import exceptions
@@ -261,12 +260,12 @@ def parse_args_to_dict(values_specs):
 
     # Populate the parser with arguments
     _parser = argparse.ArgumentParser(add_help=False)
-    for opt, optspec in six.iteritems(_options):
+    for opt, optspec in _options.items():
         _parser.add_argument(opt, **optspec)
     _args = _parser.parse_args(_values_specs)
 
     result_dict = {}
-    for opt in six.iterkeys(_options):
+    for opt in _options.keys():
         _opt = opt.split('--', 2)[1]
         _opt = _opt.replace('-', '_')
         _value = getattr(_args, _opt)
@@ -285,7 +284,7 @@ def _merge_args(qCmd, parsed_args, _extra_values, value_specs):
     @param values_specs: the unparsed unknown parts
     """
     temp_values = _extra_values.copy()
-    for key, value in six.iteritems(temp_values):
+    for key, value in temp_values.items():
         if hasattr(parsed_args, key):
             arg_value = getattr(parsed_args, key)
             if arg_value is not None and value is not None:
@@ -321,8 +320,7 @@ class NeutronCommandMeta(abc.ABCMeta):
                                                       name, bases, cls_dict)
 
 
-@six.add_metaclass(NeutronCommandMeta)
-class NeutronCommand(command.Command):
+class NeutronCommand(command.Command, metaclass=NeutronCommandMeta):
 
     values_specs = []
     json_indent = None
@@ -363,7 +361,7 @@ class NeutronCommand(command.Command):
     def format_output_data(self, data):
         # Modify data to make it more readable
         if self.resource in data:
-            for k, v in six.iteritems(data[self.resource]):
+            for k, v in data[self.resource].items():
                 if isinstance(v, list):
                     value = '\n'.join(jsonutils.dumps(
                         i, indent=self.json_indent) if isinstance(i, dict)
@@ -425,7 +423,7 @@ class CreateCommand(NeutronCommand, show.ShowOne):
                       file=self.app.stdout)
         else:
             info = {'': ''}
-        return zip(*sorted(six.iteritems(info)))
+        return zip(*sorted(info.items()))
 
 
 class UpdateCommand(NeutronCommand):
@@ -825,6 +823,6 @@ class ShowCommand(NeutronCommand, show.ShowOne):
             self.format_output_data(data)
         resource = data[self.resource]
         if self.resource in data:
-            return zip(*sorted(six.iteritems(resource)))
+            return zip(*sorted(resource.items()))
         else:
             return None

@@ -22,7 +22,6 @@ import argparse
 from cliff import lister
 from cliff import show
 from oslo_serialization import jsonutils
-import six
 
 from neutronclient._i18n import _
 from neutronclient.common import exceptions
@@ -121,7 +120,7 @@ class ShowQuotaBase(neutronV20.NeutronCommand, show.ShowOne):
         tenant_id = get_tenant_id(parsed_args, neutron_client)
         data = self.retrieve_data(tenant_id, neutron_client)
         if self.resource in data:
-            return zip(*sorted(six.iteritems(data[self.resource])))
+            return zip(*sorted(data[self.resource].items()))
         return
 
 
@@ -241,7 +240,7 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
         tenant_id = get_tenant_id(parsed_args, neutron_client)
         data = obj_updator(tenant_id, body)
         if self.resource in data:
-            for k, v in six.iteritems(data[self.resource]):
+            for k, v in data[self.resource].items():
                 if isinstance(v, list):
                     value = ""
                     for _item in v:
@@ -254,6 +253,6 @@ class UpdateQuota(neutronV20.NeutronCommand, show.ShowOne):
                     data[self.resource][k] = value
                 elif v is None:
                     data[self.resource][k] = ''
-            return zip(*sorted(six.iteritems(data[self.resource])))
+            return zip(*sorted(data[self.resource].items()))
         else:
             return

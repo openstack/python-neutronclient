@@ -21,12 +21,11 @@ import itertools
 import logging
 import re
 import time
+import urllib.parse as urlparse
 
 import debtcollector.renames
 from keystoneauth1 import exceptions as ksa_exc
 import requests
-import six.moves.urllib.parse as urlparse
-from six import string_types
 
 from neutronclient._i18n import _
 from neutronclient import client
@@ -398,7 +397,7 @@ class ClientBase(object):
         if item:
             if isinstance(item, dict):
                 return _DictWithMeta(item, resp)
-            elif isinstance(item, string_types):
+            elif isinstance(item, str):
                 return _StrWithMeta(item, resp)
         else:
             return _TupleWithMeta((), resp)

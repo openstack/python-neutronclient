@@ -14,7 +14,6 @@
 #    under the License.
 
 from oslo_utils import encodeutils
-import six
 
 from neutronclient._i18n import _
 
@@ -40,7 +39,6 @@ def _safe_decode_dict(kwargs):
     return kwargs
 
 
-@six.python_2_unicode_compatible
 class NeutronException(Exception):
     """Base Neutron Exception.
 

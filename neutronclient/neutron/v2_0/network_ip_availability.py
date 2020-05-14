@@ -12,7 +12,6 @@
 #
 
 from cliff import show
-import six
 
 from neutronclient._i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
@@ -68,6 +67,6 @@ class ShowIpAvailability(neutronV20.NeutronCommand, show.ShowOne):
         self.format_output_data(data)
         resource = data[self.resource]
         if self.resource in data:
-            return zip(*sorted(six.iteritems(resource)))
+            return zip(*sorted(resource.items()))
         else:
             return None

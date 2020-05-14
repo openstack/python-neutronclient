@@ -15,16 +15,16 @@
 #
 
 import contextlib
+from io import StringIO
 import itertools
 import sys
+import urllib.parse as urlparse
 
 import mock
 from oslo_serialization import jsonutils
 from oslo_utils import encodeutils
 from oslotest import base
 import requests
-import six
-import six.moves.urllib.parse as urlparse
 import yaml
 
 from neutronclient.common import constants
@@ -43,7 +43,7 @@ REQUEST_ID = 'test_request_id'
 
 @contextlib.contextmanager
 def capture_std_streams():
-    fake_stdout, fake_stderr = six.StringIO(), six.StringIO()
+    fake_stdout, fake_stderr = StringIO(), StringIO()
     stdout, stderr = sys.stdout, sys.stderr
     try:
         sys.stdout, sys.stderr = fake_stdout, fake_stderr
@@ -125,7 +125,7 @@ class MyComparator(object):
     def _com_dict(self, lhs, rhs):
         if len(lhs) != len(rhs):
             return False
-        for key, value in six.iteritems(lhs):
+        for key, value in lhs.items():
             if key not in rhs:
                 return False
             rhs_value = rhs[key]
@@ -743,7 +743,7 @@ class ClientV2TestJson(CLITestV20Base):
 
     def test_do_request_error_without_response_body(self):
         params = {'test': 'value'}
-        expect_query = six.moves.urllib.parse.urlencode(params)
+        expect_query = urlparse.urlencode(params)
         self.client.httpclient.auth_token = 'token'
         resp_headers = {'x-openstack-request-id': REQUEST_ID}
         resp = (MyResp(400, headers=resp_headers, reason='An error'), '')
@@ -772,7 +772,7 @@ class ClientV2TestJson(CLITestV20Base):
 
     def test_do_request_request_ids(self):
         params = {'test': 'value'}
-        expect_query = six.moves.urllib.parse.urlencode(params)
+        expect_query = urlparse.urlencode(params)
         self.client.httpclient.auth_token = 'token'
         body = params
         expect_body = self.client.serialize(body)
@@ -866,7 +866,7 @@ class ClientV2TestJson(CLITestV20Base):
 
     def test_update_resource(self):
         params = {'test': 'value'}
-        expect_query = six.moves.urllib.parse.urlencode(params)
+        expect_query = urlparse.urlencode(params)
         self.client.httpclient.auth_token = 'token'
         body = params
         expect_body = self.client.serialize(body)
@@ -889,7 +889,7 @@ class ClientV2TestJson(CLITestV20Base):
 
     def test_update_resource_with_revision_number(self):
         params = {'test': 'value'}
-        expect_query = six.moves.urllib.parse.urlencode(params)
+        expect_query = urlparse.urlencode(params)
         self.client.httpclient.auth_token = 'token'
         body = params
         expect_body = self.client.serialize(body)

@@ -16,7 +16,6 @@ import sys
 
 import mock
 from oslo_utils import encodeutils
-import six
 import testtools
 
 from neutronclient._i18n import _
@@ -46,4 +45,4 @@ class TestExceptions(testtools.TestCase):
         multibyte_binary = encodeutils.safe_encode(multibyte_string)
         e = TestException(reason=multibyte_binary)
         self.assertEqual('Exception with %s' % multibyte_string,
-                         six.text_type(e))
+                         str(e))

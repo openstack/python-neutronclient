@@ -15,10 +15,10 @@
 #    under the License.
 
 import sys
+import urllib.parse as urlparse
 
 import mock
 from oslo_utils import uuidutils
-import six
 
 from neutronclient.common import exceptions
 from neutronclient.common import utils
@@ -250,7 +250,7 @@ class CLITestV20SecurityGroupsJSON(test_cli20.CLITestV20Base):
             resp_str = self.client.serialize({'security_groups': response})
 
             result.append({
-                'filter': six.moves.urllib.parse.urlencode(params, doseq=1),
+                'filter': urlparse.urlencode(params, doseq=1),
                 'response': (test_cli20.MyResp(200), resp_str),
             })
 

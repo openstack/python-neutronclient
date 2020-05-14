@@ -19,7 +19,6 @@ from oslo_utils import uuidutils
 import osprofiler.profiler
 import osprofiler.web
 from requests_mock.contrib import fixture as mock_fixture
-import six
 import testtools
 
 from neutronclient import client
@@ -33,8 +32,7 @@ URL = 'http://test.test:1234/v2.0/test'
 BODY = 'IAMFAKE'
 
 
-@six.add_metaclass(abc.ABCMeta)
-class TestHTTPClientMixin(object):
+class TestHTTPClientMixin(object, metaclass=abc.ABCMeta):
 
     def setUp(self):
         super(TestHTTPClientMixin, self).setUp()

@@ -14,7 +14,6 @@
 #    under the License.
 #
 
-import six
 import testtools
 
 from neutronclient.common import exceptions
@@ -116,7 +115,7 @@ class CLITestArgs(testtools.TestCase):
                                neutronV20.parse_args_to_dict, _specs)
         self.assertEqual('Invalid value_specs --badtypearg type=badtype val1: '
                          'type badtype is not supported',
-                         six.text_type(ex))
+                         str(ex))
 
     def test_clear_action(self):
         _specs = ['--anyarg', 'action=clear']
@@ -128,7 +127,7 @@ class CLITestArgs(testtools.TestCase):
         ex = self.assertRaises(exceptions.CommandError,
                                neutronV20.parse_args_to_dict, _specs)
         self.assertEqual('Invalid values_specs --strarg type=str',
-                         six.text_type(ex))
+                         str(ex))
 
     def test_bad_values_list(self):
         _specs = ['--listarg', 'list=true', 'type=str']

@@ -14,7 +14,6 @@
 #    under the License.
 
 from oslo_serialization import jsonutils
-import six
 
 from neutronclient._i18n import _
 from neutronclient.common import exceptions as exception
@@ -48,7 +47,7 @@ class JSONDictSerializer(DictSerializer):
 
     def default(self, data):
         def sanitizer(obj):
-            return six.text_type(obj)
+            return str(obj)
         return jsonutils.dumps(data, default=sanitizer)
 
 

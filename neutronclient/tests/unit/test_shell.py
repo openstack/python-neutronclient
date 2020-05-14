@@ -14,6 +14,7 @@
 #    under the License.
 
 import argparse
+from io import StringIO
 import logging
 import os
 import re
@@ -22,7 +23,6 @@ import sys
 import fixtures
 from keystoneauth1 import session
 import mock
-import six
 import testtools
 from testtools import matchers
 
@@ -75,8 +75,8 @@ class ShellTest(testtools.TestCase):
         clean_env = {}
         _old_env, os.environ = os.environ, clean_env.copy()
         try:
-            sys.stdout = six.moves.cStringIO()
-            sys.stderr = six.moves.cStringIO()
+            sys.stdout = StringIO()
+            sys.stderr = StringIO()
             _shell = openstack_shell.NeutronShell('2.0')
             _shell.run(argstr.split())
         except SystemExit:

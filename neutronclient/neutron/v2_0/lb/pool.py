@@ -14,9 +14,6 @@
 #    under the License.
 #
 
-
-import six
-
 from neutronclient._i18n import _
 from neutronclient.neutron import v2_0 as neutronV20
 
@@ -119,6 +116,6 @@ class RetrievePoolStats(neutronV20.ShowCommand):
         self.format_output_data(data)
         stats = data['stats']
         if 'stats' in data:
-            return zip(*sorted(six.iteritems(stats)))
+            return zip(*sorted(stats.items()))
         else:
             return None
