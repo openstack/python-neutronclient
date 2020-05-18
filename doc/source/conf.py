@@ -13,9 +13,10 @@ extensions = [
 ]
 
 # openstackdocstheme options
-repository_name = 'openstack/python-neutronclient'
-bug_project = 'python-neutronclient'
-bug_tag = 'doc'
+openstackdocs_repo_name = 'openstack/python-neutronclient'
+openstackdocs_pdf_link = True
+openstackdocs_bug_project = 'python-neutronclient'
+openstackdocs_bug_tag = 'doc'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

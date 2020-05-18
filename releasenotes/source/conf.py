@@ -43,9 +43,10 @@ extensions = [
 ]
 
 # openstackdocstheme options
-repository_name = 'openstack/python-neutronclient'
-bug_project = 'python-neutronclient'
-bug_tag = 'doc'
+openstackdocs_repo_name = 'openstack/python-neutronclient'
+openstackdocs_bug_project = 'python-neutronclient'
+openstackdocs_bug_tag = 'doc'
+openstackdocs_auto_name = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -147,10 +148,6 @@ html_static_path = ['_static']
 # .htaccess) here, relative to this directory. These files are copied
 # directly to the root of the documentation.
 # html_extra_path = []
-
-# If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
-# using the given strftime format.
-# html_last_updated_fmt = '%b %d, %Y'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
