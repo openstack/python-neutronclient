@@ -14,8 +14,6 @@
 #    under the License.
 #
 
-from __future__ import print_function
-
 import argparse
 
 from oslo_serialization import jsonutils
