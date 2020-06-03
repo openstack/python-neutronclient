@@ -515,6 +515,8 @@ class Client(ClientBase):
     security_group_path = "/security-groups/%s"
     security_group_rules_path = "/security-group-rules"
     security_group_rule_path = "/security-group-rules/%s"
+    segments_path = "/segments"
+    segment_path = "/segments/%s"
 
     sfc_flow_classifiers_path = "/sfc/flow_classifiers"
     sfc_flow_classifier_path = "/sfc/flow_classifiers/%s"
@@ -668,6 +670,7 @@ class Client(ClientBase):
                      'service_definitions': 'service_definition',
                      'security_groups': 'security_group',
                      'security_group_rules': 'security_group_rule',
+                     'segments': 'segment',
                      'ipsecpolicies': 'ipsecpolicy',
                      'ikepolicies': 'ikepolicy',
                      'ipsec_site_connections': 'ipsec_site_connection',
@@ -1046,6 +1049,28 @@ class Client(ClientBase):
         """Fetches information of a certain security group rule."""
         return self.get(self.security_group_rule_path % (security_group_rule),
                         params=_params)
+
+    def create_segment(self, body=None):
+        """Creates a new segment."""
+        return self.post(self.segments_path, body=body)
+
+    def update_segment(self, segment, body=None, revision_number=None):
+        """Updates a segment."""
+        return self._update_resource(self.segment_path % segment, body=body,
+                                     revision_number=revision_number)
+
+    def list_segments(self, retrieve_all=True, **_params):
+        """Fetches a list of all segments for a project."""
+        return self.list('segments', self.segments_path, retrieve_all,
+                         **_params)
+
+    def show_segment(self, segment, **_params):
+        """Fetches information of a certain segment."""
+        return self.get(self.segment_path % segment, params=_params)
+
+    def delete_segment(self, segment):
+        """Deletes the specified segment."""
+        return self.delete(self.segment_path % segment)
 
     def list_endpoint_groups(self, retrieve_all=True, **_params):
         """Fetches a list of all VPN endpoint groups for a project."""

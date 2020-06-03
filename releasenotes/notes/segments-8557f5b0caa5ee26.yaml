@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    New client methods: ``create_segment``, ``update_segment``,
+    ``list_segments``, ``show_segment`` and ``delete_segment``.
