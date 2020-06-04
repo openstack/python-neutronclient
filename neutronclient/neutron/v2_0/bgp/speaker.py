@@ -14,8 +14,6 @@
 #    under the License.
 #
 
-from __future__ import print_function
-
 from neutronclient._i18n import _
 from neutronclient.common import utils
 from neutronclient.common import validators
