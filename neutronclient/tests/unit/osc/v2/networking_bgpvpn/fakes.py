@@ -15,8 +15,8 @@
 #
 
 import copy
+from unittest import mock
 
-import mock
 from osc_lib.utils import columns as column_util
 
 from neutronclient.osc import utils as nc_osc_utils

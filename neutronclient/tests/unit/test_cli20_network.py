@@ -15,8 +15,8 @@
 
 import itertools
 import sys
+from unittest import mock
 
-import mock
 from oslo_serialization import jsonutils
 
 from neutronclient.common import exceptions

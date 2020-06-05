@@ -16,9 +16,8 @@
 
 import collections
 import copy
+from unittest import mock
 import uuid
-
-import mock
 
 
 class FakeLogging(object):

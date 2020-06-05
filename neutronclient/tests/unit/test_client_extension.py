@@ -16,8 +16,8 @@
 
 import inspect
 import sys
+from unittest import mock
 
-import mock
 
 from neutronclient.common import extension
 from neutronclient.neutron.v2_0.contrib import _fox_sockets as fox_sockets

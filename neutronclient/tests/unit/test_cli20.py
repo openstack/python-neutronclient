@@ -18,9 +18,9 @@ import contextlib
 from io import StringIO
 import itertools
 import sys
+from unittest import mock
 import urllib.parse as urlparse
 
-import mock
 from oslo_serialization import jsonutils
 from oslo_utils import encodeutils
 from oslotest import base

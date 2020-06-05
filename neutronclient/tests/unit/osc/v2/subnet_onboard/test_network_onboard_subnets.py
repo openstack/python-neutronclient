@@ -14,7 +14,7 @@
 #    under the License.
 #
 
-import mock
+from unittest import mock
 
 from neutronclient.osc.v2.subnet_onboard import subnet_onboard
 from neutronclient.tests.unit.osc.v2 import fakes as test_fakes

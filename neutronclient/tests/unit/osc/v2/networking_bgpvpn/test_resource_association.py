@@ -16,8 +16,8 @@
 
 import copy
 import operator
+from unittest import mock
 
-import mock
 from osc_lib import exceptions
 from osc_lib import utils as osc_utils
 from osc_lib.utils import columns as column_util

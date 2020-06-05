@@ -15,8 +15,8 @@
 #
 
 import sys
+from unittest import mock
 
-import mock
 
 from neutronclient.neutron.v2_0.lb import healthmonitor
 from neutronclient.tests.unit import test_cli20

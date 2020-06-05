@@ -15,9 +15,9 @@
 #
 
 import copy
+from unittest import mock
 import uuid
 
-import mock
 
 from neutronclient.osc import utils as osc_utils
 from neutronclient.osc.v2.vpnaas import vpnservice

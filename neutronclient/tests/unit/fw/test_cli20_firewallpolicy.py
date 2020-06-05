@@ -15,8 +15,8 @@
 #
 
 import sys
+from unittest import mock
 
-import mock
 
 from neutronclient.neutron.v2_0.fw import firewallpolicy
 from neutronclient import shell

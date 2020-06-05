@@ -15,8 +15,8 @@
 #
 
 import copy
+from unittest import mock
 
-import mock
 from osc_lib.tests import utils as tests_utils
 
 from neutronclient.osc import utils as osc_utils

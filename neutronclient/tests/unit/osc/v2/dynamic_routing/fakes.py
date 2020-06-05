@@ -11,9 +11,9 @@
 #    under the License.
 
 import copy
+from unittest import mock
 import uuid
 
-import mock
 
 from neutronclient.tests.unit.osc.v2 import fakes
 
