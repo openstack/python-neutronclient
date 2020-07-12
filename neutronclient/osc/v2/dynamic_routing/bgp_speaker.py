@@ -285,7 +285,7 @@ class SetBgpSpeaker(command.Command):
         )
         parser.add_argument(
             '--name',
-            help=_("Name of the BGP speaker to update"))
+            help=_("New name for the BGP speaker"))
         add_common_arguments(parser)
         return parser
 
