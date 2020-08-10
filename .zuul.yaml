@@ -16,7 +16,7 @@
         - neutronclient-functional
     experimental:
       jobs:
-        - neutron-lib-grenade-dsvm:
+        - neutronclient-grenade-neutron-lib:
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
@@ -45,15 +45,19 @@
         neutron-vpnaas: https://opendev.org/openstack/neutron-vpnaas
 
 - job:
-    name: neutron-lib-grenade-dsvm
-    # Old name: legacy-grenade-dsvm-neutron-libs
-    parent: legacy-dsvm-base
-    run: playbooks/legacy/grenade-dsvm-neutron-libs/run.yaml
-    post-run: playbooks/legacy/grenade-dsvm-neutron-libs/post.yaml
-    timeout: 10800
+    name: neutronclient-grenade-neutron-lib
+    parent: grenade
+    description: |
+      neutron-lib grenade job.
+      The version of this job on the current branch is py3 based,
+      while any branch before ussuri needs to use the py2 version,
+      which is defined in openstack-zuul-jobs with the old name
+      (legacy-grenade-dsvm-neutron-libs).
+      Users of this job needs to pay attention of the version used.
+      Former names for this job were:
+        * legacy-grenade-dsvm-neutron-libs
+        * neutron-lib-grenade-dsvm
     required-projects:
-      - openstack/grenade
-      - openstack/devstack-gate
       - openstack/keystoneauth
       - openstack/neutron
       - openstack/neutron-lib
@@ -64,8 +68,3 @@
       - openstack/python-keystoneclient
       - openstack/python-neutronclient
       - openstack/python-novaclient
-    # This is py3 version for ussuri onwards rest all branch needs to be py2
-    # version which is present in openstack-zuul-jobs.
-    # We need to take care of this branch variant and python version while
-    # migrating these jobs to zuulv3.
-    branches: ^(?!(stable/(ocata|pike|queens|rocky|stein|train))).*$
