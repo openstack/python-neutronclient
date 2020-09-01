@@ -108,7 +108,7 @@ class CLITestV20BGPSpeakerJSON(test_cli20.CLITestV20Base):
                                         None)
         name = 'my-name'
         my_id = 'my-id'
-        local_asnum = '65536'
+        local_asnum = '4294967296'
         args = [name,
                 '--local-as', local_asnum]
         position_names = ['name', 'local_as', ]
@@ -117,7 +117,8 @@ class CLITestV20BGPSpeakerJSON(test_cli20.CLITestV20Base):
                                 self._test_create_resource,
                                 resource, cmd, name, my_id, args,
                                 position_names, position_values)
-        self.assertEqual('local-as "65536" should be an integer [%s:%s].' %
+        self.assertEqual('local-as "4294967296" should be an '
+                         'integer [%s:%s].' %
                          (bgp_speaker.MIN_AS_NUM, bgp_speaker.MAX_AS_NUM),
                          str(exc))
 

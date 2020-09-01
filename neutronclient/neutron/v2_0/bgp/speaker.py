@@ -22,7 +22,7 @@ from neutronclient.neutron.v2_0.bgp import peer as bgp_peer
 
 # Allowed BGP Autonomous number range
 MIN_AS_NUM = 1
-MAX_AS_NUM = 65535
+MAX_AS_NUM = 4294967295
 
 
 def get_network_id(client, id_or_name):
