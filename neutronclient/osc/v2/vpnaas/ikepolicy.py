@@ -64,7 +64,7 @@ def _get_common_parser(parser):
         help=_('Encryption algorithm'))
     parser.add_argument(
         '--phase1-negotiation-mode',
-        choices=['main'],
+        choices=['main', 'aggressive'],
         type=_convert_to_lowercase,
         help=_('IKE Phase1 negotiation mode'))
     parser.add_argument(

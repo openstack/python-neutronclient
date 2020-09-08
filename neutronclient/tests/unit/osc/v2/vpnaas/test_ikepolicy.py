@@ -208,6 +208,10 @@ class TestCreateIKEPolicy(TestIKEPolicy, common.TestCreateVPNaaS):
     def test_create_with_all_params_name(self):
         self._test_create_with_all_params({'name': 'new_ikepolicy'})
 
+    def test_create_with_all_params_aggressive_mode(self):
+        self._test_create_with_all_params(
+            {'phase1_negotiation_mode': 'aggressive'})
+
 
 class TestDeleteIKEPolicy(TestIKEPolicy, common.TestDeleteVPNaaS):
 
@@ -290,6 +294,22 @@ class TestSetIKEPolicy(TestIKEPolicy, common.TestSetVPNaaS):
 
         self.mocked.assert_called_once_with(
             target, {self.res: {'auth_algorithm': 'sha256'}})
+        self.assertIsNone(result)
+
+    def test_set_phase1_negotiation_mode_with_aggressive(self):
+        target = self.resource['id']
+        phase1_negotiation_mode = 'aggressive'
+        arglist = [target,
+                   '--phase1-negotiation-mode', phase1_negotiation_mode]
+        verifylist = [
+            (self.res, target),
+            ('phase1_negotiation_mode', phase1_negotiation_mode),
+        ]
+        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+        result = self.cmd.take_action(parsed_args)
+
+        self.mocked.assert_called_once_with(
+            target, {self.res: {'phase1_negotiation_mode': 'aggressive'}})
         self.assertIsNone(result)
 
 

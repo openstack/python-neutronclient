@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    The ``--phase1-negotiation-mode`` option supports ``aggressive`` mode
+    in VPNaaS ikepolicy commands.
