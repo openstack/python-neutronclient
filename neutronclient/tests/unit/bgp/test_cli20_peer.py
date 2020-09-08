@@ -96,7 +96,7 @@ class CLITestV20BGPPeerJSON(test_cli20.CLITestV20Base):
         name = 'my-name'
         my_id = 'my-id'
         peerip = '1.1.1.1'
-        remote_asnum = '65536'
+        remote_asnum = '4294967296'
         args = [name,
                 '--peer-ip', peerip,
                 '--remote-as', remote_asnum, ]
@@ -107,7 +107,8 @@ class CLITestV20BGPPeerJSON(test_cli20.CLITestV20Base):
                                 self._test_create_resource,
                                 resource, cmd, name, my_id, args,
                                 position_names, position_values)
-        self.assertEqual('remote-as "65536" should be an integer [%s:%s].' %
+        self.assertEqual('remote-as "4294967296" should be an '
+                         'integer [%s:%s].' %
                          (bgp_speaker.MIN_AS_NUM, bgp_speaker.MAX_AS_NUM),
                          str(exc))
 

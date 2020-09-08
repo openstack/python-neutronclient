@@ -15,4 +15,4 @@ BGP_SPEAKER = 'bgp_speaker'
 BGP_PEERS = 'bgp_peers'
 BGP_PEER = 'bgp_peer'
 MIN_AS_NUM = 1
-MAX_AS_NUM = 65535
+MAX_AS_NUM = 4294967295
