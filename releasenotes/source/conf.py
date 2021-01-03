@@ -61,8 +61,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Neutron Client Release Notes'
-copyright = u'2015, Neutron Developers'
+project = 'Neutron Client Release Notes'
+copyright = '2015, Neutron Developers'
 
 # Release notes are version independent.
 # The full version, including alpha/beta/rc tags.

@@ -28,7 +28,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-copyright = u'OpenStack Foundation'
+copyright = 'OpenStack Foundation'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
@@ -53,8 +53,8 @@ htmlhelp_basename = 'neutronclientdoc'
 
 latex_documents = [
     ('index', 'doc-python-neutronclient.tex',
-     u'python-neutronclient Documentation',
-     u'Neutron Contributors', 'manual'),
+     'python-neutronclient Documentation',
+     'Neutron Contributors', 'manual'),
 ]
 
 # Disable usage of xindy https://bugzilla.redhat.com/show_bug.cgi?id=1643664
