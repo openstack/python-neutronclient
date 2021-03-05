@@ -61,9 +61,9 @@ class HTTPClient(object):
                  token=None, region_name=None, timeout=None,
                  endpoint_url=None, insecure=False,
                  endpoint_type='publicURL',
-                 auth_strategy='keystone', ca_cert=None, log_credentials=False,
-                 service_type='network', global_request_id=None,
-                 **kwargs):
+                 auth_strategy='keystone', ca_cert=None, cert=None,
+                 log_credentials=False, service_type='network',
+                 global_request_id=None, **kwargs):
 
         self.username = username
         self.user_id = user_id
@@ -82,6 +82,7 @@ class HTTPClient(object):
         self.auth_strategy = auth_strategy
         self.log_credentials = log_credentials
         self.global_request_id = global_request_id
+        self.cert = cert
         if insecure:
             self.verify_cert = False
         else:
@@ -167,6 +168,7 @@ class HTTPClient(object):
             data=body,
             headers=headers,
             verify=self.verify_cert,
+            cert=self.cert,
             timeout=self.timeout,
             **kwargs)
 
@@ -399,6 +401,7 @@ def construct_http_client(username=None,
                           log_credentials=None,
                           auth_strategy='keystone',
                           ca_cert=None,
+                          cert=None,
                           service_type='network',
                           session=None,
                           global_request_id=None,
@@ -430,6 +433,7 @@ def construct_http_client(username=None,
                           endpoint_type=endpoint_type,
                           service_type=service_type,
                           ca_cert=ca_cert,
+                          cert=cert,
                           log_credentials=log_credentials,
                           auth_strategy=auth_strategy,
                           global_request_id=global_request_id)
