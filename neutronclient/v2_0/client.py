@@ -216,6 +216,10 @@ class ClientBase(object):
     :param bool log_credentials: Allow for logging of passwords or not.
                                  Defaults to False. (optional)
     :param string ca_cert: SSL CA bundle file to use. (optional)
+    :param cert: A client certificate to pass to requests. These are of the
+                 same form as requests expects. Either a single filename
+                 containing both the certificate and key or a tuple containing
+                 the path to the certificate then a path to the key. (optional)
     :param integer retries: How many times idempotent (GET, PUT, DELETE)
                             requests to Neutron server should be retried if
                             they fail (default: 0).
