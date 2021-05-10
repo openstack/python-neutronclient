@@ -217,5 +217,5 @@ class CLITestV20ExtensionJSONChildResource(test_cli20.CLITestV20Base):
                    self.client.delete_parents_child,
                    self.client.create_parents_child)
         for method in methods:
-            argspec = inspect.getargspec(method)
+            argspec = inspect.getfullargspec(method)
             self.assertIn("parent_id", argspec.args)
