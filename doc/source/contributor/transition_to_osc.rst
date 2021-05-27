@@ -91,17 +91,17 @@ Transition Steps
 
    * **Done** `Security Group Rule CRUD <https://bugs.launchpad.net/python-openstackclient/+bug/1519512>`_
 
-6. **In Progress:** OSC continues enhancing its networking support.
+6. **Done** OSC continues enhancing its networking support.
    At this point and when applicable, enhancements to the ``neutron``
    CLI must also be made to the ``openstack`` CLI and possibly the
    OpenStack Python SDK. Users of the neutron client's command extensions
    should start their transition to the OSC plugin system. See the
    developer guide section below for more information on this step.
 
-7. **In Progress:** Deprecate the ``neutron`` CLI. Running the CLI after
+7. **Done** Deprecate the ``neutron`` CLI. Running the CLI after
    it has been `deprecated <https://review.opendev.org/#/c/393903/>`_
    will issue a warning message:
-   ``neutron CLI is deprecated and will be removed in the future. Use openstack CLI instead.``
+   ``neutron CLI is deprecated and will be removed in the Z cycle. Use openstack CLI instead.``
    In addition, no new features will be added to the CLI, though fixes to
    the CLI will be assessed on a case by case basis.
 

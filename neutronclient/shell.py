@@ -637,7 +637,7 @@ class NeutronShell(app.App):
 def main(argv=sys.argv[1:]):
     try:
         print(_("neutron CLI is deprecated and will be removed "
-                "in the future. Use openstack CLI instead."), file=sys.stderr)
+                "in the Z cycle. Use openstack CLI instead."), file=sys.stderr)
         return NeutronShell(NEUTRON_API_VERSION).run(
             list(map(encodeutils.safe_decode, argv)))
     except KeyboardInterrupt:
