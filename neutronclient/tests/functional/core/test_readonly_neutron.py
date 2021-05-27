@@ -64,9 +64,13 @@ class SimpleReadOnlyNeutronClientTest(base.ClientTestBase):
         self.neutron('floatingip-list')
 
     def test_neutron_meter_label_list(self):
+        if not self.is_extension_enabled('metering'):
+            self.skipTest('metering is not enabled')
         self.neutron('meter-label-list')
 
     def test_neutron_meter_label_rule_list(self):
+        if not self.is_extension_enabled('metering'):
+            self.skipTest('metering is not enabled')
         self.neutron('meter-label-rule-list')
 
     def test_neutron_net_external_list(self):
