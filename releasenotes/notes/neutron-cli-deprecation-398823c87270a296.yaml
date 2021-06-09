@@ -1,0 +1,10 @@
+---
+deprecations:
+  - |
+    ``neutron`` CLI will be removed in 'Z' release.
+    While it has been marked as deprecated for removal for long,
+    all features in ``neutron`` CLI have been supported in ``openstack`` CLI
+    (OpenStackClient) as of Xena release and the neutron team plans to
+    remove it in 'Z' release. Consider using ``openstack`` CLI and
+    `Mapping Guide <https://docs.openstack.org/python-openstackclient/latest/cli/decoder.html#neutron-cli>`__
+    in the OSC documentation would help you.
