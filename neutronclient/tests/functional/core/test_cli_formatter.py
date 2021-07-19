@@ -43,7 +43,7 @@ class TestCLIFormatter(base.ClientTestBase):
         result = self._create_net('yaml', ['name', 'admin_state_up'])
         self.assertDictEqual({'name': self.net_name,
                               'admin_state_up': True},
-                             yaml.load(result))
+                             yaml.safe_load(result))
 
     def test_net_create_with_value_formatter(self):
         # NOTE(amotoki): In 'value' formatter, there is no guarantee
