@@ -13,7 +13,6 @@
 import re
 
 from tempest.lib import exceptions
-import testtools
 
 from neutronclient.tests.functional import base
 
@@ -52,7 +51,6 @@ class SimpleReadOnlyNeutronClientTest(base.ClientTestBase):
         ext = self.parser.listing(self.neutron('ext-list'))
         self.assertTableStruct(ext, ['alias', 'name'])
 
-    @testtools.skip('Skipped until ML2/OVS is enabled')
     def test_neutron_dhcp_agent_list_hosting_net(self):
         self.neutron('dhcp-agent-list-hosting-net',
                      params='private')

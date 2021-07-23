@@ -38,9 +38,31 @@
         # NOTE: neutronclient.tests.functional.base.ClientTestBase does not
         # support HTTPS endpoints now, so tls-proxy needs to be disabled.
         tls-proxy: false
+        # Disable OVN services
+        br-ex-tcpdump: false
+        br-int-flows: false
+        ovn-controller: false
+        ovn-northd: false
+        ovs-vswitchd: false
+        ovsdb-server: false
+        q-ovn-metadata-agent: false
+        # Neutron services
+        q-agt: true
+        q-dhcp: true
+        q-l3: true
+        q-meta: true
+        neutron-network-segment-range: true
+        neutron-segments: true
+        q-metering: true
+        q-qos: true
+        neutron-tag-ports-during-bulk-creation: true
+        neutron-conntrack-helper: true
       devstack_localrc:
         USE_PYTHON3: true
         LIBS_FROM_GIT: python-neutronclient
+        Q_AGENT: openvswitch
+        Q_ML2_TENANT_NETWORK_TYPE: vxlan
+        Q_ML2_PLUGIN_MECHANISM_DRIVERS: openvswitch
       devstack_plugins:
         neutron-vpnaas: https://opendev.org/openstack/neutron-vpnaas
 
