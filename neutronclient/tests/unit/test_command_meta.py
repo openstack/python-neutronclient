@@ -20,7 +20,6 @@
 import logging
 
 import testtools
-from testtools import helpers
 
 from neutronclient.neutron import v2_0 as neutronV20
 
@@ -30,7 +29,7 @@ class TestCommandMeta(testtools.TestCase):
         class FakeCommand(neutronV20.NeutronCommand):
             pass
 
-        self.assertTrue(helpers.safe_hasattr(FakeCommand, 'log'))
+        self.assertTrue(hasattr(FakeCommand, 'log'))
         self.assertIsInstance(FakeCommand.log, logging.getLoggerClass())
         self.assertEqual(__name__ + ".FakeCommand", FakeCommand.log.name)
 
@@ -38,5 +37,5 @@ class TestCommandMeta(testtools.TestCase):
         class FakeCommand(neutronV20.NeutronCommand):
             log = None
 
-        self.assertTrue(helpers.safe_hasattr(FakeCommand, 'log'))
+        self.assertTrue(hasattr(FakeCommand, 'log'))
         self.assertIsNone(FakeCommand.log)
