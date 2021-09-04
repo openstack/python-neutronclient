@@ -357,10 +357,10 @@ class ShellTest(testtools.TestCase):
         self.useFixture(fixtures.MockPatchObject(openstack_shell,
                                                  'COMMANDS', None))
         openstack_shell.NeutronShell('2.0')
-        self.assertDictContainsSubset(
+        self.assertLessEqual(
             {'net-create': network.CreateNetwork,
              'net-delete': network.DeleteNetwork,
              'net-list': network.ListNetwork,
              'net-show': network.ShowNetwork,
-             'net-update': network.UpdateNetwork},
-            openstack_shell.COMMANDS['2.0'])
+             'net-update': network.UpdateNetwork}.items(),
+            openstack_shell.COMMANDS['2.0'].items())
