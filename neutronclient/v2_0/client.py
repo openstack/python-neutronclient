@@ -625,6 +625,10 @@ class Client(ClientBase):
         "/qos/policies/%s/minimum_bandwidth_rules"
     qos_minimum_bandwidth_rule_path = \
         "/qos/policies/%s/minimum_bandwidth_rules/%s"
+    qos_minimum_packet_rate_rules_path = \
+        "/qos/policies/%s/minimum_packet_rate_rules"
+    qos_minimum_packet_rate_rule_path = \
+        "/qos/policies/%s/minimum_packet_rate_rules/%s"
     qos_rule_types_path = "/qos/rule-types"
     qos_rule_type_path = "/qos/rule-types/%s"
     flavors_path = "/flavors"
@@ -709,6 +713,7 @@ class Client(ClientBase):
                      'policies': 'policy',
                      'bandwidth_limit_rules': 'bandwidth_limit_rule',
                      'minimum_bandwidth_rules': 'minimum_bandwidth_rule',
+                     'minimum_packet_rate_rules': 'minimum_packet_rate_rule',
                      'rules': 'rule',
                      'dscp_marking_rules': 'dscp_marking_rule',
                      'rule_types': 'rule_type',
@@ -1980,6 +1985,35 @@ class Client(ClientBase):
     def delete_minimum_bandwidth_rule(self, rule, policy):
         """Deletes a minimum bandwidth rule."""
         return self.delete(self.qos_minimum_bandwidth_rule_path %
+                           (policy, rule))
+
+    def list_minimum_packet_rate_rules(self, policy_id, retrieve_all=True,
+                                       **_params):
+        """Fetches a list of all minimum packet rate rules for the given policy
+
+        """
+        return self.list('minimum_packet_rate_rules',
+                         self.qos_minimum_packet_rate_rules_path %
+                         policy_id, retrieve_all, **_params)
+
+    def show_minimum_packet_rate_rule(self, rule, policy, body=None):
+        """Fetches information of a certain minimum packet rate rule."""
+        return self.get(self.qos_minimum_packet_rate_rule_path %
+                        (policy, rule), body=body)
+
+    def create_minimum_packet_rate_rule(self, policy, body=None):
+        """Creates a new minimum packet rate rule."""
+        return self.post(self.qos_minimum_packet_rate_rules_path % policy,
+                         body=body)
+
+    def update_minimum_packet_rate_rule(self, rule, policy, body=None):
+        """Updates a minimum packet rate rule."""
+        return self.put(self.qos_minimum_packet_rate_rule_path %
+                        (policy, rule), body=body)
+
+    def delete_minimum_packet_rate_rule(self, rule, policy):
+        """Deletes a minimum packet rate rule."""
+        return self.delete(self.qos_minimum_packet_rate_rule_path %
                            (policy, rule))
 
     def create_flavor(self, body=None):

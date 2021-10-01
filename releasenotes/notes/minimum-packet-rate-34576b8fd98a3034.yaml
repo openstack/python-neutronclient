@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Added new client methods for QoS minimum packet rate rule:
+    ``list_minimum_packet_rate_rules``, ``show_minimum_packet_rate_rule``,
+    ``create_minimum_packet_rate_rule``, ``update_minimum_packet_rate_rule``,
+    ``delete_minimum_packet_rate_rule``.
