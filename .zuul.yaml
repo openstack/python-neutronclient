@@ -64,6 +64,7 @@
         Q_ML2_TENANT_NETWORK_TYPE: vxlan
         Q_ML2_PLUGIN_MECHANISM_DRIVERS: openvswitch
       devstack_plugins:
+        neutron: https://opendev.org/openstack/neutron
         neutron-vpnaas: https://opendev.org/openstack/neutron-vpnaas
 
 - job:
