@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Added new client methods for QoS packet rate limit rule:
+    ``list_packet_rate_limit_rules``, ``show_packet_rate_limit_rule``,
+    ``create_packet_rate_limit_rule``, ``update_packet_rate_limit_rule``,
+    ``delete_packet_rate_limit_rule``.
