@@ -619,6 +619,10 @@ class Client(ClientBase):
     qos_policy_path = "/qos/policies/%s"
     qos_bandwidth_limit_rules_path = "/qos/policies/%s/bandwidth_limit_rules"
     qos_bandwidth_limit_rule_path = "/qos/policies/%s/bandwidth_limit_rules/%s"
+    qos_packet_rate_limit_rules_path = \
+        "/qos/policies/%s/packet_rate_limit_rules"
+    qos_packet_rate_limit_rule_path = \
+        "/qos/policies/%s/packet_rate_limit_rules/%s"
     qos_dscp_marking_rules_path = "/qos/policies/%s/dscp_marking_rules"
     qos_dscp_marking_rule_path = "/qos/policies/%s/dscp_marking_rules/%s"
     qos_minimum_bandwidth_rules_path = \
@@ -712,6 +716,7 @@ class Client(ClientBase):
                      'qos_policies': 'qos_policy',
                      'policies': 'policy',
                      'bandwidth_limit_rules': 'bandwidth_limit_rule',
+                     'packet_rate_limit_rules': 'packet_rate_limit_rule',
                      'minimum_bandwidth_rules': 'minimum_bandwidth_rule',
                      'minimum_packet_rate_rules': 'minimum_packet_rate_rule',
                      'rules': 'rule',
@@ -1976,6 +1981,35 @@ class Client(ClientBase):
         """Creates a new minimum bandwidth rule."""
         return self.post(self.qos_minimum_bandwidth_rules_path % policy,
                          body=body)
+
+    def list_packet_rate_limit_rules(self, policy_id, retrieve_all=True,
+                                     **_params):
+        """Fetches a list of all packet rate limit rules for the given policy
+
+        """
+        return self.list('packet_rate_limit_rules',
+                         self.qos_packet_rate_limit_rules_path %
+                         policy_id, retrieve_all, **_params)
+
+    def show_packet_rate_limit_rule(self, rule, policy, body=None):
+        """Fetches information of a certain packet rate limit rule."""
+        return self.get(self.qos_packet_rate_limit_rule_path %
+                        (policy, rule), body=body)
+
+    def create_packet_rate_limit_rule(self, policy, body=None):
+        """Creates a new packet rate limit rule."""
+        return self.post(self.qos_packet_rate_limit_rules_path % policy,
+                         body=body)
+
+    def update_packet_rate_limit_rule(self, rule, policy, body=None):
+        """Updates a packet rate limit rule."""
+        return self.put(self.qos_packet_rate_limit_rule_path %
+                        (policy, rule), body=body)
+
+    def delete_packet_rate_limit_rule(self, rule, policy):
+        """Deletes a packet rate limit rule."""
+        return self.delete(self.qos_packet_rate_limit_rule_path %
+                           (policy, rule))
 
     def update_minimum_bandwidth_rule(self, rule, policy, body=None):
         """Updates a minimum bandwidth rule."""
