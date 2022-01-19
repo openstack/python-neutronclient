@@ -214,6 +214,26 @@ class CLITestV20PortJSON(test_cli20.CLITestV20Base):
         self._test_create_resource(resource, cmd, name, myid, args,
                                    position_names, position_values)
 
+    def test_create_port_vnic_type_smart_nic(self):
+        # Create port: --vnic_type smart-nic netid.
+        resource = 'port'
+        cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)
+        name = 'myname'
+        myid = 'myid'
+        netid = 'netid'
+        args = ['--vnic_type', 'smart-nic', netid]
+        position_names = ['binding:vnic_type', 'network_id']
+        position_values = ['smart-nic', netid]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
+        # Test dashed options
+        args = ['--vnic-type', 'smart-nic', netid]
+        position_names = ['binding:vnic_type', 'network_id']
+        position_values = ['smart-nic', netid]
+        self._test_create_resource(resource, cmd, name, myid, args,
+                                   position_names, position_values)
+
     def test_create_port_with_binding_profile(self):
         resource = 'port'
         cmd = port.CreatePort(test_cli20.MyApp(sys.stdout), None)

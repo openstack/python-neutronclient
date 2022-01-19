@@ -245,15 +245,15 @@ class CreatePort(neutronV20.CreateCommand, UpdatePortSecGroupMixin,
         parser.add_argument(
             '--vnic-type',
             metavar='<direct | direct-physical | macvtap '
-                    '| normal | baremetal>',
+                    '| normal | baremetal | smart-nic>',
             choices=['direct', 'direct-physical', 'macvtap',
-                     'normal', 'baremetal'],
+                     'normal', 'baremetal', 'smart-nic'],
             type=utils.convert_to_lowercase,
             help=_('VNIC type for this port.'))
         parser.add_argument(
             '--vnic_type',
             choices=['direct', 'direct-physical', 'macvtap',
-                     'normal', 'baremetal'],
+                     'normal', 'baremetal', 'smart-nic'],
             type=utils.convert_to_lowercase,
             help=argparse.SUPPRESS)
         parser.add_argument(
