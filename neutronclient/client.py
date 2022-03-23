@@ -189,7 +189,7 @@ class HTTPClient(object):
         try:
             kwargs['headers'] = kwargs.get('headers') or {}
             if self.auth_token is None:
-                self.auth_token = ""
+                self.auth_token = ""    # nosec
             kwargs['headers']['X-Auth-Token'] = self.auth_token
             resp, body = self._cs_request(self.endpoint_url + url, method,
                                           **kwargs)
