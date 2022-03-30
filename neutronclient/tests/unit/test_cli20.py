@@ -1159,7 +1159,7 @@ class CLITestV20OutputFormatter(CLITestV20Base):
 
     def test_create_resource_yaml(self):
         self._test_create_resource_with_formatter('yaml')
-        data = yaml.load(self.fake_stdout.make_string())
+        data = yaml.safe_load(self.fake_stdout.make_string())
         self.assertEqual('myname', data['name'])
         self.assertEqual('myid', data['id'])
 
@@ -1184,7 +1184,7 @@ class CLITestV20OutputFormatter(CLITestV20Base):
 
     def test_show_resource_yaml(self):
         self._test_show_resource_with_formatter('yaml')
-        data = yaml.load(''.join(self.fake_stdout.content))
+        data = yaml.safe_load(''.join(self.fake_stdout.content))
         self.assertEqual('myname', data['name'])
         self.assertEqual('myid', data['id'])
 
@@ -1211,5 +1211,5 @@ class CLITestV20OutputFormatter(CLITestV20Base):
 
     def test_list_resources_yaml(self):
         self._test_list_resources_with_formatter('yaml')
-        data = yaml.load(''.join(self.fake_stdout.content))
+        data = yaml.safe_load(''.join(self.fake_stdout.content))
         self.assertEqual(['myid1', 'myid2'], [d['id'] for d in data])
