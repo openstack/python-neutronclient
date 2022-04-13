@@ -515,6 +515,8 @@ class Client(ClientBase):
     router_path = "/routers/%s"
     floatingips_path = "/floatingips"
     floatingip_path = "/floatingips/%s"
+    port_forwardings_path = "/floatingips/%s/port_forwardings"
+    port_forwarding_path = "/floatingips/%s/port_forwardings/%s"
     security_groups_path = "/security-groups"
     security_group_path = "/security-groups/%s"
     security_group_rules_path = "/security-group-rules"
@@ -1018,6 +1020,32 @@ class Client(ClientBase):
     def delete_floatingip(self, floatingip):
         """Deletes the specified floatingip."""
         return self.delete(self.floatingip_path % (floatingip))
+
+    def show_port_forwarding(self, floatingip, portforwarding):
+        """Fetches information of a certain portforwarding"""
+        return self.get(self.port_forwarding_path % (floatingip,
+                                                     portforwarding))
+
+    def list_port_forwardings(self, floatingip, retrieve_all=True, **_params):
+        """Fetches a list of all portforwardings for a floatingip."""
+        return self.list('port_forwardings',
+                         self.port_forwardings_path % floatingip, retrieve_all,
+                         **_params)
+
+    def create_port_forwarding(self, floatingip, body=None):
+        """Creates a new portforwarding."""
+        return self.post(self.port_forwardings_path % floatingip, body=body)
+
+    def delete_port_forwarding(self, floatingip, portforwarding):
+        """Deletes the specified portforwarding."""
+        return self.delete(self.port_forwarding_path % (floatingip,
+                                                        portforwarding))
+
+    def update_port_forwarding(self, floatingip, portforwarding, body=None):
+        """Updates a portforwarding."""
+        return self.put(self.port_forwarding_path % (floatingip,
+                                                     portforwarding),
+                        body=body)
 
     def create_security_group(self, body=None):
         """Creates a new security group."""
