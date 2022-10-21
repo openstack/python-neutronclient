@@ -1,0 +1,7 @@
+---
+prelude: >
+    Openstack community decided to use one SDK for its services, that is
+    in ``openstacksdk`` repository. To avoid duplication, sooner or later the
+    python binding code in ``python-neutronclient`` will be deprecated, and
+    ``Neutron`` team decided on the ``2023.1 (Antelope)`` PTG to not allow
+    new features\' bindings implemented here.

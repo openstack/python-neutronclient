@@ -250,6 +250,9 @@ class ClientBase(object):
     def __init__(self, **kwargs):
         """Initialize a new client for the Neutron v2.0 API."""
         super(ClientBase, self).__init__()
+        _logger.warning("The python binding code in neutronclient will be "
+                        "deprecated in favor of OpenstackSDK, please use "
+                        "that!")
         self.retries = kwargs.pop('retries', 0)
         self.raise_errors = kwargs.pop('raise_errors', True)
         self.httpclient = client.construct_http_client(**kwargs)
