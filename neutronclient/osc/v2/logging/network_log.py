@@ -58,11 +58,11 @@ def _get_common_parser(parser):
     enable_group.add_argument(
         '--enable',
         action='store_true',
-        help=_('Enable this log (default is disabled)'))
+        help=_('Enable this log'))
     enable_group.add_argument(
         '--disable',
         action='store_true',
-        help=_('Disable this log'))
+        help=_('Disable this log (default is enabled)'))
     return parser
 
 
