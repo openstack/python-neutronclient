@@ -15,7 +15,6 @@ from osc_lib.command import command
 from osc_lib import utils
 
 from neutronclient._i18n import _
-from neutronclient.osc.v2.dynamic_routing import constants
 
 
 def _format_alive_state(item):
@@ -45,11 +44,9 @@ class AddBgpSpeakerToDRAgent(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        speaker_id = client.find_resource(constants.BGP_SPEAKER,
-                                          parsed_args.bgp_speaker)['id']
-        client.add_bgp_speaker_to_dragent(
-            parsed_args.dragent_id, {'bgp_speaker_id': speaker_id})
+        client = self.app.client_manager.network
+        speaker_id = client.find_bgp_speaker(parsed_args.bgp_speaker).id
+        client.add_bgp_speaker_to_dragent(parsed_args.dragent_id, speaker_id)
 
 
 class RemoveBgpSpeakerFromDRAgent(command.Command):
@@ -62,9 +59,8 @@ class RemoveBgpSpeakerFromDRAgent(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        speaker_id = client.find_resource(constants.BGP_SPEAKER,
-                                          parsed_args.bgp_speaker)['id']
+        client = self.app.client_manager.network
+        speaker_id = client.find_bgp_speaker(parsed_args.bgp_speaker).id
         client.remove_bgp_speaker_from_dragent(parsed_args.dragent_id,
                                                speaker_id)
 
@@ -92,18 +88,30 @@ class ListDRAgentsHostingBgpSpeaker(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        search_opts = {}
-        client = self.app.client_manager.neutronclient
-        speaker_id = client.find_resource(constants.BGP_SPEAKER,
-                                          parsed_args.bgp_speaker)['id']
-        search_opts['bgp_speaker'] = speaker_id
-        data = client.list_dragents_hosting_bgp_speaker(**search_opts)
-        headers = ('ID', 'Host', 'State', 'Alive')
-        columns = ('id', 'host', 'admin_state_up', 'alive')
-        return (headers,
-                (utils.get_dict_properties(
-                    s, columns, formatters=_formatters,
-                ) for s in data['agents']))
+        client = self.app.client_manager.network
+        speaker_id = client.find_bgp_speaker(parsed_args.bgp_speaker).id
+        data = client.get_bgp_dragents_hosting_speaker(speaker_id)
+        columns = (
+            'id',
+            'agent_type',
+            'host',
+            'availability_zone',
+            'is_alive',
+            'is_admin_state_up',
+            'binary'
+        )
+        column_headers = (
+            'ID',
+            'Agent Type',
+            'Host',
+            'Availability Zone',
+            'Alive',
+            'State',
+            'Binary'
+        )
+        return (column_headers,
+                (utils.get_item_properties(
+                    s, columns,) for s in data))
 
 
 class ListDRAgent(command.Lister):
@@ -123,20 +131,31 @@ class ListDRAgent(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        search_opts = {}
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         if parsed_args.bgp_speaker is not None:
-            search_opts = {}
-            speaker_id = client.find_resource(constants.BGP_SPEAKER,
-                                              parsed_args.bgp_speaker)['id']
-            search_opts['bgp_speaker'] = speaker_id
-            data = client.list_dragents_hosting_bgp_speaker(**search_opts)
+            speaker_id = client.find_bgp_speaker(parsed_args.bgp_speaker).id
+            data = client.get_bgp_dragents_hosting_speaker(speaker_id)
         else:
             attrs = {'agent_type': 'BGP dynamic routing agent'}
-            data = client.list_agents(**attrs)
-        headers = ('ID', 'Host', 'State', 'Alive')
-        columns = ('id', 'host', 'admin_state_up', 'alive')
-        return (headers,
-                (utils.get_dict_properties(
-                    s, columns, formatters=_formatters,
-                ) for s in data['agents']))
+            data = client.agents(**attrs)
+        columns = (
+            'id',
+            'agent_type',
+            'host',
+            'availability_zone',
+            'is_alive',
+            'is_admin_state_up',
+            'binary'
+        )
+        column_headers = (
+            'ID',
+            'Agent Type',
+            'Host',
+            'Availability Zone',
+            'Alive',
+            'State',
+            'Binary'
+        )
+        return (column_headers,
+                (utils.get_item_properties(
+                    s, columns,) for s in data))

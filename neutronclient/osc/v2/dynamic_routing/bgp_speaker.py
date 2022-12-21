@@ -13,7 +13,6 @@
 
 from osc_lib.command import command
 from osc_lib import utils
-from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
 from neutronclient.osc import utils as nc_osc_utils
@@ -87,12 +86,12 @@ class AddNetworkToSpeaker(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        speaker_id = client.find_resource(constants.BGP_SPEAKER,
-                                          parsed_args.bgp_speaker)['id']
-        net_id = client.find_resource('network',
-                                      parsed_args.network)['id']
-        client.add_network_to_bgp_speaker(speaker_id, {'network_id': net_id})
+        client = self.app.client_manager.network
+        speaker_id = client.find_bgp_speaker(parsed_args.bgp_speaker,
+                                             ignore_missing=False).id
+        net_id = client.find_network(parsed_args.network,
+                                     ignore_missing=False).id
+        client.add_gateway_network_to_speaker(speaker_id, net_id)
 
 
 class AddPeerToSpeaker(command.Command):
@@ -111,12 +110,10 @@ class AddPeerToSpeaker(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        speaker_id = client.find_resource(constants.BGP_SPEAKER,
-                                          parsed_args.bgp_speaker)['id']
-        peer_id = client.find_resource(constants.BGP_PEER,
-                                       parsed_args.bgp_peer)['id']
-        client.add_peer_to_bgp_speaker(speaker_id, {'bgp_peer_id': peer_id})
+        client = self.app.client_manager.network
+        speaker_id = client.find_bgp_speaker(parsed_args.bgp_speaker)['id']
+        peer_id = client.find_bgp_peer(parsed_args.bgp_peer)['id']
+        client.add_bgp_peer_to_speaker(speaker_id, peer_id)
 
 
 class CreateBgpSpeaker(command.ShowOne):
@@ -145,12 +142,10 @@ class CreateBgpSpeaker(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_attrs(self.app.client_manager, parsed_args)
-        body = {}
-        body[constants.BGP_SPEAKER] = attrs
-        obj = client.create_bgp_speaker(body)[constants.BGP_SPEAKER]
-        columns, display_columns = column_util.get_columns(obj)
+        obj = client.create_bgp_speaker(**attrs)
+        display_columns, columns = nc_osc_utils._get_columns(obj)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -168,9 +163,8 @@ class DeleteBgpSpeaker(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        id = client.find_resource(constants.BGP_SPEAKER,
-                                  parsed_args.bgp_speaker)['id']
+        client = self.app.client_manager.network
+        id = client.find_bgp_speaker(parsed_args.bgp_speaker)['id']
         client.delete_bgp_speaker(id)
 
 
@@ -186,16 +180,16 @@ class ListBgpSpeaker(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         if parsed_args.agent is not None:
-            data = client.list_bgp_speaker_on_dragent(parsed_args.agent)
+            data = client.get_bgp_speakers_hosted_by_dragent(parsed_args.agent)
         else:
-            data = client.list_bgp_speakers()
+            data = client.bgp_speakers(retrieve_all=True)
 
         headers = ('ID', 'Name', 'Local AS', 'IP Version')
         columns = ('id', 'name', 'local_as', 'ip_version')
         return (headers, (utils.get_dict_properties(s, columns)
-                          for s in data[constants.BGP_SPEAKERS]))
+                          for s in data))
 
 
 class ListRoutesAdvertisedBySpeaker(command.Lister):
@@ -211,10 +205,9 @@ class ListRoutesAdvertisedBySpeaker(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        speaker_id = client.find_resource(constants.BGP_SPEAKER,
-                                          parsed_args.bgp_speaker)['id']
-        data = client.list_route_advertised_from_bgp_speaker(speaker_id)
+        client = self.app.client_manager.network
+        speaker_id = client.find_bgp_speaker(parsed_args.bgp_speaker)['id']
+        data = client.get_advertised_routes_of_speaker(speaker_id)
         headers = ('Destination', 'Nexthop')
         columns = ('destination', 'next_hop')
         return (headers, (utils.get_dict_properties(s, columns)
@@ -237,13 +230,10 @@ class RemoveNetworkFromSpeaker(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        speaker_id = client.find_resource(constants.BGP_SPEAKER,
-                                          parsed_args.bgp_speaker)['id']
-        net_id = client.find_resource('network',
-                                      parsed_args.network)['id']
-        client.remove_network_from_bgp_speaker(speaker_id,
-                                               {'network_id': net_id})
+        client = self.app.client_manager.network
+        speaker_id = client.find_bgp_speaker(parsed_args.bgp_speaker)['id']
+        net_id = client.find_network(parsed_args.network)['id']
+        client.remove_gateway_network_from_speaker(speaker_id, net_id)
 
 
 class RemovePeerFromSpeaker(command.Command):
@@ -262,13 +252,10 @@ class RemovePeerFromSpeaker(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        speaker_id = client.find_resource(constants.BGP_SPEAKER,
-                                          parsed_args.bgp_speaker)['id']
-        peer_id = client.find_resource(constants.BGP_PEER,
-                                       parsed_args.bgp_peer)['id']
-        client.remove_peer_from_bgp_speaker(speaker_id,
-                                            {'bgp_peer_id': peer_id})
+        client = self.app.client_manager.network
+        speaker_id = client.find_bgp_speaker(parsed_args.bgp_speaker)['id']
+        peer_id = client.find_bgp_peer(parsed_args.bgp_peer)['id']
+        client.remove_bgp_peer_from_speaker(speaker_id, peer_id)
 
 
 class SetBgpSpeaker(command.Command):
@@ -290,13 +277,10 @@ class SetBgpSpeaker(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        id = client.find_resource(constants.BGP_SPEAKER,
-                                  parsed_args.bgp_speaker)['id']
+        client = self.app.client_manager.network
+        id = client.find_bgp_speaker(parsed_args.bgp_speaker)['id']
         attrs = _get_attrs(self.app.client_manager, parsed_args)
-        body = {}
-        body[constants.BGP_SPEAKER] = attrs
-        client.update_bgp_speaker(id, body)
+        client.update_bgp_speaker(id, **attrs)
 
 
 class ShowBgpSpeaker(command.ShowOne):
@@ -312,10 +296,10 @@ class ShowBgpSpeaker(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        id = client.find_resource(constants.BGP_SPEAKER,
-                                  parsed_args.bgp_speaker)['id']
-        obj = client.show_bgp_speaker(id)[constants.BGP_SPEAKER]
-        columns, display_columns = column_util.get_columns(obj)
+        client = self.app.client_manager.network
+        id = client.find_bgp_speaker(parsed_args.bgp_speaker,
+                                     ignore_missing=False).id
+        obj = client.get_bgp_speaker(id)
+        display_columns, columns = nc_osc_utils._get_columns(obj)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data

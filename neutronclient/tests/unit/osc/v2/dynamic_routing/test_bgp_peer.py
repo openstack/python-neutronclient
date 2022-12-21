@@ -20,7 +20,7 @@ class TestListBgpPeer(fakes.TestNeutronDynamicRoutingOSCV2):
     _bgp_peers = fakes.FakeBgpPeer.create_bgp_peers(count=1)
     columns = ('ID', 'Name', 'Peer IP', 'Remote AS')
     data = []
-    for _bgp_peer in _bgp_peers['bgp_peers']:
+    for _bgp_peer in _bgp_peers:
         data.append((
             _bgp_peer['id'],
             _bgp_peer['name'],
@@ -30,7 +30,7 @@ class TestListBgpPeer(fakes.TestNeutronDynamicRoutingOSCV2):
     def setUp(self):
         super(TestListBgpPeer, self).setUp()
 
-        self.neutronclient.list_bgp_peers = mock.Mock(
+        self.networkclient.bgp_peers = mock.Mock(
             return_value=self._bgp_peers
         )
 
@@ -41,7 +41,8 @@ class TestListBgpPeer(fakes.TestNeutronDynamicRoutingOSCV2):
         parsed_args = self.check_parser(self.cmd, [], [])
 
         columns, data = self.cmd.take_action(parsed_args)
-        self.neutronclient.list_bgp_peers.assert_called_once_with()
+        self.networkclient.bgp_peers.assert_called_once_with(
+            retrieve_all=True)
         self.assertEqual(self.columns, columns)
         self.assertEqual(self.data, list(data))
 
@@ -53,7 +54,7 @@ class TestDeleteBgpPeer(fakes.TestNeutronDynamicRoutingOSCV2):
     def setUp(self):
         super(TestDeleteBgpPeer, self).setUp()
 
-        self.neutronclient.delete_bgp_peer = mock.Mock(return_value=None)
+        self.networkclient.delete_bgp_peer = mock.Mock(return_value=None)
 
         self.cmd = bgp_peer.DeleteBgpPeer(self.app, self.namespace)
 
@@ -68,7 +69,7 @@ class TestDeleteBgpPeer(fakes.TestNeutronDynamicRoutingOSCV2):
 
         result = self.cmd.take_action(parsed_args)
 
-        self.neutronclient.delete_bgp_peer.assert_called_once_with(
+        self.networkclient.delete_bgp_peer.assert_called_once_with(
             self._bgp_peer['name'])
         self.assertIsNone(result)
 
@@ -80,31 +81,30 @@ class TestShowBgpPeer(fakes.TestNeutronDynamicRoutingOSCV2):
         _one_bgp_peer['id'],
         _one_bgp_peer['name'],
         _one_bgp_peer['peer_ip'],
+        _one_bgp_peer['tenant_id'],
         _one_bgp_peer['remote_as'],
-        _one_bgp_peer['tenant_id']
     )
-    _bgp_peer = {'bgp_peer': _one_bgp_peer}
+    _bgp_peer = _one_bgp_peer
     _bgp_peer_name = _one_bgp_peer['name']
     columns = (
         'auth_type',
         'id',
         'name',
         'peer_ip',
+        'project_id',
         'remote_as',
-        'tenant_id'
     )
 
     def setUp(self):
         super(TestShowBgpPeer, self).setUp()
 
-        self.neutronclient.show_bgp_peer = mock.Mock(
+        self.networkclient.get_bgp_peer = mock.Mock(
             return_value=self._bgp_peer
         )
-        bgp_peer.get_bgp_peer_id = mock.Mock(return_value=self._bgp_peer_name)
         # Get the command object to test
         self.cmd = bgp_peer.ShowBgpPeer(self.app, self.namespace)
 
-    def test_bgp_peer_list(self):
+    def test_bgp_peer_show(self):
         arglist = [
             self._bgp_peer_name,
         ]
@@ -114,7 +114,7 @@ class TestShowBgpPeer(fakes.TestNeutronDynamicRoutingOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
 
         data = self.cmd.take_action(parsed_args)
-        self.neutronclient.show_bgp_peer.assert_called_once_with(
+        self.networkclient.get_bgp_peer.assert_called_once_with(
             self._bgp_peer_name)
         self.assertEqual(self.columns, data[0])
         self.assertEqual(self.data, data[1])
@@ -126,7 +126,7 @@ class TestSetBgpPeer(fakes.TestNeutronDynamicRoutingOSCV2):
 
     def setUp(self):
         super(TestSetBgpPeer, self).setUp()
-        self.neutronclient.update_bgp_peer = mock.Mock(return_value=None)
+        self.networkclient.update_bgp_peer = mock.Mock(return_value=None)
         bgp_peer.get_bgp_peer_id = mock.Mock(return_value=self._bgp_peer_name)
 
         self.cmd = bgp_peer.SetBgpPeer(self.app, self.namespace)
@@ -144,10 +144,7 @@ class TestSetBgpPeer(fakes.TestNeutronDynamicRoutingOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        attrs = {'bgp_peer': {
-            'name': 'noob',
-            'password': None}
-        }
-        self.neutronclient.update_bgp_peer.assert_called_once_with(
-            self._bgp_peer_name, attrs)
+        attrs = {'name': 'noob', 'password': None}
+        self.networkclient.update_bgp_peer.assert_called_once_with(
+            self._bgp_peer_name, **attrs)
         self.assertIsNone(result)
