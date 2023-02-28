@@ -25,13 +25,12 @@ from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
 from neutronclient.osc import utils as nc_osc_utils
-from neutronclient.osc.v2.networking_bgpvpn import constants
 
 LOG = logging.getLogger(__name__)
 
 _attr_map = (
     ('id', 'ID', column_util.LIST_BOTH),
-    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
+    ('project_id', 'Project', column_util.LIST_LONG_ONLY),
     ('name', 'Name', column_util.LIST_BOTH),
     ('type', 'Type', column_util.LIST_BOTH),
     ('route_targets', 'Route Targets', column_util.LIST_LONG_ONLY),
@@ -166,7 +165,7 @@ def _args2body(client_manager, id, action, args):
              args.purge_export_target and args.purge_route_distinguisher) and
             (args.route_targets or args.import_targets or
              args.export_targets or args.route_distinguishers)):
-        bgpvpn = client_manager.neutronclient.show_bgpvpn(id)['bgpvpn']
+        bgpvpn = client_manager.network.get_bgpvpn(id)
 
     attrs = {}
 
@@ -221,7 +220,7 @@ def _args2body(client_manager, id, action, args):
                 set(bgpvpn['route_distinguishers']) -
                 set(args.route_distinguishers))
 
-    return {constants.BGPVPN: attrs}
+    return attrs
 
 
 class CreateBgpvpn(command.ShowOne):
@@ -241,7 +240,7 @@ class CreateBgpvpn(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = {}
         if parsed_args.name is not None:
             attrs['name'] = str(parsed_args.name)
@@ -266,9 +265,8 @@ class CreateBgpvpn(command.ShowOne):
                 parsed_args.project_domain,
             ).id
             attrs['tenant_id'] = project_id
-        body = {constants.BGPVPN: attrs}
-        obj = client.create_bgpvpn(body)[constants.BGPVPN]
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        obj = client.create_bgpvpn(**attrs)
+        display_columns, columns = nc_osc_utils._get_columns(obj)
         data = osc_utils.get_dict_properties(obj, columns,
                                              formatters=_formatters)
         return display_columns, data
@@ -288,10 +286,10 @@ class SetBgpvpn(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        id = client.find_resource(constants.BGPVPN, parsed_args.bgpvpn)['id']
+        client = self.app.client_manager.network
+        id = client.find_bgpvpn(parsed_args.bgpvpn)['id']
         body = _args2body(self.app.client_manager, id, 'set', parsed_args)
-        client.update_bgpvpn(id, body)
+        client.update_bgpvpn(id, **body)
 
 
 class UnsetBgpvpn(command.Command):
@@ -308,10 +306,10 @@ class UnsetBgpvpn(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        id = client.find_resource(constants.BGPVPN, parsed_args.bgpvpn)['id']
+        client = self.app.client_manager.network
+        id = client.find_bgpvpn(parsed_args.bgpvpn)['id']
         body = _args2body(self.app.client_manager, id, 'unset', parsed_args)
-        client.update_bgpvpn(id, body)
+        client.update_bgpvpn(id, **body)
 
 
 class DeleteBgpvpn(command.Command):
@@ -328,11 +326,11 @@ class DeleteBgpvpn(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         fails = 0
         for id_or_name in parsed_args.bgpvpns:
             try:
-                id = client.find_resource(constants.BGPVPN, id_or_name)['id']
+                id = client.find_bgpvpn(id_or_name)['id']
                 client.delete_bgpvpn(id)
                 LOG.warning("BGP VPN %(id)s deleted", {'id': id})
             except Exception as e:
@@ -368,7 +366,7 @@ class ListBgpvpn(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         params = {}
         if parsed_args.project is not None:
             project_id = nc_osc_utils.find_project(
@@ -379,7 +377,7 @@ class ListBgpvpn(command.Lister):
             params['tenant_id'] = project_id
         if parsed_args.property:
             params.update(parsed_args.property)
-        objs = client.list_bgpvpns(**params)[constants.BGPVPNS]
+        objs = client.bgpvpns(**params)
         headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (osc_utils.get_dict_properties(
@@ -399,10 +397,10 @@ class ShowBgpvpn(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        id = client.find_resource(constants.BGPVPN, parsed_args.bgpvpn)['id']
-        obj = client.show_bgpvpn(id)[constants.BGPVPN]
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        client = self.app.client_manager.network
+        id = client.find_bgpvpn(parsed_args.bgpvpn)['id']
+        obj = client.get_bgpvpn(id)
+        display_columns, columns = nc_osc_utils._get_columns(obj)
         data = osc_utils.get_dict_properties(obj, columns,
                                              formatters=_formatters)
         return display_columns, data

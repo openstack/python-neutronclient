@@ -14,7 +14,6 @@
 #   under the License.
 #
 
-import copy
 import operator
 from unittest import mock
 
@@ -56,8 +55,12 @@ class TestCreateRouterAssoc(fakes.TestNeutronClientBgpvpn):
     def setUp(self):
         super(TestCreateRouterAssoc, self).setUp()
         self.cmd = fakes.CreateBgpvpnFakeRouterAssoc(self.app, self.namespace)
-        self.fake_bgpvpn = fakes.FakeBgpvpn.create_one_bgpvpn()
-        self.fake_router = fakes.FakeResource.create_one_resource()
+        self.fake_bgpvpn = fakes.create_one_bgpvpn()
+        self.fake_router = fakes.create_one_resource()
+        self.networkclient.find_bgpvpn = mock.Mock(
+            side_effect=lambda name_or_id: {'id': name_or_id})
+        self.networkclient.find_fake_resource = mock.Mock(
+            side_effect=lambda name_or_id: {'id': name_or_id})
 
     def _build_args(self, param=None):
         arglist_base = [
@@ -89,20 +92,26 @@ class TestCreateRouterAssoc(fakes.TestNeutronClientBgpvpn):
 
         cols, data = self.cmd.take_action(parsed_args)
 
-        fake_res_assoc_call = copy.deepcopy(fake_res_assoc)
-        fake_res_assoc_call.pop('id')
+        fake_res_assoc_call = {
+            'fake_resource_id': 'fake_resource_id',
+            'tenant_id': 'fake_project_id'
+        }
+        for key, value in verifylist:
+            if value not in fake_res_assoc_call.values():
+                fake_res_assoc_call[key] = value
+        fake_res_assoc_call.pop('bgpvpn')
 
-        self.neutronclient.create_bgpvpn_fake_resource_assoc.\
+        self.networkclient.create_bgpvpn_fake_resource_association.\
             assert_called_once_with(
                 self.fake_bgpvpn['id'],
-                {fakes.BgpvpnFakeRouterAssoc._resource: fake_res_assoc_call})
+                **fake_res_assoc_call)
         return cols, data
 
-    def test_create_router_association(self):
-        fake_res_assoc = fakes.FakeResAssoc.create_one_resource_association(
+    def test_create_router_associationx(self):
+        fake_res_assoc = fakes.create_one_resource_association(
             self.fake_router)
 
-        self.neutronclient.create_bgpvpn_fake_resource_assoc = mock.Mock(
+        self.networkclient.create_bgpvpn_fake_resource_association = mock.Mock(
             return_value={
                 fakes.BgpvpnFakeRouterAssoc._resource: fake_res_assoc,
                 'advertise_extra_routes': True})
@@ -116,37 +125,35 @@ class TestCreateRouterAssoc(fakes.TestNeutronClientBgpvpn):
             fake_res_assoc, arglist, verifylist)
 
     def test_create_router_association_advertise(self):
-        fake_res_assoc = fakes.FakeResAssoc.create_one_resource_association(
+        fake_res_assoc = fakes.create_one_resource_association(
             self.fake_router,
             {'advertise_extra_routes': True})
 
-        self.neutronclient.create_bgpvpn_fake_resource_assoc = mock.Mock(
-            return_value={
-                fakes.BgpvpnFakeRouterAssoc._resource: fake_res_assoc})
+        self.networkclient.create_bgpvpn_fake_resource_association = mock.Mock(
+            return_value=fake_res_assoc)
 
         arglist = self._build_args('--advertise_extra_routes')
         verifylist = self._build_verify_list(('advertise_extra_routes', True))
 
         cols, data = self._exec_create_router_association(
             fake_res_assoc, arglist, verifylist)
-        self.assertEqual(sorted_headers, cols)
+        self.assertEqual(sorted_columns, cols)
         self.assertEqual(_get_data(fake_res_assoc), data)
 
     def test_create_router_association_no_advertise(self):
-        fake_res_assoc = fakes.FakeResAssoc.create_one_resource_association(
+        fake_res_assoc = fakes.create_one_resource_association(
             self.fake_router,
             {'advertise_extra_routes': False})
 
-        self.neutronclient.create_bgpvpn_fake_resource_assoc = mock.Mock(
-            return_value={
-                fakes.BgpvpnFakeRouterAssoc._resource: fake_res_assoc})
+        self.networkclient.create_bgpvpn_fake_resource_association = mock.Mock(
+            return_value=fake_res_assoc)
 
         arglist = self._build_args('--no-advertise_extra_routes')
         verifylist = self._build_verify_list(('advertise_extra_routes', False))
 
         cols, data = self._exec_create_router_association(
             fake_res_assoc, arglist, verifylist)
-        self.assertEqual(sorted_headers, cols)
+        self.assertEqual(sorted_columns, cols)
         self.assertEqual(_get_data(fake_res_assoc), data)
 
     def test_create_router_association_advertise_fault(self):
@@ -172,8 +179,10 @@ class TestSetRouterAssoc(fakes.TestNeutronClientBgpvpn):
     def setUp(self):
         super(TestSetRouterAssoc, self).setUp()
         self.cmd = fakes.SetBgpvpnFakeRouterAssoc(self.app, self.namespace)
-        self.fake_bgpvpn = fakes.FakeBgpvpn.create_one_bgpvpn()
-        self.fake_router = fakes.FakeResource.create_one_resource()
+        self.fake_bgpvpn = fakes.create_one_bgpvpn()
+        self.fake_router = fakes.create_one_resource()
+        self.networkclient.find_bgpvpn = mock.Mock(
+            side_effect=lambda name_or_id: {'id': name_or_id})
 
     def _build_args(self, fake_res_assoc, param=None):
         arglist_base = [
@@ -197,10 +206,11 @@ class TestSetRouterAssoc(fakes.TestNeutronClientBgpvpn):
         return verifylist
 
     def test_set_router_association_no_advertise(self):
-        fake_res_assoc = fakes.FakeResAssoc.create_one_resource_association(
+        fake_res_assoc = fakes.create_one_resource_association(
             self.fake_router,
             {'advertise_extra_routes': True})
-        self.neutronclient.update_bgpvpn_fake_resource_assoc = mock.Mock()
+        self.networkclient.update_bgpvpn_fake_resource_association = \
+            mock.Mock()
 
         arglist = self._build_args(
             fake_res_assoc,
@@ -213,25 +223,20 @@ class TestSetRouterAssoc(fakes.TestNeutronClientBgpvpn):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        fake_res_assoc_call = copy.deepcopy(fake_res_assoc)
-        fake_res_assoc_call.pop('id')
-
-        self.neutronclient.update_bgpvpn_fake_resource_assoc.\
+        self.networkclient.update_bgpvpn_fake_resource_association.\
             assert_called_once_with(
                 self.fake_bgpvpn['id'],
                 fake_res_assoc['id'],
-                {
-                    fakes.BgpvpnFakeRouterAssoc._resource: {
-                        'advertise_extra_routes': False
-                    }
-                })
+                **{'advertise_extra_routes': False}
+            )
         self.assertIsNone(result)
 
     def test_set_router_association_advertise(self):
-        fake_res_assoc = fakes.FakeResAssoc.create_one_resource_association(
+        fake_res_assoc = fakes.create_one_resource_association(
             self.fake_router,
             {'advertise_extra_routes': False})
-        self.neutronclient.update_bgpvpn_fake_resource_assoc = mock.Mock()
+        self.networkclient.update_bgpvpn_fake_resource_association = \
+            mock.Mock()
 
         arglist = self._build_args(
             fake_res_assoc,
@@ -244,18 +249,12 @@ class TestSetRouterAssoc(fakes.TestNeutronClientBgpvpn):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        fake_res_assoc_call = copy.deepcopy(fake_res_assoc)
-        fake_res_assoc_call.pop('id')
-
-        self.neutronclient.update_bgpvpn_fake_resource_assoc.\
+        self.networkclient.update_bgpvpn_fake_resource_association.\
             assert_called_once_with(
                 self.fake_bgpvpn['id'],
                 fake_res_assoc['id'],
-                {
-                    fakes.BgpvpnFakeRouterAssoc._resource: {
-                        'advertise_extra_routes': True
-                    }
-                })
+                **{'advertise_extra_routes': True}
+            )
         self.assertIsNone(result)
 
 
@@ -263,15 +262,17 @@ class TestShowRouterAssoc(fakes.TestNeutronClientBgpvpn):
     def setUp(self):
         super(TestShowRouterAssoc, self).setUp()
         self.cmd = fakes.ShowBgpvpnFakeRouterAssoc(self.app, self.namespace)
+        self.networkclient.find_bgpvpn = mock.Mock(
+            side_effect=lambda name_or_id: {'id': name_or_id})
 
     def test_show_router_association(self):
-        fake_bgpvpn = fakes.FakeBgpvpn.create_one_bgpvpn()
-        fake_res = fakes.FakeResource.create_one_resource()
-        fake_res_assoc = fakes.FakeResAssoc.create_one_resource_association(
+        fake_bgpvpn = fakes.create_one_bgpvpn()
+        fake_res = fakes.create_one_resource()
+        fake_res_assoc = fakes.create_one_resource_association(
             fake_res,
             {'advertise_extra_routes': True})
-        self.neutronclient.show_bgpvpn_fake_resource_assoc = mock.Mock(
-            return_value={fakes.BgpvpnFakeAssoc._resource: fake_res_assoc})
+        self.networkclient.get_bgpvpn_fake_resource_association = mock.Mock(
+            return_value=fake_res_assoc)
         arglist = [
             fake_res_assoc['id'],
             fake_bgpvpn['id'],
@@ -283,9 +284,9 @@ class TestShowRouterAssoc(fakes.TestNeutronClientBgpvpn):
 
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
 
-        headers, data = self.cmd.take_action(parsed_args)
+        cols, data = self.cmd.take_action(parsed_args)
 
-        self.neutronclient.show_bgpvpn_fake_resource_assoc.\
+        self.networkclient.get_bgpvpn_fake_resource_association.\
             assert_called_once_with(fake_bgpvpn['id'], fake_res_assoc['id'])
-        self.assertEqual(sorted_headers, headers)
+        self.assertEqual(sorted_columns, cols)
         self.assertEqual(data, _get_data(fake_res_assoc))

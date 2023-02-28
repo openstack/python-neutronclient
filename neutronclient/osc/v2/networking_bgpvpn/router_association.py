@@ -75,14 +75,13 @@ class BgpvpnRouterAssoc(object):
         )
 
     def _args2body(self, _, args):
-        attrs = {}
-
+        attrs = {'advertise_extra_routes': False}
         if args.advertise_extra_routes:
             attrs['advertise_extra_routes'] = self._action != 'unset'
         elif args.no_advertise_extra_routes:
             attrs['advertise_extra_routes'] = self._action == 'unset'
 
-        return {self._resource: attrs}
+        return attrs
 
 
 class CreateBgpvpnRouterAssoc(BgpvpnRouterAssoc, CreateBgpvpnResAssoc):

@@ -108,6 +108,7 @@ class BgpvpnPortAssoc(object):
                 LOG.warning("Unknown route type %s (%s).", route['type'],
                             route)
         data.pop('routes', None)
+        return data
 
     def _get_common_parser(self, parser):
         """Adds to parser arguments common to create, set and unset commands.
@@ -201,15 +202,13 @@ class BgpvpnPortAssoc(object):
             )
 
     def _args2body(self, bgpvpn_id, args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = {}
 
         if self._action != 'create':
-            assoc = client.find_resource_by_id(
-                self._resource,
+            assoc = client.find_bgpvpn_port_association(
                 args.resource_association_id,
-                cmd_resource='bgpvpn_%s_assoc' % self._assoc_res_name,
-                parent_id=bgpvpn_id)
+                bgpvpn_id=bgpvpn_id)
         else:
             assoc = {'routes': []}
 
@@ -248,7 +247,7 @@ class BgpvpnPortAssoc(object):
                 else:
                     routes = args.bgpvpn_routes
                 args_bgpvpn_routes = {
-                    client.find_resource(constants.BGPVPN, r['bgpvpn'])['id']:
+                    client.find_bgpvpn(r['bgpvpn']).id:
                         r.get('local_pref')
                     for r in routes
                 }
@@ -281,7 +280,7 @@ class BgpvpnPortAssoc(object):
                     route['local_pref'] = int(local_pref)
                 attrs.setdefault('routes', []).append(route)
 
-        return {self._resource: attrs}
+        return attrs
 
 
 class CreateBgpvpnPortAssoc(BgpvpnPortAssoc,

@@ -17,10 +17,11 @@
 import copy
 from unittest import mock
 
+from openstack.network.v2 import bgpvpn as _bgpvpn
+from openstack import resource as sdk_resource
 from osc_lib.utils import columns as column_util
 
 from neutronclient.osc import utils as nc_osc_utils
-from neutronclient.osc.v2.networking_bgpvpn import constants
 from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
     CreateBgpvpnResAssoc
 from neutronclient.osc.v2.networking_bgpvpn.resource_association import\
@@ -61,50 +62,45 @@ class TestNeutronClientBgpvpn(test_fakes.TestNeutronClientOSCV2):
             side_effect=lambda _, name_or_id, __: mock.Mock(id=name_or_id))
 
 
-class FakeBgpvpn(object):
-    """Fake BGP VPN with attributes."""
+def create_one_bgpvpn(attrs=None):
+    """Create a fake BGP VPN."""
 
-    @staticmethod
-    def create_one_bgpvpn(attrs=None):
-        """Create a fake BGP VPN."""
+    attrs = attrs or {}
 
-        attrs = attrs or {}
+    # Set default attributes.
+    bgpvpn_attrs = {
+        'id': 'fake_bgpvpn_id',
+        'tenant_id': _FAKE_PROJECT_ID,
+        'name': '',
+        'type': 'l3',
+        'route_targets': [],
+        'import_targets': [],
+        'export_targets': [],
+        'route_distinguishers': [],
+        'networks': [],
+        'routers': [],
+        'ports': [],
+        'vni': 100,
+        'local_pref': 777,
+    }
 
-        # Set default attributes.
-        bgpvpn_attrs = {
-            'id': 'fake_bgpvpn_id',
-            'tenant_id': _FAKE_PROJECT_ID,
-            'name': '',
-            'type': 'l3',
-            'route_targets': [],
-            'import_targets': [],
-            'export_targets': [],
-            'route_distinguishers': [],
-            'networks': [],
-            'routers': [],
-            'ports': [],
-            'vni': 100,
-            'local_pref': 777,
-        }
+    # Overwrite default attributes.
+    bgpvpn_attrs.update(attrs)
+    return _bgpvpn.BgpVpn(**bgpvpn_attrs)
 
-        # Overwrite default attributes.
-        bgpvpn_attrs.update(attrs)
 
-        return copy.deepcopy(bgpvpn_attrs)
+def create_bgpvpns(attrs=None, count=1):
+    """Create multiple fake BGP VPN."""
 
-    @staticmethod
-    def create_bgpvpns(attrs=None, count=1):
-        """Create multiple fake BGP VPN."""
+    bgpvpns = []
+    for i in range(0, count):
+        if attrs is None:
+            attrs = {'id': 'fake_id%d' % i}
+        elif getattr(attrs, 'id', None) is None:
+            attrs['id'] = 'fake_id%d' % i
+        bgpvpns.append(create_one_bgpvpn(attrs))
 
-        bgpvpns = []
-        for i in range(0, count):
-            if attrs is None:
-                attrs = {'id': 'fake_id%d' % i}
-            elif getattr(attrs, 'id', None) is None:
-                attrs['id'] = 'fake_id%d' % i
-            bgpvpns.append(FakeBgpvpn.create_one_bgpvpn(attrs))
-
-        return {constants.BGPVPNS: bgpvpns}
+    return bgpvpns
 
 
 class BgpvpnFakeAssoc(object):
@@ -114,9 +110,10 @@ class BgpvpnFakeAssoc(object):
 
     _attr_map = (
         ('id', 'ID', column_util.LIST_BOTH),
-        ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
         ('%s_id' % _assoc_res_name, '%s ID' % _assoc_res_name.capitalize(),
          column_util.LIST_BOTH),
+        ('name', 'Name', column_util.LIST_BOTH),
+        ('project_id', 'Project ID', column_util.LIST_BOTH),
     )
     _formatters = {}
 
@@ -152,11 +149,12 @@ class BgpvpnFakeRouterAssoc(object):
 
     _attr_map = (
         ('id', 'ID', column_util.LIST_BOTH),
-        ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
         ('%s_id' % _assoc_res_name, '%s ID' % _assoc_res_name.capitalize(),
          column_util.LIST_BOTH),
         ('advertise_extra_routes', 'Advertise extra routes',
          column_util.LIST_LONG_ONLY),
+        ('name', 'Name', column_util.LIST_BOTH),
+        ('project_id', 'Project ID', column_util.LIST_BOTH),
     )
     _formatters = {}
 
@@ -174,71 +172,99 @@ class ShowBgpvpnFakeRouterAssoc(BgpvpnFakeRouterAssoc, ShowBgpvpnRouterAssoc):
     pass
 
 
-class FakeResource(object):
-    """Fake resource with minimal attributes."""
+class FakeResource(sdk_resource.Resource):
+    resource_key = 'fakeresource'
+    resources_key = 'fakeresources'
+    base_path = '/bgpvpn/fakeresources'
 
-    @staticmethod
-    def create_one_resource(attrs=None):
-        """Create a fake resource."""
+    _allow_unknown_attrs_in_body = True
 
-        attrs = attrs or {}
+    # capabilities
+    allow_create = True
+    allow_fetch = True
+    allow_commit = True
+    allow_delete = True
+    allow_list = True
 
-        # Set default attributes.
-        res_attrs = {
-            'id': 'fake_resource_id',
-            'tenant_id': _FAKE_PROJECT_ID,
-        }
-
-        # Overwrite default attributes.
-        res_attrs.update(attrs)
-        return copy.deepcopy(res_attrs)
-
-    @staticmethod
-    def create_resources(attrs=None, count=1):
-        """Create multiple fake resources."""
-
-        resources = []
-        for i in range(0, count):
-            if attrs is None:
-                attrs = {'id': 'fake_id%d' % i}
-            elif getattr(attrs, 'id', None) is None:
-                attrs['id'] = 'fake_id%d' % i
-            resources.append(FakeResource.create_one_resource(attrs))
-
-        return {'%ss' % BgpvpnFakeAssoc._assoc_res_name: resources}
+    id = sdk_resource.Body('id')
+    tenant_id = sdk_resource.Body('tenant_id', deprecated=True)
+    project_id = sdk_resource.Body('project_id', alias='tenant_id')
 
 
-class FakeResAssoc(object):
-    """Fake resource association with minimal attributes."""
+class FakeResoureAssociation(sdk_resource.Resource):
+    resource_key = 'fakeresourceassociation'
+    resources_key = 'fakeresourceassociations'
+    base_path = '/bgpvpn/fakeresourceassociations'
 
-    @staticmethod
-    def create_one_resource_association(resource, attrs=None):
-        """Create a fake resource association."""
+    _allow_unknown_attrs_in_body = True
 
-        attrs = attrs or {}
+    # capabilities
+    allow_create = True
+    allow_fetch = True
+    allow_commit = True
+    allow_delete = True
+    allow_list = True
 
+    id = sdk_resource.Body('id')
+    tenant_id = sdk_resource.Body('tenant_id', deprecated=True)
+    project_id = sdk_resource.Body('project_id', alias='tenant_id')
+
+
+def create_one_resource(attrs=None):
+    """Create a fake resource."""
+    attrs = attrs or {}
+
+    # Set default attributes.
+    res_attrs = {
+        'id': 'fake_resource_id',
+        'tenant_id': _FAKE_PROJECT_ID,
+    }
+
+    # Overwrite default attributes.
+    res_attrs.update(attrs)
+    return FakeResource(**res_attrs)
+
+
+def create_resources(attrs=None, count=1):
+    """Create multiple fake resources."""
+
+    resources = []
+    for i in range(0, count):
+        if attrs is None:
+            attrs = {'id': 'fake_id%d' % i}
+        elif getattr(attrs, 'id', None) is None:
+            attrs['id'] = 'fake_id%d' % i
+        resources.append(create_one_resource(attrs))
+
+    return resources
+
+
+def create_one_resource_association(resource, attrs=None):
+    """Create a fake resource association."""
+
+    attrs = attrs or {}
+
+    res_assoc_attrs = {
+        'id': 'fake_association_id',
+        'tenant_id': resource['tenant_id'],
+        'fake_resource_id': resource['id'],
+    }
+
+    # Overwrite default attributes.
+    res_assoc_attrs.update(attrs)
+    return FakeResoureAssociation(**res_assoc_attrs)
+
+
+def create_resource_associations(resources):
+    """Create multiple fake resource associations."""
+
+    res_assocs = []
+    for idx, resource in enumerate(resources):
         res_assoc_attrs = {
-            'id': 'fake_association_id',
+            'id': 'fake_association_id%d' % idx,
             'tenant_id': resource['tenant_id'],
             'fake_resource_id': resource['id'],
         }
+        res_assocs.append(copy.deepcopy(res_assoc_attrs))
 
-        # Overwrite default attributes.
-        res_assoc_attrs.update(attrs)
-        return copy.deepcopy(res_assoc_attrs)
-
-    @staticmethod
-    def create_resource_associations(resources):
-        """Create multiple fake resource associations."""
-
-        res_assocs = []
-        for idx, resource in enumerate(
-                resources['%ss' % BgpvpnFakeAssoc._assoc_res_name]):
-            res_assoc_attrs = {
-                'id': 'fake_association_id%d' % idx,
-                'tenant_id': resource['tenant_id'],
-                'fake_resource_id': resource['id'],
-            }
-            res_assocs.append(copy.deepcopy(res_assoc_attrs))
-
-        return {BgpvpnFakeAssoc._resource_plural: res_assocs}
+    return res_assocs

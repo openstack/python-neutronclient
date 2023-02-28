@@ -24,7 +24,6 @@ from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
 from neutronclient.osc import utils as nc_osc_utils
-from neutronclient.osc.v2.networking_bgpvpn import constants
 
 LOG = logging.getLogger(__name__)
 
@@ -56,35 +55,32 @@ class CreateBgpvpnResAssoc(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         create_method = getattr(
-            client, 'create_bgpvpn_%s_assoc' % self._assoc_res_name)
-        bgpvpn = client.find_resource(constants.BGPVPN, parsed_args.bgpvpn)
-        assoc_res = client.find_resource(self._assoc_res_name,
-                                         parsed_args.resource)
-        body = {
-            self._resource: {
-                '%s_id' % self._assoc_res_name: assoc_res['id'],
-            },
-        }
+            client, 'create_bgpvpn_%s_association' % self._assoc_res_name)
+        bgpvpn = client.find_bgpvpn(parsed_args.bgpvpn)
+        find_res_method = getattr(
+            client, 'find_%s' % self._assoc_res_name)
+        assoc_res = find_res_method(parsed_args.resource)
+        body = {'%s_id' % self._assoc_res_name: assoc_res['id']}
         if 'project' in parsed_args and parsed_args.project is not None:
             project_id = nc_osc_utils.find_project(
                 self.app.client_manager.identity,
                 parsed_args.project,
                 parsed_args.project_domain,
             ).id
-            body[self._resource]['tenant_id'] = project_id
+            body['tenant_id'] = project_id
 
         arg2body = getattr(self, '_args2body', None)
         if callable(arg2body):
-            body[self._resource].update(
-                arg2body(bgpvpn['id'], parsed_args)[self._resource])
+            body.update(
+                arg2body(bgpvpn['id'], parsed_args))
 
-        obj = create_method(bgpvpn['id'], body)[self._resource]
+        obj = create_method(bgpvpn['id'], **body)
         transform = getattr(self, '_transform_resource', None)
         if callable(transform):
             transform(obj)
-        columns, display_columns = column_util.get_columns(obj, self._attr_map)
+        display_columns, columns = nc_osc_utils._get_columns(obj)
         data = osc_utils.get_dict_properties(obj, columns,
                                              formatters=self._formatters)
         return display_columns, data
@@ -116,15 +112,15 @@ class SetBgpvpnResAssoc(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         update_method = getattr(
-            client, 'update_bgpvpn_%s_assoc' % self._assoc_res_name)
-        bgpvpn = client.find_resource(constants.BGPVPN, parsed_args.bgpvpn)
+            client, 'update_bgpvpn_%s_association' % self._assoc_res_name)
+        bgpvpn = client.find_bgpvpn(parsed_args.bgpvpn)
         arg2body = getattr(self, '_args2body', None)
         if callable(arg2body):
             body = arg2body(bgpvpn['id'], parsed_args)
             update_method(bgpvpn['id'], parsed_args.resource_association_id,
-                          body)
+                          **body)
 
 
 class UnsetBgpvpnResAssoc(SetBgpvpnResAssoc):
@@ -153,10 +149,10 @@ class DeleteBgpvpnResAssoc(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         delete_method = getattr(
-            client, 'delete_bgpvpn_%s_assoc' % self._assoc_res_name)
-        bgpvpn = client.find_resource(constants.BGPVPN, parsed_args.bgpvpn)
+            client, 'delete_bgpvpn_%s_association' % self._assoc_res_name)
+        bgpvpn = client.find_bgpvpn(parsed_args.bgpvpn)
         fails = 0
         for id in parsed_args.resource_association_ids:
             try:
@@ -206,22 +202,27 @@ class ListBgpvpnResAssoc(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         list_method = getattr(client,
-                              'list_bgpvpn_%s_assocs' % self._assoc_res_name)
-        bgpvpn = client.find_resource(constants.BGPVPN, parsed_args.bgpvpn)
+                              'bgpvpn_%s_associations' % self._assoc_res_name)
+        bgpvpn = client.find_bgpvpn(parsed_args.bgpvpn)
         params = {}
         if parsed_args.property:
             params.update(parsed_args.property)
         objs = list_method(bgpvpn['id'],
-                           retrieve_all=True, **params)[self._resource_plural]
+                           retrieve_all=True, **params)
         transform = getattr(self, '_transform_resource', None)
+        transformed_objs = []
         if callable(transform):
-            [transform(obj) for obj in objs]
+            for obj in objs:
+                transformed_objs.append(transform(obj))
+        else:
+            transformed_objs = list(objs)
         headers, columns = column_util.get_column_definitions(
             self._attr_map, long_listing=parsed_args.long)
         return (headers, (osc_utils.get_dict_properties(
-            s, columns, formatters=self._formatters) for s in objs))
+            s, columns, formatters=self._formatters)
+            for s in transformed_objs))
 
 
 class ShowBgpvpnResAssoc(command.ShowOne):
@@ -243,20 +244,16 @@ class ShowBgpvpnResAssoc(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        show_method = getattr(client,
-                              'show_bgpvpn_%s_assoc' % self._assoc_res_name)
-        bgpvpn = client.find_resource(constants.BGPVPN, parsed_args.bgpvpn)
-        assoc = client.find_resource_by_id(
-            self._resource,
-            parsed_args.resource_association_id,
-            cmd_resource='bgpvpn_%s_assoc' % self._assoc_res_name,
-            parent_id=bgpvpn['id'])
-        obj = show_method(bgpvpn['id'], assoc['id'])[self._resource]
+        client = self.app.client_manager.network
+        show_method = getattr(
+            client, 'get_bgpvpn_%s_association' % self._assoc_res_name)
+        bgpvpn = client.find_bgpvpn(parsed_args.bgpvpn)
+        obj = show_method(bgpvpn['id'],
+                          parsed_args.resource_association_id)
         transform = getattr(self, '_transform_resource', None)
         if callable(transform):
             transform(obj)
-        columns, display_columns = column_util.get_columns(obj, self._attr_map)
+        display_columns, columns = nc_osc_utils._get_columns(obj)
         data = osc_utils.get_dict_properties(obj, columns,
                                              formatters=self._formatters)
         return display_columns, data
