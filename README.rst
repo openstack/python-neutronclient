@@ -15,8 +15,7 @@ Python bindings to the Neutron API
     :alt: Latest Version
 
 This is a client library for Neutron built on the Neutron API. It
-provides a Python API (the ``neutronclient`` module) and a command-line tool
-(``neutron``).
+provides a Python API (the ``neutronclient`` module).
 
 * License: Apache License, Version 2.0
 * `PyPi`_ - package installation

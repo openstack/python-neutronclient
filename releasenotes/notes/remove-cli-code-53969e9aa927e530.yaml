@@ -1,0 +1,12 @@
+prelude: >
+    |
+    This new version of ``python-neutronclient`` does not include the
+    command line interface code. The "neutron" script is no longer
+    supported. This project only contains the OpenStack Client bindings
+    that are currently being moved to OpenStack SDK
+    <https://bugs.launchpad.net/neutron/+bug/1999774>_.
+deprecations:
+  - |
+    This project no longer provides CLI support. All code has been removed.
+    Please use openstack CLI instead. See `openstack CLI command list
+    <https://docs.openstack.org/python-openstackclient/latest/cli/command-list.html>`_.

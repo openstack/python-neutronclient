@@ -31,6 +31,4 @@ OpenStack client.
 .. toctree::
    :maxdepth: 2
 
-   client_command_extensions
-   cli_option_guideline
    transition_to_osc

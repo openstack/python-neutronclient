@@ -24,10 +24,9 @@
 Using CLI
 =========
 
-There are two CLIs which support the Networking API:
-`OpenStackClient (OSC)
+There is `OpenStackClient (OSC)
 <https://docs.openstack.org/python-openstackclient/latest/>`__
-and :doc:`neutron CLI <neutron>` (deprecated).
+which support the Networking API
 
 OpenStackClient
 ---------------
@@ -49,15 +48,8 @@ neutron CLI
 
 .. warning::
 
-   neutron CLI is now deprecated and will be removed in the future.
-   Use openstack CLI instead. See `openstack CLI command list
+   neutron CLI is removed. Use openstack CLI instead. See `openstack CLI command list
    <https://docs.openstack.org/python-openstackclient/latest/cli/command-list.html>`__
    and :doc:`its extensions for advanced networking services <osc_plugins>`.
    The command mapping from neutron CLI to openstack CLI is available
    `here <https://docs.openstack.org/python-openstackclient/latest/cli/decoder.html#neutron-cli>`__.
-
-.. toctree::
-   :maxdepth: 2
-
-   neutron CLI guide <neutron>
-   neutron CLI reference <neutron-reference>

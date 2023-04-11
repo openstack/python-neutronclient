@@ -105,7 +105,7 @@ Transition Steps
    In addition, no new features will be added to the CLI, though fixes to
    the CLI will be assessed on a case by case basis.
 
-8. **Not Started:** Remove the ``neutron`` CLI after two deprecation cycles
+8. **Done** Remove the ``neutron`` CLI after two deprecation cycles
    once the criteria below have been met.
 
    * The networking support provide by the ``openstack`` CLI is functionally
@@ -122,32 +122,8 @@ Transition Steps
 
 Developer Guide
 ---------------
-The ``neutron`` CLI version 6.x, without extensions, supports over 200
-commands while the ``openstack`` CLI version 3.3.0 supports over 70
-networking commands. Of the 70 commands, some do not have all of the options
-or arguments of their ``neutron`` CLI equivalent. With this large functional
-gap, a few critical questions for developers during this transition are "Which
-CLI do I change?", "Where does my CLI belong?", and "Which Python library do I change?"
-The answer depends on the state of a command and the state of the overall transition.
-Details are outlined in the tables below. Early stages of the transition will require
-dual maintenance.
-
-**Which CLI do I change?**
-
-+----------------------+------------------------+-------------------------------------------------+
-| ``neutron`` Command  | ``openstack`` Command  | CLI to Change                                   |
-+======================+========================+=================================================+
-| Exists               | Doesn't Exist          | ``neutron``                                     |
-+----------------------+------------------------+-------------------------------------------------+
-| Exists               | In Progress            | ``neutron`` and ``openstack``                   |
-|                      |                        | (update related blueprint or bug)               |
-+----------------------+------------------------+-------------------------------------------------+
-| Exists               | Exists                 | ``openstack``                                   |
-|                      |                        | (assumes command parity resulting in            |
-|                      |                        | ``neutron`` being deprecated)                   |
-+----------------------+------------------------+-------------------------------------------------+
-| Doesn't Exist        | Doesn't Exist          | ``openstack``                                   |
-+----------------------+------------------------+-------------------------------------------------+
+The ``neutron`` CLI tool is now removed and all new CLI changes should be done
+in the ``OpenStackClient (OSC)`` and, if needed, also in the ``OpenStack SDK``.
 
 **Where does my CLI belong?**
 
@@ -185,8 +161,6 @@ is not required as the neutronclient is already deprecated on its own.
 | OpenStack Project for ``openstack`` Commands    | Python Library to Change                      |
 +=================================================+===============================================+
 | python-openstackclient                          | openstacksdk                                  |
-+-------------------------------------------------+-----------------------------------------------+
-| python-neutronclient                            | python-neutronclient                          |
 +-------------------------------------------------+-----------------------------------------------+
 | Other                                           | Applicable project owning network resource    |
 +-------------------------------------------------+-----------------------------------------------+

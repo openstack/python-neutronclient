@@ -24,15 +24,11 @@ python-neutronclient documentation
 ==================================
 
 This is a client for OpenStack Networking API. It provides
-:doc:`Python API bindings <reference/index>` (the neutronclient module) and
-:doc:`command-line interface (CLI) <cli/index>`.
+:doc:`Python API bindings <reference/index>` (the neutronclient module).
 
-There are two CLIs which support the Networking API:
-:doc:`neutron CLI <cli/neutron>` and
+There is
 `OpenStack Client (OSC) <https://docs.openstack.org/python-openstackclient/latest/>`__.
-OpenStack Client provides the basic network commands and
-python-neutronclient provides extensions (aka OSC plugins)
-for advanced networking services.
+CLI which support the Networking API.
 
 User Documentation
 ------------------
