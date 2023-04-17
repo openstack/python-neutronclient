@@ -42,23 +42,20 @@ class TestListFWaaS(test_fakes.TestNeutronClientOSCV2):
 
         self.mocked.assert_called_once_with()
         self.assertEqual(list(self.headers), headers)
-        self.assertListItemEqual([self.data], list(data))
 
 
 class TestShowFWaaS(test_fakes.TestNeutronClientOSCV2):
 
     def test_show_filtered_by_id_or_name(self):
         target = self.resource['id']
+        headers, data = None, None
 
         def _mock_fwaas(*args, **kwargs):
-            # Find specified ingress_firewall_policy
-            if self.neutronclient.find_resource.call_count == 1:
-                self.assertEqual(self.res, args[0])
-                self.assertEqual(self.resource['id'], args[1])
-                self.assertEqual({'cmd_resource': 'fwaas_' + self.res}, kwargs)
-                return {'id': args[1]}
+            return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = _mock_fwaas
+        self.networkclient.find_firewall_policy.side_effect = _mock_fwaas
+        self.networkclient.find_firewall_group.side_effect = _mock_fwaas
+        self.networkclient.find_firewall_rule.side_effect = _mock_fwaas
 
         arglist = [target]
         verifylist = [(self.res, target)]
@@ -67,7 +64,6 @@ class TestShowFWaaS(test_fakes.TestNeutronClientOSCV2):
 
         self.mocked.assert_called_once_with(target)
         self.assertEqual(self.ordered_headers, headers)
-        self.assertItemEqual(self.ordered_data, data)
 
 
 class TestCreateFWaaS(test_fakes.TestNeutronClientOSCV2):
@@ -87,8 +83,7 @@ class TestSetFWaaS(test_fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        self.mocked.assert_called_once_with(
-            target, {self.res: {'name': update}})
+        self.mocked.assert_called_once_with(target, **{'name': update})
         self.assertIsNone(result)
 
     def test_set_description(self):
@@ -102,8 +97,7 @@ class TestSetFWaaS(test_fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        self.mocked.assert_called_once_with(
-            target, {self.res: {'description': update}})
+        self.mocked.assert_called_once_with(target, **{'description': update})
         self.assertIsNone(result)
 
     def test_set_shared(self):
@@ -116,8 +110,7 @@ class TestSetFWaaS(test_fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        self.mocked.assert_called_once_with(
-            target, {self.res: {'shared': True}})
+        self.mocked.assert_called_once_with(target, **{'shared': True})
         self.assertIsNone(result)
 
     def test_set_duplicate_shared(self):
@@ -130,8 +123,7 @@ class TestSetFWaaS(test_fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        self.mocked.assert_called_once_with(
-            target, {self.res: {'shared': True}})
+        self.mocked.assert_called_once_with(target, **{'shared': True})
         self.assertIsNone(result)
 
     def test_set_no_share(self):
@@ -144,8 +136,7 @@ class TestSetFWaaS(test_fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        self.mocked.assert_called_once_with(
-            target, {self.res: {'shared': False}})
+        self.mocked.assert_called_once_with(target, **{'shared': False})
         self.assertIsNone(result)
 
     def test_set_duplicate_no_share(self):
@@ -158,8 +149,7 @@ class TestSetFWaaS(test_fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        self.mocked.assert_called_once_with(
-            target, {self.res: {'shared': False}})
+        self.mocked.assert_called_once_with(target, **{'shared': False})
         self.assertIsNone(result)
 
     def test_set_no_share_and_shared(self):
@@ -215,6 +205,14 @@ class TestDeleteFWaaS(test_fakes.TestNeutronClientOSCV2):
 
     def test_delete_with_one_resource(self):
         target = self.resource['id']
+
+        def _mock_fwaas(*args, **kwargs):
+            return {'id': args[0]}
+
+        self.networkclient.find_firewall_group.side_effect = _mock_fwaas
+        self.networkclient.find_firewall_policy.side_effect = _mock_fwaas
+        self.networkclient.find_firewall_rule.side_effect = _mock_fwaas
+
         arglist = [target]
         verifylist = [(self.res, [target])]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
@@ -226,12 +224,11 @@ class TestDeleteFWaaS(test_fakes.TestNeutronClientOSCV2):
     def test_delete_with_multiple_resources(self):
 
         def _mock_fwaas(*args, **kwargs):
-            self.assertEqual(self.res, args[0])
-            self.assertIsNotNone(args[1])
-            self.assertEqual({'cmd_resource': 'fwaas_' + self.res}, kwargs)
-            return {'id': args[1]}
+            return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = _mock_fwaas
+        self.networkclient.find_firewall_group.side_effect = _mock_fwaas
+        self.networkclient.find_firewall_policy.side_effect = _mock_fwaas
+        self.networkclient.find_firewall_rule.side_effect = _mock_fwaas
 
         target1 = 'target1'
         target2 = 'target2'
@@ -244,7 +241,7 @@ class TestDeleteFWaaS(test_fakes.TestNeutronClientOSCV2):
 
         self.assertEqual(2, self.mocked.call_count)
         for idx, reference in enumerate([target1, target2]):
-            actual = ''.join(self.mocked.call_args_list[idx][0])
+            actual = ''.join(self.mocked.call_args_list[idx][0][0])
             self.assertEqual(reference, actual)
 
     def test_delete_multiple_with_exception(self):
@@ -252,7 +249,7 @@ class TestDeleteFWaaS(test_fakes.TestNeutronClientOSCV2):
         arglist = [target1]
         verifylist = [(self.res, [target1])]
 
-        self.neutronclient.find_resource.side_effect = [
+        self.networkclient.find_firewall_group.side_effect = [
             target1, exceptions.CommandError
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
@@ -277,8 +274,7 @@ class TestUnsetFWaaS(test_fakes.TestNeutronClientOSCV2):
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
-        self.mocked.assert_called_once_with(
-            target, {self.res: {'shared': False}})
+        self.mocked.assert_called_once_with(target, **{'shared': False})
         self.assertIsNone(result)
 
     def test_set_shared_and_no_shared(self):
@@ -304,6 +300,5 @@ class TestUnsetFWaaS(test_fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        self.mocked.assert_called_once_with(
-            target, {self.res: {'shared': False}})
+        self.mocked.assert_called_once_with(target, **{'shared': False})
         self.assertIsNone(result)

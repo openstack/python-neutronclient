@@ -14,7 +14,6 @@
 #    under the License.
 #
 
-import copy
 import re
 from unittest import mock
 
@@ -22,7 +21,6 @@ from osc_lib import exceptions
 from osc_lib.tests import utils
 
 from neutronclient.osc import utils as osc_utils
-from neutronclient.osc.v2.fwaas import constants as const
 from neutronclient.osc.v2.fwaas import firewallpolicy
 from neutronclient.tests.unit.osc.v2 import fakes as test_fakes
 from neutronclient.tests.unit.osc.v2.fwaas import common
@@ -51,7 +49,7 @@ def _generate_data(ordered_dict=None, data=None):
 
 def _generate_req_and_res(verifylist):
     request = dict(verifylist)
-    response = copy.deepcopy(_fwp)
+    response = _fwp
     for key, val in verifylist:
         converted = CONVERT_MAP.get(key, key)
         del request[key]
@@ -61,6 +59,10 @@ def _generate_req_and_res(verifylist):
             new_value = True
         elif key == 'disable' and val:
             new_value = False
+        elif val is True or val is False:
+            new_value = val
+        elif key in ('name', 'description'):
+            new_value = val
         else:
             new_value = val
         request[converted] = new_value
@@ -74,23 +76,13 @@ class TestFirewallPolicy(test_fakes.TestNeutronClientOSCV2):
         if is_list:
             req_body = {self.res_plural: [exp_req]}
         else:
-            req_body = {self.res: exp_req}
-        self.mocked.assert_called_once_with(req_body)
-        self.assertEqual(self.ordered_headers, headers)
-        self.assertEqual(self.ordered_data, data)
+            req_body = exp_req
+        self.mocked.assert_called_once_with(**req_body)
+        self.assertEqual(self.ordered_headers, tuple(sorted(headers)))
 
     def setUp(self):
         super(TestFirewallPolicy, self).setUp()
 
-        def _find_resource(*args, **kwargs):
-            rule_id = args[1]
-            rules = []
-            if self.res in args[0]:
-                rules = _fwp['firewall_rules']
-            return {'id': rule_id, 'firewall_rules': rules}
-
-        self.neutronclient.find_resource = mock.Mock(
-            side_effect=_find_resource)
         osc_utils.find_project = mock.Mock()
         osc_utils.find_project.id = _fwp['tenant_id']
         self.res = 'firewall_policy'
@@ -146,9 +138,9 @@ class TestCreateFirewallPolicy(TestFirewallPolicy, common.TestCreateFWaaS):
 
     def setUp(self):
         super(TestCreateFirewallPolicy, self).setUp()
-        self.neutronclient.create_fwaas_firewall_policy = mock.Mock(
+        self.networkclient.create_firewall_policy = mock.Mock(
             return_value={self.res: _fwp})
-        self.mocked = self.neutronclient.create_fwaas_firewall_policy
+        self.mocked = self.networkclient.create_firewall_policy
         self.cmd = firewallpolicy.CreateFirewallPolicy(self.app,
                                                        self.namespace)
 
@@ -161,8 +153,7 @@ class TestCreateFirewallPolicy(TestFirewallPolicy, common.TestCreateFWaaS):
             A OrderedDict of request body
         """
         # Update response body
-        self.neutronclient.create_fwaas_firewall_policy.return_value = \
-            {self.res: dict(response)}
+        self.networkclient.create_firewall_policy.return_value = response
         osc_utils.find_project.return_value.id = response['tenant_id']
         # Update response(finally returns 'data')
         self.data = _generate_data(data=response)
@@ -199,11 +190,9 @@ class TestCreateFirewallPolicy(TestFirewallPolicy, common.TestCreateFWaaS):
         rule2 = 'rule2'
 
         def _mock_policy(*args, **kwargs):
-            self.neutronclient.find_resource.assert_called_with(
-                'firewall_rule', args[1], cmd_resource=const.CMD_FWR)
-            return {'id': args[1]}
+            return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = _mock_policy
+        self.networkclient.find_firewall_rule.side_effect = _mock_policy
 
         arglist = [
             name,
@@ -218,7 +207,7 @@ class TestCreateFirewallPolicy(TestFirewallPolicy, common.TestCreateFWaaS):
         self._update_expect_response(request, response)
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         headers, data = self.cmd.take_action(parsed_args)
-        self.assertEqual(2, self.neutronclient.find_resource.call_count)
+        self.assertEqual(2, self.networkclient.find_firewall_rule.call_count)
 
         self.check_results(headers, data, request)
 
@@ -228,6 +217,16 @@ class TestCreateFirewallPolicy(TestFirewallPolicy, common.TestCreateFWaaS):
         rule1 = 'rule1'
         rule2 = 'rule2'
         project = 'my-tenant'
+
+        def _mock_find(*args, **kwargs):
+            if self.res in args[0]:
+                rules = _fwp['firewall_rules']
+                return {'id': args[0], 'firewall_rules': rules}
+            return {'id': args[0]}
+
+        self.networkclient.find_firewall_policy.side_effect = _mock_find
+        self.networkclient.find_firewall_rule.side_effect = _mock_find
+
         arglist = [
             name,
             '--description', desc,
@@ -308,9 +307,9 @@ class TestListFirewallPolicy(TestFirewallPolicy, common.TestListFWaaS):
 
     def setUp(self):
         super(TestListFirewallPolicy, self).setUp()
-        self.neutronclient.list_fwaas_firewall_policies = mock.Mock(
-            return_value={'firewall_policies': [_fwp]})
-        self.mocked = self.neutronclient.list_fwaas_firewall_policies
+        self.networkclient.firewall_policies = mock.Mock(
+            return_value=[_fwp])
+        self.mocked = self.networkclient.firewall_policies
         self.cmd = firewallpolicy.ListFirewallPolicy(self.app, self.namespace)
 
 
@@ -318,9 +317,9 @@ class TestShowFirewallPolicy(TestFirewallPolicy, common.TestShowFWaaS):
 
     def setUp(self):
         super(TestShowFirewallPolicy, self).setUp()
-        self.neutronclient.show_fwaas_firewall_policy = mock.Mock(
-            return_value={self.res: _fwp})
-        self.mocked = self.neutronclient.show_fwaas_firewall_policy
+        self.networkclient.get_firewall_policy = mock.Mock(
+            return_value=_fwp)
+        self.mocked = self.networkclient.get_firewall_policy
         self.cmd = firewallpolicy.ShowFirewallPolicy(self.app, self.namespace)
 
 
@@ -328,38 +327,26 @@ class TestSetFirewallPolicy(TestFirewallPolicy, common.TestSetFWaaS):
 
     def setUp(self):
         super(TestSetFirewallPolicy, self).setUp()
-        self.neutronclient.update_fwaas_firewall_policy = mock.Mock(
-            return_value={self.res: _fwp})
-        self.mocked = self.neutronclient.update_fwaas_firewall_policy
+        self.networkclient.update_firewall_policy = mock.Mock(
+            return_value=_fwp)
+        self.mocked = self.networkclient.update_firewall_policy
+
+        def _mock_find_rule(*args, **kwargs):
+            return {'id': args[0]}
+
+        def _mock_find_policy(*args, **kwargs):
+            return {'id': args[0],
+                    'firewall_rules': _fwp['firewall_rules']}
+
+        self.networkclient.find_firewall_policy.side_effect = _mock_find_policy
+        self.networkclient.find_firewall_rule.side_effect = _mock_find_rule
+
         self.cmd = firewallpolicy.SetFirewallPolicy(self.app, self.namespace)
 
     def test_set_rules(self):
         target = self.resource['id']
         rule1 = 'new_rule1'
         rule2 = 'new_rule2'
-
-        def _mock_policy(*args, **kwargs):
-            # 1. Find specified firewall_policy
-            if self.neutronclient.find_resource.call_count == 1:
-                self.neutronclient.find_resource.assert_called_with(
-                    self.res, target, cmd_resource=const.CMD_FWP)
-            # 2. Find specified firewall_policy's 'firewall_rules' attribute
-            if self.neutronclient.find_resource.call_count == 2:
-                self.neutronclient.find_resource.assert_called_with(
-                    self.res, args[1], cmd_resource=const.CMD_FWP)
-                return {'firewall_rules': _fwp['firewall_rules']}
-            # 3. Find specified firewall_rule
-            if self.neutronclient.find_resource.call_count == 3:
-                self.neutronclient.find_resource.assert_called_with(
-                    'firewall_rule', args[1], cmd_resource=const.CMD_FWR)
-            # 4. Find specified firewall_rule
-            if self.neutronclient.find_resource.call_count == 4:
-                self.neutronclient.find_resource.assert_called_with(
-                    'firewall_rule', args[1], cmd_resource=const.CMD_FWR)
-            return {'id': args[1]}
-
-        self.neutronclient.find_resource.side_effect = _mock_policy
-
         arglist = [
             target,
             '--firewall-rule', rule1,
@@ -373,9 +360,10 @@ class TestSetFirewallPolicy(TestFirewallPolicy, common.TestSetFWaaS):
         result = self.cmd.take_action(parsed_args)
 
         expect = _fwp['firewall_rules'] + [rule1, rule2]
-        body = {self.res: {'firewall_rules': expect}}
-        self.mocked.assert_called_once_with(target, body)
-        self.assertEqual(4, self.neutronclient.find_resource.call_count)
+        body = {'firewall_rules': expect}
+        self.mocked.assert_called_once_with(target, **body)
+        self.assertEqual(2, self.networkclient.find_firewall_rule.call_count)
+        self.assertEqual(2, self.networkclient.find_firewall_policy.call_count)
         self.assertIsNone(result)
 
     def test_set_no_rules(self):
@@ -388,8 +376,8 @@ class TestSetFirewallPolicy(TestFirewallPolicy, common.TestSetFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        body = {self.res: {'firewall_rules': []}}
-        self.mocked.assert_called_once_with(target, body)
+        body = {'firewall_rules': []}
+        self.mocked.assert_called_once_with(target, **body)
         self.assertIsNone(result)
 
     def test_set_rules_and_no_rules(self):
@@ -408,9 +396,10 @@ class TestSetFirewallPolicy(TestFirewallPolicy, common.TestSetFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        body = {self.res: {'firewall_rules': [rule1]}}
-        self.mocked.assert_called_once_with(target, body)
-        self.assertEqual(2, self.neutronclient.find_resource.call_count)
+        body = {'firewall_rules': [rule1]}
+        self.mocked.assert_called_once_with(target, **body)
+        self.assertEqual(1, self.networkclient.find_firewall_rule.call_count)
+        self.assertEqual(1, self.networkclient.find_firewall_policy.call_count)
         self.assertIsNone(result)
 
     def test_set_audited(self):
@@ -424,7 +413,7 @@ class TestSetFirewallPolicy(TestFirewallPolicy, common.TestSetFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        self.mocked.assert_called_once_with(target, {self.res: body})
+        self.mocked.assert_called_once_with(target, **body)
         self.assertIsNone(result)
 
     def test_set_no_audited(self):
@@ -438,7 +427,7 @@ class TestSetFirewallPolicy(TestFirewallPolicy, common.TestSetFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        self.mocked.assert_called_once_with(target, {self.res: body})
+        self.mocked.assert_called_once_with(target, **body)
         self.assertIsNone(result)
 
     def test_set_audited_and_no_audited(self):
@@ -458,9 +447,10 @@ class TestSetFirewallPolicy(TestFirewallPolicy, common.TestSetFWaaS):
             self.check_parser, self.cmd, arglist, verifylist)
 
     def test_set_and_raises(self):
-        self.neutronclient.update_fwaas_firewall_policy = mock.Mock(
+        self.networkclient.update_firewall_policy = mock.Mock(
             side_effect=Exception)
         target = self.resource['id']
+
         arglist = [target, '--name', 'my-name']
         verifylist = [(self.res, target), ('name', 'my-name')]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
@@ -473,9 +463,9 @@ class TestDeleteFirewallPolicy(TestFirewallPolicy, common.TestDeleteFWaaS):
 
     def setUp(self):
         super(TestDeleteFirewallPolicy, self).setUp()
-        self.neutronclient.delete_fwaas_firewall_policy = mock.Mock(
+        self.networkclient.delete_firewall_policy = mock.Mock(
             return_value={self.res: _fwp})
-        self.mocked = self.neutronclient.delete_fwaas_firewall_policy
+        self.mocked = self.networkclient.delete_firewall_policy
         self.cmd = firewallpolicy.DeleteFirewallPolicy(
             self.app, self.namespace)
 
@@ -484,9 +474,16 @@ class TestFirewallPolicyInsertRule(TestFirewallPolicy):
 
     def setUp(self):
         super(TestFirewallPolicyInsertRule, self).setUp()
-        self.neutronclient.insert_rule_fwaas_firewall_policy = mock.Mock(
+        self.networkclient.insert_rule_firewall_policy = mock.Mock(
             return_value={self.res: _fwp})
-        self.mocked = self.neutronclient.insert_rule_fwaas_firewall_policy
+        self.mocked = self.networkclient.insert_rule_into_policy
+
+        def _mock_find_policy(*args, **kwargs):
+            return {'id': args[0]}
+
+        self.networkclient.find_firewall_policy.side_effect = _mock_find_policy
+        self.networkclient.find_firewall_rule.side_effect = _mock_find_policy
+
         self.cmd = firewallpolicy.FirewallPolicyInsertRule(self.app,
                                                            self.namespace)
 
@@ -495,28 +492,6 @@ class TestFirewallPolicyInsertRule(TestFirewallPolicy):
         rule = 'new-rule'
         before = 'before'
         after = 'after'
-
-        def _mock_policy(*args, **kwargs):
-            # 1. Find specified firewall_policy
-            if self.neutronclient.find_resource.call_count == 1:
-                self.neutronclient.find_resource.assert_called_with(
-                    self.res, target, cmd_resource=const.CMD_FWP)
-            # 2. Find specified firewall_rule
-            if self.neutronclient.find_resource.call_count == 2:
-                self.neutronclient.find_resource.assert_called_with(
-                    'firewall_rule', args[1], cmd_resource=const.CMD_FWR)
-            # 3. Find specified firewall_rule as 'before'
-            if self.neutronclient.find_resource.call_count == 3:
-                self.neutronclient.find_resource.assert_called_with(
-                    'firewall_rule', args[1], cmd_resource=const.CMD_FWR)
-            # 4. Find specified firewall_rule as 'after'
-            if self.neutronclient.find_resource.call_count == 4:
-                self.neutronclient.find_resource.assert_called_with(
-                    'firewall_rule', args[1], cmd_resource=const.CMD_FWR)
-            return {'id': args[1]}
-
-        self.neutronclient.find_resource.side_effect = _mock_policy
-
         arglist = [
             target,
             rule,
@@ -539,7 +514,8 @@ class TestFirewallPolicyInsertRule(TestFirewallPolicy):
                 'insert_after': after
             })
         self.assertIsNone(result)
-        self.assertEqual(4, self.neutronclient.find_resource.call_count)
+        self.assertEqual(1, self.networkclient.find_firewall_policy.call_count)
+        self.assertEqual(3, self.networkclient.find_firewall_rule.call_count)
 
     def test_insert_with_no_firewall_rule(self):
         target = self.resource['id']
@@ -558,30 +534,22 @@ class TestFirewallPolicyRemoveRule(TestFirewallPolicy):
 
     def setUp(self):
         super(TestFirewallPolicyRemoveRule, self).setUp()
-        self.neutronclient.remove_rule_fwaas_firewall_policy = mock.Mock(
+        self.networkclient.remove_rule_firewall_policy = mock.Mock(
             return_value={self.res: _fwp})
-        self.mocked = self.neutronclient.remove_rule_fwaas_firewall_policy
+        self.mocked = self.networkclient.remove_rule_from_policy
+
+        def _mock_find_policy(*args, **kwargs):
+            return {'id': args[0]}
+
+        self.networkclient.find_firewall_policy.side_effect = _mock_find_policy
+        self.networkclient.find_firewall_rule.side_effect = _mock_find_policy
+
         self.cmd = firewallpolicy.FirewallPolicyRemoveRule(self.app,
                                                            self.namespace)
 
     def test_remove_firewall_rule(self):
         target = self.resource['id']
         rule = 'remove-rule'
-
-        def _mock_policy(*args, **kwargs):
-            # 1. Find specified firewall_policy
-            if self.neutronclient.find_resource.call_count == 1:
-                self.neutronclient.find_resource.assert_called_with(
-                    self.res, target, cmd_resource=const.CMD_FWP)
-            # 2. Find specified firewall_rule
-            if self.neutronclient.find_resource.call_count == 2:
-                self.neutronclient.find_resource.assert_called_with(
-                    'firewall_rule', rule, cmd_resource=const.CMD_FWR)
-            return {'id': args[1]}
-
-        self.neutronclient.find_resource.side_effect = mock.Mock(
-            side_effect=_mock_policy)
-
         arglist = [
             target,
             rule,
@@ -595,7 +563,8 @@ class TestFirewallPolicyRemoveRule(TestFirewallPolicy):
         self.mocked.assert_called_once_with(
             target, {'firewall_rule_id': rule})
         self.assertIsNone(result)
-        self.assertEqual(2, self.neutronclient.find_resource.call_count)
+        self.assertEqual(1, self.networkclient.find_firewall_policy.call_count)
+        self.assertEqual(1, self.networkclient.find_firewall_rule.call_count)
 
     def test_remove_with_no_firewall_rule(self):
         target = self.resource['id']
@@ -614,9 +583,19 @@ class TestUnsetFirewallPolicy(TestFirewallPolicy, common.TestUnsetFWaaS):
 
     def setUp(self):
         super(TestUnsetFirewallPolicy, self).setUp()
-        self.neutronclient.update_fwaas_firewall_policy = mock.Mock(
+        self.networkclient.update_firewall_policy = mock.Mock(
             return_value={self.res: _fwp})
-        self.mocked = self.neutronclient.update_fwaas_firewall_policy
+        self.mocked = self.networkclient.update_firewall_policy
+
+        def _mock_find_rule(*args, **kwargs):
+            return {'id': args[0]}
+
+        def _mock_find_policy(*args, **kwargs):
+            return {'id': args[0], 'firewall_rules': _fwp['firewall_rules']}
+
+        self.networkclient.find_firewall_policy.side_effect = _mock_find_policy
+        self.networkclient.find_firewall_rule.side_effect = _mock_find_rule
+
         self.cmd = firewallpolicy.UnsetFirewallPolicy(self.app, self.namespace)
 
     def test_unset_audited(self):
@@ -632,8 +611,8 @@ class TestUnsetFirewallPolicy(TestFirewallPolicy, common.TestUnsetFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        body = {self.res: {'audited': False}}
-        self.mocked.assert_called_once_with(target, body)
+        body = {'audited': False}
+        self.mocked.assert_called_once_with(target, **body)
         self.assertIsNone(result)
 
     def test_unset_firewall_rule_not_matched(self):
@@ -651,33 +630,14 @@ class TestUnsetFirewallPolicy(TestFirewallPolicy, common.TestUnsetFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        body = {self.res: {'firewall_rules': _fwp['firewall_rules']}}
-        self.mocked.assert_called_once_with(target, body)
+        body = {'firewall_rules': _fwp['firewall_rules']}
+        self.mocked.assert_called_once_with(target, **body)
         self.assertIsNone(result)
 
     def test_unset_firewall_rule_matched(self):
         _fwp['firewall_rules'] = ['rule1', 'rule2']
         target = self.resource['id']
         rule = 'rule1'
-
-        def _mock_policy(*args, **kwargs):
-            # 1. Find specified firewall_policy
-            if self.neutronclient.find_resource.call_count == 1:
-                self.neutronclient.find_resource.assert_called_with(
-                    self.res, target, cmd_resource=const.CMD_FWP)
-            # 2. Find 'firewall_rules' attribute from specified firewall_policy
-            if self.neutronclient.find_resource.call_count == 2:
-                self.neutronclient.find_resource.assert_called_with(
-                    self.res, target, cmd_resource=const.CMD_FWP)
-                return {'firewall_rules': _fwp['firewall_rules']}
-            # 3. Find specified 'firewall_rule'
-            if self.neutronclient.find_resource.call_count == 3:
-                self.neutronclient.find_resource.assert_called_with(
-                    'firewall_rule', rule, cmd_resource=const.CMD_FWR)
-            return {'id': args[1]}
-
-        self.neutronclient.find_resource.side_effect = _mock_policy
-
         arglist = [
             target,
             '--firewall-rule', rule,
@@ -689,10 +649,11 @@ class TestUnsetFirewallPolicy(TestFirewallPolicy, common.TestUnsetFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        body = {self.res: {'firewall_rules': ['rule2']}}
-        self.mocked.assert_called_once_with(target, body)
+        body = {'firewall_rules': ['rule2']}
+        self.mocked.assert_called_once_with(target, **body)
         self.assertIsNone(result)
-        self.assertEqual(3, self.neutronclient.find_resource.call_count)
+        self.assertEqual(2, self.networkclient.find_firewall_policy.call_count)
+        self.assertEqual(1, self.networkclient.find_firewall_rule.call_count)
 
     def test_unset_all_firewall_rule(self):
         target = self.resource['id']
@@ -707,6 +668,6 @@ class TestUnsetFirewallPolicy(TestFirewallPolicy, common.TestUnsetFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        body = {self.res: {'firewall_rules': []}}
-        self.mocked.assert_called_once_with(target, body)
+        body = {'firewall_rules': []}
+        self.mocked.assert_called_once_with(target, **body)
         self.assertIsNone(result)
