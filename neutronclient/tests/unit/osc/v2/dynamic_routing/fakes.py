@@ -10,10 +10,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import copy
 from unittest import mock
 import uuid
 
+from openstack.network.v2 import agent as _agent
+from openstack.network.v2 import bgp_peer as _bgp_peer
+from openstack.network.v2 import bgp_speaker as _bgp_speaker
 
 from neutronclient.tests.unit.osc.v2 import fakes
 
@@ -25,6 +27,17 @@ class TestNeutronDynamicRoutingOSCV2(fakes.TestNeutronClientOSCV2):
             side_effect=lambda resource, name_or_id, project_id=None,
             cmd_resource=None, parent_id=None, fields=None:
             {'id': name_or_id})
+
+        self.networkclient.find_bgp_speaker = mock.Mock(
+            side_effect=lambda name_or_id, project_id=None,
+            cmd_resource=None, parent_id=None, fields=None,
+            ignore_missing=False:
+            _bgp_speaker.BgpSpeaker(id=name_or_id))
+        self.networkclient.find_bgp_peer = mock.Mock(
+            side_effect=lambda name_or_id, project_id=None,
+            cmd_resource=None, parent_id=None, fields=None,
+            ignore_missing=False:
+            _bgp_peer.BgpPeer(id=name_or_id))
 
 
 class FakeBgpSpeaker(object):
@@ -48,8 +61,9 @@ class FakeBgpSpeaker(object):
 
         # Overwrite default attributes.
         bgp_speaker_attrs.update(attrs)
+        ret_bgp_speaker = _bgp_speaker.BgpSpeaker(**bgp_speaker_attrs)
 
-        return copy.deepcopy(bgp_speaker_attrs)
+        return ret_bgp_speaker
 
     @staticmethod
     def create_bgp_speakers(attrs=None, count=1):
@@ -61,7 +75,7 @@ class FakeBgpSpeaker(object):
             bgp_speaker = FakeBgpSpeaker.create_one_bgp_speaker(attrs)
             bgp_speakers.append(bgp_speaker)
 
-        return {'bgp_speakers': bgp_speakers}
+        return bgp_speakers
 
 
 class FakeBgpPeer(object):
@@ -82,8 +96,9 @@ class FakeBgpPeer(object):
 
         # Overwrite default attributes.
         bgp_peer_attrs.update(attrs)
+        ret_bgp_peer = _bgp_peer.BgpPeer(**bgp_peer_attrs)
 
-        return copy.deepcopy(bgp_peer_attrs)
+        return ret_bgp_peer
 
     @staticmethod
     def create_bgp_peers(attrs=None, count=1):
@@ -93,7 +108,7 @@ class FakeBgpPeer(object):
             bgp_peer = FakeBgpPeer.create_one_bgp_peer(attrs)
             bgp_peers.append(bgp_peer)
 
-        return {'bgp_peers': bgp_peers}
+        return bgp_peers
 
 
 class FakeDRAgent(object):
@@ -106,6 +121,7 @@ class FakeDRAgent(object):
         dragent_attrs = {
             'binary': 'neutron-bgp-dragent',
             'admin_state_up': True,
+            'availability_zone': None,
             'alive': True,
             'topic': 'bgp_dragent',
             'host': 'network-' + uuid.uuid4().hex,
@@ -116,8 +132,7 @@ class FakeDRAgent(object):
 
         # Overwrite default attributes.
         dragent_attrs.update(attrs)
-
-        return copy.deepcopy(dragent_attrs)
+        return _agent.Agent(**dragent_attrs)
 
     @staticmethod
     def create_dragents(attrs=None, count=1):
@@ -127,4 +142,4 @@ class FakeDRAgent(object):
             agent = FakeDRAgent.create_one_dragent(attrs)
             agents.append(agent)
 
-        return {'agents': agents}
+        return agents

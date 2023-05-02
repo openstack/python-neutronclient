@@ -39,15 +39,14 @@ class TestAddBgpSpeakerToDRAgent(fakes.TestNeutronDynamicRoutingOSCV2):
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
 
-        with mock.patch.object(self.neutronclient,
+        with mock.patch.object(self.networkclient,
                                "add_bgp_speaker_to_dragent",
                                return_value=None):
 
             result = self.cmd.take_action(parsed_args)
-            self.neutronclient.add_bgp_speaker_to_dragent.\
+            self.networkclient.add_bgp_speaker_to_dragent.\
                 assert_called_once_with(
-                    self._bgp_dragent_id,
-                    {'bgp_speaker_id': self._bgp_speaker_id})
+                    self._bgp_dragent_id, self._bgp_speaker_id)
             self.assertIsNone(result)
 
 
@@ -75,11 +74,11 @@ class TestRemoveBgpSpeakerFromDRAgent(fakes.TestNeutronDynamicRoutingOSCV2):
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
 
-        with mock.patch.object(self.neutronclient,
+        with mock.patch.object(self.networkclient,
                                "remove_bgp_speaker_from_dragent",
                                return_value=None):
             result = self.cmd.take_action(parsed_args)
-            self.neutronclient.remove_bgp_speaker_from_dragent.\
+            self.networkclient.remove_bgp_speaker_from_dragent.\
                 assert_called_once_with(self._bgp_dragent_id,
                                         self._bgp_speaker_id)
             self.assertIsNone(result)
@@ -90,12 +89,16 @@ class TestListDRAgentsHostingBgpSpeaker(fakes.TestNeutronDynamicRoutingOSCV2):
     _bgp_speaker_id = _bgp_speaker['id']
     attrs = {'bgp_speaker_id': _bgp_speaker_id}
     _bgp_dragents = fakes.FakeDRAgent.create_dragents(attrs)
-    columns = ('ID', 'Host', 'State', 'Alive')
+    columns = ('ID', 'Agent Type', 'Host', 'Availability Zone',
+               'Alive', 'State', 'Binary')
     data = [(_bgp_dragent['id'],
+             _bgp_dragent['agent_type'],
              _bgp_dragent['host'],
+             _bgp_dragent['availability_zone'],
              _bgp_dragent['admin_state_up'],
-             ':-)' if _bgp_dragent['alive'] else 'XXX')
-            for _bgp_dragent in _bgp_dragents['agents']]
+             _bgp_dragent['alive'],
+             _bgp_dragent['binary'],)
+            for _bgp_dragent in _bgp_dragents]
 
     def setUp(self):
         super(TestListDRAgentsHostingBgpSpeaker, self).setUp()
@@ -112,12 +115,11 @@ class TestListDRAgentsHostingBgpSpeaker(fakes.TestNeutronDynamicRoutingOSCV2):
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
 
-        with mock.patch.object(self.neutronclient,
-                               "list_dragents_hosting_bgp_speaker",
+        with mock.patch.object(self.networkclient,
+                               "get_bgp_dragents_hosting_speaker",
                                return_value=self._bgp_dragents):
             columns, data = self.cmd.take_action(parsed_args)
-            attrs = {'bgp_speaker': self._bgp_speaker_id}
-            self.neutronclient.list_dragents_hosting_bgp_speaker.\
-                assert_called_once_with(**attrs)
+            self.networkclient.get_bgp_dragents_hosting_speaker.\
+                assert_called_once_with(self._bgp_speaker_id)
             self.assertEqual(self.columns, columns)
             self.assertListEqual(self.data, list(data))

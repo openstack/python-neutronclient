@@ -118,3 +118,13 @@ def _find_identity_resource(identity_client_manager, name_or_id,
 
 # The above are borrowed from openstackclient.identity.common.
 # DO NOT ADD original methods in neutronclient repo to the above area.
+
+
+def _get_columns(item):
+    column_map = {}
+    hidden_columns = ['location', 'tenant_id']
+    return utils.get_osc_show_columns_for_sdk_resource(
+        item,
+        column_map,
+        hidden_columns
+    )

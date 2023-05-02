@@ -20,7 +20,7 @@ class TestListBgpSpeaker(fakes.TestNeutronDynamicRoutingOSCV2):
     _bgp_speakers = fakes.FakeBgpSpeaker.create_bgp_speakers()
     columns = ('ID', 'Name', 'Local AS', 'IP Version')
     data = []
-    for _bgp_speaker in _bgp_speakers['bgp_speakers']:
+    for _bgp_speaker in _bgp_speakers:
         data.append((
             _bgp_speaker['id'],
             _bgp_speaker['name'],
@@ -30,7 +30,7 @@ class TestListBgpSpeaker(fakes.TestNeutronDynamicRoutingOSCV2):
     def setUp(self):
         super(TestListBgpSpeaker, self).setUp()
 
-        self.neutronclient.list_bgp_speakers = mock.Mock(
+        self.networkclient.bgp_speakers = mock.Mock(
             return_value=self._bgp_speakers
         )
 
@@ -41,7 +41,9 @@ class TestListBgpSpeaker(fakes.TestNeutronDynamicRoutingOSCV2):
         parsed_args = self.check_parser(self.cmd, [], [])
 
         columns, data = self.cmd.take_action(parsed_args)
-        self.neutronclient.list_bgp_speakers.assert_called_once_with()
+        self.networkclient.bgp_speakers.assert_called_once_with(
+            retrieve_all=True)
+
         self.assertEqual(self.columns, columns)
         self.assertEqual(self.data, list(data))
 
@@ -53,7 +55,7 @@ class TestDeleteBgpSpeaker(fakes.TestNeutronDynamicRoutingOSCV2):
     def setUp(self):
         super(TestDeleteBgpSpeaker, self).setUp()
 
-        self.neutronclient.delete_bgp_speaker = mock.Mock(return_value=None)
+        self.networkclient.delete_bgp_speaker = mock.Mock(return_value=None)
 
         self.cmd = bgp_speaker.DeleteBgpSpeaker(self.app, self.namespace)
 
@@ -68,7 +70,7 @@ class TestDeleteBgpSpeaker(fakes.TestNeutronDynamicRoutingOSCV2):
 
         result = self.cmd.take_action(parsed_args)
 
-        self.neutronclient.delete_bgp_speaker.assert_called_once_with(
+        self.networkclient.delete_bgp_speaker.assert_called_once_with(
             self._bgp_speaker['name'])
         self.assertIsNone(result)
 
@@ -86,7 +88,7 @@ class TestShowBgpSpeaker(fakes.TestNeutronDynamicRoutingOSCV2):
         _one_bgp_speaker['peers'],
         _one_bgp_speaker['tenant_id']
     )
-    _bgp_speaker = {'bgp_speaker': _one_bgp_speaker}
+    _bgp_speaker = _one_bgp_speaker
     _bgp_speaker_name = _one_bgp_speaker['name']
     columns = (
         'advertise_floating_ip_host_routes',
@@ -97,13 +99,13 @@ class TestShowBgpSpeaker(fakes.TestNeutronDynamicRoutingOSCV2):
         'name',
         'networks',
         'peers',
-        'tenant_id'
+        'project_id'
     )
 
     def setUp(self):
         super(TestShowBgpSpeaker, self).setUp()
 
-        self.neutronclient.show_bgp_speaker = mock.Mock(
+        self.networkclient.get_bgp_speaker = mock.Mock(
             return_value=self._bgp_speaker
         )
         # Get the command object to test
@@ -119,7 +121,7 @@ class TestShowBgpSpeaker(fakes.TestNeutronDynamicRoutingOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
 
         data = self.cmd.take_action(parsed_args)
-        self.neutronclient.show_bgp_speaker.assert_called_once_with(
+        self.networkclient.get_bgp_speaker.assert_called_once_with(
             self._bgp_speaker_name)
         self.assertEqual(self.columns, data[0])
         self.assertEqual(self.data, data[1])
@@ -131,7 +133,7 @@ class TestSetBgpSpeaker(fakes.TestNeutronDynamicRoutingOSCV2):
 
     def setUp(self):
         super(TestSetBgpSpeaker, self).setUp()
-        self.neutronclient.update_bgp_speaker = mock.Mock(
+        self.networkclient.update_bgp_speaker = mock.Mock(
             return_value=None)
 
         self.cmd = bgp_speaker.SetBgpSpeaker(self.app, self.namespace)
@@ -149,9 +151,7 @@ class TestSetBgpSpeaker(fakes.TestNeutronDynamicRoutingOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        attrs = {'bgp_speaker': {
-            'name': 'noob'}
-        }
-        self.neutronclient.update_bgp_speaker.assert_called_once_with(
-            self._bgp_speaker_name, attrs)
+        attrs = {'name': 'noob'}
+        self.networkclient.update_bgp_speaker.assert_called_once_with(
+            self._bgp_speaker_name, **attrs)
         self.assertIsNone(result)

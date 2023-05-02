@@ -13,7 +13,6 @@
 
 from osc_lib.command import command
 from osc_lib import utils
-from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
 from neutronclient.common import exceptions
@@ -96,11 +95,10 @@ class CreateBgpPeer(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_attrs(self.app.client_manager, parsed_args)
-        body = {constants.BGP_PEER: attrs}
-        obj = client.create_bgp_peer(body)[constants.BGP_PEER]
-        columns, display_columns = column_util.get_columns(obj)
+        obj = client.create_bgp_peer(**attrs)
+        display_columns, columns = nc_osc_utils._get_columns(obj)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -118,9 +116,8 @@ class DeleteBgpPeer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        id = client.find_resource(constants.BGP_PEER,
-                                  parsed_args.bgp_peer)['id']
+        client = self.app.client_manager.network
+        id = client.find_bgp_peer(parsed_args.bgp_peer)['id']
         client.delete_bgp_peer(id)
 
 
@@ -128,13 +125,11 @@ class ListBgpPeer(command.Lister):
     _description = _("List BGP peers")
 
     def take_action(self, parsed_args):
-        data = self.app.client_manager.neutronclient.list_bgp_peers()
+        data = self.app.client_manager.network.bgp_peers(retrieve_all=True)
         headers = ('ID', 'Name', 'Peer IP', 'Remote AS')
         columns = ('id', 'name', 'peer_ip', 'remote_as')
         return (headers,
-                (utils.get_dict_properties(
-                    s, columns,
-                ) for s in data[constants.BGP_PEERS]))
+                (utils.get_dict_properties(s, columns,) for s in data))
 
 
 class SetBgpPeer(command.Command):
@@ -158,13 +153,10 @@ class SetBgpPeer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        id = client.find_resource(constants.BGP_PEER,
-                                  parsed_args.bgp_peer)['id']
+        client = self.app.client_manager.network
+        id = client.find_bgp_peer(parsed_args.bgp_peer)['id']
         attrs = _get_attrs(self.app.client_manager, parsed_args)
-        body = {}
-        body[constants.BGP_PEER] = attrs
-        client.update_bgp_peer(id, body)
+        client.update_bgp_peer(id, **attrs)
 
 
 class ShowBgpPeer(command.ShowOne):
@@ -180,10 +172,10 @@ class ShowBgpPeer(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        id = client.find_resource(constants.BGP_PEER,
-                                  parsed_args.bgp_peer)['id']
-        obj = client.show_bgp_peer(id)[constants.BGP_PEER]
-        columns, display_columns = column_util.get_columns(obj)
+        client = self.app.client_manager.network
+        id = client.find_bgp_peer(parsed_args.bgp_peer,
+                                  ignore_missing=False).id
+        obj = client.get_bgp_peer(id)
+        display_columns, columns = nc_osc_utils._get_columns(obj)
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
