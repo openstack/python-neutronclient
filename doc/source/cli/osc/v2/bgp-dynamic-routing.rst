@@ -26,9 +26,6 @@ Network v2
    :command: bgp speaker show
 
 .. autoprogram-cliff:: openstack.neutronclient.v2
-   :command: bgp speaker show dragents
-
-.. autoprogram-cliff:: openstack.neutronclient.v2
    :command: bgp speaker add network
 
 .. autoprogram-cliff:: openstack.neutronclient.v2

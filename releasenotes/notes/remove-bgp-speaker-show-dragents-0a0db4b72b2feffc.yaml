@@ -1,0 +1,6 @@
+---
+upgrade:
+  - |
+    The ``openstack bgp speaker show dragents`` CLI is removed. It was
+    deprecated in the 7.1.0 release (Ussuri). Use ``openstack bgp dragent list
+    --bgp-speaker <bgp-speaker>`` CLI instead.
