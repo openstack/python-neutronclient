@@ -32,8 +32,18 @@ _attr_map = (
     ('type', 'Type', column_util.LIST_BOTH),
     ('endpoints', 'Endpoints', column_util.LIST_BOTH),
     ('description', 'Description', column_util.LIST_LONG_ONLY),
-    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
+    ('project_id', 'Project', column_util.LIST_LONG_ONLY),
 )
+
+_attr_map_dict = {
+    'id': 'ID',
+    'name': 'Name',
+    'type': 'Type',
+    'endpoints': 'Endpoints',
+    'description': 'Description',
+    'tenant_id': 'Project',
+    'project_id': 'Project',
+}
 
 
 def _get_common_parser(parser):
@@ -83,23 +93,22 @@ class CreateEndpointGroup(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         if parsed_args.name:
             attrs['name'] = str(parsed_args.name)
         attrs['type'] = parsed_args.type
         if parsed_args.type == 'subnet':
-            _subnet_ids = [client.find_resource(
-                'subnet',
+            _subnet_ids = [client.find_subnet(
                 endpoint,
-                cmd_resource='subnet')['id']
-                for endpoint in parsed_args.endpoints]
+                ignore_missing=False)['id']
+                    for endpoint in parsed_args.endpoints]
             attrs['endpoints'] = _subnet_ids
         else:
             attrs['endpoints'] = parsed_args.endpoints
-        obj = client.create_endpoint_group(
-            {'endpoint_group': attrs})['endpoint_group']
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        obj = client.create_vpn_endpoint_group(**attrs)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -117,15 +126,13 @@ class DeleteEndpointGroup(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         result = 0
         for endpoint in parsed_args.endpoint_group:
             try:
-                endpoint_id = client.find_resource(
-                    'endpoint_group',
-                    endpoint,
-                    cmd_resource='endpoint_group')['id']
-                client.delete_endpoint_group(endpoint_id)
+                endpoint_id = client.find_vpn_endpoint_group(
+                    endpoint, ignore_missing=False)['id']
+                client.delete_vpn_endpoint_group(endpoint_id)
             except Exception as e:
                 result += 1
                 LOG.error(_("Failed to delete endpoint group with "
@@ -153,8 +160,8 @@ class ListEndpointGroup(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        obj = client.list_endpoint_groups()['endpoint_groups']
+        client = self.app.client_manager.network
+        obj = client.vpn_endpoint_groups()
         headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(s, columns) for s in obj))
@@ -177,17 +184,15 @@ class SetEndpointGroup(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager,
                                   parsed_args, is_create=False)
         if parsed_args.name:
             attrs['name'] = str(parsed_args.name)
-        endpoint_id = client.find_resource(
-            'endpoint_group', parsed_args.endpoint_group,
-            cmd_resource='endpoint_group')['id']
+        endpoint_id = client.find_vpn_endpoint_group(
+            parsed_args.endpoint_group, ignore_missing=False)['id']
         try:
-            client.update_endpoint_group(endpoint_id,
-                                         {'endpoint_group': attrs})
+            client.update_vpn_endpoint_group(endpoint_id, **attrs)
         except Exception as e:
             msg = (_("Failed to set endpoint group "
                      "%(endpoint_group)s: %(e)s")
@@ -207,11 +212,11 @@ class ShowEndpointGroup(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        endpoint_id = client.find_resource(
-            'endpoint_group', parsed_args.endpoint_group,
-            cmd_resource='endpoint_group')['id']
-        obj = client.show_endpoint_group(endpoint_id)['endpoint_group']
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        client = self.app.client_manager.network
+        endpoint_id = client.find_vpn_endpoint_group(
+            parsed_args.endpoint_group, ignore_missing=False)['id']
+        obj = client.get_vpn_endpoint_group(endpoint_id)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id'])
         data = utils.get_dict_properties(obj, columns)
         return (display_columns, data)

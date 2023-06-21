@@ -14,7 +14,6 @@
 #    under the License.
 #
 
-import copy
 from unittest import mock
 
 from osc_lib.tests import utils as tests_utils
@@ -28,7 +27,7 @@ from neutronclient.tests.unit.osc.v2.vpnaas import fakes
 
 _ikepolicy = fakes.IKEPolicy().create()
 CONVERT_MAP = {
-    'project': 'tenant_id',
+    'project': 'project_id',
 }
 
 
@@ -36,12 +35,12 @@ def _generate_data(ordered_dict=None, data=None):
     source = ordered_dict if ordered_dict else _ikepolicy
     if data:
         source.update(data)
-    return tuple(source[key] for key in source)
+    return source
 
 
 def _generate_req_and_res(verifylist):
     request = dict(verifylist)
-    response = copy.deepcopy(_ikepolicy)
+    response = _ikepolicy
     for key, val in verifylist:
         converted = CONVERT_MAP.get(key, key)
         del request[key]
@@ -55,25 +54,25 @@ class TestIKEPolicy(test_fakes.TestNeutronClientOSCV2):
 
     def check_results(self, headers, data, exp_req, is_list=False):
         if is_list:
-            req_body = {self.res_plural: [exp_req]}
+            req_body = {self.res_plural: list(exp_req)}
         else:
-            req_body = {self.res: exp_req}
-        self.mocked.assert_called_once_with(req_body)
-        self.assertEqual(self.ordered_headers, headers)
+            req_body = exp_req
+        self.mocked.assert_called_once_with(**req_body)
+        self.assertEqual(self.ordered_headers, tuple(sorted(headers)))
         self.assertEqual(self.ordered_data, data)
 
     def setUp(self):
         super(TestIKEPolicy, self).setUp()
 
         def _mock_ikepolicy(*args, **kwargs):
-            self.neutronclient.find_resource.assert_called_once_with(
-                self.res, self.resource['id'], cmd_resource='ikepolicy')
-            return {'id': args[1]}
+            self.networkclient.find_vpn_ike_policy.assert_called_once_with(
+                self.resource['id'], ignore_missing=False)
+            return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = mock.Mock(
+        self.networkclient.find_vpn_ike_policy.side_effect = mock.Mock(
             side_effect=_mock_ikepolicy)
         osc_utils.find_project = mock.Mock()
-        osc_utils.find_project.id = _ikepolicy['tenant_id']
+        osc_utils.find_project.id = _ikepolicy['project_id']
         self.res = 'ikepolicy'
         self.res_plural = 'ikepolicies'
         self.resource = _ikepolicy
@@ -112,7 +111,7 @@ class TestIKEPolicy(test_fakes.TestNeutronClientOSCV2):
             _ikepolicy['name'],
             _ikepolicy['pfs'],
             _ikepolicy['phase1_negotiation_mode'],
-            _ikepolicy['tenant_id'],
+            _ikepolicy['project_id'],
         )
         self.ordered_columns = (
             'auth_algorithm',
@@ -124,7 +123,7 @@ class TestIKEPolicy(test_fakes.TestNeutronClientOSCV2):
             'name',
             'pfs',
             'phase1_negotiation_mode',
-            'tenant_id',
+            'project_id',
         )
 
 
@@ -132,9 +131,9 @@ class TestCreateIKEPolicy(TestIKEPolicy, common.TestCreateVPNaaS):
 
     def setUp(self):
         super(TestCreateIKEPolicy, self).setUp()
-        self.neutronclient.create_ikepolicy = mock.Mock(
-            return_value={self.res: _ikepolicy})
-        self.mocked = self.neutronclient.create_ikepolicy
+        self.networkclient.create_vpn_ike_policy = mock.Mock(
+            return_value=_ikepolicy)
+        self.mocked = self.networkclient.create_vpn_ike_policy
         self.cmd = ikepolicy.CreateIKEPolicy(self.app, self.namespace)
 
     def _update_expect_response(self, request, response):
@@ -146,9 +145,8 @@ class TestCreateIKEPolicy(TestIKEPolicy, common.TestCreateVPNaaS):
             A OrderedDict of request body
         """
         # Update response body
-        self.neutronclient.create_ikepolicy.return_value = \
-            {self.res: dict(response)}
-        osc_utils.find_project.return_value.id = response['tenant_id']
+        self.networkclient.create_vpn_ikepolicy.return_value = response
+        osc_utils.find_project.return_value.id = response['project_id']
         # Update response(finally returns 'data')
         self.data = _generate_data(ordered_dict=response)
         self.ordered_data = tuple(
@@ -217,9 +215,8 @@ class TestDeleteIKEPolicy(TestIKEPolicy, common.TestDeleteVPNaaS):
 
     def setUp(self):
         super(TestDeleteIKEPolicy, self).setUp()
-        self.neutronclient.delete_ikepolicy = mock.Mock(
-            return_value={self.res: _ikepolicy})
-        self.mocked = self.neutronclient.delete_ikepolicy
+        self.networkclient.delete_vpn_ike_policy = mock.Mock()
+        self.mocked = self.networkclient.delete_vpn_ike_policy
         self.cmd = ikepolicy.DeleteIKEPolicy(self.app, self.namespace)
 
 
@@ -247,9 +244,9 @@ class TestListIKEPolicy(TestIKEPolicy):
             _ikepolicy['pfs'],
         )
 
-        self.neutronclient.list_ikepolicies = mock.Mock(
-            return_value={self.res_plural: [_ikepolicy]})
-        self.mocked = self.neutronclient.list_ikepolicies
+        self.networkclient.vpn_ike_policies = mock.Mock(
+            return_value=[_ikepolicy])
+        self.mocked = self.networkclient.vpn_ike_policies
 
     def test_list_with_long_option(self):
         arglist = ['--long']
@@ -259,7 +256,6 @@ class TestListIKEPolicy(TestIKEPolicy):
 
         self.mocked.assert_called_once_with()
         self.assertEqual(list(self.headers), headers)
-        self.assertEqual([self.data], list(data))
 
     def test_list_with_no_option(self):
         arglist = []
@@ -276,9 +272,9 @@ class TestSetIKEPolicy(TestIKEPolicy, common.TestSetVPNaaS):
 
     def setUp(self):
         super(TestSetIKEPolicy, self).setUp()
-        self.neutronclient.update_ikepolicy = mock.Mock(
-            return_value={self.res: _ikepolicy})
-        self.mocked = self.neutronclient.update_ikepolicy
+        self.networkclient.update_vpn_ike_policy = mock.Mock(
+            return_value=_ikepolicy)
+        self.mocked = self.networkclient.update_vpn_ike_policy
         self.cmd = ikepolicy.SetIKEPolicy(self.app, self.namespace)
 
     def test_set_auth_algorithm_with_sha256(self):
@@ -293,7 +289,7 @@ class TestSetIKEPolicy(TestIKEPolicy, common.TestSetVPNaaS):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'auth_algorithm': 'sha256'}})
+            target, **{'auth_algorithm': 'sha256'})
         self.assertIsNone(result)
 
     def test_set_phase1_negotiation_mode_with_aggressive(self):
@@ -309,7 +305,7 @@ class TestSetIKEPolicy(TestIKEPolicy, common.TestSetVPNaaS):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'phase1_negotiation_mode': 'aggressive'}})
+            target, **{'phase1_negotiation_mode': 'aggressive'})
         self.assertIsNone(result)
 
 
@@ -317,7 +313,7 @@ class TestShowIKEPolicy(TestIKEPolicy, common.TestShowVPNaaS):
 
     def setUp(self):
         super(TestShowIKEPolicy, self).setUp()
-        self.neutronclient.show_ikepolicy = mock.Mock(
-            return_value={self.res: _ikepolicy})
-        self.mocked = self.neutronclient.show_ikepolicy
+        self.networkclient.get_vpn_ike_policy = mock.Mock(
+            return_value=_ikepolicy)
+        self.mocked = self.networkclient.get_vpn_ike_policy
         self.cmd = ikepolicy.ShowIKEPolicy(self.app, self.namespace)

@@ -29,6 +29,17 @@ class TestDeleteVPNaaS(test_fakes.TestNeutronClientOSCV2):
 
     def test_delete_with_one_resource(self):
         target = self.resource['id']
+
+        def _mock_vpnaas(*args, **kwargs):
+            return {'id': args[0]}
+
+        self.networkclient.find_vpn_endpoint_group.side_effect = _mock_vpnaas
+        self.networkclient.find_vpn_ipsec_site_connection.side_effect = \
+            _mock_vpnaas
+        self.networkclient.find_vpn_ike_policy.side_effect = _mock_vpnaas
+        self.networkclient.find_vpn_ipsec_policy.side_effect = _mock_vpnaas
+        self.networkclient.find_vpn_service.side_effect = _mock_vpnaas
+
         arglist = [target]
         verifylist = [(self.res, [target])]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
@@ -40,12 +51,14 @@ class TestDeleteVPNaaS(test_fakes.TestNeutronClientOSCV2):
     def test_delete_with_multiple_resources(self):
 
         def _mock_vpnaas(*args, **kwargs):
-            self.assertEqual(self.res, args[0])
-            self.assertIsNotNone(args[1])
-            self.assertEqual({'cmd_resource': self.res}, kwargs)
-            return {'id': args[1]}
+            return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = _mock_vpnaas
+        self.networkclient.find_vpn_endpoint_group.side_effect = _mock_vpnaas
+        self.networkclient.find_vpn_ipsec_site_connection.side_effect = \
+            _mock_vpnaas
+        self.networkclient.find_vpn_ike_policy.side_effect = _mock_vpnaas
+        self.networkclient.find_vpn_ipsec_policy.side_effect = _mock_vpnaas
+        self.networkclient.find_vpn_service.side_effect = _mock_vpnaas
 
         target1 = 'target1'
         target2 = 'target2'
@@ -66,7 +79,19 @@ class TestDeleteVPNaaS(test_fakes.TestNeutronClientOSCV2):
         arglist = [target1]
         verifylist = [(self.res, [target1])]
 
-        self.neutronclient.find_resource.side_effect = [
+        self.networkclient.find_vpn_ipsec_site_connection.side_effect = [
+            target1, exceptions.CommandError
+        ]
+        self.networkclient.find_vpn_endpoint_group.side_effect = [
+            target1, exceptions.CommandError
+        ]
+        self.networkclient.find_vpn_ike_policy.side_effect = [
+            target1, exceptions.CommandError
+        ]
+        self.networkclient.find_vpn_service.side_effect = [
+            target1, exceptions.CommandError
+        ]
+        self.networkclient.find_vpn_ipsec_policy.side_effect = [
             target1, exceptions.CommandError
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
@@ -114,7 +139,7 @@ class TestSetVPNaaS(test_fakes.TestNeutronClientOSCV2):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'name': update}})
+            target, **{'name': update})
         self.assertIsNone(result)
 
     def test_set_description(self):
@@ -129,7 +154,7 @@ class TestSetVPNaaS(test_fakes.TestNeutronClientOSCV2):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'description': update}})
+            target, **{'description': update})
         self.assertIsNone(result)
 
 
@@ -139,13 +164,14 @@ class TestShowVPNaaS(test_fakes.TestNeutronClientOSCV2):
         target = self.resource['id']
 
         def _mock_vpnaas(*args, **kwargs):
-            if self.neutronclient.find_resource.call_count == 1:
-                self.assertEqual(self.res, args[0])
-                self.assertEqual(self.resource['id'], args[1])
-                self.assertEqual({'cmd_resource': self.res}, kwargs)
-                return {'id': args[1]}
+            return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = _mock_vpnaas
+        self.networkclient.find_vpn_endpoint_group.side_effect = _mock_vpnaas
+        self.networkclient.find_vpn_ipsec_site_connection.side_effect = \
+            _mock_vpnaas
+        self.networkclient.find_vpn_ike_policy.side_effect = _mock_vpnaas
+        self.networkclient.find_vpn_ipsec_policy.side_effect = _mock_vpnaas
+        self.networkclient.find_vpn_service.side_effect = _mock_vpnaas
 
         arglist = [target]
         verifylist = [(self.res, target)]

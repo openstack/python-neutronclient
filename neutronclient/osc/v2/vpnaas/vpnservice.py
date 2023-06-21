@@ -32,11 +32,23 @@ _attr_map = (
     ('router_id', 'Router', column_util.LIST_BOTH),
     ('subnet_id', 'Subnet', column_util.LIST_BOTH),
     ('flavor_id', 'Flavor', column_util.LIST_BOTH),
-    ('admin_state_up', 'State', column_util.LIST_BOTH),
+    ('is_admin_state_up', 'State', column_util.LIST_BOTH),
     ('status', 'Status', column_util.LIST_BOTH),
     ('description', 'Description', column_util.LIST_LONG_ONLY),
-    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
+    ('project_id', 'Project', column_util.LIST_LONG_ONLY),
 )
+
+_attr_map_dict = {
+    'id': 'ID',
+    'name': 'Name',
+    'router_id': 'Router',
+    'subnet_id': 'Subnet',
+    'flavor_id': 'Flavor',
+    'is_admin_state_up': 'State',
+    'status': 'Status',
+    'description': 'Description',
+    'project_id': 'Project',
+}
 
 
 def _get_common_parser(parser):
@@ -70,7 +82,7 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
     attrs = {}
     if is_create:
         if 'project' in parsed_args and parsed_args.project is not None:
-            attrs['tenant_id'] = osc_utils.find_project(
+            attrs['project_id'] = osc_utils.find_project(
                 client_manager.identity,
                 parsed_args.project,
                 parsed_args.project_domain,
@@ -113,16 +125,18 @@ class CreateVPNService(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         if parsed_args.name:
             attrs['name'] = str(parsed_args.name)
         if parsed_args.router:
-            _router_id = self.app.client_manager.network.find_router(
-                parsed_args.router).id
+            _router_id = client.find_router(parsed_args.router,
+                                            ignore_missing=False).id
             attrs['router_id'] = _router_id
-        obj = client.create_vpnservice({'vpnservice': attrs})['vpnservice']
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        obj = client.create_vpn_service(**attrs)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id', 'external_v4_ip',
+                                  'external_v6_ip'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -140,13 +154,13 @@ class DeleteVPNService(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         result = 0
         for vpn in parsed_args.vpnservice:
             try:
-                vpn_id = client.find_resource(
-                    'vpnservice', vpn, cmd_resource='vpnservice')['id']
-                client.delete_vpnservice(vpn_id)
+                vpn_id = client.find_vpn_service(vpn,
+                                                 ignore_missing=False)['id']
+                client.delete_vpn_service(vpn_id)
             except Exception as e:
                 result += 1
                 LOG.error(_("Failed to delete VPN service with "
@@ -174,8 +188,8 @@ class ListVPNService(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        obj = client.list_vpnservices()['vpnservices']
+        client = self.app.client_manager.network
+        obj = client.vpn_services()
         headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(s, columns) for s in obj))
@@ -198,16 +212,15 @@ class SetVPNSercice(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager,
                                   parsed_args, is_create=False)
         if parsed_args.name:
             attrs['name'] = str(parsed_args.name)
-        vpn_id = client.find_resource(
-            'vpnservice', parsed_args.vpnservice,
-            cmd_resource='vpnservice')['id']
+        vpn_id = client.find_vpn_service(parsed_args.vpnservice,
+                                         ignore_missing=False)['id']
         try:
-            client.update_vpnservice(vpn_id, {'vpnservice': attrs})
+            client.update_vpn_service(vpn_id, **attrs)
         except Exception as e:
             msg = (_("Failed to set vpn service '%(vpn)s': %(e)s")
                    % {'vpn': parsed_args.vpnservice, 'e': e})
@@ -226,11 +239,12 @@ class ShowVPNService(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        vpn_id = client.find_resource(
-            'vpnservice', parsed_args.vpnservice,
-            cmd_resource='vpnservice')['id']
-        obj = client.show_vpnservice(vpn_id)['vpnservice']
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        client = self.app.client_manager.network
+        vpn_id = client.find_vpn_service(parsed_args.vpnservice,
+                                         ignore_missing=False)['id']
+        obj = client.get_vpn_service(vpn_id)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id', 'external_v4_ip',
+                                  'external_v6_ip'])
         data = utils.get_dict_properties(obj, columns)
         return (display_columns, data)

@@ -38,9 +38,23 @@ _attr_map = (
     ('description', 'Description', column_util.LIST_LONG_ONLY),
     ('phase1_negotiation_mode', 'Phase1 Negotiation Mode',
         column_util.LIST_LONG_ONLY),
-    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
+    ('project_id', 'Project', column_util.LIST_LONG_ONLY),
     ('lifetime', 'Lifetime', column_util.LIST_LONG_ONLY),
 )
+
+_attr_map_dict = {
+    'id': 'ID',
+    'name': 'Name',
+    'auth_algorithm': 'Authentication Algorithm',
+    'encryption_algorithm': 'Encryption Algorithm',
+    'ike_version': 'IKE Version',
+    'pfs': 'Perfect Forward Secrecy (PFS)',
+    'phase1_negotiation_mode': 'Phase1 Negotiation Mode',
+    'lifetime': 'Lifetime',
+    'description': 'Description',
+    'tenant_id': 'Project',
+    'project_id': 'Project',
+}
 
 
 def _convert_to_lowercase(string):
@@ -89,7 +103,7 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
     attrs = {}
     if is_create:
         if 'project' in parsed_args and parsed_args.project is not None:
-            attrs['tenant_id'] = osc_utils.find_project(
+            attrs['project_id'] = osc_utils.find_project(
                 client_manager.identity,
                 parsed_args.project,
                 parsed_args.project_domain,
@@ -126,12 +140,13 @@ class CreateIKEPolicy(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         if parsed_args.name:
             attrs['name'] = str(parsed_args.name)
-        obj = client.create_ikepolicy({'ikepolicy': attrs})['ikepolicy']
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        obj = client.create_vpn_ike_policy(**attrs)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id', 'units', 'value'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -149,13 +164,13 @@ class DeleteIKEPolicy(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         result = 0
         for ike in parsed_args.ikepolicy:
             try:
-                ike_id = client.find_resource(
-                    'ikepolicy', ike, cmd_resource='ikepolicy')['id']
-                client.delete_ikepolicy(ike_id)
+                ike_id = client.find_vpn_ike_policy(ike,
+                                                    ignore_missing=False)['id']
+                client.delete_vpn_ike_policy(ike_id)
             except Exception as e:
                 result += 1
                 LOG.error(_("Failed to delete IKE policy with "
@@ -182,8 +197,8 @@ class ListIKEPolicy(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        obj = client.list_ikepolicies()['ikepolicies']
+        client = self.app.client_manager.network
+        obj = client.vpn_ike_policies()
         headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(s, columns) for s in obj))
@@ -206,16 +221,15 @@ class SetIKEPolicy(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager,
                                   parsed_args, is_create=False)
         if parsed_args.name:
             attrs['name'] = parsed_args.name
-        ike_id = client.find_resource(
-            'ikepolicy', parsed_args.ikepolicy,
-            cmd_resource='ikepolicy')['id']
+        ike_id = client.find_vpn_ike_policy(parsed_args.ikepolicy,
+                                            ignore_missing=False)['id']
         try:
-            client.update_ikepolicy(ike_id, {'ikepolicy': attrs})
+            client.update_vpn_ike_policy(ike_id, **attrs)
         except Exception as e:
             msg = (_("Failed to set IKE policy '%(ike)s': %(e)s")
                    % {'ike': parsed_args.ikepolicy, 'e': e})
@@ -234,11 +248,11 @@ class ShowIKEPolicy(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        ike_id = client.find_resource(
-            'ikepolicy', parsed_args.ikepolicy,
-            cmd_resource='ikepolicy')['id']
-        obj = client.show_ikepolicy(ike_id)['ikepolicy']
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        client = self.app.client_manager.network
+        ike_id = client.find_vpn_ike_policy(parsed_args.ikepolicy,
+                                            ignore_missing=False)['id']
+        obj = client.get_vpn_ike_policy(ike_id)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id', 'units', 'value'])
         data = utils.get_dict_properties(obj, columns)
         return (display_columns, data)

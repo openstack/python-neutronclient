@@ -37,9 +37,22 @@ _attr_map = (
     ('encryption_algorithm', 'Encryption Algorithm', column_util.LIST_BOTH),
     ('pfs', 'Perfect Forward Secrecy (PFS)', column_util.LIST_LONG_ONLY),
     ('description', 'Description', column_util.LIST_LONG_ONLY),
-    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
+    ('project_id', 'Project', column_util.LIST_LONG_ONLY),
     ('lifetime', 'Lifetime', column_util.LIST_LONG_ONLY),
 )
+
+_attr_map_dict = {
+    'id': 'ID',
+    'name': 'Name',
+    'auth_algorithm': 'Authentication Algorithm',
+    'encapsulation_mode': 'Encapsulation Mode',
+    'transform_protocol': 'Transform Protocol',
+    'encryption_algorithm': 'Encryption Algorithm',
+    'pfs': 'Perfect Forward Secrecy (PFS)',
+    'lifetime': 'Lifetime',
+    'description': 'Description',
+    'project_id': 'Project',
+}
 
 
 def _convert_to_lowercase(string):
@@ -87,7 +100,7 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
     attrs = {}
     if is_create:
         if 'project' in parsed_args and parsed_args.project is not None:
-            attrs['tenant_id'] = osc_utils.find_project(
+            attrs['project_id'] = osc_utils.find_project(
                 client_manager.identity,
                 parsed_args.project,
                 parsed_args.project_domain,
@@ -124,12 +137,14 @@ class CreateIPsecPolicy(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         if parsed_args.name:
             attrs['name'] = str(parsed_args.name)
-        obj = client.create_ipsecpolicy({'ipsecpolicy': attrs})['ipsecpolicy']
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        obj = client.create_vpn_ipsec_policy(**attrs)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id',
+                                  'phase1_negotiation_mode', 'units', 'value'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -147,13 +162,13 @@ class DeleteIPsecPolicy(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         result = 0
         for ipsec in parsed_args.ipsecpolicy:
             try:
-                ipsec_id = client.find_resource(
-                    'ipsecpolicy', ipsec, cmd_resource='ipsecpolicy')['id']
-                client.delete_ipsecpolicy(ipsec_id)
+                ipsec_id = client.find_vpn_ipsec_policy(
+                    ipsec, ignore_missing=False)['id']
+                client.delete_vpn_ipsec_policy(ipsec_id)
             except Exception as e:
                 result += 1
                 LOG.error(_("Failed to delete IPsec policy with "
@@ -181,8 +196,8 @@ class ListIPsecPolicy(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        obj = client.list_ipsecpolicies()['ipsecpolicies']
+        client = self.app.client_manager.network
+        obj = client.vpn_ipsec_policies()
         headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(s, columns) for s in obj))
@@ -205,16 +220,15 @@ class SetIPsecPolicy(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager,
                                   parsed_args, is_create=False)
         if parsed_args.name:
             attrs['name'] = str(parsed_args.name)
-        ipsec_id = client.find_resource(
-            'ipsecpolicy', parsed_args.ipsecpolicy,
-            cmd_resource='ipsecpolicy')['id']
+        ipsec_id = client.find_vpn_ipsec_policy(
+            parsed_args.ipsecpolicy, ignore_missing=False)['id']
         try:
-            client.update_ipsecpolicy(ipsec_id, {'ipsecpolicy': attrs})
+            client.update_vpn_ipsec_policy(ipsec_id, **attrs)
         except Exception as e:
             msg = (_("Failed to set IPsec policy '%(ipsec)s': %(e)s")
                    % {'ipsec': parsed_args.ipsecpolicy, 'e': e})
@@ -233,11 +247,12 @@ class ShowIPsecPolicy(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        ipsec_id = client.find_resource(
-            'ipsecpolicy', parsed_args.ipsecpolicy,
-            cmd_resource='ipsecpolicy')['id']
-        obj = client.show_ipsecpolicy(ipsec_id)['ipsecpolicy']
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        client = self.app.client_manager.network
+        ipsec_id = client.find_vpn_ipsec_policy(
+            parsed_args.ipsecpolicy, ignore_missing=False)['id']
+        obj = client.get_vpn_ipsec_policy(ipsec_id)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id',
+                                  'phase1_negotiation_mode', 'units', 'value'])
         data = utils.get_dict_properties(obj, columns)
         return (display_columns, data)

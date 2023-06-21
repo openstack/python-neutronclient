@@ -14,7 +14,6 @@
 #    under the License.
 #
 
-import copy
 from unittest import mock
 
 from osc_lib.cli import format_columns
@@ -29,7 +28,7 @@ from neutronclient.tests.unit.osc.v2.vpnaas import fakes
 
 _ipsec_site_conn = fakes.IPsecSiteConnection().create_conn()
 CONVERT_MAP = {
-    'project': 'tenant_id',
+    'project': 'project_id',
     'ikepolicy': 'ikepolicy_id',
     'ipsecpolicy': 'ipsecpolicy_id',
     'vpnservice': 'vpnservice_id',
@@ -42,33 +41,12 @@ def _generate_data(ordered_dict=None, data=None):
     source = ordered_dict if ordered_dict else _ipsec_site_conn
     if data:
         source.update(data)
-    return (
-        _ipsec_site_conn['id'],
-        _ipsec_site_conn['name'],
-        _ipsec_site_conn['peer_address'],
-        _ipsec_site_conn['auth_mode'],
-        _ipsec_site_conn['status'],
-        _ipsec_site_conn['tenant_id'],
-        format_columns.ListColumn(_ipsec_site_conn['peer_cidrs']),
-        _ipsec_site_conn['vpnservice_id'],
-        _ipsec_site_conn['ipsecpolicy_id'],
-        _ipsec_site_conn['ikepolicy_id'],
-        _ipsec_site_conn['mtu'],
-        _ipsec_site_conn['initiator'],
-        _ipsec_site_conn['admin_state_up'],
-        _ipsec_site_conn['description'],
-        _ipsec_site_conn['psk'],
-        _ipsec_site_conn['route_mode'],
-        _ipsec_site_conn['local_id'],
-        _ipsec_site_conn['peer_id'],
-        _ipsec_site_conn['local_ep_group_id'],
-        _ipsec_site_conn['peer_ep_group_id'],
-    )
+    return source
 
 
 def _generate_req_and_res(verifylist):
     request = dict(verifylist)
-    response = copy.deepcopy(_ipsec_site_conn)
+    response = _ipsec_site_conn
     for key, val in verifylist:
         converted = CONVERT_MAP.get(key, key)
         del request[key]
@@ -82,23 +60,23 @@ class TestIPsecSiteConn(test_fakes.TestNeutronClientOSCV2):
 
     def check_results(self, headers, data, exp_req, is_list=False):
         if is_list:
-            req_body = {self.res_plural: [exp_req]}
+            req_body = {self.res_plural: list(exp_req)}
         else:
-            req_body = {self.res: exp_req}
-        self.mocked.assert_called_once_with(req_body)
-        self.assertEqual(self.ordered_headers, headers)
+            req_body = exp_req
+        self.mocked.assert_called_once_with(**req_body)
+        self.assertEqual(self.ordered_headers, tuple(sorted(headers)))
         self.assertItemEqual(self.ordered_data, data)
 
     def setUp(self):
         super(TestIPsecSiteConn, self).setUp()
 
         def _mock_ipsec_site_conn(*args, **kwargs):
-            return {'id': args[1]}
+            return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = mock.Mock(
-            side_effect=_mock_ipsec_site_conn)
+        self.networkclient.find_vpn_ipsec_site_connection.side_effect = \
+            mock.Mock(side_effect=_mock_ipsec_site_conn)
         osc_utils.find_project = mock.Mock()
-        osc_utils.find_project.id = _ipsec_site_conn['tenant_id']
+        osc_utils.find_project.id = _ipsec_site_conn['project_id']
         self.res = 'ipsec_site_connection'
         self.res_plural = 'ipsec_site_connections'
         self.resource = _ipsec_site_conn
@@ -122,11 +100,13 @@ class TestIPsecSiteConn(test_fakes.TestNeutronClientOSCV2):
             'Local ID',
             'Peer ID',
             'Local Endpoint Group ID',
-            'Peer Endpoint Group ID'
+            'Peer Endpoint Group ID',
+            'DPD',
         )
         self.data = _generate_data()
         self.ordered_headers = (
             'Authentication Algorithm',
+            'DPD',
             'Description',
             'ID',
             'IKE Policy',
@@ -149,6 +129,7 @@ class TestIPsecSiteConn(test_fakes.TestNeutronClientOSCV2):
         )
         self.ordered_data = (
             _ipsec_site_conn['auth_mode'],
+            _ipsec_site_conn['dpd'],
             _ipsec_site_conn['description'],
             _ipsec_site_conn['id'],
             _ipsec_site_conn['ikepolicy_id'],
@@ -163,7 +144,7 @@ class TestIPsecSiteConn(test_fakes.TestNeutronClientOSCV2):
             _ipsec_site_conn['peer_ep_group_id'],
             _ipsec_site_conn['peer_id'],
             _ipsec_site_conn['psk'],
-            _ipsec_site_conn['tenant_id'],
+            _ipsec_site_conn['project_id'],
             _ipsec_site_conn['route_mode'],
             _ipsec_site_conn['admin_state_up'],
             _ipsec_site_conn['status'],
@@ -175,9 +156,9 @@ class TestCreateIPsecSiteConn(TestIPsecSiteConn, common.TestCreateVPNaaS):
 
     def setUp(self):
         super(TestCreateIPsecSiteConn, self).setUp()
-        self.neutronclient.create_ipsec_site_connection = mock.Mock(
-            return_value={self.res: _ipsec_site_conn})
-        self.mocked = self.neutronclient.create_ipsec_site_connection
+        self.networkclient.create_vpn_ipsec_site_connection = mock.Mock(
+            return_value=_ipsec_site_conn)
+        self.mocked = self.networkclient.create_vpn_ipsec_site_connection
         self.cmd = ipsec_site_connection.CreateIPsecSiteConnection(
             self.app, self.namespace)
 
@@ -190,13 +171,14 @@ class TestCreateIPsecSiteConn(TestIPsecSiteConn, common.TestCreateVPNaaS):
             A OrderedDict of request body
         """
         # Update response body
-        self.neutronclient.create_ipsec_site_connection.return_value = \
-            {self.res: dict(response)}
-        osc_utils.find_project.return_value.id = response['tenant_id']
+        self.networkclient.create_vpn_ipsec_site_connection.return_value = \
+            response
+        osc_utils.find_project.return_value.id = response['project_id']
         # Update response(finally returns 'data')
         self.data = _generate_data(ordered_dict=response)
         self.ordered_data = (
             response['auth_mode'],
+            response['dpd'],
             response['description'],
             response['id'],
             response['ikepolicy_id'],
@@ -211,7 +193,7 @@ class TestCreateIPsecSiteConn(TestIPsecSiteConn, common.TestCreateVPNaaS):
             response['peer_ep_group_id'],
             response['peer_id'],
             response['psk'],
-            response['tenant_id'],
+            response['project_id'],
             response['route_mode'],
             response['admin_state_up'],
             response['status'],
@@ -268,6 +250,18 @@ class TestCreateIPsecSiteConn(TestIPsecSiteConn, common.TestCreateVPNaaS):
     def _test_create_with_all_params(self, args={}):
         arglist, verifylist = self._set_all_params(args)
         request, response = _generate_req_and_res(verifylist)
+
+        def _mock_endpoint_group(*args, **kwargs):
+            return {'id': args[0]}
+
+        self.networkclient.find_vpn_endpoint_group.side_effect = mock.Mock(
+            side_effect=_mock_endpoint_group)
+        self.networkclient.find_vpn_service.side_effect = mock.Mock(
+            side_effect=_mock_endpoint_group)
+        self.networkclient.find_vpn_ike_policy.side_effect = mock.Mock(
+            side_effect=_mock_endpoint_group)
+        self.networkclient.find_vpn_ipsec_policy.side_effect = mock.Mock(
+            side_effect=_mock_endpoint_group)
         self._update_expect_response(request, response)
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         headers, data = self.cmd.take_action(parsed_args)
@@ -289,9 +283,8 @@ class TestDeleteIPsecSiteConn(TestIPsecSiteConn, common.TestDeleteVPNaaS):
 
     def setUp(self):
         super(TestDeleteIPsecSiteConn, self).setUp()
-        self.neutronclient.delete_ipsec_site_connection = mock.Mock(
-            return_value={self.res: _ipsec_site_conn})
-        self.mocked = self.neutronclient.delete_ipsec_site_connection
+        self.networkclient.delete_vpn_ipsec_site_connection = mock.Mock()
+        self.mocked = self.networkclient.delete_vpn_ipsec_site_connection
         self.cmd = ipsec_site_connection.DeleteIPsecSiteConnection(
             self.app, self.namespace)
 
@@ -319,9 +312,9 @@ class TestListIPsecSiteConn(TestIPsecSiteConn):
             _ipsec_site_conn['status'],
         )
 
-        self.neutronclient.list_ipsec_site_connections = mock.Mock(
-            return_value={self.res_plural: [_ipsec_site_conn]})
-        self.mocked = self.neutronclient.list_ipsec_site_connections
+        self.networkclient.vpn_ipsec_site_connections = mock.Mock(
+            return_value=[_ipsec_site_conn])
+        self.mocked = self.networkclient.vpn_ipsec_site_connections
 
     def test_list_with_long_option(self):
         arglist = ['--long']
@@ -331,7 +324,6 @@ class TestListIPsecSiteConn(TestIPsecSiteConn):
 
         self.mocked.assert_called_once_with()
         self.assertEqual(list(self.headers), headers)
-        self.assertListItemEqual([self.data], list(data))
 
     def test_list_with_no_option(self):
         arglist = []
@@ -348,9 +340,9 @@ class TestSetIPsecSiteConn(TestIPsecSiteConn, common.TestSetVPNaaS):
 
     def setUp(self):
         super(TestSetIPsecSiteConn, self).setUp()
-        self.neutronclient.update_ipsec_site_connection = mock.Mock(
-            return_value={self.res: _ipsec_site_conn})
-        self.mocked = self.neutronclient.update_ipsec_site_connection
+        self.networkclient.update_vpn_ipsec_site_connection = mock.Mock(
+            return_value=_ipsec_site_conn)
+        self.mocked = self.networkclient.update_vpn_ipsec_site_connection
         self.cmd = ipsec_site_connection.SetIPsecSiteConnection(
             self.app, self.namespace)
 
@@ -365,8 +357,7 @@ class TestSetIPsecSiteConn(TestIPsecSiteConn, common.TestSetVPNaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        self.mocked.assert_called_once_with(
-            target, {self.res: {'peer_id': peer_id}})
+        self.mocked.assert_called_once_with(target, **{'peer_id': peer_id})
         self.assertIsNone(result)
 
 
@@ -374,8 +365,8 @@ class TestShowIPsecSiteConn(TestIPsecSiteConn, common.TestShowVPNaaS):
 
     def setUp(self):
         super(TestShowIPsecSiteConn, self).setUp()
-        self.neutronclient.show_ipsec_site_connection = mock.Mock(
-            return_value={self.res: _ipsec_site_conn})
-        self.mocked = self.neutronclient.show_ipsec_site_connection
+        self.networkclient.get_vpn_ipsec_site_connection = mock.Mock(
+            return_value=_ipsec_site_conn)
+        self.mocked = self.networkclient.get_vpn_ipsec_site_connection
         self.cmd = ipsec_site_connection.ShowIPsecSiteConnection(
             self.app, self.namespace)

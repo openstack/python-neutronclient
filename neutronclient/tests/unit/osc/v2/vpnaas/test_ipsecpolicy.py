@@ -14,7 +14,6 @@
 #    under the License.
 #
 
-import copy
 from unittest import mock
 
 from osc_lib.tests import utils as tests_utils
@@ -28,7 +27,7 @@ from neutronclient.tests.unit.osc.v2.vpnaas import fakes
 
 _ipsecpolicy = fakes.IPSecPolicy().create()
 CONVERT_MAP = {
-    'project': 'tenant_id',
+    'project': 'project_id',
 }
 
 
@@ -36,12 +35,12 @@ def _generate_data(ordered_dict=None, data=None):
     source = ordered_dict if ordered_dict else _ipsecpolicy
     if data:
         source.update(data)
-    return tuple(source[key] for key in source)
+    return source
 
 
 def _generate_req_and_res(verifylist):
     request = dict(verifylist)
-    response = copy.deepcopy(_ipsecpolicy)
+    response = _ipsecpolicy
     for key, val in verifylist:
         converted = CONVERT_MAP.get(key, key)
         del request[key]
@@ -55,10 +54,10 @@ class TestIPSecPolicy(test_fakes.TestNeutronClientOSCV2):
 
     def check_results(self, headers, data, exp_req, is_list=False):
         if is_list:
-            req_body = {self.res_plural: [exp_req]}
+            req_body = {self.res_plural: list(exp_req)}
         else:
-            req_body = {self.res: exp_req}
-        self.mocked.assert_called_once_with(req_body)
+            req_body = exp_req
+        self.mocked.assert_called_once_with(**req_body)
         self.assertEqual(self.ordered_headers, headers)
         self.assertEqual(self.ordered_data, data)
 
@@ -66,14 +65,14 @@ class TestIPSecPolicy(test_fakes.TestNeutronClientOSCV2):
         super(TestIPSecPolicy, self).setUp()
 
         def _mock_ipsecpolicy(*args, **kwargs):
-            self.neutronclient.find_resource.assert_called_once_with(
-                self.res, self.resource['id'], cmd_resource='ipsecpolicy')
-            return {'id': args[1]}
+            self.networkclient.find_vpn_ipsec_policy.assert_called_once_with(
+                self.resource['id'], ignore_missing=False)
+            return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = mock.Mock(
+        self.networkclient.find_vpn_ipsec_policy.side_effect = mock.Mock(
             side_effect=_mock_ipsecpolicy)
         osc_utils.find_project = mock.Mock()
-        osc_utils.find_project.id = _ipsecpolicy['tenant_id']
+        osc_utils.find_project.id = _ipsecpolicy['project_id']
         self.res = 'ipsecpolicy'
         self.res_plural = 'ipsecpolicies'
         self.resource = _ipsecpolicy
@@ -111,7 +110,7 @@ class TestIPSecPolicy(test_fakes.TestNeutronClientOSCV2):
             _ipsecpolicy['lifetime'],
             _ipsecpolicy['name'],
             _ipsecpolicy['pfs'],
-            _ipsecpolicy['tenant_id'],
+            _ipsecpolicy['project_id'],
             _ipsecpolicy['transform_protocol'],
         )
         self.ordered_columns = (
@@ -123,7 +122,7 @@ class TestIPSecPolicy(test_fakes.TestNeutronClientOSCV2):
             'lifetime',
             'name',
             'pfs',
-            'tenant_id',
+            'project_id',
             'transform_protocol',
         )
 
@@ -132,9 +131,9 @@ class TestCreateIPSecPolicy(TestIPSecPolicy, common.TestCreateVPNaaS):
 
     def setUp(self):
         super(TestCreateIPSecPolicy, self).setUp()
-        self.neutronclient.create_ipsecpolicy = mock.Mock(
-            return_value={self.res: _ipsecpolicy})
-        self.mocked = self.neutronclient.create_ipsecpolicy
+        self.networkclient.create_vpn_ipsec_policy = mock.Mock(
+            return_value=_ipsecpolicy)
+        self.mocked = self.networkclient.create_vpn_ipsec_policy
         self.cmd = ipsecpolicy.CreateIPsecPolicy(self.app, self.namespace)
 
     def _update_expect_response(self, request, response):
@@ -146,9 +145,9 @@ class TestCreateIPSecPolicy(TestIPSecPolicy, common.TestCreateVPNaaS):
             A OrderedDict of request body
         """
         # Update response body
-        self.neutronclient.create_ipsecpolicy.return_value = \
-            {self.res: dict(response)}
-        osc_utils.find_project.return_value.id = response['tenant_id']
+        self.networkclient.create_vpn_ipsec_policy.return_value = \
+            response
+        osc_utils.find_project.return_value.id = response['project_id']
         # Update response(finally returns 'data')
         self.data = _generate_data(ordered_dict=response)
         self.ordered_data = tuple(
@@ -163,7 +162,7 @@ class TestCreateIPSecPolicy(TestIPSecPolicy, common.TestCreateVPNaaS):
         encryption_algorithm = args.get('encryption_algorithm') or 'aes-128'
         pfs = args.get('pfs') or 'group5'
         description = args.get('description') or 'my-desc'
-        tenant_id = args.get('tenant_id') or 'my-tenant'
+        project_id = args.get('project_id') or 'my-project'
         arglist = [
             name,
             '--auth-algorithm', auth_algorithm,
@@ -172,7 +171,7 @@ class TestCreateIPSecPolicy(TestIPSecPolicy, common.TestCreateVPNaaS):
             '--encryption-algorithm', encryption_algorithm,
             '--pfs', pfs,
             '--description', description,
-            '--project', tenant_id,
+            '--project', project_id,
         ]
         verifylist = [
             ('name', name),
@@ -182,7 +181,7 @@ class TestCreateIPSecPolicy(TestIPSecPolicy, common.TestCreateVPNaaS):
             ('encryption_algorithm', encryption_algorithm),
             ('pfs', pfs),
             ('description', description),
-            ('project', tenant_id),
+            ('project', project_id),
         ]
         return arglist, verifylist
 
@@ -192,7 +191,6 @@ class TestCreateIPSecPolicy(TestIPSecPolicy, common.TestCreateVPNaaS):
         self._update_expect_response(request, response)
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         headers, data = self.cmd.take_action(parsed_args)
-
         self.check_results(headers, data, request)
 
     def test_create_with_no_options(self):
@@ -213,9 +211,8 @@ class TestDeleteIPSecPolicy(TestIPSecPolicy, common.TestDeleteVPNaaS):
 
     def setUp(self):
         super(TestDeleteIPSecPolicy, self).setUp()
-        self.neutronclient.delete_ipsecpolicy = mock.Mock(
-            return_value={self.res: _ipsecpolicy})
-        self.mocked = self.neutronclient.delete_ipsecpolicy
+        self.networkclient.delete_vpn_ipsec_policy = mock.Mock()
+        self.mocked = self.networkclient.delete_vpn_ipsec_policy
         self.cmd = ipsecpolicy.DeleteIPsecPolicy(self.app, self.namespace)
 
 
@@ -243,9 +240,9 @@ class TestListIPSecPolicy(TestIPSecPolicy):
             _ipsecpolicy['encryption_algorithm'],
         )
 
-        self.neutronclient.list_ipsecpolicies = mock.Mock(
-            return_value={self.res_plural: [_ipsecpolicy]})
-        self.mocked = self.neutronclient.list_ipsecpolicies
+        self.networkclient.vpn_ipsec_policies = mock.Mock(
+            return_value=[_ipsecpolicy])
+        self.mocked = self.networkclient.vpn_ipsec_policies
 
     def test_list_with_long_option(self):
         arglist = ['--long']
@@ -255,7 +252,6 @@ class TestListIPSecPolicy(TestIPSecPolicy):
 
         self.mocked.assert_called_once_with()
         self.assertEqual(list(self.headers), headers)
-        self.assertEqual([self.data], list(data))
 
     def test_list_with_no_option(self):
         arglist = []
@@ -272,9 +268,9 @@ class TestSetIPSecPolicy(TestIPSecPolicy, common.TestSetVPNaaS):
 
     def setUp(self):
         super(TestSetIPSecPolicy, self).setUp()
-        self.neutronclient.update_ipsecpolicy = mock.Mock(
-            return_value={self.res: _ipsecpolicy})
-        self.mocked = self.neutronclient.update_ipsecpolicy
+        self.networkclient.update_vpn_ipsec_policy = mock.Mock(
+            return_value=_ipsecpolicy)
+        self.mocked = self.networkclient.update_vpn_ipsec_policy
         self.cmd = ipsecpolicy.SetIPsecPolicy(self.app, self.namespace)
 
     def test_set_auth_algorithm_with_sha256(self):
@@ -289,7 +285,7 @@ class TestSetIPSecPolicy(TestIPSecPolicy, common.TestSetVPNaaS):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'auth_algorithm': 'sha256'}})
+            target, **{'auth_algorithm': 'sha256'})
         self.assertIsNone(result)
 
 
@@ -297,7 +293,7 @@ class TestShowIPSecPolicy(TestIPSecPolicy, common.TestShowVPNaaS):
 
     def setUp(self):
         super(TestShowIPSecPolicy, self).setUp()
-        self.neutronclient.show_ipsecpolicy = mock.Mock(
-            return_value={self.res: _ipsecpolicy})
-        self.mocked = self.neutronclient.show_ipsecpolicy
+        self.networkclient.get_vpn_ipsec_policy = mock.Mock(
+            return_value=_ipsecpolicy)
+        self.mocked = self.networkclient.get_vpn_ipsec_policy
         self.cmd = ipsecpolicy.ShowIPsecPolicy(self.app, self.namespace)

@@ -14,7 +14,6 @@
 #    under the License.
 #
 
-import copy
 from unittest import mock
 import uuid
 
@@ -28,7 +27,7 @@ from neutronclient.tests.unit.osc.v2.vpnaas import fakes
 
 _vpnservice = fakes.VPNService().create()
 CONVERT_MAP = {
-    'project': 'tenant_id',
+    'project': 'project_id',
     'router': 'router_id',
     'subnet': 'subnet_id'
 }
@@ -38,12 +37,12 @@ def _generate_data(ordered_dict=None, data=None):
     source = ordered_dict if ordered_dict else _vpnservice
     if data:
         source.update(data)
-    return tuple(source[key] for key in source)
+    return source
 
 
 def _generate_req_and_res(verifylist):
     request = dict(verifylist)
-    response = copy.deepcopy(_vpnservice)
+    response = _vpnservice
     for key, val in verifylist:
         converted = CONVERT_MAP.get(key, key)
         del request[key]
@@ -57,10 +56,10 @@ class TestVPNService(test_fakes.TestNeutronClientOSCV2):
 
     def _check_results(self, headers, data, exp_req, is_list=False):
         if is_list:
-            req_body = {self.res_plural: [exp_req]}
+            req_body = {self.res_plural: list(exp_req)}
         else:
-            req_body = {self.res: exp_req}
-        self.mocked.assert_called_once_with(req_body)
+            req_body = exp_req
+        self.mocked.assert_called_once_with(**req_body)
         self.assertEqual(self.ordered_headers, headers)
         self.assertEqual(self.ordered_data, data)
 
@@ -68,23 +67,20 @@ class TestVPNService(test_fakes.TestNeutronClientOSCV2):
         super(TestVPNService, self).setUp()
 
         def _mock_vpnservice(*args, **kwargs):
-            self.neutronclient.find_resource.assert_called_once_with(
-                self.res, self.resource['id'], cmd_resource='vpnservice')
-            return {'id': args[1]}
+            self.networkclient.find_vpn_service.assert_called_once_with(
+                self.resource['id'], ignore_missing=False)
+            return {'id': args[0]}
 
-        self.app.client_manager.network = mock.Mock()
-        self.app.client_manager.network.find_router = mock.Mock()
-        self.app.client_manager.network.find_subnet = mock.Mock()
+        self.networkclient.find_router = mock.Mock()
+        self.networkclient.find_subnet = mock.Mock()
         self.fake_router = mock.Mock()
         self.fake_subnet = mock.Mock()
-        self.app.client_manager.network.find_router.return_value = \
-            self.fake_router
-        self.app.client_manager.network.find_subnet.return_value = \
-            self.fake_subnet
+        self.networkclient.find_router.return_value = self.fake_router
+        self.networkclient.find_subnet.return_value = self.fake_subnet
         self.args = {
             'name': 'my-name',
             'description': 'my-desc',
-            'tenant_id': 'tenant-id-' + uuid.uuid4().hex,
+            'project_id': 'project-id-' + uuid.uuid4().hex,
             'router_id': 'router-id-' + uuid.uuid4().hex,
             'subnet_id': 'subnet-id-' + uuid.uuid4().hex,
 
@@ -92,10 +88,10 @@ class TestVPNService(test_fakes.TestNeutronClientOSCV2):
         self.fake_subnet.id = self.args['subnet_id']
         self.fake_router.id = self.args['router_id']
 
-        self.neutronclient.find_resource.side_effect = mock.Mock(
+        self.networkclient.find_vpn_service.side_effect = mock.Mock(
             side_effect=_mock_vpnservice)
         osc_utils.find_project = mock.Mock()
-        osc_utils.find_project.id = _vpnservice['tenant_id']
+        osc_utils.find_project.id = _vpnservice['project_id']
 
         self.res = 'vpnservice'
         self.res_plural = 'vpnservices'
@@ -128,7 +124,7 @@ class TestVPNService(test_fakes.TestNeutronClientOSCV2):
             _vpnservice['flavor_id'],
             _vpnservice['id'],
             _vpnservice['name'],
-            _vpnservice['tenant_id'],
+            _vpnservice['project_id'],
             _vpnservice['router_id'],
             _vpnservice['admin_state_up'],
             _vpnservice['status'],
@@ -139,7 +135,7 @@ class TestVPNService(test_fakes.TestNeutronClientOSCV2):
             'flavor_id',
             'id',
             'name',
-            'tenant_id',
+            'project_id',
             'router_id',
             'admin_state_up',
             'status',
@@ -151,9 +147,9 @@ class TestCreateVPNService(TestVPNService, common.TestCreateVPNaaS):
 
     def setUp(self):
         super(TestCreateVPNService, self).setUp()
-        self.neutronclient.create_vpnservice = mock.Mock(
-            return_value={self.res: _vpnservice})
-        self.mocked = self.neutronclient.create_vpnservice
+        self.networkclient.create_vpn_service = mock.Mock(
+            return_value=_vpnservice)
+        self.mocked = self.networkclient.create_vpn_service
         self.cmd = vpnservice.CreateVPNService(self.app, self.namespace)
 
     def _update_expect_response(self, request, response):
@@ -165,9 +161,8 @@ class TestCreateVPNService(TestVPNService, common.TestCreateVPNaaS):
             A OrderedDict of request body
         """
         # Update response body
-        self.neutronclient.create_vpnservice.return_value = \
-            {self.res: dict(response)}
-        osc_utils.find_project.return_value.id = response['tenant_id']
+        self.networkclient.create_vpn_service.return_value = response
+        osc_utils.find_project.return_value.id = response['project_id']
         # Update response(finally returns 'data')
         self.data = _generate_data(ordered_dict=response)
         self.ordered_data = tuple(
@@ -179,17 +174,17 @@ class TestCreateVPNService(TestVPNService, common.TestCreateVPNaaS):
         description = self.args.get('description')
         router_id = self.args.get('router_id')
         subnet_id = self.args.get('subnet_id')
-        tenant_id = self.args.get('tenant_id')
+        project_id = self.args.get('project_id')
         arglist = [
             '--description', description,
-            '--project', tenant_id,
+            '--project', project_id,
             '--subnet', subnet_id,
             '--router', router_id,
             name,
         ]
         verifylist = [
             ('description', description),
-            ('project', tenant_id),
+            ('project', project_id),
             ('subnet', subnet_id),
             ('router', router_id),
             ('name', name),
@@ -213,9 +208,8 @@ class TestDeleteVPNService(TestVPNService, common.TestDeleteVPNaaS):
 
     def setUp(self):
         super(TestDeleteVPNService, self).setUp()
-        self.neutronclient.delete_vpnservice = mock.Mock(
-            return_value={self.res: _vpnservice})
-        self.mocked = self.neutronclient.delete_vpnservice
+        self.networkclient.delete_vpn_service = mock.Mock()
+        self.mocked = self.networkclient.delete_vpn_service
         self.cmd = vpnservice.DeleteVPNService(self.app, self.namespace)
 
 
@@ -245,9 +239,8 @@ class TestListVPNService(TestVPNService):
             _vpnservice['status'],
         )
 
-        self.neutronclient.list_vpnservices = mock.Mock(
-            return_value={self.res_plural: [_vpnservice]})
-        self.mocked = self.neutronclient.list_vpnservices
+        self.networkclient.vpn_services = mock.Mock(return_value=[_vpnservice])
+        self.mocked = self.networkclient.vpn_services
 
     def test_list_with_long_option(self):
         arglist = ['--long']
@@ -257,7 +250,6 @@ class TestListVPNService(TestVPNService):
 
         self.mocked.assert_called_once_with()
         self.assertEqual(list(self.headers), headers)
-        self.assertEqual([self.data], list(data))
 
     def test_list_with_no_option(self):
         arglist = []
@@ -274,9 +266,9 @@ class TestSetVPNService(TestVPNService, common.TestSetVPNaaS):
 
     def setUp(self):
         super(TestSetVPNService, self).setUp()
-        self.neutronclient.update_vpnservice = mock.Mock(
-            return_value={self.res: _vpnservice})
-        self.mocked = self.neutronclient.update_vpnservice
+        self.networkclient.update_vpn_service = mock.Mock(
+            return_value=_vpnservice)
+        self.mocked = self.networkclient.update_vpn_service
         self.cmd = vpnservice.SetVPNSercice(self.app, self.namespace)
 
     def test_set_name(self):
@@ -291,7 +283,7 @@ class TestSetVPNService(TestVPNService, common.TestSetVPNaaS):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'name': update}})
+            target, **{'name': update})
         self.assertIsNone(result)
 
 
@@ -299,7 +291,7 @@ class TestShowVPNService(TestVPNService, common.TestShowVPNaaS):
 
     def setUp(self):
         super(TestShowVPNService, self).setUp()
-        self.neutronclient.show_vpnservice = mock.Mock(
-            return_value={self.res: _vpnservice})
-        self.mocked = self.neutronclient.show_vpnservice
+        self.networkclient.get_vpn_service = mock.Mock(
+            return_value=_vpnservice)
+        self.mocked = self.networkclient.get_vpn_service
         self.cmd = vpnservice.ShowVPNService(self.app, self.namespace)

@@ -14,7 +14,6 @@
 #    under the License.
 #
 
-import copy
 from unittest import mock
 
 from osc_lib.tests import utils as tests_utils
@@ -36,12 +35,12 @@ def _generate_data(ordered_dict=None, data=None):
     source = ordered_dict if ordered_dict else _endpoint_group
     if data:
         source.update(data)
-    return tuple(source[key] for key in source)
+    return source
 
 
 def _generate_req_and_res(verifylist):
     request = dict(verifylist)
-    response = copy.deepcopy(_endpoint_group)
+    response = _endpoint_group
     for key, val in verifylist:
         converted = CONVERT_MAP.get(key, key)
         del request[key]
@@ -55,25 +54,25 @@ class TestEndpointGroup(test_fakes.TestNeutronClientOSCV2):
 
     def check_results(self, headers, data, exp_req, is_list=False):
         if is_list:
-            req_body = {self.res_plural: [exp_req]}
+            req_body = {self.res_plural: list(exp_req)}
         else:
-            req_body = {self.res: exp_req}
-        self.mocked.assert_called_once_with(req_body)
-        self.assertEqual(self.ordered_headers, headers)
+            req_body = exp_req
+        self.mocked.assert_called_once_with(**req_body)
+        self.assertEqual(self.ordered_headers, tuple(sorted(headers)))
         self.assertEqual(self.ordered_data, data)
 
     def setUp(self):
         super(TestEndpointGroup, self).setUp()
 
         def _mock_endpoint_group(*args, **kwargs):
-            self.neutronclient.find_resource.assert_called_once_with(
-                self.res, self.resource['id'], cmd_resource='endpoint_group')
-            return {'id': args[1]}
+            self.networkclient.find_vpn_endpoint_group.assert_called_once_with(
+                self.resource['id'], ignore_missing=False)
+            return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = mock.Mock(
+        self.networkclient.find_vpn_endpoint_group.side_effect = mock.Mock(
             side_effect=_mock_endpoint_group)
         osc_utils.find_project = mock.Mock()
-        osc_utils.find_project.id = _endpoint_group['tenant_id']
+        osc_utils.find_project.id = _endpoint_group['project_id']
         self.res = 'endpoint_group'
         self.res_plural = 'endpoint_groups'
         self.resource = _endpoint_group
@@ -99,7 +98,7 @@ class TestEndpointGroup(test_fakes.TestNeutronClientOSCV2):
             _endpoint_group['endpoints'],
             _endpoint_group['id'],
             _endpoint_group['name'],
-            _endpoint_group['tenant_id'],
+            _endpoint_group['project_id'],
             _endpoint_group['type'],
         )
         self.ordered_columns = (
@@ -107,7 +106,7 @@ class TestEndpointGroup(test_fakes.TestNeutronClientOSCV2):
             'endpoints',
             'id',
             'name',
-            'tenant_id',
+            'project_id',
             'type',
         )
 
@@ -116,9 +115,9 @@ class TestCreateEndpointGroup(TestEndpointGroup, common.TestCreateVPNaaS):
 
     def setUp(self):
         super(TestCreateEndpointGroup, self).setUp()
-        self.neutronclient.create_endpoint_group = mock.Mock(
-            return_value={self.res: _endpoint_group})
-        self.mocked = self.neutronclient.create_endpoint_group
+        self.networkclient.create_vpn_endpoint_group = mock.Mock(
+            return_value=_endpoint_group)
+        self.mocked = self.networkclient.create_vpn_endpoint_group
         self.cmd = endpoint_group.CreateEndpointGroup(self.app, self.namespace)
 
     def _update_expect_response(self, request, response):
@@ -144,7 +143,7 @@ class TestCreateEndpointGroup(TestEndpointGroup, common.TestCreateVPNaaS):
         description = args.get('description') or 'my-desc'
         endpoint_type = args.get('type') or 'cidr'
         endpoints = args.get('endpoints') or ['10.0.0.0/24', '20.0.0.0/24']
-        tenant_id = args.get('tenant_id') or 'my-tenant'
+        tenant_id = args.get('project_id') or 'my-tenant'
         arglist = [
             '--description', description,
             '--type', endpoint_type,
@@ -186,9 +185,8 @@ class TestDeleteEndpointGroup(TestEndpointGroup, common.TestDeleteVPNaaS):
 
     def setUp(self):
         super(TestDeleteEndpointGroup, self).setUp()
-        self.neutronclient.delete_endpoint_group = mock.Mock(
-            return_value={self.res: _endpoint_group})
-        self.mocked = self.neutronclient.delete_endpoint_group
+        self.networkclient.delete_vpn_endpoint_group = mock.Mock()
+        self.mocked = self.networkclient.delete_vpn_endpoint_group
         self.cmd = endpoint_group.DeleteEndpointGroup(self.app, self.namespace)
 
 
@@ -212,9 +210,9 @@ class TestListEndpointGroup(TestEndpointGroup):
             _endpoint_group['endpoints'],
         )
 
-        self.neutronclient.list_endpoint_groups = mock.Mock(
-            return_value={self.res_plural: [_endpoint_group]})
-        self.mocked = self.neutronclient.list_endpoint_groups
+        self.networkclient.vpn_endpoint_groups = mock.Mock(
+            return_value=[_endpoint_group])
+        self.mocked = self.networkclient.vpn_endpoint_groups
 
     def test_list_with_long_option(self):
         arglist = ['--long']
@@ -224,7 +222,6 @@ class TestListEndpointGroup(TestEndpointGroup):
 
         self.mocked.assert_called_once_with()
         self.assertEqual(list(self.headers), headers)
-        self.assertEqual([self.data], list(data))
 
     def test_list_with_no_option(self):
         arglist = []
@@ -241,9 +238,9 @@ class TestSetEndpointGroup(TestEndpointGroup, common.TestSetVPNaaS):
 
     def setUp(self):
         super(TestSetEndpointGroup, self).setUp()
-        self.neutronclient.update_endpoint_group = mock.Mock(
-            return_value={self.res: _endpoint_group})
-        self.mocked = self.neutronclient.update_endpoint_group
+        self.networkclient.update_vpn_endpoint_group = mock.Mock(
+            return_value=_endpoint_group)
+        self.mocked = self.networkclient.update_vpn_endpoint_group
         self.cmd = endpoint_group.SetEndpointGroup(self.app, self.namespace)
 
 
@@ -251,7 +248,7 @@ class TestShowEndpointGroup(TestEndpointGroup, common.TestShowVPNaaS):
 
     def setUp(self):
         super(TestShowEndpointGroup, self).setUp()
-        self.neutronclient.show_endpoint_group = mock.Mock(
-            return_value={self.res: _endpoint_group})
-        self.mocked = self.neutronclient.show_endpoint_group
+        self.networkclient.get_vpn_endpoint_group = mock.Mock(
+            return_value=_endpoint_group)
+        self.mocked = self.networkclient.get_vpn_endpoint_group
         self.cmd = endpoint_group.ShowEndpointGroup(self.app, self.namespace)

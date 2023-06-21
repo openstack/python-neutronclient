@@ -41,14 +41,14 @@ _attr_map = (
     ('peer_address', 'Peer Address', column_util.LIST_BOTH),
     ('auth_mode', 'Authentication Algorithm', column_util.LIST_BOTH),
     ('status', 'Status', column_util.LIST_BOTH),
-    ('tenant_id', 'Project', column_util.LIST_LONG_ONLY),
+    ('project_id', 'Project', column_util.LIST_LONG_ONLY),
     ('peer_cidrs', 'Peer CIDRs', column_util.LIST_LONG_ONLY),
     ('vpnservice_id', 'VPN Service', column_util.LIST_LONG_ONLY),
     ('ipsecpolicy_id', 'IPSec Policy', column_util.LIST_LONG_ONLY),
     ('ikepolicy_id', 'IKE Policy', column_util.LIST_LONG_ONLY),
     ('mtu', 'MTU', column_util.LIST_LONG_ONLY),
     ('initiator', 'Initiator', column_util.LIST_LONG_ONLY),
-    ('admin_state_up', 'State', column_util.LIST_LONG_ONLY),
+    ('is_admin_state_up', 'State', column_util.LIST_LONG_ONLY),
     ('description', 'Description', column_util.LIST_LONG_ONLY),
     ('psk', 'Pre-shared Key', column_util.LIST_LONG_ONLY),
     ('route_mode', 'Route Mode', column_util.LIST_LONG_ONLY),
@@ -57,7 +57,32 @@ _attr_map = (
     ('local_ep_group_id', 'Local Endpoint Group ID',
      column_util.LIST_LONG_ONLY),
     ('peer_ep_group_id', 'Peer Endpoint Group ID', column_util.LIST_LONG_ONLY),
+    ('dpd', 'DPD', column_util.LIST_LONG_ONLY),
 )
+
+_attr_map_dict = {
+    'id': 'ID',
+    'name': 'Name',
+    'peer_address': 'Peer Address',
+    'auth_mode': 'Authentication Algorithm',
+    'status': 'Status',
+    'peer_cidrs': 'Peer CIDRs',
+    'vpnservice_id': 'VPN Service',
+    'ipsecpolicy_id': 'IPSec Policy',
+    'ikepolicy_id': 'IKE Policy',
+    'mtu': 'MTU',
+    'initiator': 'Initiator',
+    'is_admin_state_up': 'State',
+    'psk': 'Pre-shared Key',
+    'route_mode': 'Route Mode',
+    'local_id': 'Local ID',
+    'peer_id': 'Peer ID',
+    'local_ep_group_id': 'Local Endpoint Group ID',
+    'peer_ep_group_id': 'Peer Endpoint Group ID',
+    'description': 'Description',
+    'project_id': 'Project',
+    'dpd': 'DPD',
+}
 
 
 def _convert_to_lowercase(string):
@@ -122,7 +147,7 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
     attrs = {}
     if is_create:
         if 'project' in parsed_args and parsed_args.project is not None:
-            attrs['tenant_id'] = osc_utils.find_project(
+            attrs['project_id'] = osc_utils.find_project(
                 client_manager.identity,
                 parsed_args.project,
                 parsed_args.project_domain,
@@ -141,16 +166,12 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
         vpn_utils.validate_dpd_dict(parsed_args.dpd)
         attrs['dpd'] = parsed_args.dpd
     if parsed_args.local_endpoint_group:
-        _local_epg = client_manager.neutronclient.find_resource(
-            'endpoint_group',
-            parsed_args.local_endpoint_group,
-            cmd_resource='endpoint_group')['id']
+        _local_epg = client_manager.network.find_vpn_endpoint_group(
+            parsed_args.local_endpoint_group)['id']
         attrs['local_ep_group_id'] = _local_epg
     if parsed_args.peer_endpoint_group:
-        _peer_epg = client_manager.neutronclient.find_resource(
-            'endpoint_group',
-            parsed_args.peer_endpoint_group,
-            cmd_resource='endpoint_group')['id']
+        _peer_epg = client_manager.network.find_vpn_endpoint_group(
+            parsed_args.peer_endpoint_group)['id']
         attrs['peer_ep_group_id'] = _peer_epg
     if parsed_args.peer_cidrs:
         attrs['peer_cidrs'] = parsed_args.peer_cidrs
@@ -203,25 +224,19 @@ class CreateIPsecSiteConnection(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         if parsed_args.vpnservice:
-            _vpnservice_id = client.find_resource(
-                'vpnservice',
-                parsed_args.vpnservice,
-                cmd_resource='vpnservice')['id']
+            _vpnservice_id = client.find_vpn_service(
+                parsed_args.vpnservice, ignore_missing=False)['id']
             attrs['vpnservice_id'] = _vpnservice_id
         if parsed_args.ikepolicy:
-            _ikepolicy_id = client.find_resource(
-                'ikepolicy',
-                parsed_args.ikepolicy,
-                cmd_resource='ikepolicy')['id']
+            _ikepolicy_id = client.find_vpn_ike_policy(
+                parsed_args.ikepolicy, ignore_missing=False)['id']
             attrs['ikepolicy_id'] = _ikepolicy_id
         if parsed_args.ipsecpolicy:
-            _ipsecpolicy_id = client.find_resource(
-                'ipsecpolicy',
-                parsed_args.ipsecpolicy,
-                cmd_resource='ipsecpolicy')['id']
+            _ipsecpolicy_id = client.find_vpn_ipsec_policy(
+                parsed_args.ipsecpolicy, ignore_missing=False)['id']
             attrs['ipsecpolicy_id'] = _ipsecpolicy_id
         if parsed_args.peer_id:
             attrs['peer_id'] = parsed_args.peer_id
@@ -239,9 +254,10 @@ class CreateIPsecSiteConnection(command.ShowOne):
         if not parsed_args.peer_cidrs and not parsed_args.local_endpoint_group:
             message = _("You must specify endpoint groups or peer CIDR(s)")
             raise exceptions.CommandError(message)
-        obj = client.create_ipsec_site_connection(
-            {'ipsec_site_connection': attrs})['ipsec_site_connection']
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        obj = client.create_vpn_ipsec_site_connection(**attrs)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id', 'action',
+                                  'timeout', 'interval'])
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
         return display_columns, data
 
@@ -259,15 +275,13 @@ class DeleteIPsecSiteConnection(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         result = 0
         for ipsec_conn in parsed_args.ipsec_site_connection:
             try:
-                ipsec_con_id = client.find_resource(
-                    'ipsec_site_connection',
-                    ipsec_conn,
-                    cmd_resource='ipsec_site_connection')['id']
-                client.delete_ipsec_site_connection(ipsec_con_id)
+                ipsec_con_id = client.find_vpn_ipsec_site_connection(
+                    ipsec_conn, ignore_missing=False)['id']
+                client.delete_vpn_ipsec_site_connection(ipsec_con_id)
             except Exception as e:
                 result += 1
                 LOG.error(_("Failed to delete IPsec site connection with "
@@ -296,8 +310,8 @@ class ListIPsecSiteConnection(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        obj = client.list_ipsec_site_connections()['ipsec_site_connections']
+        client = self.app.client_manager.network
+        obj = client.vpn_ipsec_site_connections()
         headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(
@@ -328,7 +342,7 @@ class SetIPsecSiteConnection(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager,
                                   parsed_args, is_create=False)
         if parsed_args.peer_id:
@@ -337,13 +351,10 @@ class SetIPsecSiteConnection(command.Command):
             attrs['peer_address'] = parsed_args.peer_address
         if parsed_args.name:
             attrs['name'] = parsed_args.name
-        ipsec_conn_id = client.find_resource(
-            'ipsec_site_connection', parsed_args.ipsec_site_connection,
-            cmd_resource='ipsec_site_connection')['id']
+        ipsec_conn_id = client.find_vpn_ipsec_site_connection(
+            parsed_args.ipsec_site_connection, ignore_missing=False)['id']
         try:
-            client.update_ipsec_site_connection(
-                ipsec_conn_id,
-                {'ipsec_site_connection': attrs})
+            client.update_vpn_ipsec_site_connection(ipsec_conn_id, **attrs)
         except Exception as e:
             msg = (_("Failed to set IPsec site "
                      "connection '%(ipsec_conn)s': %(e)s")
@@ -363,12 +374,12 @@ class ShowIPsecSiteConnection(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        ipsec_site_id = client.find_resource(
-            'ipsec_site_connection', parsed_args.ipsec_site_connection,
-            cmd_resource='ipsec_site_connection')['id']
-        obj = client.show_ipsec_site_connection(
-            ipsec_site_id)['ipsec_site_connection']
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        client = self.app.client_manager.network
+        ipsec_site_id = client.find_vpn_ipsec_site_connection(
+            parsed_args.ipsec_site_connection, ignore_missing=False)['id']
+        obj = client.get_vpn_ipsec_site_connection(ipsec_site_id)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id', 'action',
+                                  'timeout', 'interval'])
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
         return (display_columns, data)
