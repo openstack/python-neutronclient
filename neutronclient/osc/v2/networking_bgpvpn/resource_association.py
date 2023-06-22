@@ -24,6 +24,7 @@ from osc_lib.utils import columns as column_util
 
 from neutronclient._i18n import _
 from neutronclient.osc import utils as nc_osc_utils
+from neutronclient.osc.v2.networking_bgpvpn import constants
 
 LOG = logging.getLogger(__name__)
 
@@ -56,8 +57,6 @@ class CreateBgpvpnResAssoc(command.ShowOne):
 
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
-        create_method = getattr(
-            client, 'create_bgpvpn_%s_association' % self._assoc_res_name)
         bgpvpn = client.find_bgpvpn(parsed_args.bgpvpn)
         find_res_method = getattr(
             client, 'find_%s' % self._assoc_res_name)
@@ -76,7 +75,14 @@ class CreateBgpvpnResAssoc(command.ShowOne):
             body.update(
                 arg2body(bgpvpn['id'], parsed_args))
 
-        obj = create_method(bgpvpn['id'], **body)
+        if self._assoc_res_name == constants.NETWORK_ASSOC:
+            obj = client.create_bgpvpn_network_association(
+                bgpvpn['id'], **body)
+        elif self._assoc_res_name == constants.PORT_ASSOCS:
+            obj = client.create_bgpvpn_port_association(bgpvpn['id'], **body)
+        else:
+            obj = client.create_bgpvpn_router_association(
+                bgpvpn['id'], **body)
         transform = getattr(self, '_transform_resource', None)
         if callable(transform):
             transform(obj)
@@ -113,14 +119,19 @@ class SetBgpvpnResAssoc(command.Command):
 
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
-        update_method = getattr(
-            client, 'update_bgpvpn_%s_association' % self._assoc_res_name)
         bgpvpn = client.find_bgpvpn(parsed_args.bgpvpn)
         arg2body = getattr(self, '_args2body', None)
         if callable(arg2body):
             body = arg2body(bgpvpn['id'], parsed_args)
-            update_method(bgpvpn['id'], parsed_args.resource_association_id,
-                          **body)
+            if self._assoc_res_name == constants.NETWORK_ASSOC:
+                client.update_bgpvpn_network_association(
+                    bgpvpn['id'], parsed_args.resource_association_id, **body)
+            elif self._assoc_res_name == constants.PORT_ASSOCS:
+                client.update_bgpvpn_port_association(
+                    bgpvpn['id'], parsed_args.resource_association_id, **body)
+            else:
+                client.update_bgpvpn_router_association(
+                    bgpvpn['id'], parsed_args.resource_association_id, **body)
 
 
 class UnsetBgpvpnResAssoc(SetBgpvpnResAssoc):
@@ -150,13 +161,16 @@ class DeleteBgpvpnResAssoc(command.Command):
 
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
-        delete_method = getattr(
-            client, 'delete_bgpvpn_%s_association' % self._assoc_res_name)
         bgpvpn = client.find_bgpvpn(parsed_args.bgpvpn)
         fails = 0
         for id in parsed_args.resource_association_ids:
             try:
-                delete_method(bgpvpn['id'], id)
+                if self._assoc_res_name == constants.NETWORK_ASSOC:
+                    client.delete_bgpvpn_network_association(bgpvpn['id'], id)
+                elif self._assoc_res_name == constants.PORT_ASSOCS:
+                    client.delete_bgpvpn_port_association(bgpvpn['id'], id)
+                else:
+                    client.delete_bgpvpn_router_association(bgpvpn['id'], id)
                 LOG.warning(
                     "%(assoc_res_name)s association %(id)s deleted",
                     {'assoc_res_name': self._assoc_res_name.capitalize(),
@@ -203,14 +217,19 @@ class ListBgpvpnResAssoc(command.Lister):
 
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
-        list_method = getattr(client,
-                              'bgpvpn_%s_associations' % self._assoc_res_name)
         bgpvpn = client.find_bgpvpn(parsed_args.bgpvpn)
         params = {}
         if parsed_args.property:
             params.update(parsed_args.property)
-        objs = list_method(bgpvpn['id'],
-                           retrieve_all=True, **params)
+        if self._assoc_res_name == constants.NETWORK_ASSOC:
+            objs = client.bgpvpn_network_associations(
+                bgpvpn['id'], retrieve_all=True, **params)
+        elif self._assoc_res_name == constants.PORT_ASSOCS:
+            objs = client.bgpvpn_port_associations(
+                bgpvpn['id'], retrieve_all=True, **params)
+        else:
+            objs = client.bgpvpn_router_associations(
+                bgpvpn['id'], retrieve_all=True, **params)
         transform = getattr(self, '_transform_resource', None)
         transformed_objs = []
         if callable(transform):
@@ -245,11 +264,16 @@ class ShowBgpvpnResAssoc(command.ShowOne):
 
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
-        show_method = getattr(
-            client, 'get_bgpvpn_%s_association' % self._assoc_res_name)
         bgpvpn = client.find_bgpvpn(parsed_args.bgpvpn)
-        obj = show_method(bgpvpn['id'],
-                          parsed_args.resource_association_id)
+        if self._assoc_res_name == constants.NETWORK_ASSOC:
+            obj = client.get_bgpvpn_network_association(
+                bgpvpn['id'], parsed_args.resource_association_id)
+        elif self._assoc_res_name == constants.PORT_ASSOCS:
+            obj = client.get_bgpvpn_port_association(
+                bgpvpn['id'], parsed_args.resource_association_id)
+        else:
+            obj = client.get_bgpvpn_router_association(
+                bgpvpn['id'], parsed_args.resource_association_id)
         transform = getattr(self, '_transform_resource', None)
         if callable(transform):
             transform(obj)
