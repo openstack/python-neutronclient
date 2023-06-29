@@ -14,12 +14,17 @@
 #   under the License.
 
 import argparse
-import copy
 from unittest import mock
 
 
 from osc_lib.tests import utils
 from oslo_utils import uuidutils
+
+from openstack.network.v2 import sfc_flow_classifier as flow_classifier
+from openstack.network.v2 import sfc_port_chain as port_chain
+from openstack.network.v2 import sfc_port_pair as port_pair
+from openstack.network.v2 import sfc_port_pair_group as port_pair_group
+from openstack.network.v2 import sfc_service_graph as service_graph
 
 
 class TestNeutronClientOSCV2(utils.TestCommand):
@@ -28,12 +33,32 @@ class TestNeutronClientOSCV2(utils.TestCommand):
         super(TestNeutronClientOSCV2, self).setUp()
         self.namespace = argparse.Namespace()
         self.app.client_manager.session = mock.Mock()
-        self.app.client_manager.neutronclient = mock.Mock()
-        self.neutronclient = self.app.client_manager.neutronclient
-        self.neutronclient.find_resource = mock.Mock(
-            side_effect=lambda resource, name_or_id, project_id=None,
-            cmd_resource=None, parent_id=None, fields=None:
-            {'id': name_or_id})
+        self.app.client_manager.network = mock.Mock()
+        self.network = self.app.client_manager.network
+        self.network.find_sfc_flow_classifier = mock.Mock(
+            side_effect=lambda name_or_id, ignore_missing=False:
+            {'id': name_or_id}
+        )
+        self.network.find_sfc_port_chain = mock.Mock(
+            side_effect=lambda name_or_id, ignore_missing=False:
+            {'id': name_or_id}
+        )
+        self.network.find_sfc_port_pair = mock.Mock(
+            side_effect=lambda name_or_id, ignore_missing=False:
+            {'id': name_or_id}
+        )
+        self.network.find_sfc_port_pair_group = mock.Mock(
+            side_effect=lambda name_or_id, ignore_missing=False:
+            {'id': name_or_id}
+        )
+        self.network.find_sfc_service_graph = mock.Mock(
+            side_effect=lambda name_or_id, ignore_missing=False:
+            {'id': name_or_id}
+        )
+        self.network.find_port = mock.Mock(
+            side_effect=lambda name_or_id, ignore_missing=False:
+            {'id': name_or_id}
+        )
 
 
 class FakeSfcPortPair(object):
@@ -58,13 +83,14 @@ class FakeSfcPortPair(object):
             'id': uuidutils.generate_uuid(),
             'ingress': uuidutils.generate_uuid(),
             'name': 'port-pair-name',
-            'service_function_parameters': 'correlation=None,weight=1',
+            'service_function_parameters': [('correlation', None),
+                                            ('weight', 1)],
             'project_id': uuidutils.generate_uuid(),
         }
 
         # Overwrite default attributes.
         port_pair_attrs.update(attrs)
-        return copy.deepcopy(port_pair_attrs)
+        return port_pair.SfcPortPair(**port_pair_attrs)
 
     @staticmethod
     def create_port_pairs(attrs=None, count=1):
@@ -102,18 +128,16 @@ class FakeSfcPortPairGroup(object):
         # Set default attributes.
         port_pair_group_attrs = {
             'id': uuidutils.generate_uuid(),
-            'group_id': uuidutils.generate_uuid(),
             'name': 'port-pair-group-name',
             'description': 'description',
             'port_pairs': uuidutils.generate_uuid(),
-            'port_pair_group_parameters': '{"lb_fields": []}',
+            'port_pair_group_parameters': {"lb_fields": []},
             'project_id': uuidutils.generate_uuid(),
             'tap_enabled': False
         }
 
-        # port_pair_group_attrs default attributes.
         port_pair_group_attrs.update(attrs)
-        return copy.deepcopy(port_pair_group_attrs)
+        return port_pair_group.SfcPortPairGroup(**port_pair_group_attrs)
 
     @staticmethod
     def create_port_pair_groups(attrs=None, count=1):
@@ -164,10 +188,10 @@ class FakeSfcFlowClassifier(object):
             'source_port_range_max': '20',
             'source_port_range_min': '10',
             'project_id': uuidutils.generate_uuid(),
-            'l7_parameters': '{}'
+            'l7_parameters': {}
         }
         flow_classifier_attrs.update(attrs)
-        return copy.deepcopy(flow_classifier_attrs)
+        return flow_classifier.SfcFlowClassifier(**flow_classifier_attrs)
 
     @staticmethod
     def create_flow_classifiers(attrs=None, count=1):
@@ -205,18 +229,16 @@ class FakeSfcPortChain(object):
         # Set default attributes.
         port_chain_attrs = {
             'id': uuidutils.generate_uuid(),
-            'chain_id': uuidutils.generate_uuid(),
             'name': 'port-chain-name',
             'description': 'description',
             'port_pair_groups': uuidutils.generate_uuid(),
             'flow_classifiers': uuidutils.generate_uuid(),
-            'chain_parameters': '{"correlation": mpls}',
+            'chain_parameters': {"correlation": "mpls", "symmetric": False},
             'project_id': uuidutils.generate_uuid(),
         }
 
-        # port_pair_group_attrs default attributes.
         port_chain_attrs.update(attrs)
-        return copy.deepcopy(port_chain_attrs)
+        return port_chain.SfcPortChain(**port_chain_attrs)
 
     @staticmethod
     def create_port_chains(attrs=None, count=1):
@@ -260,7 +282,7 @@ class FakeSfcServiceGraph(object):
         }
 
         service_graph_attrs.update(attrs)
-        return copy.deepcopy(service_graph_attrs)
+        return service_graph.SfcServiceGraph(**service_graph_attrs)
 
     @staticmethod
     def create_sfc_service_graphs(attrs=None, count=1):

@@ -36,9 +36,19 @@ _attr_map = (
     ('chain_parameters', 'Chain Parameters',
      column_util.LIST_BOTH),
     ('description', 'Description', column_util.LIST_LONG_ONLY),
-    ('chain_id', 'Chain ID',  column_util.LIST_BOTH),
     ('project_id', 'Project', column_util.LIST_LONG_ONLY),
 )
+
+_attr_map_dict = {
+    'id': 'ID',
+    'name': 'Name',
+    'port_pair_groups': 'Port Pair Groups',
+    'flow_classifiers': 'Flow Classifiers',
+    'chain_parameters': 'Chain Parameters',
+    'description': 'Description',
+    'tenant_id': 'Project',
+    'project_id': 'Project',
+}
 
 
 class CreateSfcPortChain(command.ShowOne):
@@ -81,11 +91,11 @@ class CreateSfcPortChain(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
-        body = {resource: attrs}
-        obj = client.create_sfc_port_chain(body)[resource]
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        obj = client.create_sfc_port_chain(**attrs)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -98,20 +108,28 @@ class DeleteSfcPortChain(command.Command):
         parser.add_argument(
             'port_chain',
             metavar="<port-chain>",
-            help=_("Port chain to delete (name or ID)")
+            nargs='+',
+            help=_("Port chain(s) to delete (name or ID)")
         )
         return parser
 
     def take_action(self, parsed_args):
-        # TODO(mohan): Add support for deleting multiple resources.
-        client = self.app.client_manager.neutronclient
-        pc_id = _get_id(client, parsed_args.port_chain, resource)
-        try:
-            client.delete_sfc_port_chain(pc_id)
-        except Exception as e:
-            msg = (_("Failed to delete port chain with name "
-                     "or ID '%(pc)s': %(e)s")
-                   % {'pc': parsed_args.port_chain, 'e': e})
+        client = self.app.client_manager.network
+        result = 0
+        for pc in parsed_args.port_chain:
+            try:
+                pc_id = client.find_sfc_port_chain(
+                    pc, ignore_missing=False)['id']
+                client.delete_sfc_port_chain(pc_id)
+            except Exception as e:
+                result += 1
+                LOG.error(_("Failed to delete port chain with name "
+                            "or ID '%(pc)s': %(e)s"), {'pc': pc, 'e': e})
+        if result > 0:
+            total = len(parsed_args.port_chain)
+            msg = (_("%(result)s of %(total)s port chain(s) "
+                     "failed to delete.") % {'result': result,
+                                             'total': total})
             raise exceptions.CommandError(msg)
 
 
@@ -129,13 +147,13 @@ class ListSfcPortChain(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        data = client.list_sfc_port_chains()
+        client = self.app.client_manager.network
+        data = client.sfc_port_chains()
         headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers,
                 (utils.get_dict_properties(s, columns)
-                 for s in data['port_chains']))
+                 for s in data))
 
 
 class SetSfcPortChain(command.Command):
@@ -184,8 +202,9 @@ class SetSfcPortChain(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        pc_id = _get_id(client, parsed_args.port_chain, resource)
+        client = self.app.client_manager.network
+        pc_id = client.find_sfc_port_chain(parsed_args.port_chain,
+                                           ignore_missing=False)['id']
         attrs = _get_common_attrs(self.app.client_manager, parsed_args,
                                   is_create=False)
         if parsed_args.no_flow_classifier:
@@ -194,13 +213,14 @@ class SetSfcPortChain(command.Command):
             if parsed_args.no_flow_classifier:
                 fc_list = []
             else:
-                fc_list = client.find_resource(
-                    resource, parsed_args.port_chain,
-                    cmd_resource='sfc_port_chain')['flow_classifiers']
+                fc_list = client.find_sfc_port_chain(
+                    parsed_args.port_chain,
+                    ignore_missing=False
+                )['flow_classifiers']
             for fc in parsed_args.flow_classifiers:
-                fc_id = client.find_resource(
-                    'flow_classifier', fc,
-                    cmd_resource='sfc_flow_classifier')['id']
+                fc_id = client.find_sfc_flow_classifier(
+                    fc,
+                    ignore_missing=False)['id']
                 if fc_id not in fc_list:
                     fc_list.append(fc_id)
             attrs['flow_classifiers'] = fc_list
@@ -211,27 +231,25 @@ class SetSfcPortChain(command.Command):
         if parsed_args.no_port_pair_group and parsed_args.port_pair_groups:
             ppg_list = []
             for ppg in parsed_args.port_pair_groups:
-                ppg_id = client.find_resource(
-                    'port_pair_group', ppg,
-                    cmd_resource='sfc_port_pair_group')['id']
+                ppg_id = client.find_sfc_port_pair_group(
+                    ppg, ignore_missing=False)['id']
                 if ppg_id not in ppg_list:
                     ppg_list.append(ppg_id)
             attrs['port_pair_groups'] = ppg_list
         if (parsed_args.port_pair_groups and
                 not parsed_args.no_port_pair_group):
-            ppg_list = client.find_resource(
-                resource, parsed_args.port_chain,
-                cmd_resource='sfc_port_chain')['port_pair_groups']
+            ppg_list = client.find_sfc_port_chain(
+                parsed_args.port_chain,
+                ignore_missing=False
+            )['port_pair_groups']
             for ppg in parsed_args.port_pair_groups:
-                ppg_id = client.find_resource(
-                    'port_pair_group', ppg,
-                    cmd_resource='sfc_port_pair_group')['id']
+                ppg_id = client.find_sfc_port_pair_group(
+                    ppg, ignore_missing=False)['id']
                 if ppg_id not in ppg_list:
                     ppg_list.append(ppg_id)
             attrs['port_pair_groups'] = ppg_list
-        body = {resource: attrs}
         try:
-            client.update_sfc_port_chain(pc_id, body)
+            client.update_sfc_port_chain(pc_id, **attrs)
         except Exception as e:
             msg = (_("Failed to update port chain '%(pc)s': %(e)s")
                    % {'pc': parsed_args.port_chain, 'e': e})
@@ -251,10 +269,12 @@ class ShowSfcPortChain(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        pc_id = _get_id(client, parsed_args.port_chain, resource)
-        obj = client.show_sfc_port_chain(pc_id)[resource]
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        client = self.app.client_manager.network
+        pc_id = client.find_sfc_port_chain(parsed_args.port_chain,
+                                           ignore_missing=False)['id']
+        obj = client.get_sfc_port_chain(pc_id)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -290,30 +310,31 @@ class UnsetSfcPortChain(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        pc_id = _get_id(client, parsed_args.port_chain, resource)
+        client = self.app.client_manager.network
+        pc_id = client.find_sfc_port_chain(parsed_args.port_chain,
+                                           ignore_missing=False)['id']
         attrs = {}
         if parsed_args.flow_classifiers:
-            fc_list = client.find_resource(
-                resource, parsed_args.port_chain,
-                cmd_resource='sfc_port_chain')['flow_classifiers']
+            fc_list = client.find_sfc_port_chain(
+                parsed_args.port_chain, ignore_missing=False
+            )['flow_classifiers']
             for fc in parsed_args.flow_classifiers:
-                fc_id = client.find_resource(
-                    'flow_classifier', fc,
-                    cmd_resource='sfc_flow_classifier')['id']
+                fc_id = client.find_sfc_flow_classifier(
+                    fc,
+                    ignore_missing=False)['id']
                 if fc_id in fc_list:
                     fc_list.remove(fc_id)
             attrs['flow_classifiers'] = fc_list
         if parsed_args.all_flow_classifier:
             attrs['flow_classifiers'] = []
         if parsed_args.port_pair_groups:
-            ppg_list = client.find_resource(
-                resource, parsed_args.port_chain,
-                cmd_resource='sfc_port_chain')['port_pair_groups']
+            ppg_list = client.find_sfc_port_chain(
+                parsed_args.port_chain,
+                ignore_missing=False)['port_pair_groups']
             for ppg in parsed_args.port_pair_groups:
-                ppg_id = client.find_resource(
-                    'port_pair_group', ppg,
-                    cmd_resource='sfc_port_pair_group')['id']
+                ppg_id = client.find_sfc_port_pair_group(
+                    ppg,
+                    ignore_missing=False)['id']
                 if ppg_id in ppg_list:
                     ppg_list.remove(ppg_id)
             if ppg_list == []:
@@ -321,9 +342,8 @@ class UnsetSfcPortChain(command.Command):
                             ' specified.')
                 raise exceptions.CommandError(message)
             attrs['port_pair_groups'] = ppg_list
-        body = {resource: attrs}
         try:
-            client.update_sfc_port_chain(pc_id, body)
+            client.update_sfc_port_chain(pc_id, **attrs)
         except Exception as e:
             msg = (_("Failed to unset port chain '%(pc)s': %(e)s")
                    % {'pc': parsed_args.port_chain, 'e': e})
@@ -332,17 +352,18 @@ class UnsetSfcPortChain(command.Command):
 
 def _get_common_attrs(client_manager, parsed_args, is_create=True):
     attrs = {}
+    client = client_manager.network
     if parsed_args.name is not None:
         attrs['name'] = parsed_args.name
     if parsed_args.description is not None:
         attrs['description'] = parsed_args.description
     if parsed_args.port_pair_groups:
-        attrs['port_pair_groups'] = [(_get_id(client_manager.neutronclient,
-                                              ppg, 'port_pair_group'))
+        attrs['port_pair_groups'] = [client.find_sfc_port_pair_group(
+            ppg, ignore_missing=False)['id']
                                      for ppg in parsed_args.port_pair_groups]
     if parsed_args.flow_classifiers:
-        attrs['flow_classifiers'] = [(_get_id(client_manager.neutronclient, fc,
-                                      'flow_classifier'))
+        attrs['flow_classifiers'] = [client.find_sfc_flow_classifier(
+            fc, ignore_missing=False)['id']
                                      for fc in parsed_args.flow_classifiers]
     if is_create is True:
         _get_attrs(attrs, parsed_args)
@@ -358,7 +379,3 @@ def _get_attrs(attrs, parsed_args):
             if 'symmetric' in chain_param:
                 chain_params['symmetric'] = chain_param['symmetric']
         attrs['chain_parameters'] = chain_params
-
-
-def _get_id(client, id_or_name, resource):
-    return client.find_resource(resource, id_or_name)['id']

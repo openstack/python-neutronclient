@@ -33,6 +33,15 @@ _attr_map = (
     ('project_id', 'Project', column_util.LIST_LONG_ONLY),
 )
 
+_attr_map_dict = {
+    'id': 'ID',
+    'name': 'Name',
+    'description': 'Description',
+    'port_chains': 'Branching Points',
+    'tenant_id': 'Project',
+    'project_id': 'Project',
+}
+
 
 class CreateSfcServiceGraph(command.ShowOne):
     """Create a service graph."""
@@ -57,12 +66,13 @@ class CreateSfcServiceGraph(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
         try:
-            body = {resource: attrs}
-            obj = client.create_sfc_service_graph(body)[resource]
-            columns, display_columns = column_util.get_columns(obj, _attr_map)
+            obj = client.create_sfc_service_graph(**attrs)
+            display_columns, columns = \
+                utils.get_osc_show_columns_for_sdk_resource(
+                    obj, _attr_map_dict, ['location', 'tenant_id'])
             data = utils.get_dict_properties(obj, columns)
             return display_columns, data
         except Exception as e:
@@ -92,13 +102,13 @@ class SetSfcServiceGraph(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        service_graph_id = _get_id(client, parsed_args.service_graph, resource)
+        client = self.app.client_manager.network
+        service_graph_id = client.find_sfc_service_graph(
+            parsed_args.service_graph, ignore_missing=False)['id']
         attrs = _get_common_attrs(self.app.client_manager, parsed_args,
                                   is_create=False)
-        body = {resource: attrs}
         try:
-            client.update_sfc_service_graph(service_graph_id, body)
+            client.update_sfc_service_graph(service_graph_id, **attrs)
         except Exception as e:
             msg = (_("Failed to update service graph "
                      "'%(service_graph)s': %(e)s")
@@ -114,14 +124,30 @@ class DeleteSfcServiceGraph(command.Command):
         parser.add_argument(
             'service_graph',
             metavar="<service-graph>",
-            help=_("ID or name of the service graph to delete.")
+            nargs='+',
+            help=_("ID or name of the service graph(s) to delete.")
         )
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        id = _get_id(client, parsed_args.service_graph, resource)
-        client.delete_sfc_service_graph(id)
+        client = self.app.client_manager.network
+        result = 0
+        for sg in parsed_args.service_graph:
+            try:
+                sg_id = client.find_sfc_service_graph(
+                    sg, ignore_missing=False)['id']
+                client.delete_sfc_service_graph(sg_id)
+            except Exception as e:
+                result += 1
+                LOG.error(_("Failed to delete service graph with name "
+                            "or ID '%(sg)s': %(e)s"),
+                          {'sg': sg, 'e': e})
+        if result > 0:
+            total = len(parsed_args.service_graph)
+            msg = (_("%(result)s of %(total)s service graph(s) "
+                     "failed to delete.") % {'result': result,
+                                             'total': total})
+            raise exceptions.CommandError(msg)
 
 
 class ListSfcServiceGraph(command.Lister):
@@ -138,13 +164,13 @@ class ListSfcServiceGraph(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        data = client.list_sfc_service_graphs()
+        client = self.app.client_manager.network
+        data = client.sfc_service_graphs()
         headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers,
                 (utils.get_dict_properties(s, columns)
-                 for s in data['service_graphs']))
+                 for s in data))
 
 
 class ShowSfcServiceGraph(command.ShowOne):
@@ -160,10 +186,12 @@ class ShowSfcServiceGraph(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        sg_id = _get_id(client, parsed_args.service_graph, resource)
-        obj = client.show_sfc_service_graph(sg_id)[resource]
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        client = self.app.client_manager.network
+        sg_id = client.find_sfc_service_graph(parsed_args.service_graph,
+                                              ignore_missing=False)['id']
+        obj = client.get_sfc_service_graph(sg_id)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -179,10 +207,10 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
     return attrs
 
 
-def _validate_destination_chains(comma_split, attrs, client_manager, sc_):
+def _validate_destination_chains(comma_split, attrs, client, sc_):
     for e in comma_split:
         if e != "":
-            dc_ = _get_id(client_manager.neutronclient, e, 'port_chain')
+            dc_ = client.find_sfc_port_chain(e, ignore_missing=False)['id']
             attrs['port_chains'][sc_].append(dc_)
             if _check_cycle(attrs['port_chains'], sc_, dc_):
                 raise(exceptions.CommandError(
@@ -214,6 +242,7 @@ def _visit(graph, src, new_dest, new_src):
 
 
 def _get_attrs_for_create(client_manager, attrs, parsed_args):
+    client = client_manager.network
     if parsed_args.branching_points:
         attrs['port_chains'] = {}
         src_chain = None
@@ -224,8 +253,8 @@ def _get_attrs_for_create(client_manager, attrs, parsed_args):
                     "destination chain for each source chain.")
             colon_split = c.split(':')
             src_chain = colon_split.pop(0)
-            sc_ = _get_id(client_manager.neutronclient,
-                          src_chain, 'port_chain')
+            sc_ = client.find_sfc_port_chain(src_chain,
+                                             ignore_missing=False)['id']
             for i in colon_split:
                 comma_split = i.split(',')
                 unique = set(comma_split)
@@ -240,8 +269,4 @@ def _get_attrs_for_create(client_manager, attrs, parsed_args):
                         "use already ".format(src_chain))
                 attrs['port_chains'][sc_] = []
                 _validate_destination_chains(
-                    comma_split, attrs, client_manager, sc_)
-
-
-def _get_id(client, id_or_name, resource):
-    return client.find_resource(resource, id_or_name)['id']
+                    comma_split, attrs, client, sc_)

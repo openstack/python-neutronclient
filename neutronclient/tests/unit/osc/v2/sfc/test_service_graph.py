@@ -11,17 +11,15 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+
 from unittest import mock
 
 from osc_lib import exceptions
 from osc_lib.tests import utils as tests_utils
+import testtools
 
 from neutronclient.osc.v2.sfc import sfc_service_graph
 from neutronclient.tests.unit.osc.v2.sfc import fakes
-
-
-def _get_id(client, id_or_name, resource):
-    return id_or_name
 
 
 class TestListSfcServiceGraph(fakes.TestNeutronClientOSCV2):
@@ -47,11 +45,8 @@ class TestListSfcServiceGraph(fakes.TestNeutronClientOSCV2):
 
     def setUp(self):
         super(TestListSfcServiceGraph, self).setUp()
-        mock.patch(
-            'neutronclient.osc.v2.sfc.sfc_service_graph._get_id',
-            new=_get_id).start()
-        self.neutronclient.list_sfc_service_graphs = mock.Mock(
-            return_value={'service_graphs': self._service_graphs}
+        self.network.sfc_service_graphs = mock.Mock(
+            return_value=self._service_graphs
         )
         # Get the command object to test
         self.cmd = sfc_service_graph.ListSfcServiceGraph(
@@ -62,7 +57,7 @@ class TestListSfcServiceGraph(fakes.TestNeutronClientOSCV2):
         verifylist = []
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         columns = self.cmd.take_action(parsed_args)[0]
-        sgs = self.neutronclient.list_sfc_service_graphs()['service_graphs']
+        sgs = self.network.sfc_service_graphs()
         sg = sgs[0]
         data = [
             sg['id'],
@@ -77,7 +72,7 @@ class TestListSfcServiceGraph(fakes.TestNeutronClientOSCV2):
         verifylist = [('long', True)]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         columns = self.cmd.take_action(parsed_args)[0]
-        sgs = self.neutronclient.list_sfc_service_graphs()['service_graphs']
+        sgs = self.network.sfc_service_graphs()
         sg = sgs[0]
         data = [
             sg['id'],
@@ -107,10 +102,8 @@ class TestCreateSfcServiceGraph(fakes.TestNeutronClientOSCV2):
 
     def setUp(self):
         super(TestCreateSfcServiceGraph, self).setUp()
-        mock.patch('neutronclient.osc.v2.sfc.sfc_service_graph._get_id',
-                   new=_get_id).start()
-        self.neutronclient.create_sfc_service_graph = mock.Mock(
-            return_value={'service_graph': self._service_graph})
+        self.network.create_sfc_service_graph = mock.Mock(
+            return_value=self._service_graph)
         self.data = self.get_data()
         self.cmd = sfc_service_graph.CreateSfcServiceGraph(
             self.app, self.namespace)
@@ -145,12 +138,10 @@ class TestCreateSfcServiceGraph(fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         columns, data = (self.cmd.take_action(parsed_args))
 
-        self.neutronclient.create_sfc_service_graph.assert_called_once_with({
-            'service_graph': {
+        self.network.create_sfc_service_graph.assert_called_once_with(**{
                 'description': self._service_graph['description'],
                 'name': self._service_graph['name'],
                 'port_chains': pcs
-            }
         })
         self.assertEqual(self.columns_long, columns)
         self.assertEqual(self.data, data)
@@ -227,25 +218,41 @@ class TestDeleteSfcServiceGraph(fakes.TestNeutronClientOSCV2):
 
     def setUp(self):
         super(TestDeleteSfcServiceGraph, self).setUp()
-        self.neutronclient.delete_sfc_service_graph = mock.Mock(
+        self.network.delete_sfc_service_graph = mock.Mock(
             return_value=None)
         self.cmd = sfc_service_graph.DeleteSfcServiceGraph(
             self.app, self.namespace)
 
     def test_delete_sfc_service_graph(self):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         mock_service_graph_delete = client.delete_sfc_service_graph
         arglist = [
             self._service_graph[0]['id'],
         ]
         verifylist = [
-            ('service_graph', self._service_graph[0]['id']),
+            ('service_graph', [self._service_graph[0]['id']]),
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
         mock_service_graph_delete.assert_called_once_with(
             self._service_graph[0]['id'])
         self.assertIsNone(result)
+
+    def test_delete_multiple_service_graphs_with_exception(self):
+        client = self.app.client_manager.network
+        target = self._service_graph[0]['id']
+        arglist = [target]
+        verifylist = [('service_graph', [target])]
+
+        client.find_sfc_service_graph.side_effect = [
+            target, exceptions.CommandError
+        ]
+
+        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+        msg = "1 of 2 service graph(s) failed to delete."
+        with testtools.ExpectedException(exceptions.CommandError) as e:
+            self.cmd.take_action(parsed_args)
+            self.assertEqual(msg, str(e))
 
 
 class TestShowSfcServiceGraph(fakes.TestNeutronClientOSCV2):
@@ -266,15 +273,12 @@ class TestShowSfcServiceGraph(fakes.TestNeutronClientOSCV2):
         _sg['project_id']
     )
 
-    _service_graph = {'service_graph': _sg}
+    _service_graph = _sg
     _service_graph_id = _sg['id']
 
     def setUp(self):
         super(TestShowSfcServiceGraph, self).setUp()
-        mock.patch(
-            'neutronclient.osc.v2.sfc.sfc_service_graph._get_id',
-            new=_get_id).start()
-        self.neutronclient.show_sfc_service_graph = mock.Mock(
+        self.network.get_sfc_service_graph = mock.Mock(
             return_value=self._service_graph
         )
         # Get the command object to test
@@ -282,8 +286,8 @@ class TestShowSfcServiceGraph(fakes.TestNeutronClientOSCV2):
             self.app, self.namespace)
 
     def test_service_graph_show(self):
-        client = self.app.client_manager.neutronclient
-        mock_service_graph_show = client.show_sfc_service_graph
+        client = self.app.client_manager.network
+        mock_service_graph_show = client.get_sfc_service_graph
         arglist = [
             self._service_graph_id,
         ]
@@ -305,15 +309,13 @@ class TestSetSfcServiceGraph(fakes.TestNeutronClientOSCV2):
 
     def setUp(self):
         super(TestSetSfcServiceGraph, self).setUp()
-        mock.patch('neutronclient.osc.v2.sfc.sfc_service_graph._get_id',
-                   new=_get_id).start()
-        self.neutronclient.update_sfc_service_graph = mock.Mock(
+        self.network.update_sfc_service_graph = mock.Mock(
             return_value=None)
         self.cmd = sfc_service_graph.SetSfcServiceGraph(
             self.app, self.namespace)
 
     def test_set_service_graph(self):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         mock_service_graph_update = client.update_sfc_service_graph
         arglist = [
             self._service_graph_name,
@@ -327,10 +329,10 @@ class TestSetSfcServiceGraph(fakes.TestNeutronClientOSCV2):
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
-        attrs = {'service_graph': {
+        attrs = {
             'name': 'name_updated',
-            'description': 'desc_updated'}
+            'description': 'desc_updated'
         }
         mock_service_graph_update.assert_called_once_with(
-            self._service_graph_name, attrs)
+            self._service_graph_name, **attrs)
         self.assertIsNone(result)

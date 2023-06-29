@@ -38,6 +38,17 @@ _attr_map = (
     ('project_id', 'Project', column_util.LIST_LONG_ONLY),
 )
 
+_attr_map_dict = {
+    'id': 'ID',
+    'name': 'Name',
+    'description': 'Description',
+    'ingress': 'Ingress Logical Port',
+    'egress': 'Egress Logical Port',
+    'service_function_parameters': 'Service Function Parameters',
+    'tenant_id': 'Project',
+    'project_id': 'Project',
+}
+
 
 class CreateSfcPortPair(command.ShowOne):
     _description = _("Create a port pair")
@@ -76,11 +87,11 @@ class CreateSfcPortPair(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
-        body = {resource: attrs}
-        obj = client.create_sfc_port_pair(body)[resource]
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        obj = client.create_sfc_port_pair(**attrs)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -93,20 +104,29 @@ class DeleteSfcPortPair(command.Command):
         parser.add_argument(
             'port_pair',
             metavar="<port-pair>",
-            help=_("Port pair to delete (name or ID)")
+            nargs='+',
+            help=_("Port pair(s) to delete (name or ID)")
         )
         return parser
 
     def take_action(self, parsed_args):
-        # TODO(mohan): Add support for deleting multiple resources.
-        client = self.app.client_manager.neutronclient
-        port_pair_id = _get_id(client, parsed_args.port_pair, resource)
-        try:
-            client.delete_sfc_port_pair(port_pair_id)
-        except Exception as e:
-            msg = (_("Failed to delete port pair with name "
-                     "or ID '%(port_pair)s': %(e)s")
-                   % {'port_pair': parsed_args.port_pair, 'e': e})
+        client = self.app.client_manager.network
+        result = 0
+        for pp in parsed_args.port_pair:
+            try:
+                port_pair_id = client.find_sfc_port_pair(
+                    pp, ignore_missing=False)['id']
+                client.delete_sfc_port_pair(port_pair_id)
+            except Exception as e:
+                result += 1
+                LOG.error(_("Failed to delete port pair with name "
+                            "or ID '%(port_pair)s': %(e)s"),
+                          {'port_pair': pp, 'e': e})
+        if result > 0:
+            total = len(parsed_args.port_pair)
+            msg = (_("%(result)s of %(total)s port pair(s) "
+                     "failed to delete.") % {'result': result,
+                                             'total': total})
             raise exceptions.CommandError(msg)
 
 
@@ -123,14 +143,14 @@ class ListSfcPortPair(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        data = client.list_sfc_port_pairs()
+        client = self.app.client_manager.network
+        data = client.sfc_port_pairs()
         headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers,
                 (utils.get_dict_properties(
                     s, columns,
-                ) for s in data['port_pairs']))
+                ) for s in data))
 
 
 class SetSfcPortPair(command.Command):
@@ -154,13 +174,14 @@ class SetSfcPortPair(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        port_pair_id = _get_id(client, parsed_args.port_pair, resource)
+        client = self.app.client_manager.network
+        port_pair_id = client.find_sfc_port_pair(
+            parsed_args.port_pair, ignore_missing=False
+        )['id']
         attrs = _get_common_attrs(self.app.client_manager, parsed_args,
                                   is_create=False)
-        body = {resource: attrs}
         try:
-            client.update_sfc_port_pair(port_pair_id, body)
+            client.update_sfc_port_pair(port_pair_id, **attrs)
         except Exception as e:
             msg = (_("Failed to update port pair '%(port_pair)s': %(e)s")
                    % {'port_pair': parsed_args.port_pair, 'e': e})
@@ -180,10 +201,13 @@ class ShowSfcPortPair(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        port_pair_id = _get_id(client, parsed_args.port_pair, resource)
-        obj = client.show_sfc_port_pair(port_pair_id)[resource]
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        client = self.app.client_manager.network
+        port_pair_id = client.find_sfc_port_pair(
+            parsed_args.port_pair, ignore_missing=False
+        )['id']
+        obj = client.get_sfc_port_pair(port_pair_id)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -200,12 +224,15 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
 
 
 def _get_attrs(client_manager, attrs, parsed_args):
+    client = client_manager.network
     if parsed_args.ingress is not None:
-        attrs['ingress'] = _get_id(client_manager.neutronclient,
-                                   parsed_args.ingress, 'port')
+        attrs['ingress'] = client.find_port(
+            parsed_args.ingress, ignore_missing=False
+        )['id']
     if parsed_args.egress is not None:
-        attrs['egress'] = _get_id(client_manager.neutronclient,
-                                  parsed_args.egress, 'port')
+        attrs['egress'] = client.find_port(
+            parsed_args.egress, ignore_missing=False
+        )['id']
     if parsed_args.service_function_parameters is not None:
         attrs['service_function_parameters'] = _get_service_function_params(
             parsed_args.service_function_parameters)
@@ -222,7 +249,3 @@ def _get_service_function_params(sf_params):
         if 'weight' in sf_param:
             attrs['weight'] = sf_param['weight']
     return attrs
-
-
-def _get_id(client, id_or_name, resource):
-    return client.find_resource(resource, id_or_name)['id']

@@ -55,6 +55,26 @@ _attr_map = (
     ('project_id', 'Project', column_util.LIST_LONG_ONLY),
 )
 
+_attr_map_dict = {
+    'id': 'ID',
+    'name': 'Name',
+    'description': 'Description',
+    'summary': 'Summary',
+    'protocol': 'Protocol',
+    'ethertype': 'Ethertype',
+    'source_ip_prefix': 'Source IP',
+    'destination_ip_prefix': 'Destination IP',
+    'logical_source_port': 'Logical Source Port',
+    'logical_destination_port': 'Logical Destination Port',
+    'source_port_range_min': 'Source Port Range Min',
+    'source_port_range_max': 'Source Port Range Max',
+    'destination_port_range_min': 'Destination Port Range Min',
+    'destination_port_range_max': 'Destination Port Range Max',
+    'l7_parameters': 'L7 Parameters',
+    'tenant_id': 'Project',
+    'project_id': 'Project',
+}
+
 
 class CreateSfcFlowClassifier(command.ShowOne):
     _description = _("Create a flow classifier")
@@ -114,11 +134,11 @@ class CreateSfcFlowClassifier(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
-        body = {resource: attrs}
-        obj = client.create_sfc_flow_classifier(body)[resource]
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        obj = client.create_sfc_flow_classifier(**attrs)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id', 'summary'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -131,20 +151,27 @@ class DeleteSfcFlowClassifier(command.Command):
         parser.add_argument(
             'flow_classifier',
             metavar='<flow-classifier>',
-            help=_("Flow classifier to delete (name or ID)")
+            nargs='+',
+            help=_("Flow classifier(s) to delete (name or ID)")
         )
         return parser
 
     def take_action(self, parsed_args):
-        # TODO(mohan): Add support for deleting multiple resources.
-        client = self.app.client_manager.neutronclient
-        fc_id = _get_id(client, parsed_args.flow_classifier, resource)
-        try:
-            client.delete_sfc_flow_classifier(fc_id)
-        except Exception as e:
-            msg = (_("Failed to delete flow classifier with name "
-                     "or ID '%(fc)s': %(e)s")
-                   % {'fc': parsed_args.flow_classifier, 'e': e})
+        client = self.app.client_manager.network
+        result = 0
+        for fcl in parsed_args.flow_classifier:
+            try:
+                fc_id = client.find_sfc_flow_classifier(
+                    fcl, ignore_missing=False)['id']
+                client.delete_sfc_flow_classifier(fc_id)
+            except Exception as e:
+                result += 1
+                LOG.error(_("Failed to delete flow classifier with name "
+                            "or ID '%(fc)s': %(e)s"), {'fc': fcl, 'e': e})
+        if result > 0:
+            total = len(parsed_args.flow_classifier)
+            msg = (_("%(result)s of %(total)s flow classifier(s) "
+                     "failed to delete.") % {'result': result, 'total': total})
             raise exceptions.CommandError(msg)
 
 
@@ -161,8 +188,8 @@ class ListSfcFlowClassifier(command.Lister):
         return parser
 
     def extend_list(self, data, parsed_args):
-        ext_data = data['flow_classifiers']
-        for d in ext_data:
+        ext_data = []
+        for d in data:
             val = []
             protocol = d['protocol'].upper() if d['protocol'] else 'any'
             val.append('protocol: ' + protocol)
@@ -180,6 +207,7 @@ class ListSfcFlowClassifier(command.Lister):
                 l7_param = 'l7_parameters: {%s}' % ','.join(d['l7_parameters'])
                 val.append(l7_param)
             d['summary'] = ',\n'.join(val)
+            ext_data.append(d)
         return ext_data
 
     def _get_protocol_port_details(self, data, val):
@@ -197,8 +225,8 @@ class ListSfcFlowClassifier(command.Lister):
             val, ip_prefix, min_port, max_port)
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        obj = client.list_sfc_flow_classifiers()
+        client = self.app.client_manager.network
+        obj = client.sfc_flow_classifiers()
         obj_extend = self.extend_list(obj, parsed_args)
         headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
@@ -227,13 +255,13 @@ class SetSfcFlowClassifier(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        fc_id = _get_id(client, parsed_args.flow_classifier, resource)
+        client = self.app.client_manager.network
+        fc_id = client.find_sfc_flow_classifier(parsed_args.flow_classifier,
+                                                ignore_missing=False)['id']
         attrs = _get_common_attrs(self.app.client_manager, parsed_args,
                                   is_create=False)
-        body = {resource: attrs}
         try:
-            client.update_sfc_flow_classifier(fc_id, body)
+            client.update_sfc_flow_classifier(fc_id, **attrs)
         except Exception as e:
             msg = (_("Failed to update flow classifier '%(fc)s': %(e)s")
                    % {'fc': parsed_args.flow_classifier, 'e': e})
@@ -253,10 +281,12 @@ class ShowSfcFlowClassifier(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        fc_id = _get_id(client, parsed_args.flow_classifier, resource)
-        obj = client.show_sfc_flow_classifier(fc_id)[resource]
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        client = self.app.client_manager.network
+        fc_id = client.find_sfc_flow_classifier(parsed_args.flow_classifier,
+                                                ignore_missing=False)['id']
+        obj = client.get_sfc_flow_classifier(fc_id)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id', 'summary'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -282,13 +312,13 @@ def _get_attrs(client_manager, attrs, parsed_args):
     if parsed_args.destination_ip_prefix is not None:
         attrs['destination_ip_prefix'] = parsed_args.destination_ip_prefix
     if parsed_args.logical_source_port is not None:
-        attrs['logical_source_port'] = _get_id(
-            client_manager.neutronclient, parsed_args.logical_source_port,
-            'port')
+        attrs['logical_source_port'] = client_manager.network.find_port(
+            parsed_args.logical_source_port, ignore_missing=False
+        )['id']
     if parsed_args.logical_destination_port is not None:
-        attrs['logical_destination_port'] = _get_id(
-            client_manager.neutronclient, parsed_args.logical_destination_port,
-            'port')
+        attrs['logical_destination_port'] = client_manager.network.find_port(
+            parsed_args.logical_destination_port, ignore_missing=False
+        )['id']
     if parsed_args.source_port is not None:
         _fill_protocol_port_info(attrs, 'source',
                                         parsed_args.source_port)
@@ -314,7 +344,3 @@ def _fill_protocol_port_info(attrs, port_type, port_val):
         message = (_("Protocol port value %s must be an integer "
                      "or integer:integer.") % port_val)
         raise nc_exc.CommandError(message=message)
-
-
-def _get_id(client, id_or_name, resource):
-    return client.find_resource(resource, id_or_name)['id']

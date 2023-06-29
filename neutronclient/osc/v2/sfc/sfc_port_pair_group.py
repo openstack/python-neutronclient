@@ -34,10 +34,20 @@ _attr_map = (
     ('port_pair_group_parameters', 'Port Pair Group Parameters',
      column_util.LIST_BOTH),
     ('description', 'Description', column_util.LIST_LONG_ONLY),
-    ('group_id', 'Loadbalance ID', column_util.LIST_LONG_ONLY),
     ('project_id', 'Project',  column_util.LIST_LONG_ONLY),
-    ('tap_enabled', 'Tap Enabled', column_util.LIST_BOTH)
+    ('is_tap_enabled', 'Tap Enabled', column_util.LIST_BOTH)
 )
+
+_attr_map_dict = {
+    'id': 'ID',
+    'name': 'Name',
+    'description': 'Description',
+    'port_pairs': 'Port Pair',
+    'port_pair_group_parameters': 'Port Pair Group Parameters',
+    'is_tap_enabled': 'Tap Enabled',
+    'tenant_id': 'Project',
+    'project_id': 'Project',
+}
 
 
 class CreateSfcPortPairGroup(command.ShowOne):
@@ -85,11 +95,11 @@ class CreateSfcPortPairGroup(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
-        body = {resource: attrs}
-        obj = client.create_sfc_port_pair_group(body)[resource]
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        obj = client.create_sfc_port_pair_group(**attrs)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -102,20 +112,28 @@ class DeleteSfcPortPairGroup(command.Command):
         parser.add_argument(
             'port_pair_group',
             metavar='<port-pair-group>',
-            help=_("Port pair group to delete (name or ID)")
+            nargs='+',
+            help=_("Port pair group(s) to delete (name or ID)")
         )
         return parser
 
     def take_action(self, parsed_args):
-        # TODO(mohan): Add support for deleting multiple resources.
-        client = self.app.client_manager.neutronclient
-        ppg_id = _get_id(client,  parsed_args.port_pair_group, resource)
-        try:
-            client.delete_sfc_port_pair_group(ppg_id)
-        except Exception as e:
-            msg = (_("Failed to delete port pair group with name "
-                     "or ID '%(ppg)s': %(e)s")
-                   % {'ppg': parsed_args.port_pair_group, 'e': e})
+        client = self.app.client_manager.network
+        result = 0
+        for ppg in parsed_args.port_pair_group:
+            try:
+                ppg_id = client.find_sfc_port_pair_group(
+                    ppg, ignore_missing=False)['id']
+                client.delete_sfc_port_pair_group(ppg_id)
+            except Exception as e:
+                result += 1
+                LOG.error(_("Failed to delete port pair group with name "
+                            "or ID '%(ppg)s': %(e)s"), {'ppg': ppg, 'e': e})
+        if result > 0:
+            total = len(parsed_args.port_pair_group)
+            msg = (_("%(result)s of %(total)s port pair group(s) "
+                     "failed to delete.") % {'result': result,
+                                             'total': total})
             raise exceptions.CommandError(msg)
 
 
@@ -133,14 +151,14 @@ class ListSfcPortPairGroup(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        data = client.list_sfc_port_pair_groups()
+        client = self.app.client_manager.network
+        data = client.sfc_port_pair_groups()
         headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers,
                 (utils.get_dict_properties(
                     s, columns,
-                ) for s in data['port_pair_groups']))
+                ) for s in data))
 
 
 class SetSfcPortPairGroup(command.Command):
@@ -175,26 +193,26 @@ class SetSfcPortPairGroup(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        ppg_id = _get_id(client, parsed_args.port_pair_group, resource)
+        client = self.app.client_manager.network
+        ppg_id = client.find_sfc_port_pair_group(
+            parsed_args.port_pair_group)['id']
         attrs = _get_common_attrs(self.app.client_manager, parsed_args,
                                   is_create=False)
         if parsed_args.no_port_pair:
             attrs['port_pairs'] = []
         if parsed_args.port_pairs:
-            added = [client.find_resource('port_pair', pp,
-                                          cmd_resource='sfc_port_pair')['id']
+            added = [client.find_sfc_port_pair(pp,
+                                               ignore_missing=False)['id']
                      for pp in parsed_args.port_pairs]
             if parsed_args.no_port_pair:
                 existing = []
             else:
-                existing = client.find_resource(
-                    resource, parsed_args.port_pair_group,
-                    cmd_resource='sfc_port_pair_group')['port_pairs']
+                existing = client.find_sfc_port_pair_group(
+                    parsed_args.port_pair_group,
+                    ignore_missing=False)['port_pairs']
             attrs['port_pairs'] = sorted(list(set(existing) | set(added)))
-        body = {resource: attrs}
         try:
-            client.update_sfc_port_pair_group(ppg_id, body)
+            client.update_sfc_port_pair_group(ppg_id, **attrs)
         except Exception as e:
             msg = (_("Failed to update port pair group '%(ppg)s': %(e)s")
                    % {'ppg': parsed_args.port_pair_group, 'e': e})
@@ -214,10 +232,12 @@ class ShowSfcPortPairGroup(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        ppg_id = _get_id(client, parsed_args.port_pair_group, resource)
-        obj = client.show_sfc_port_pair_group(ppg_id)[resource]
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        client = self.app.client_manager.network
+        ppg_id = client.find_sfc_port_pair_group(
+            parsed_args.port_pair_group, ignore_missing=False)['id']
+        obj = client.get_sfc_port_pair_group(ppg_id)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -246,22 +266,22 @@ class UnsetSfcPortPairGroup(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        ppg_id = _get_id(client, parsed_args.port_pair_group, resource)
+        client = self.app.client_manager.network
+        ppg_id = client.find_sfc_port_pair_group(
+            parsed_args.port_pair_group, ignore_missing=False)['id']
         attrs = {}
         if parsed_args.port_pairs:
-            existing = client.find_resource(
-                resource, parsed_args.port_pair_group,
-                cmd_resource='sfc_port_pair_group')['port_pairs']
-            removed = [client.find_resource('port_pair', pp,
-                       cmd_resource='sfc_port_pair')['id']
+            existing = client.find_sfc_port_pair_group(
+                parsed_args.port_pair_group,
+                ignore_missing=False)['port_pairs']
+            removed = [client.find_sfc_port_pair(pp,
+                       ignore_missing=False)['id']
                        for pp in parsed_args.port_pairs]
             attrs['port_pairs'] = list(set(existing) - set(removed))
         if parsed_args.all_port_pair:
             attrs['port_pairs'] = []
-        body = {resource: attrs}
         try:
-            client.update_sfc_port_pair_group(ppg_id, body)
+            client.update_sfc_port_pair_group(ppg_id, **attrs)
         except Exception as e:
             msg = (_("Failed to unset port pair group '%(ppg)s': %(e)s")
                    % {'ppg': parsed_args.port_pair_group, 'e': e})
@@ -280,15 +300,17 @@ def _get_ppg_param(attrs, ppg):
 
 
 def _get_common_attrs(client_manager, parsed_args, is_create=True):
+    client = client_manager.network
     attrs = {}
     if parsed_args.name is not None:
         attrs['name'] = parsed_args.name
     if parsed_args.description is not None:
         attrs['description'] = parsed_args.description
     if parsed_args.port_pairs:
-        attrs['port_pairs'] = [(_get_id(client_manager.neutronclient, pp,
-                                        'port_pair'))
+        attrs['port_pairs'] = [client.find_sfc_port_pair(
+            pp, ignore_missing=False)['id']
                                for pp in parsed_args.port_pairs]
+
     if is_create:
         _get_attrs(attrs, parsed_args)
     return attrs
@@ -302,7 +324,3 @@ def _get_attrs(attrs, parsed_args):
         attrs['tap_enabled'] = True
     if parsed_args.disable_tap:
         attrs['tap_enabled'] = False
-
-
-def _get_id(client, id_or_name, resource):
-    return client.find_resource(resource, id_or_name)['id']

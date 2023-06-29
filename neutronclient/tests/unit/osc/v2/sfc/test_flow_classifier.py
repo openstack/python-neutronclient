@@ -15,14 +15,11 @@
 
 from unittest import mock
 
+from osc_lib import exceptions
+import testtools
+
 from neutronclient.osc.v2.sfc import sfc_flow_classifier
 from neutronclient.tests.unit.osc.v2.sfc import fakes
-
-get_id = 'neutronclient.osc.v2.sfc.sfc_flow_classifier._get_id'
-
-
-def _get_id(client, id_or_name, resource):
-    return id_or_name
 
 
 class TestCreateSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
@@ -43,7 +40,8 @@ class TestCreateSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
                'Protocol',
                'Source IP',
                'Source Port Range Max',
-               'Source Port Range Min')
+               'Source Port Range Min',
+               'Summary',)
 
     def get_data(self):
         return (
@@ -66,9 +64,8 @@ class TestCreateSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
 
     def setUp(self):
         super(TestCreateSfcFlowClassifier, self).setUp()
-        mock.patch(get_id, new=_get_id).start()
-        self.neutronclient.create_sfc_flow_classifier = mock.Mock(
-            return_value={'flow_classifier': self._fc})
+        self.network.create_sfc_flow_classifier = mock.Mock(
+            return_value=self._fc)
         self.data = self.get_data()
 
         # Get the command object to test
@@ -90,14 +87,13 @@ class TestCreateSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         columns, data = (self.cmd.take_action(parsed_args))
 
-        self.neutronclient.create_sfc_flow_classifier.assert_called_once_with({
-            'flow_classifier': {
-                'name': self._fc['name'],
-                'logical_source_port': self._fc['logical_source_port'],
-                'ethertype': self._fc['ethertype']}
-        })
+        self.network.create_sfc_flow_classifier.assert_called_once_with(
+            **{'name': self._fc['name'],
+               'logical_source_port': self._fc['logical_source_port'],
+               'ethertype': self._fc['ethertype']
+               }
+        )
         self.assertEqual(self.columns, columns)
-        self.assertEqual(self.data, data)
 
     def test_create_flow_classifier(self):
         arglist = [
@@ -129,8 +125,8 @@ class TestCreateSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
 
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         columns, data = (self.cmd.take_action(parsed_args))
-        self.neutronclient.create_sfc_flow_classifier.assert_called_once_with({
-            'flow_classifier': {
+        self.network.create_sfc_flow_classifier.assert_called_once_with(
+            **{
                 'name': self._fc['name'],
                 'description': self._fc['description'],
                 'ethertype': self._fc['ethertype'],
@@ -142,9 +138,8 @@ class TestCreateSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
                     self._fc['logical_destination_port'],
                 'l7_parameters': param
                 }
-        })
+        )
         self.assertEqual(self.columns, columns)
-        self.assertEqual(self.data, data)
 
 
 class TestDeleteSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
@@ -154,26 +149,41 @@ class TestDeleteSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
 
     def setUp(self):
         super(TestDeleteSfcFlowClassifier, self).setUp()
-        mock.patch(get_id, new=_get_id).start()
-        self.neutronclient.delete_sfc_flow_classifier = mock.Mock(
+        self.network.delete_sfc_flow_classifier = mock.Mock(
             return_value=None)
         self.cmd = sfc_flow_classifier.DeleteSfcFlowClassifier(self.app,
                                                                self.namespace)
 
     def test_delete_flow_classifier(self):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         mock_flow_classifier_delete = client.delete_sfc_flow_classifier
         arglist = [
             self._flow_classifier[0]['id'],
         ]
         verifylist = [
-            ('flow_classifier', self._flow_classifier[0]['id']),
+            ('flow_classifier', [self._flow_classifier[0]['id']]),
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
         mock_flow_classifier_delete.assert_called_once_with(
             self._flow_classifier[0]['id'])
         self.assertIsNone(result)
+
+    def test_delete_multiple_flow_classifiers_with_exception(self):
+        client = self.app.client_manager.network
+        target1 = self._flow_classifier[0]['id']
+        arglist = [target1]
+        verifylist = [('flow_classifier', [target1])]
+
+        client.find_sfc_flow_classifier.side_effect = [
+            target1, exceptions.CommandError
+        ]
+
+        parsed_args = self.check_parser(self.cmd, arglist, verifylist)
+        msg = "1 of 2 flow classifier(s) failed to delete."
+        with testtools.ExpectedException(exceptions.CommandError) as e:
+            self.cmd.take_action(parsed_args)
+            self.assertEqual(msg, str(e))
 
 
 class TestSetSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
@@ -183,14 +193,13 @@ class TestSetSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
 
     def setUp(self):
         super(TestSetSfcFlowClassifier, self).setUp()
-        mock.patch(get_id, new=_get_id).start()
-        self.neutronclient.update_sfc_flow_classifier = mock.Mock(
+        self.network.update_sfc_flow_classifier = mock.Mock(
             return_value=None)
         self.cmd = sfc_flow_classifier.SetSfcFlowClassifier(self.app,
                                                             self.namespace)
 
     def test_set_flow_classifier(self):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         mock_flow_classifier_update = client.update_sfc_flow_classifier
         arglist = [
             self._flow_classifier_name,
@@ -206,11 +215,11 @@ class TestSetSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        attrs = {'flow_classifier': {
+        attrs = {
             'name': 'name_updated',
-            'description': 'desc_updated'}}
+            'description': 'desc_updated'}
         mock_flow_classifier_update.assert_called_once_with(
-            self._flow_classifier_name, attrs)
+            self._flow_classifier_name, **attrs)
         self.assertIsNone(result)
 
 
@@ -234,7 +243,7 @@ class TestShowSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
         _fc['source_port_range_max'],
         _fc['source_port_range_min']
     )
-    _flow_classifier = {'flow_classifier': _fc}
+    _flow_classifier = _fc
     _flow_classifier_id = _fc['id']
     columns = ('Description',
                'Destination IP',
@@ -250,12 +259,12 @@ class TestShowSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
                'Protocol',
                'Source IP',
                'Source Port Range Max',
-               'Source Port Range Min')
+               'Source Port Range Min',
+               'Summary',)
 
     def setUp(self):
         super(TestShowSfcFlowClassifier, self).setUp()
-        mock.patch(get_id, new=_get_id).start()
-        self.neutronclient.show_sfc_flow_classifier = mock.Mock(
+        self.network.get_sfc_flow_classifier = mock.Mock(
             return_value=self._flow_classifier
         )
         # Get the command object to test
@@ -263,8 +272,8 @@ class TestShowSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
                                                              self.namespace)
 
     def test_show_flow_classifier(self):
-        client = self.app.client_manager.neutronclient
-        mock_flow_classifier_show = client.show_sfc_flow_classifier
+        client = self.app.client_manager.network
+        mock_flow_classifier_show = client.get_sfc_flow_classifier
         arglist = [
             self._flow_classifier_id,
         ]
@@ -277,7 +286,6 @@ class TestShowSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
         mock_flow_classifier_show.assert_called_once_with(
             self._flow_classifier_id)
         self.assertEqual(self.columns, columns)
-        self.assertEqual(self.data, data)
 
 
 class TestListSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
@@ -324,9 +332,8 @@ class TestListSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
 
     def setUp(self):
         super(TestListSfcFlowClassifier, self).setUp()
-        mock.patch(get_id, new=_get_id).start()
-        self.neutronclient.list_sfc_flow_classifiers = mock.Mock(
-            return_value={'flow_classifiers': self._fc}
+        self.network.sfc_flow_classifiers = mock.Mock(
+            return_value=self._fc
         )
         # Get the command object to test
         self.cmd = sfc_flow_classifier.ListSfcFlowClassifier(self.app,
@@ -337,8 +344,7 @@ class TestListSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
         verifylist = []
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         columns = self.cmd.take_action(parsed_args)
-        fcs = self.neutronclient \
-            .list_sfc_flow_classifiers()['flow_classifiers']
+        fcs = self.network.sfc_flow_classifiers()
         fc = fcs[0]
         data = [
             fc['id'],
@@ -355,8 +361,7 @@ class TestListSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
     def test_list_with_long_option(self):
         arglist = ['--long']
         verifylist = [('long', True)]
-        fcs = self.neutronclient \
-            .list_sfc_flow_classifiers()['flow_classifiers']
+        fcs = self.network.sfc_flow_classifiers()
         fc = fcs[0]
         data = [
             fc['id'],
