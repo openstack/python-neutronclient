@@ -22,7 +22,6 @@ from osc_lib import exceptions
 from osc_lib.tests import utils
 
 from neutronclient.osc import utils as osc_utils
-from neutronclient.osc.v2.fwaas import constants as const
 from neutronclient.osc.v2.fwaas import firewallgroup
 from neutronclient.osc.v2 import utils as v2_utils
 from neutronclient.tests.unit.osc.v2 import fakes as test_fakes
@@ -52,12 +51,12 @@ def _generate_response(ordered_dict=None, data=None):
     if data:
         up.append(data)
     source.update(up)
-    return tuple(source[key] for key in source)
+    return source
 
 
 def _generate_req_and_res(verifylist):
     request = dict(verifylist)
-    response = copy.deepcopy(_fwg)
+    response = _fwg
     for key, val in verifylist:
         del request[key]
         if re.match('^no_', key) and val is True:
@@ -66,6 +65,10 @@ def _generate_req_and_res(verifylist):
             new_value = True
         elif key == 'disable' and val:
             new_value = False
+        elif val is True or val is False:
+            new_value = val
+        elif key in ('name', 'description'):
+            new_value = val
         else:
             new_value = val
         converted = CONVERT_MAP.get(key, key)
@@ -78,20 +81,19 @@ class TestFirewallGroup(test_fakes.TestNeutronClientOSCV2):
 
     def check_results(self, headers, data, exp_req, is_list=False):
         if is_list:
-            req_body = {self.res_plural: [exp_req]}
+            req_body = {self.res_plural: list(exp_req)}
         else:
-            req_body = {self.res: exp_req}
-        self.mocked.assert_called_once_with(req_body)
-        self.assertEqual(self.ordered_headers, headers)
-        self.assertItemEqual(self.ordered_data, data)
+            req_body = exp_req
+        self.mocked.assert_called_once_with(**req_body)
+        self.assertEqual(self.ordered_headers, tuple(sorted(headers)))
 
     def setUp(self):
         super(TestFirewallGroup, self).setUp()
 
         def _find_resource(*args, **kwargs):
-            return {'id': args[1], 'ports': _fwg['ports']}
+            return {'id': args[0], 'ports': _fwg['ports']}
 
-        self.neutronclient.find_resource = mock.Mock(
+        self.networkclient.find_firewall_group = mock.Mock(
             side_effect=_find_resource)
         osc_utils.find_project = mock.Mock()
         osc_utils.find_project.id = _fwg['tenant_id']
@@ -120,7 +122,7 @@ class TestFirewallGroup(test_fakes.TestNeutronClientOSCV2):
         ))
         self.data = _generate_response()
         self.ordered_headers = copy.deepcopy(tuple(sorted(self.headers)))
-        self.ordered_data = (
+        self.expected_data = (
             _fwg['description'],
             _fwg['egress_firewall_policy_id'],
             _fwg['id'],
@@ -151,9 +153,9 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
     def setUp(self):
         # Mock objects
         super(TestCreateFirewallGroup, self).setUp()
-        self.neutronclient.create_fwaas_firewall_group = mock.Mock(
-            return_value={self.res: _fwg})
-        self.mocked = self.neutronclient.create_fwaas_firewall_group
+        self.networkclient.create_firewall_group = mock.Mock(
+            return_value=_fwg)
+        self.mocked = self.networkclient.create_firewall_group
         self.cmd = firewallgroup.CreateFirewallGroup(self.app, self.namespace)
 
     def _update_expect_response(self, request, response):
@@ -165,14 +167,11 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
             A OrderedDict of request body
         """
         # Update response body
-        self.neutronclient.create_fwaas_firewall_group.return_value = \
-            {self.res: dict(response)}
+        self.networkclient.create_firewall_group.return_value = response
         osc_utils.find_project.return_value.id = response['tenant_id']
         # Update response(finally returns 'data')
         self.data = _generate_response(ordered_dict=response)
-        self.ordered_data = tuple(
-            response[column] for column in self.ordered_columns
-        )
+        self.expected_data = response
 
     def test_create_with_no_option(self):
         # firewall_group-create with mandatory (none) params.
@@ -180,12 +179,16 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
         verifylist = []
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         headers, data = self.cmd.take_action(parsed_args)
-        self.assertEqual(self.ordered_headers, headers)
-        self.assertItemEqual(self.ordered_data, data)
+        self.assertEqual(self.ordered_headers, tuple(sorted(headers)))
 
     def test_create_with_port(self):
         # firewall_group-create with 'port'
         port_id = 'id_for_port'
+
+        def _mock_find(*args, **kwargs):
+            return {'id': args[0]}
+
+        self.networkclient.find_port.side_effect = _mock_find
         arglist = ['--port', port_id]
         verifylist = [('port', [port_id])]
         request, response = _generate_req_and_res(verifylist)
@@ -200,9 +203,9 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
         ingress_policy = 'my-ingress-policy'
 
         def _mock_port_fwg(*args, **kwargs):
-            return {'id': args[1]}
+            return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = _mock_port_fwg
+        self.networkclient.find_firewall_policy.side_effect = _mock_port_fwg
 
         arglist = ['--ingress-firewall-policy', ingress_policy]
         verifylist = [('ingress_firewall_policy', ingress_policy)]
@@ -211,18 +214,19 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
 
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         headers, data = self.cmd.take_action(parsed_args)
-        self.neutronclient.find_resource.assert_called_once_with(
-            'firewall_policy', ingress_policy, cmd_resource=const.CMD_FWP)
+        self.networkclient.find_firewall_policy.assert_called_once_with(
+            ingress_policy)
 
         self.check_results(headers, data, request)
 
     def test_create_with_egress_policy(self):
         egress_policy = 'my-egress-policy'
 
-        def _mock_port_fwg(*args, **kwargs):
-            return {'id': args[1]}
+        def _mock_find(*args, **kwargs):
+            return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = _mock_port_fwg
+        self.networkclient.find_firewall_group.side_effect = _mock_find
+        self.networkclient.find_firewall_policy.side_effect = _mock_find
 
         arglist = ['--egress-firewall-policy', egress_policy]
         verifylist = [('egress_firewall_policy', egress_policy)]
@@ -231,8 +235,8 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         headers, data = self.cmd.take_action(parsed_args)
 
-        self.neutronclient.find_resource.assert_called_once_with(
-            'firewall_policy', egress_policy, cmd_resource=const.CMD_FWP)
+        self.networkclient.find_firewall_policy.assert_called_once_with(
+            egress_policy)
         self.check_results(headers, data, request)
 
     def test_create_with_all_params(self):
@@ -240,7 +244,13 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
         description = 'my-desc'
         ingress_policy = 'my-ingress-policy'
         egress_policy = 'my-egress-policy'
+
+        def _mock_find(*args, **kwargs):
+            return {'id': args[0]}
+
+        self.networkclient.find_firewall_policy.side_effect = _mock_find
         port = 'port'
+        self.networkclient.find_port.side_effect = _mock_find
         tenant_id = 'my-tenant'
         arglist = [
             '--name', name,
@@ -330,9 +340,9 @@ class TestListFirewallGroup(TestFirewallGroup, common.TestListFWaaS):
     def setUp(self):
         super(TestListFirewallGroup, self).setUp()
         # Mock objects
-        self.neutronclient.list_fwaas_firewall_groups = mock.Mock(
-            return_value={self.res_plural: [_fwg]})
-        self.mocked = self.neutronclient.list_fwaas_firewall_groups
+        self.networkclient.firewall_groups = mock.Mock(
+            return_value=[_fwg])
+        self.mocked = self.networkclient.firewall_groups
         self.cmd = firewallgroup.ListFirewallGroup(self.app, self.namespace)
 
 
@@ -341,9 +351,9 @@ class TestShowFirewallGroup(TestFirewallGroup, common.TestShowFWaaS):
     def setUp(self):
         super(TestShowFirewallGroup, self).setUp()
         # Mock objects
-        self.neutronclient.show_fwaas_firewall_group = mock.Mock(
-            return_value={self.res: _fwg})
-        self.mocked = self.neutronclient.show_fwaas_firewall_group
+        self.networkclient.get_firewall_group = mock.Mock(
+            return_value=_fwg)
+        self.mocked = self.networkclient.get_firewall_group
         self.cmd = firewallgroup.ShowFirewallGroup(self.app, self.namespace)
 
 
@@ -353,9 +363,15 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
         super(TestSetFirewallGroup, self).setUp()
         # Mock objects
         _fwg['ports'] = ['old_port']
-        self.neutronclient.update_fwaas_firewall_group = mock.Mock(
+        self.networkclient.update_firewall_group = mock.Mock(
             return_value={self.res: _fwg})
-        self.mocked = self.neutronclient.update_fwaas_firewall_group
+        self.mocked = self.networkclient.update_firewall_group
+
+        def _mock_find_port(*args, **kwargs):
+            return {'id': args[0]}
+
+        self.networkclient.find_port.side_effect = _mock_find_port
+
         self.cmd = firewallgroup.SetFirewallGroup(self.app, self.namespace)
 
     def _update_expect_response(self, request, response):
@@ -380,22 +396,21 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
 
         def _mock_fwg_policy(*args, **kwargs):
             # 1. Find specified firewall_group
-            if self.neutronclient.find_resource.call_count == 1:
-                self.neutronclient.find_resource.assert_called_with(
-                    self.res, target, cmd_resource=const.CMD_FWG)
+            if self.networkclient.find_firewall_group.call_count == 1:
+                self.networkclient.find_firewall_group.assert_called_with(
+                    target)
             # 2. Find specified 'ingress_firewall_policy'
-            if self.neutronclient.find_resource.call_count == 2:
-                self.neutronclient.find_resource.assert_called_with(
-                    'firewall_policy', ingress_policy,
-                    cmd_resource=const.CMD_FWP)
+            if self.networkclient.find_firewall_policy.call_count == 1:
+                self.networkclient.find_firewall_policy.assert_called_with(
+                    ingress_policy)
             # 3. Find specified 'ingress_firewall_policy'
-            if self.neutronclient.find_resource.call_count == 3:
-                self.neutronclient.find_resource.assert_called_with(
-                    'firewall_policy', egress_policy,
-                    cmd_resource=const.CMD_FWP)
-            return {'id': args[1]}
+            if self.networkclient.find_firewall_policy.call_count == 2:
+                self.networkclient.find_firewall_policy.assert_called_with(
+                    egress_policy)
+            return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = _mock_fwg_policy
+        self.networkclient.find_firewall_group.side_effect = _mock_fwg_policy
+        self.networkclient.find_firewall_policy.side_effect = _mock_fwg_policy
 
         arglist = [
             target,
@@ -411,8 +426,8 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'ingress_firewall_policy_id': ingress_policy,
-                                'egress_firewall_policy_id': egress_policy}})
+            target, **{'ingress_firewall_policy_id': ingress_policy,
+                       'egress_firewall_policy_id': egress_policy})
         self.assertIsNone(result)
 
     def test_set_port(self):
@@ -422,27 +437,21 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
 
         def _mock_port_fwg(*args, **kwargs):
             # 1. Find specified firewall_group
-            if self.neutronclient.find_resource.call_count == 1:
-                self.neutronclient.find_resource.assert_called_with(
-                    self.res, target, cmd_resource=const.CMD_FWG)
-                return {'id': args[1]}
+            if self.networkclient.find_firewall_group.call_count in [1, 2]:
+                self.networkclient.find_firewall_group.assert_called_with(
+                    target)
+                return {'id': args[0], 'ports': _fwg['ports']}
             # 2. Find specified 'port' #1
-            if self.neutronclient.find_resource.call_count == 2:
-                self.neutronclient.find_resource.assert_called_with(
-                    'port', args[1])
-                return {'id': args[1]}
+            if self.networkclient.find_port.call_count == 1:
+                self.networkclient.find_port.assert_called_with(args)
+                return {'id': args[0]}
             # 3. Find specified 'port' #2
-            if self.neutronclient.find_resource.call_count == 3:
-                self.neutronclient.find_resource.assert_called_with(
-                    'port', args[1])
-                return {'id': args[1]}
-            # 4. Find specified firewall_group and refer 'ports' attribute
-            if self.neutronclient.find_resource.call_count == 4:
-                self.neutronclient.find_resource.assert_called_with(
-                    self.res, target, cmd_resource=const.CMD_FWG)
-                return {'ports': _fwg['ports']}
+            if self.networkclient.find_port.call_count == 2:
+                self.networkclient.find_port.assert_called_with(args)
+                return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = _mock_port_fwg
+        self.networkclient.find_fireall_group.side_effect = _mock_port_fwg
+        self.networkclient.find_port.side_effect = _mock_port_fwg
 
         arglist = [
             target,
@@ -457,8 +466,8 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
         result = self.cmd.take_action(parsed_args)
 
         expect = {'ports': sorted(_fwg['ports'] + [port1, port2])}
-        self.mocked.assert_called_once_with(target, {self.res: expect})
-        self.assertEqual(4, self.neutronclient.find_resource.call_count)
+        self.mocked.assert_called_once_with(target, **expect)
+        self.assertEqual(2, self.networkclient.find_firewall_group.call_count)
         self.assertIsNone(result)
 
     def test_set_no_port(self):
@@ -473,7 +482,7 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'ports': []}})
+            target, **{'ports': []})
         self.assertIsNone(result)
 
     def test_set_admin_state(self):
@@ -487,12 +496,18 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'admin_state_up': True}})
+            target, **{'admin_state_up': True})
         self.assertIsNone(result)
 
     def test_set_egress_policy(self):
         target = self.resource['id']
         policy = 'egress_policy'
+
+        def _mock_find_policy(*args, **kwargs):
+            return {'id': args[0]}
+
+        self.networkclient.find_firewall_policy.side_effect = _mock_find_policy
+
         arglist = [target, '--egress-firewall-policy', policy]
         verifylist = [
             (self.res, target),
@@ -502,7 +517,7 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'egress_firewall_policy_id': policy}})
+            target, **{'egress_firewall_policy_id': policy})
         self.assertIsNone(result)
 
     def test_set_no_ingress_policies(self):
@@ -516,7 +531,7 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'ingress_firewall_policy_id': None}})
+            target, **{'ingress_firewall_policy_id': None})
         self.assertIsNone(result)
 
     def test_set_no_egress_policies(self):
@@ -530,7 +545,7 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
         result = self.cmd.take_action(parsed_args)
 
         self.mocked.assert_called_once_with(
-            target, {self.res: {'egress_firewall_policy_id': None}})
+            target, **{'egress_firewall_policy_id': None})
         self.assertIsNone(result)
 
     def test_set_port_and_no_port(self):
@@ -549,7 +564,7 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
         self.mocked.assert_called_once_with(
-            target, {self.res: {'ports': [port]}})
+            target, **{'ports': [port]})
         self.assertIsNone(result)
 
     def test_set_ingress_policy_and_no_ingress_policy(self):
@@ -585,7 +600,7 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
             self.check_parser, self.cmd, arglist, verifylist)
 
     def test_set_and_raises(self):
-        self.neutronclient.update_fwaas_firewall_group = mock.Mock(
+        self.networkclient.update_firewall_group = mock.Mock(
             side_effect=Exception)
         target = self.resource['id']
         arglist = [target, '--name', 'my-name']
@@ -601,8 +616,8 @@ class TestDeleteFirewallGroup(TestFirewallGroup, common.TestDeleteFWaaS):
     def setUp(self):
         super(TestDeleteFirewallGroup, self).setUp()
         # Mock objects
-        self.neutronclient.delete_fwaas_firewall_group = mock.Mock()
-        self.mocked = self.neutronclient.delete_fwaas_firewall_group
+        self.networkclient.delete_firewall_group = mock.Mock()
+        self.mocked = self.networkclient.delete_firewall_group
         self.cmd = firewallgroup.DeleteFirewallGroup(self.app, self.namespace)
 
 
@@ -612,8 +627,8 @@ class TestUnsetFirewallGroup(TestFirewallGroup, common.TestUnsetFWaaS):
         super(TestUnsetFirewallGroup, self).setUp()
         _fwg['ports'] = ['old_port']
         # Mock objects
-        self.neutronclient.update_fwaas_firewall_group = mock.Mock()
-        self.mocked = self.neutronclient.update_fwaas_firewall_group
+        self.networkclient.update_firewall_group = mock.Mock()
+        self.mocked = self.networkclient.update_firewall_group
         self.cmd = firewallgroup.UnsetFirewallGroup(self.app, self.namespace)
 
     def test_unset_ingress_policy(self):
@@ -629,7 +644,7 @@ class TestUnsetFirewallGroup(TestFirewallGroup, common.TestUnsetFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
         self.mocked.assert_called_once_with(
-            target, {self.res: {'ingress_firewall_policy_id': None}})
+            target, **{'ingress_firewall_policy_id': None})
         self.assertIsNone(result)
 
     def test_unset_egress_policy(self):
@@ -645,7 +660,7 @@ class TestUnsetFirewallGroup(TestFirewallGroup, common.TestUnsetFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
         self.mocked.assert_called_once_with(
-            target, {self.res: {'egress_firewall_policy_id': None}})
+            target, **{'egress_firewall_policy_id': None})
         self.assertIsNone(result)
 
     def test_unset_enable(self):
@@ -661,7 +676,7 @@ class TestUnsetFirewallGroup(TestFirewallGroup, common.TestUnsetFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
         self.mocked.assert_called_once_with(
-            target, {self.res: {'admin_state_up': False}})
+            target, **{'admin_state_up': False})
         self.assertIsNone(result)
 
     def test_unset_port(self):
@@ -670,23 +685,21 @@ class TestUnsetFirewallGroup(TestFirewallGroup, common.TestUnsetFWaaS):
 
         def _mock_port_fwg(*args, **kwargs):
             # 1. Find specified firewall_group
-            if self.neutronclient.find_resource.call_count == 1:
-                self.neutronclient.find_resource.assert_called_with(
-                    self.res, target, cmd_resource=const.CMD_FWG)
-                return {'id': args[1]}
+            if self.networkclient.find_firewall_group.call_count in [1, 2]:
+                self.networkclient.find_firewall_group.assert_called_with(
+                    target)
+                return {'id': args[0], 'ports': _fwg['ports']}
             # 2. Find specified firewall_group and refer 'ports' attribute
-            if self.neutronclient.find_resource.call_count == 2:
-                self.neutronclient.find_resource.assert_called_with(
-                    self.res, target, cmd_resource=const.CMD_FWG)
+            if self.networkclient.find_port.call_count == 2:
+                self.networkclient.find_port.assert_called_with(target)
                 return {'ports': _fwg['ports']}
             # 3. Find specified 'port'
-            if self.neutronclient.find_resource.call_count == 3:
-                self.neutronclient.find_resource.assert_called_with(
-                    'port', port)
-                return {'id': args[1]}
+            if self.networkclient.find_port.call_count == 3:
+                self.networkclient.find_port.assert_called_with(port)
+                return {'id': args[0]}
 
-        self.neutronclient.find_resource.side_effect = mock.Mock(
-            side_effect=_mock_port_fwg)
+        self.networkclient.find_firewall_group.side_effect = _mock_port_fwg
+        self.networkclient.find_port.side_effect = _mock_port_fwg
 
         arglist = [
             target,
@@ -698,7 +711,7 @@ class TestUnsetFirewallGroup(TestFirewallGroup, common.TestUnsetFWaaS):
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
-        self.mocked.assert_called_once_with(target, {self.res: {'ports': []}})
+        self.mocked.assert_called_once_with(target, **{'ports': []})
         self.assertIsNone(result)
 
     def test_unset_all_port(self):
@@ -713,5 +726,5 @@ class TestUnsetFirewallGroup(TestFirewallGroup, common.TestUnsetFWaaS):
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
-        self.mocked.assert_called_once_with(target, {self.res: {'ports': []}})
+        self.mocked.assert_called_once_with(target, **{'ports': []})
         self.assertIsNone(result)

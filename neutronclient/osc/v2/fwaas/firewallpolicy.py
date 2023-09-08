@@ -30,6 +30,18 @@ LOG = logging.getLogger(__name__)
 
 _formatters = {}
 
+
+_attr_map_dict = {
+    'id': 'ID',
+    'name': 'Name',
+    'description': 'Description',
+    'firewall_rules': 'Firewall Rules',
+    'audited': 'Audited',
+    'shared': 'Shared',
+    'tenant_id': 'Project',
+    'project_id': 'Project',
+}
+
 _attr_map = (
     ('id', 'ID', column_util.LIST_BOTH),
     ('name', 'Name', column_util.LIST_BOTH),
@@ -43,7 +55,7 @@ _attr_map = (
 
 def _get_common_attrs(client_manager, parsed_args, is_create=True):
     attrs = {}
-    client = client_manager.neutronclient
+    client = client_manager.network
 
     if is_create:
         if 'project' in parsed_args and parsed_args.project is not None:
@@ -55,18 +67,16 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
     if parsed_args.firewall_rule and parsed_args.no_firewall_rule:
         _firewall_rules = []
         for f in parsed_args.firewall_rule:
-            _firewall_rules.append(client.find_resource(
-                const.FWR, f, cmd_resource=const.CMD_FWR)['id'])
+            _firewall_rules.append(client.find_firewall_rule(f)['id'])
         attrs[const.FWRS] = _firewall_rules
     elif parsed_args.firewall_rule:
         rules = []
         if not is_create:
-            rules += client.find_resource(
-                const.FWP, parsed_args.firewall_policy,
-                cmd_resource=const.CMD_FWP)[const.FWRS]
+            foobar = client.find_firewall_policy(
+                parsed_args.firewall_policy)
+            rules += foobar[const.FWRS]
         for f in parsed_args.firewall_rule:
-            rules.append(client.find_resource(
-                const.FWR, f, cmd_resource=const.CMD_FWR)['id'])
+            rules.append(client.find_firewall_rule(f)['id'])
         attrs[const.FWRS] = rules
     elif parsed_args.no_firewall_rule:
         attrs[const.FWRS] = []
@@ -137,11 +147,11 @@ class CreateFirewallPolicy(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager, parsed_args)
-        obj = client.create_fwaas_firewall_policy(
-            {const.FWP: attrs})[const.FWP]
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        obj = client.create_firewall_policy(**attrs)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id'])
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
         return (display_columns, data)
 
@@ -159,13 +169,12 @@ class DeleteFirewallPolicy(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         result = 0
         for fwp in parsed_args.firewall_policy:
             try:
-                fwp_id = client.find_resource(
-                    const.FWP, fwp, cmd_resource='fwaas_' + const.FWP)['id']
-                client.delete_fwaas_firewall_policy(fwp_id)
+                fwp_id = client.find_firewall_policy(fwp)['id']
+                client.delete_firewall_policy(fwp_id)
             except Exception as e:
                 result += 1
                 LOG.error(_("Failed to delete Firewall policy with "
@@ -205,31 +214,28 @@ class FirewallPolicyInsertRule(command.Command):
         return parser
 
     def args2body(self, parsed_args):
-        client = self.app.client_manager.neutronclient
+        client = self.app.client_manager.network
         _rule_id = _get_required_firewall_rule(client, parsed_args)
         _insert_before = ''
         if 'insert_before' in parsed_args:
             if parsed_args.insert_before:
-                _insert_before = client.find_resource(
-                    const.FWR, parsed_args.insert_before,
-                    cmd_resource=const.CMD_FWR)['id']
+                _insert_before = client.find_firewall_rule(
+                    parsed_args.insert_before)['id']
         _insert_after = ''
         if 'insert_after' in parsed_args:
             if parsed_args.insert_after:
-                _insert_after = client.find_resource(
-                    const.FWR, parsed_args.insert_after,
-                    cmd_resource=const.CMD_FWR)['id']
+                _insert_after = client.find_firewall_rule(
+                    parsed_args.insert_after)['id']
         return {'firewall_rule_id': _rule_id,
                 'insert_before': _insert_before,
                 'insert_after': _insert_after}
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        policy_id = client.find_resource(
-            const.FWP, parsed_args.firewall_policy,
-            cmd_resource=const.CMD_FWP)['id']
+        client = self.app.client_manager.network
+        policy_id = client.find_firewall_policy(
+            parsed_args.firewall_policy)['id']
         body = self.args2body(parsed_args)
-        client.insert_rule_fwaas_firewall_policy(policy_id, body)
+        client.insert_rule_into_policy(policy_id, body)
         rule_id = body['firewall_rule_id']
         policy = parsed_args.firewall_policy
         print((_('Inserted firewall rule %(rule)s in firewall policy '
@@ -253,13 +259,12 @@ class FirewallPolicyRemoveRule(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        policy_id = client.find_resource(
-            const.FWP, parsed_args.firewall_policy,
-            cmd_resource=const.CMD_FWP)['id']
+        client = self.app.client_manager.network
+        policy_id = client.find_firewall_policy(
+            parsed_args.firewall_policy)['id']
         fwr_id = _get_required_firewall_rule(client, parsed_args)
         body = {'firewall_rule_id': fwr_id}
-        client.remove_rule_fwaas_firewall_policy(policy_id, body)
+        client.remove_rule_from_policy(policy_id, body)
         rule_id = body['firewall_rule_id']
         policy = parsed_args.firewall_policy
         print((_('Removed firewall rule %(rule)s from firewall policy '
@@ -281,8 +286,8 @@ class ListFirewallPolicy(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        obj = client.list_fwaas_firewall_policies()[const.FWPS]
+        client = self.app.client_manager.network
+        obj = client.firewall_policies()
         headers, columns = column_util.get_column_definitions(
             _attr_map, long_listing=parsed_args.long)
         return (headers, (utils.get_dict_properties(
@@ -315,14 +320,13 @@ class SetFirewallPolicy(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        fwp_id = client.find_resource(
-            const.FWP, parsed_args.firewall_policy,
-            cmd_resource=const.CMD_FWP)['id']
+        client = self.app.client_manager.network
+        fwp_id = client.find_firewall_policy(
+            parsed_args.firewall_policy)['id']
         attrs = _get_common_attrs(self.app.client_manager,
                                   parsed_args, is_create=False)
         try:
-            client.update_fwaas_firewall_policy(fwp_id, {const.FWP: attrs})
+            client.update_firewall_policy(fwp_id, **attrs)
         except Exception as e:
             msg = (_("Failed to set firewall policy '%(policy)s': %(e)s")
                    % {'policy': parsed_args.firewall_policy, 'e': e})
@@ -341,12 +345,12 @@ class ShowFirewallPolicy(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        fwp_id = client.find_resource(const.FWP,
-                                      parsed_args.firewall_policy,
-                                      cmd_resource=const.CMD_FWP)['id']
-        obj = client.show_fwaas_firewall_policy(fwp_id)[const.FWP]
-        columns, display_columns = column_util.get_columns(obj, _attr_map)
+        client = self.app.client_manager.network
+        fwp_id = client.find_firewall_policy(
+            parsed_args.firewall_policy)['id']
+        obj = client.get_firewall_policy(fwp_id)
+        display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
+            obj, _attr_map_dict, ['location', 'tenant_id'])
         data = utils.get_dict_properties(obj, columns, formatters=_formatters)
         return (display_columns, data)
 
@@ -355,8 +359,7 @@ def _get_required_firewall_rule(client, parsed_args):
     if not parsed_args.firewall_rule:
         msg = (_("Firewall rule (name or ID) is required."))
         raise exceptions.CommandError(msg)
-    return client.find_resource(
-        const.FWR, parsed_args.firewall_rule, cmd_resource=const.CMD_FWR)['id']
+    return client.find_firewall_rule(parsed_args.firewall_rule)['id']
 
 
 class UnsetFirewallPolicy(command.Command):
@@ -392,16 +395,14 @@ class UnsetFirewallPolicy(command.Command):
 
     def _get_attrs(self, client_manager, parsed_args):
         attrs = {}
-        client = client_manager.neutronclient
+        client = client_manager.network
 
         if parsed_args.firewall_rule:
-            current = client.find_resource(
-                const.FWP, parsed_args.firewall_policy,
-                cmd_resource=const.CMD_FWP)[const.FWRS]
+            current = client.find_firewall_policy(
+                parsed_args.firewall_policy)[const.FWRS]
             removed = []
             for f in set(parsed_args.firewall_rule):
-                removed.append(client.find_resource(
-                    const.FWR, f, cmd_resource=const.CMD_FWR)['id'])
+                removed.append(client.find_firewall_rule(f)['id'])
             attrs[const.FWRS] = [r for r in current if r not in removed]
         if parsed_args.all_firewall_rule:
             attrs[const.FWRS] = []
@@ -412,13 +413,12 @@ class UnsetFirewallPolicy(command.Command):
         return attrs
 
     def take_action(self, parsed_args):
-        client = self.app.client_manager.neutronclient
-        fwp_id = client.find_resource(
-            const.FWP, parsed_args.firewall_policy,
-            cmd_resource=const.CMD_FWP)['id']
+        client = self.app.client_manager.network
+        fwp_id = client.find_firewall_policy(
+            parsed_args.firewall_policy)['id']
         attrs = self._get_attrs(self.app.client_manager, parsed_args)
         try:
-            client.update_fwaas_firewall_policy(fwp_id, {const.FWP: attrs})
+            client.update_firewall_policy(fwp_id, **attrs)
         except Exception as e:
             msg = (_("Failed to unset firewall policy '%(policy)s': %(e)s")
                    % {'policy': parsed_args.firewall_policy, 'e': e})
