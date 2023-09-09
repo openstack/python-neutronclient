@@ -1,0 +1,400 @@
+# Andi Chandler <andi@gowling.com>, 2022. #zanata
+# Andi Chandler <andi@gowling.com>, 2023. #zanata
+msgid ""
+msgstr ""
+"Project-Id-Version: Neutron Client Release Notes\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-08 20:18+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2023-07-28 12:44+0000\n"
+"Last-Translator: Andi Chandler <andi@gowling.com>\n"
+"Language-Team: English (United Kingdom)\n"
+"Language: en_GB\n"
+"X-Generator: Zanata 4.3.3\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgid ""
+"\"admin-state-down\" option was deprecated in Mitaka and has been removed in "
+"Newton."
+msgstr ""
+"\"admin-state-down\" option was deprecated in Mitaka and has been removed in "
+"Newton."
+
+msgid "10.0.0"
+msgstr "10.0.0"
+
+msgid "2.0"
+msgstr "2.0"
+
+msgid "2.2.0"
+msgstr "2.2.0"
+
+msgid "2.2.2"
+msgstr "2.2.2"
+
+msgid "2023.1 Series Release Notes"
+msgstr "2023.1 Series Release Notes"
+
+msgid "4.0.0"
+msgstr "4.0.0"
+
+msgid "4.1.0"
+msgstr "4.1.0"
+
+msgid "4.1.1"
+msgstr "4.1.1"
+
+msgid "4.1.2-15"
+msgstr "4.1.2-15"
+
+msgid "4.2.0"
+msgstr "4.2.0"
+
+msgid "5.0.0"
+msgstr "5.0.0"
+
+msgid "5.1.0"
+msgstr "5.1.0"
+
+msgid "6.0.0"
+msgstr "6.0.0"
+
+msgid "6.1.0"
+msgstr "6.1.0"
+
+msgid "6.1.1"
+msgstr "6.1.1"
+
+msgid "6.10.0"
+msgstr "6.10.0"
+
+msgid "6.11.0"
+msgstr "6.11.0"
+
+msgid "6.12.0"
+msgstr "6.12.0"
+
+msgid "6.14.0"
+msgstr "6.14.0"
+
+msgid "6.2.0"
+msgstr "6.2.0"
+
+msgid "6.3.0"
+msgstr "6.3.0"
+
+msgid "6.4.0"
+msgstr "6.4.0"
+
+msgid "6.5.0"
+msgstr "6.5.0"
+
+msgid "6.6.0"
+msgstr "6.6.0"
+
+msgid "6.7.0"
+msgstr "6.7.0"
+
+msgid "7.0.0"
+msgstr "7.0.0"
+
+msgid "7.1.0"
+msgstr "7.1.0"
+
+msgid "7.2.0"
+msgstr "7.2.0"
+
+msgid "7.2.1"
+msgstr "7.2.1"
+
+msgid "7.5.0"
+msgstr "7.5.0"
+
+msgid "7.7.0"
+msgstr "7.7.0"
+
+msgid "7.8.0"
+msgstr "7.8.0"
+
+msgid "8.0.0"
+msgstr "8.0.0"
+
+msgid "8.1.0"
+msgstr "8.1.0"
+
+msgid "8.2.0"
+msgstr "8.2.0"
+
+msgid ""
+"A new option ``--no-session-persistence`` has been added to the ``neutron "
+"lbaas-pool-update`` CLI to clear the session persistence with which the "
+"current pool is associated."
+msgstr ""
+"A new option ``--no-session-persistence`` has been added to the ``neutron "
+"lbaas-pool-update`` CLI to clear the session persistence with which the "
+"current pool is associated."
+
+msgid ""
+"Add BGP VPN `port association <https://developer.openstack.org/api-ref/"
+"network/v2/index.html#port-associations>`_ support to the CLI, which are "
+"introduced for BGP VPN interconnections by the ``bgpvpn-routes-control`` API "
+"extension."
+msgstr ""
+"Add BGP VPN `port association <https://developer.openstack.org/api-ref/"
+"network/v2/index.html#port-associations>`_ support to the CLI, which are "
+"introduced for BGP VPN interconnections by the ``bgpvpn-routes-control`` API "
+"extension."
+
+msgid ""
+"Add OSC plugin support for the “Networking Service Function Chaining” "
+"feature commands along with client bindings. [Blueprint `openstackclient-cli-"
+"porting <https://blueprints.launchpad.net/networking-sfc/+spec/"
+"openstackclient-cli-porting>`_]"
+msgstr ""
+"Add OSC plugin support for the “Networking Service Function Chaining” "
+"feature commands along with client bindings. [Blueprint `openstackclient-cli-"
+"porting <https://blueprints.launchpad.net/networking-sfc/+spec/"
+"openstackclient-cli-porting>`_]"
+
+msgid "Add OSC plugin to support \"Neutron Dynamic Routing\""
+msgstr "Add OSC plugin to support \"Neutron Dynamic Routing\""
+
+msgid "Add OSC support to create Port pair group for Tap service functions."
+msgstr "Add OSC support to create Port pair group for Tap service functions."
+
+msgid ""
+"Add ``network onboard subnets`` OSC command to enable subnet onboard support "
+"from the CLI [Blueprint `subnet-onboard <https://blueprints.launchpad.net/"
+"neutron/+spec/subnet-onboard>`_]"
+msgstr ""
+"Add ``network onboard subnets`` OSC command to enable subnet onboard support "
+"from the CLI [Blueprint `subnet-onboard <https://blueprints.launchpad.net/"
+"neutron/+spec/subnet-onboard>`_]"
+
+msgid ""
+"Add ``network trunk create``, ``network trunk list``, ``network trunk set``, "
+"``network trunk unset``, ``network trunk delete`` and ``network subport "
+"list`` OSC commands for trunk resource along with client bindings. "
+"[Blueprint `vlan-aware-vms <https://blueprints.launchpad.net/neutron/+spec/"
+"vlan-aware-vms>`_]"
+msgstr ""
+"Add ``network trunk create``, ``network trunk list``, ``network trunk set``, "
+"``network trunk unset``, ``network trunk delete`` and ``network subport "
+"list`` OSC commands for trunk resource along with client bindings. "
+"[Blueprint `vlan-aware-vms <https://blueprints.launchpad.net/neutron/+spec/"
+"vlan-aware-vms>`_]"
+
+msgid ""
+"Add optional flag to control the advertisement in BGPVPNs of the routes "
+"defined on a Router resource (``bgpvpn-routes-control`` API extension)."
+msgstr ""
+"Add optional flag to control the advertisement in BGPVPNs of the routes "
+"defined on a Router resource (``bgpvpn-routes-control`` API extension)."
+
+msgid ""
+"Add osprofiler support to the neutronclient python binding. If osprofiler is "
+"initiated, neutronclient sends a special HTTP header that contains trace "
+"info."
+msgstr ""
+"Add osprofiler support to the neutronclient python binding. If osprofiler is "
+"initiated, neutronclient sends a special HTTP header that contains trace "
+"info."
+
+msgid "Add support to floating ip port forwarding."
+msgstr "Add support to floating ip port forwarding."
+
+msgid ""
+"By using this feature, multiple resource can be deleted using a single "
+"command."
+msgstr ""
+"By using this feature, multiple resource can be deleted using a single "
+"command."
+
+msgid ""
+"CLI support for 'Logging' feature, which enable to collect packet logs for "
+"specified resource. Currently, only security-group can be logged."
+msgstr ""
+"CLI support for 'Logging' feature, which enable to collect packet logs for "
+"specified resource. Currently, only security-group can be logged."
+
+msgid "CLI support for Layer 7 content policies and rules."
+msgstr "CLI support for Layer 7 content policies and rules."
+
+msgid "CLI support for Neutron-LBaaS v2 shared pools added."
+msgstr "CLI support for Neutron-LBaaS v2 shared pools added."
+
+msgid "CLI support for QoS policy RBAC."
+msgstr "CLI support for QoS policy RBAC."
+
+msgid "Current Series Release Notes"
+msgstr "Current Series Release Notes"
+
+msgid "Mitaka Series Release Notes"
+msgstr "Mitaka Series Release Notes"
+
+msgid "Neutron Client Release Notes"
+msgstr "Neutron Client Release Notes"
+
+msgid "Newton Series Release Notes"
+msgstr "Newton Series Release Notes"
+
+msgid "Ocata Series Release Notes"
+msgstr "Ocata Series Release Notes"
+
+msgid "Old Release Notes"
+msgstr "Old Release Notes"
+
+msgid "Pike Series Release Notes"
+msgstr "Pike Series Release Notes"
+
+msgid "Queens Series Release Notes"
+msgstr "Queens Series Release Notes"
+
+msgid "Rocky Series Release Notes"
+msgstr "Rocky Series Release Notes"
+
+msgid "Stein Series Release Notes"
+msgstr "Stein Series Release Notes"
+
+msgid "The ``rbac-create`` command include a --type qos-policy option."
+msgstr "The ``rbac-create`` command include a --type qos-policy option."
+
+msgid "The ``rbac-list`` command output includes a new 'type' column."
+msgstr "The ``rbac-list`` command output includes a new 'type' column."
+
+msgid ""
+"The ``subnetpool-create`` and ``subnetpool-update`` commands include a ``--"
+"is-default`` option."
+msgstr ""
+"The ``subnetpool-create`` and ``subnetpool-update`` commands include a ``--"
+"is-default`` option."
+
+msgid ""
+"The ``subnetpool-list`` and ``subnetpool-show`` command output includes the "
+"``is_default`` field."
+msgstr ""
+"The ``subnetpool-list`` and ``subnetpool-show`` command output includes the "
+"``is_default`` field."
+
+msgid ""
+"The ``tag-add`` command sets a tag on the network resource. It also includes "
+"``--resource-type``, ``--resource`` and ``--tag`` options."
+msgstr ""
+"The ``tag-add`` command sets a tag on the network resource. It also includes "
+"``--resource-type``, ``--resource`` and ``--tag`` options."
+
+msgid ""
+"This patch provides user the support to use any form of casing, thus "
+"removing the specific UPPER/lower case inputs required by different neutron "
+"CLIs."
+msgstr ""
+"This patch provides users the support to use any form of casing, thus "
+"removing the specific UPPER/lower case inputs required by different Neutron "
+"CLIs."
+
+msgid ""
+"This project no longer provides CLI support. All code has been removed. "
+"Please use openstack CLI instead. See `openstack CLI command list <https://"
+"docs.openstack.org/python-openstackclient/latest/cli/command-list.html>`_."
+msgstr ""
+"This project no longer provides CLI support. All code has been removed. "
+"Please use OpenStack CLI instead. See `openstack CLI command list <https://"
+"docs.openstack.org/python-openstackclient/latest/cli/command-list.html>`_."
+
+msgid "Train Series Release Notes"
+msgstr "Train Series Release Notes"
+
+msgid "Upgrade Notes"
+msgstr "Upgrade Notes"
+
+msgid ""
+"Using 'tenant_id' and 'tenant_name' arguments in API bindings is deprecated. "
+"Use 'project_id' and 'project_name' arguments instead."
+msgstr ""
+"Using 'tenant_id' and 'tenant_name' arguments in API bindings is deprecated. "
+"Use 'project_id' and 'project_name' arguments instead."
+
+msgid "Ussuri Series Release Notes"
+msgstr "Ussuri Series Release Notes"
+
+msgid "Victoria Series Release Notes"
+msgstr "Victoria Series Release Notes"
+
+msgid "Wallaby Series Release Notes"
+msgstr "Wallaby Series Release Notes"
+
+msgid "XML request format support has been removed."
+msgstr "XML request format support has been removed."
+
+msgid "Xena Series Release Notes"
+msgstr "Xena Series Release Notes"
+
+msgid "Yoga Series Release Notes"
+msgstr "Yoga Series Release Notes"
+
+msgid "Zed Series Release Notes"
+msgstr "Zed Series Release Notes"
+
+msgid "add --endpoint-type and OS_ENDPOINT_TYPE to shell client"
+msgstr "add --endpoint-type and OS_ENDPOINT_TYPE to shell client"
+
+msgid "add Lbaas commands"
+msgstr "add Lbaas commands"
+
+msgid "add NVP queue and net gateway commands"
+msgstr "add NVP queue and net gateway commands"
+
+msgid ""
+"add ability to update security group name (requires 2013.2-Havana or later)"
+msgstr ""
+"add ability to update security group name (requires 2013.2-Havana or later)"
+
+msgid "add commands for DHCP and L3 agents scheduling"
+msgstr "add commands for DHCP and L3 agents scheduling"
+
+msgid "add commands for agent management extensions"
+msgstr "add commands for agent management extensions"
+
+msgid "add flake8 and pbr support for testing and building"
+msgstr "add flake8 and pbr support for testing and building"
+
+msgid "add security group commands"
+msgstr "add security group commands"
+
+msgid "allow options put after positional arguments"
+msgstr "allow options put after positional arguments"
+
+msgid "improved support for listing a large number of filtered subnets"
+msgstr "improved support for listing a large number of filtered subnets"
+
+msgid "made the publicURL the default endpoint instead of adminURL"
+msgstr "made the publicURL the default endpoint instead of adminURL"
+
+msgid "openstack firewall rule create"
+msgstr "openstack firewall rule create"
+
+msgid "openstack firewall rule set"
+msgstr "openstack firewall rule set"
+
+msgid "openstack firewall rule unset"
+msgstr "openstack firewall rule unset"
+
+msgid "py26 support has been dropped."
+msgstr "py26 support has been dropped."
+
+msgid "py33 support has been dropped."
+msgstr "py33 support has been dropped."
+
+msgid "request-format option is deprecated."
+msgstr "request-format option is deprecated."
+
+msgid "support Neutron API 2.0"
+msgstr "support Neutron API 2.0"
+
+msgid "support XML request format"
+msgstr "support XML request format"
+
+msgid "support pagination options"
+msgstr "support pagination options"
