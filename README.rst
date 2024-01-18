@@ -17,6 +17,12 @@ Python bindings to the Neutron API
 This is a client library for Neutron built on the Neutron API. It
 provides a Python API (the ``neutronclient`` module).
 
+.. note:: This project has been deprecated. The CLI code has been deleted
+   and is not accessible anymore. The Python bindings are still in use by
+   other projects but no new features will be added to this project.
+   Any new feature should be proposed to OpenStack SDK and OpenStack
+   Client.
+
 * License: Apache License, Version 2.0
 * `PyPi`_ - package installation
 * `Online Documentation`_
