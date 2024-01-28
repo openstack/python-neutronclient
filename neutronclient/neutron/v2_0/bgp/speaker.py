@@ -189,7 +189,7 @@ class RemovePeerFromSpeaker(neutronv20.NeutronCommand):
         neutron_client.remove_peer_from_bgp_speaker(_speaker_id,
                                                     {'bgp_peer_id': _peer_id})
         print(_('Removed BGP peer %(peer)s from BGP speaker %(speaker)s.') %
-              {'peer':  parsed_args.bgp_peer,
+              {'peer': parsed_args.bgp_peer,
                'speaker': parsed_args.bgp_speaker},
               file=self.app.stdout)
 

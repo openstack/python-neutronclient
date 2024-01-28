@@ -213,8 +213,8 @@ def _validate_destination_chains(comma_split, attrs, client, sc_):
             dc_ = client.find_sfc_port_chain(e, ignore_missing=False)['id']
             attrs['port_chains'][sc_].append(dc_)
             if _check_cycle(attrs['port_chains'], sc_, dc_):
-                raise(exceptions.CommandError(
-                    "Error: Service graph contains a cycle"))
+                raise exceptions.CommandError(
+                    "Error: Service graph contains a cycle")
         else:
             raise exceptions.CommandError(
                 "Error: you must specify at least one "
