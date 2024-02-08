@@ -138,7 +138,7 @@ def str2dict(strdict, required_keys=None, optional_keys=None):
                 msg = _("missing value for key '%s'")
                 raise argparse.ArgumentTypeError(msg % kv)
             else:
-                kvlist[i-1] = "%s,%s" % (kvlist[i-1], kv)
+                kvlist[i - 1] = "%s,%s" % (kvlist[i - 1], kv)
         for kv in kvlist:
             key, sep, value = kv.partition('=')
             if not sep:

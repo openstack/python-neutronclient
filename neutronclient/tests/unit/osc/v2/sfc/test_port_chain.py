@@ -47,7 +47,7 @@ class TestCreateSfcPortChain(fakes.TestNeutronClientOSCV2):
             self._port_chain['name'],
             self._port_chain['port_pair_groups'],
             self._port_chain['project_id'],
-            )
+        )
 
     def setUp(self):
         super(TestCreateSfcPortChain, self).setUp()
@@ -357,7 +357,7 @@ class TestSetSfcPortChain(fakes.TestNeutronClientOSCV2):
         arglist = [
             target,
             '--no-port-pair-group',
-            ]
+        ]
         verifylist = [
             (self.res, target),
             ('no_port_pair_group', True),

@@ -34,7 +34,7 @@ _attr_map = (
     ('port_pair_group_parameters', 'Port Pair Group Parameters',
      column_util.LIST_BOTH),
     ('description', 'Description', column_util.LIST_LONG_ONLY),
-    ('project_id', 'Project',  column_util.LIST_LONG_ONLY),
+    ('project_id', 'Project', column_util.LIST_LONG_ONLY),
     ('is_tap_enabled', 'Tap Enabled', column_util.LIST_BOTH)
 )
 

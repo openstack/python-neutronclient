@@ -137,7 +137,7 @@ class TestCreateSfcFlowClassifier(fakes.TestNeutronClientOSCV2):
                 'logical_destination_port':
                     self._fc['logical_destination_port'],
                 'l7_parameters': param
-                }
+            }
         )
         self.assertEqual(self.columns, columns)
 

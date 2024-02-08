@@ -123,8 +123,8 @@ class TestCreateSfcServiceGraph(fakes.TestNeutronClientOSCV2):
 
         arglist = [
             "--description", self._service_graph['description'],
-            "--branching-point",  bp1_str,
-            "--branching-point",  bp2_str,
+            "--branching-point", bp1_str,
+            "--branching-point", bp2_str,
             self._service_graph['name']]
 
         pcs = {'pc1': ['pc2', 'pc3'], 'pc2': ['pc4']}
@@ -154,8 +154,8 @@ class TestCreateSfcServiceGraph(fakes.TestNeutronClientOSCV2):
 
         arglist = [
             "--description", self._service_graph['description'],
-            "--branching-point",  bp1_str,
-            "--branching-point",  bp2_str,
+            "--branching-point", bp1_str,
+            "--branching-point", bp2_str,
             self._service_graph['name']]
 
         verifylist = [
@@ -175,7 +175,7 @@ class TestCreateSfcServiceGraph(fakes.TestNeutronClientOSCV2):
 
         arglist = [
             "--description", self._service_graph['description'],
-            "--branching-point",  bp1_str,
+            "--branching-point", bp1_str,
             self._service_graph['name']]
 
         verifylist = [
@@ -196,8 +196,8 @@ class TestCreateSfcServiceGraph(fakes.TestNeutronClientOSCV2):
 
         arglist = [
             "--description", self._service_graph['description'],
-            "--branching-point",  bp1_str,
-            "--branching-point",  bp2_str,
+            "--branching-point", bp1_str,
+            "--branching-point", bp2_str,
             self._service_graph['name']]
 
         verifylist = [
