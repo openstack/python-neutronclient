@@ -507,12 +507,12 @@ class TestFirewallPolicyInsertRule(TestFirewallPolicy):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
 
-        self.mocked.assert_called_once_with(
-            target, {
-                'firewall_rule_id': rule,
-                'insert_before': before,
-                'insert_after': after
-            })
+        body = {
+            'firewall_rule_id': rule,
+            'insert_before': before,
+            'insert_after': after
+        }
+        self.mocked.assert_called_once_with(target, **body)
         self.assertIsNone(result)
         self.assertEqual(1, self.networkclient.find_firewall_policy.call_count)
         self.assertEqual(3, self.networkclient.find_firewall_rule.call_count)
@@ -560,8 +560,8 @@ class TestFirewallPolicyRemoveRule(TestFirewallPolicy):
         ]
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         result = self.cmd.take_action(parsed_args)
-        self.mocked.assert_called_once_with(
-            target, {'firewall_rule_id': rule})
+        body = {'firewall_rule_id': rule}
+        self.mocked.assert_called_once_with(target, **body)
         self.assertIsNone(result)
         self.assertEqual(1, self.networkclient.find_firewall_policy.call_count)
         self.assertEqual(1, self.networkclient.find_firewall_rule.call_count)
