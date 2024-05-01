@@ -75,10 +75,10 @@ class CreateBgpvpnResAssoc(command.ShowOne):
             body.update(
                 arg2body(bgpvpn['id'], parsed_args))
 
-        if self._assoc_res_name == constants.NETWORK_ASSOC:
+        if self._resource == constants.NETWORK_ASSOC:
             obj = client.create_bgpvpn_network_association(
                 bgpvpn['id'], **body)
-        elif self._assoc_res_name == constants.PORT_ASSOCS:
+        elif self._resource == constants.PORT_ASSOC:
             obj = client.create_bgpvpn_port_association(bgpvpn['id'], **body)
         else:
             obj = client.create_bgpvpn_router_association(
@@ -123,10 +123,10 @@ class SetBgpvpnResAssoc(command.Command):
         arg2body = getattr(self, '_args2body', None)
         if callable(arg2body):
             body = arg2body(bgpvpn['id'], parsed_args)
-            if self._assoc_res_name == constants.NETWORK_ASSOC:
+            if self._resource == constants.NETWORK_ASSOC:
                 client.update_bgpvpn_network_association(
                     bgpvpn['id'], parsed_args.resource_association_id, **body)
-            elif self._assoc_res_name == constants.PORT_ASSOCS:
+            elif self._resource == constants.PORT_ASSOC:
                 client.update_bgpvpn_port_association(
                     bgpvpn['id'], parsed_args.resource_association_id, **body)
             else:
@@ -165,9 +165,9 @@ class DeleteBgpvpnResAssoc(command.Command):
         fails = 0
         for id in parsed_args.resource_association_ids:
             try:
-                if self._assoc_res_name == constants.NETWORK_ASSOC:
+                if self._resource == constants.NETWORK_ASSOC:
                     client.delete_bgpvpn_network_association(bgpvpn['id'], id)
-                elif self._assoc_res_name == constants.PORT_ASSOCS:
+                elif self._resource == constants.PORT_ASSOC:
                     client.delete_bgpvpn_port_association(bgpvpn['id'], id)
                 else:
                     client.delete_bgpvpn_router_association(bgpvpn['id'], id)
@@ -221,10 +221,10 @@ class ListBgpvpnResAssoc(command.Lister):
         params = {}
         if parsed_args.property:
             params.update(parsed_args.property)
-        if self._assoc_res_name == constants.NETWORK_ASSOC:
+        if self._resource == constants.NETWORK_ASSOC:
             objs = client.bgpvpn_network_associations(
                 bgpvpn['id'], retrieve_all=True, **params)
-        elif self._assoc_res_name == constants.PORT_ASSOCS:
+        elif self._resource == constants.PORT_ASSOC:
             objs = client.bgpvpn_port_associations(
                 bgpvpn['id'], retrieve_all=True, **params)
         else:
@@ -265,10 +265,10 @@ class ShowBgpvpnResAssoc(command.ShowOne):
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
         bgpvpn = client.find_bgpvpn(parsed_args.bgpvpn)
-        if self._assoc_res_name == constants.NETWORK_ASSOC:
+        if self._resource == constants.NETWORK_ASSOC:
             obj = client.get_bgpvpn_network_association(
                 bgpvpn['id'], parsed_args.resource_association_id)
-        elif self._assoc_res_name == constants.PORT_ASSOCS:
+        elif self._resource == constants.PORT_ASSOC:
             obj = client.get_bgpvpn_port_association(
                 bgpvpn['id'], parsed_args.resource_association_id)
         else:
