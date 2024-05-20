@@ -235,7 +235,7 @@ class FirewallPolicyInsertRule(command.Command):
         policy_id = client.find_firewall_policy(
             parsed_args.firewall_policy)['id']
         body = self.args2body(parsed_args)
-        client.insert_rule_into_policy(policy_id, body)
+        client.insert_rule_into_policy(policy_id, **body)
         rule_id = body['firewall_rule_id']
         policy = parsed_args.firewall_policy
         print((_('Inserted firewall rule %(rule)s in firewall policy '
@@ -264,7 +264,7 @@ class FirewallPolicyRemoveRule(command.Command):
             parsed_args.firewall_policy)['id']
         fwr_id = _get_required_firewall_rule(client, parsed_args)
         body = {'firewall_rule_id': fwr_id}
-        client.remove_rule_from_policy(policy_id, body)
+        client.remove_rule_from_policy(policy_id, **body)
         rule_id = body['firewall_rule_id']
         policy = parsed_args.firewall_policy
         print((_('Removed firewall rule %(rule)s from firewall policy '
