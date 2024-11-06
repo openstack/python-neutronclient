@@ -125,6 +125,8 @@ class VPNService(FakeVPNaaS):
             ('status', 'ACTIVE'),
             ('description', 'my-desc-' + uuid.uuid4().hex),
             ('project_id', 'project-id-' + uuid.uuid4().hex),
+            ('external_v4_ip', '192.0.2.42'),
+            ('external_v6_ip', '2001:0db8:207a:4a3a:053b:6fab:7df9:1afd'),
         ))
 
 

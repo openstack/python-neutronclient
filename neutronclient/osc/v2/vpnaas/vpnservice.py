@@ -36,6 +36,8 @@ _attr_map = (
     ('status', 'Status', column_util.LIST_BOTH),
     ('description', 'Description', column_util.LIST_LONG_ONLY),
     ('project_id', 'Project', column_util.LIST_LONG_ONLY),
+    ('external_v4_ip', 'Ext v4 IP', column_util.LIST_LONG_ONLY),
+    ('external_v6_ip', 'Ext v6 IP', column_util.LIST_LONG_ONLY),
 )
 
 _attr_map_dict = {
@@ -48,6 +50,8 @@ _attr_map_dict = {
     'status': 'Status',
     'description': 'Description',
     'project_id': 'Project',
+    'external_v4_ip': 'Ext v4 IP',
+    'external_v6_ip': 'Ext v6 IP',
 }
 
 
@@ -135,8 +139,7 @@ class CreateVPNService(command.ShowOne):
             attrs['router_id'] = _router_id
         obj = client.create_vpn_service(**attrs)
         display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
-            obj, _attr_map_dict, ['location', 'tenant_id', 'external_v4_ip',
-                                  'external_v6_ip'])
+            obj, _attr_map_dict, ['location', 'tenant_id'])
         data = utils.get_dict_properties(obj, columns)
         return display_columns, data
 
@@ -244,7 +247,6 @@ class ShowVPNService(command.ShowOne):
                                          ignore_missing=False)['id']
         obj = client.get_vpn_service(vpn_id)
         display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
-            obj, _attr_map_dict, ['location', 'tenant_id', 'external_v4_ip',
-                                  'external_v6_ip'])
+            obj, _attr_map_dict, ['location', 'tenant_id'])
         data = utils.get_dict_properties(obj, columns)
         return (display_columns, data)
