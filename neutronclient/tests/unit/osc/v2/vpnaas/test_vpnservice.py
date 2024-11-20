@@ -106,10 +106,14 @@ class TestVPNService(test_fakes.TestNeutronClientOSCV2):
             'Status',
             'Description',
             'Project',
+            'Ext v4 IP',
+            'Ext v6 IP',
         )
         self.data = _generate_data()
         self.ordered_headers = (
             'Description',
+            'Ext v4 IP',
+            'Ext v6 IP',
             'Flavor',
             'ID',
             'Name',
@@ -121,6 +125,8 @@ class TestVPNService(test_fakes.TestNeutronClientOSCV2):
         )
         self.ordered_data = (
             _vpnservice['description'],
+            _vpnservice['external_v4_ip'],
+            _vpnservice['external_v6_ip'],
             _vpnservice['flavor_id'],
             _vpnservice['id'],
             _vpnservice['name'],
@@ -132,6 +138,8 @@ class TestVPNService(test_fakes.TestNeutronClientOSCV2):
         )
         self.ordered_columns = (
             'description',
+            'external_v4_ip',
+            'external_v6_ip',
             'flavor_id',
             'id',
             'name',
