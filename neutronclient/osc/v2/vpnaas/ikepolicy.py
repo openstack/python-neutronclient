@@ -56,6 +56,66 @@ _attr_map_dict = {
     'project_id': 'Project',
 }
 
+_auth_algorithms = [
+    'sha1',
+    'sha256',
+    'sha384',
+    'sha512',
+    'aes-xcbc',
+    'aes-cmac',
+]
+
+_encryption_algorithms = [
+    '3des',
+    'aes-128',
+    'aes-192',
+    'aes-256',
+    'aes-128-ccm-8',
+    'aes-192-ccm-8',
+    'aes-256-ccm-8',
+    'aes-128-ccm-12',
+    'aes-192-ccm-12',
+    'aes-256-ccm-12',
+    'aes-128-ccm-16',
+    'aes-192-ccm-16',
+    'aes-256-ccm-16',
+    'aes-128-gcm-8',
+    'aes-192-gcm-8',
+    'aes-256-gcm-8',
+    'aes-128-gcm-12',
+    'aes-192-gcm-12',
+    'aes-256-gcm-12',
+    'aes-128-gcm-16',
+    'aes-192-gcm-16',
+    'aes-256-gcm-16',
+    'aes-128-ctr',
+    'aes-192-ctr',
+    'aes-256-ctr',
+]
+
+_pfs_groups = [
+    'group2',
+    'group5',
+    'group14',
+    'group15',
+    'group16',
+    'group17',
+    'group18',
+    'group19',
+    'group20',
+    'group21',
+    'group22',
+    'group23',
+    'group24',
+    'group25',
+    'group26',
+    'group27',
+    'group28',
+    'group29',
+    'group30',
+    'group31',
+]
+
 
 def _convert_to_lowercase(string):
     return string.lower()
@@ -68,12 +128,12 @@ def _get_common_parser(parser):
         help=_('Description of the IKE policy'))
     parser.add_argument(
         '--auth-algorithm',
-        choices=['sha1', 'sha256', 'sha384', 'sha512'],
+        choices=_auth_algorithms,
         type=_convert_to_lowercase,
         help=_('Authentication algorithm'))
     parser.add_argument(
         '--encryption-algorithm',
-        choices=['aes-128', '3des', 'aes-192', 'aes-256'],
+        choices=_encryption_algorithms,
         type=_convert_to_lowercase,
         help=_('Encryption algorithm'))
     parser.add_argument(
@@ -88,7 +148,7 @@ def _get_common_parser(parser):
         help=_('IKE version for the policy'))
     parser.add_argument(
         '--pfs',
-        choices=['group5', 'group2', 'group14'],
+        choices=_pfs_groups,
         type=_convert_to_lowercase,
         help=_('Perfect Forward Secrecy'))
     parser.add_argument(
