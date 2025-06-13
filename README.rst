@@ -20,6 +20,7 @@ provides a Python API (the ``neutronclient`` module).
 .. note:: This project has been deprecated. The CLI code has been deleted
    and is not accessible anymore. The Python bindings are still in use by
    other projects but no new features will be added to this project.
+   All projects under Openstack governance migrating to use OpenstackSDK.
    Any new feature should be proposed to OpenStack SDK and OpenStack
    Client.
 
