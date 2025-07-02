@@ -31,7 +31,6 @@
       - openstack/keystoneauth
       - openstack/neutron
       - openstack/neutron-lib
-      - openstack/os-client-config
       - openstack/python-cinderclient
       - openstack/python-glanceclient
       - openstack/python-ironicclient
