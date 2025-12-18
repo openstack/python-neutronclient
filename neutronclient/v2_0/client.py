@@ -847,7 +847,7 @@ class Client(ClientBase):
 
     def list_port_bindings(self, port_id, retrieve_all=True, **_params):
         """Fetches a list of all bindings for a certain port."""
-        return self.list('port_bindings', self.port_bindings_path % port_id,
+        return self.list('bindings', self.port_bindings_path % port_id,
                          retrieve_all, **_params)
 
     def activate_port_binding(self, port_id, host_id):
