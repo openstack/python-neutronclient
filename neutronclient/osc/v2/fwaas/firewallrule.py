@@ -86,9 +86,12 @@ def _get_common_parser(parser):
         help=_('Description of the firewall rule'))
     parser.add_argument(
         '--protocol',
-        choices=['tcp', 'udp', 'icmp', 'any'],
         type=nc_utils.convert_to_lowercase,
-        help=_('Protocol for the firewall rule'))
+        help=_('IP protocol (ah, dccp, egp, esp, gre, icmp, igmp, '
+               'ipv6-encap, ipv6-frag, ipv6-icmp, ipv6-nonxt, ipv6-opts, '
+               'ipv6-route, ospf, pgm, rsvp, sctp, tcp, udp, udplite, '
+               'vrrp and integer representations [0-255] or any; '
+               'default: any (all protocols))'))
     parser.add_argument(
         '--action',
         choices=['allow', 'deny', 'reject'],
