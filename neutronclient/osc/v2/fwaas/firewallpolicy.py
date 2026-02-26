@@ -67,16 +67,18 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
     if parsed_args.firewall_rule and parsed_args.no_firewall_rule:
         _firewall_rules = []
         for f in parsed_args.firewall_rule:
-            _firewall_rules.append(client.find_firewall_rule(f)['id'])
+            _firewall_rules.append(
+                client.find_firewall_rule(f, ignore_missing=False)['id'])
         attrs[const.FWRS] = _firewall_rules
     elif parsed_args.firewall_rule:
         rules = []
         if not is_create:
             foobar = client.find_firewall_policy(
-                parsed_args.firewall_policy)
+                parsed_args.firewall_policy, ignore_missing=False)
             rules += foobar[const.FWRS]
         for f in parsed_args.firewall_rule:
-            rules.append(client.find_firewall_rule(f)['id'])
+            rules.append(
+                client.find_firewall_rule(f, ignore_missing=False)['id'])
         attrs[const.FWRS] = rules
     elif parsed_args.no_firewall_rule:
         attrs[const.FWRS] = []
@@ -173,7 +175,8 @@ class DeleteFirewallPolicy(command.Command):
         result = 0
         for fwp in parsed_args.firewall_policy:
             try:
-                fwp_id = client.find_firewall_policy(fwp)['id']
+                fwp_id = client.find_firewall_policy(
+                    fwp, ignore_missing=False)['id']
                 client.delete_firewall_policy(fwp_id)
             except Exception as e:
                 result += 1
@@ -220,12 +223,12 @@ class FirewallPolicyInsertRule(command.Command):
         if 'insert_before' in parsed_args:
             if parsed_args.insert_before:
                 _insert_before = client.find_firewall_rule(
-                    parsed_args.insert_before)['id']
+                    parsed_args.insert_before, ignore_missing=False)['id']
         _insert_after = ''
         if 'insert_after' in parsed_args:
             if parsed_args.insert_after:
                 _insert_after = client.find_firewall_rule(
-                    parsed_args.insert_after)['id']
+                    parsed_args.insert_after, ignore_missing=False)['id']
         return {'firewall_rule_id': _rule_id,
                 'insert_before': _insert_before,
                 'insert_after': _insert_after}
@@ -233,7 +236,7 @@ class FirewallPolicyInsertRule(command.Command):
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
         policy_id = client.find_firewall_policy(
-            parsed_args.firewall_policy)['id']
+            parsed_args.firewall_policy, ignore_missing=False)['id']
         body = self.args2body(parsed_args)
         client.insert_rule_into_policy(policy_id, **body)
         rule_id = body['firewall_rule_id']
@@ -261,7 +264,7 @@ class FirewallPolicyRemoveRule(command.Command):
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
         policy_id = client.find_firewall_policy(
-            parsed_args.firewall_policy)['id']
+            parsed_args.firewall_policy, ignore_missing=False)['id']
         fwr_id = _get_required_firewall_rule(client, parsed_args)
         body = {'firewall_rule_id': fwr_id}
         client.remove_rule_from_policy(policy_id, **body)
@@ -322,7 +325,7 @@ class SetFirewallPolicy(command.Command):
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
         fwp_id = client.find_firewall_policy(
-            parsed_args.firewall_policy)['id']
+            parsed_args.firewall_policy, ignore_missing=False)['id']
         attrs = _get_common_attrs(self.app.client_manager,
                                   parsed_args, is_create=False)
         try:
@@ -347,7 +350,7 @@ class ShowFirewallPolicy(command.ShowOne):
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
         fwp_id = client.find_firewall_policy(
-            parsed_args.firewall_policy)['id']
+            parsed_args.firewall_policy, ignore_missing=False)['id']
         obj = client.get_firewall_policy(fwp_id)
         display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
             obj, _attr_map_dict, ['location', 'tenant_id'])
@@ -359,7 +362,8 @@ def _get_required_firewall_rule(client, parsed_args):
     if not parsed_args.firewall_rule:
         msg = (_("Firewall rule (name or ID) is required."))
         raise exceptions.CommandError(msg)
-    return client.find_firewall_rule(parsed_args.firewall_rule)['id']
+    return client.find_firewall_rule(
+        parsed_args.firewall_rule, ignore_missing=False)['id']
 
 
 class UnsetFirewallPolicy(command.Command):
@@ -399,10 +403,11 @@ class UnsetFirewallPolicy(command.Command):
 
         if parsed_args.firewall_rule:
             current = client.find_firewall_policy(
-                parsed_args.firewall_policy)[const.FWRS]
+                parsed_args.firewall_policy, ignore_missing=False)[const.FWRS]
             removed = []
             for f in set(parsed_args.firewall_rule):
-                removed.append(client.find_firewall_rule(f)['id'])
+                removed.append(
+                    client.find_firewall_rule(f, ignore_missing=False)['id'])
             attrs[const.FWRS] = [r for r in current if r not in removed]
         if parsed_args.all_firewall_rule:
             attrs[const.FWRS] = []
@@ -415,7 +420,7 @@ class UnsetFirewallPolicy(command.Command):
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
         fwp_id = client.find_firewall_policy(
-            parsed_args.firewall_policy)['id']
+            parsed_args.firewall_policy, ignore_missing=False)['id']
         attrs = self._get_attrs(self.app.client_manager, parsed_args)
         try:
             client.update_firewall_policy(fwp_id, **attrs)

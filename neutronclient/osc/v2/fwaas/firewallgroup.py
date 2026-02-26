@@ -129,19 +129,19 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
     if (parsed_args.ingress_firewall_policy and
             parsed_args.no_ingress_firewall_policy):
         attrs['ingress_firewall_policy_id'] = client.find_firewall_policy(
-            parsed_args.ingress_firewall_policy)['id']
+            parsed_args.ingress_firewall_policy, ignore_missing=False)['id']
     elif parsed_args.ingress_firewall_policy:
         attrs['ingress_firewall_policy_id'] = client.find_firewall_policy(
-            parsed_args.ingress_firewall_policy)['id']
+            parsed_args.ingress_firewall_policy, ignore_missing=False)['id']
     elif parsed_args.no_ingress_firewall_policy:
         attrs['ingress_firewall_policy_id'] = None
     if (parsed_args.egress_firewall_policy and
             parsed_args.no_egress_firewall_policy):
         attrs['egress_firewall_policy_id'] = client.find_firewall_policy(
-            parsed_args.egress_firewall_policy)['id']
+            parsed_args.egress_firewall_policy, ignore_missing=False)['id']
     elif parsed_args.egress_firewall_policy:
         attrs['egress_firewall_policy_id'] = client.find_firewall_policy(
-            parsed_args.egress_firewall_policy)['id']
+            parsed_args.egress_firewall_policy, ignore_missing=False)['id']
     elif parsed_args.no_egress_firewall_policy:
         attrs['egress_firewall_policy_id'] = None
     if parsed_args.share:
@@ -165,7 +165,7 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
             ports.append(client.find_port(p)['id'])
         if not is_create:
             ports += client.find_firewall_group(
-                parsed_args.firewall_group)['ports']
+                parsed_args.firewall_group, ignore_missing=False)['ports']
         attrs['ports'] = sorted(set(ports))
     elif parsed_args.no_port:
         attrs['ports'] = []
@@ -220,7 +220,8 @@ class DeleteFirewallGroup(command.Command):
         result = 0
         for fwg in parsed_args.firewall_group:
             try:
-                fwg_id = client.find_firewall_group(fwg)['id']
+                fwg_id = client.find_firewall_group(
+                    fwg, ignore_missing=False)['id']
                 client.delete_firewall_group(fwg_id)
             except Exception as e:
                 result += 1
@@ -281,7 +282,8 @@ class SetFirewallGroup(command.Command):
 
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
-        fwg_id = client.find_firewall_group(parsed_args.firewall_group)['id']
+        fwg_id = client.find_firewall_group(
+            parsed_args.firewall_group, ignore_missing=False)['id']
         attrs = _get_common_attrs(self.app.client_manager, parsed_args,
                                   is_create=False)
         try:
@@ -305,7 +307,8 @@ class ShowFirewallGroup(command.ShowOne):
 
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
-        fwg_id = client.find_firewall_group(parsed_args.firewall_group)['id']
+        fwg_id = client.find_firewall_group(
+            parsed_args.firewall_group, ignore_missing=False)['id']
         obj = client.get_firewall_group(fwg_id)
         display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
             obj, _attr_map_dict, ['location', 'tenant_id'])
@@ -366,7 +369,7 @@ class UnsetFirewallGroup(command.Command):
             attrs['admin_state_up'] = False
         if parsed_args.port:
             old = client.find_firewall_group(
-                parsed_args.firewall_group)['ports']
+                parsed_args.firewall_group, ignore_missing=False)['ports']
             new = [client.find_port(r)['id'] for r in parsed_args.port]
             attrs['ports'] = sorted(list(set(old) - set(new)))
         if parsed_args.all_port:
@@ -375,7 +378,8 @@ class UnsetFirewallGroup(command.Command):
 
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
-        fwg_id = client.find_firewall_group(parsed_args.firewall_group)['id']
+        fwg_id = client.find_firewall_group(
+            parsed_args.firewall_group, ignore_missing=False)['id']
         attrs = self._get_attrs(client, parsed_args)
         try:
             client.update_firewall_group(fwg_id, **attrs)

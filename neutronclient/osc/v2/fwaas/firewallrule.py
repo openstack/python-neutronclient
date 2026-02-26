@@ -229,12 +229,12 @@ def _get_common_attrs(client_manager, parsed_args, is_create=True):
         attrs['shared'] = False
     if parsed_args.source_firewall_group:
         attrs['source_firewall_group_id'] = client.find_firewall_group(
-            parsed_args.source_firewall_group)['id']
+            parsed_args.source_firewall_group, ignore_missing=False)['id']
     if parsed_args.no_source_firewall_group:
         attrs['source_firewall_group_id'] = None
     if parsed_args.destination_firewall_group:
         attrs['destination_firewall_group_id'] = client.find_firewall_group(
-            parsed_args.destination_firewall_group)['id']
+            parsed_args.destination_firewall_group, ignore_missing=False)['id']
     if parsed_args.no_destination_firewall_group:
         attrs['destination_firewall_group_id'] = None
     return attrs
@@ -284,7 +284,8 @@ class DeleteFirewallRule(command.Command):
         result = 0
         for fwr in parsed_args.firewall_rule:
             try:
-                fwr_id = client.find_firewall_rule(fwr)['id']
+                fwr_id = client.find_firewall_rule(
+                    fwr, ignore_missing=False)['id']
                 client.delete_firewall_rule(fwr_id)
             except Exception as e:
                 result += 1
@@ -361,7 +362,8 @@ class SetFirewallRule(command.Command):
         client = self.app.client_manager.network
         attrs = _get_common_attrs(self.app.client_manager,
                                   parsed_args, is_create=False)
-        fwr_id = client.find_firewall_rule(parsed_args.firewall_rule)['id']
+        fwr_id = client.find_firewall_rule(
+            parsed_args.firewall_rule, ignore_missing=False)['id']
         try:
             client.update_firewall_rule(fwr_id, **attrs)
         except Exception as e:
@@ -383,7 +385,8 @@ class ShowFirewallRule(command.ShowOne):
 
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
-        fwr_id = client.find_firewall_rule(parsed_args.firewall_rule)['id']
+        fwr_id = client.find_firewall_rule(
+            parsed_args.firewall_rule, ignore_missing=False)['id']
         obj = client.get_firewall_rule(fwr_id)
         display_columns, columns = utils.get_osc_show_columns_for_sdk_resource(
             obj, _attr_map_dict, ['location', 'tenant_id'])
@@ -461,7 +464,8 @@ class UnsetFirewallRule(command.Command):
     def take_action(self, parsed_args):
         client = self.app.client_manager.network
         attrs = self._get_attrs(self.app.client_manager, parsed_args)
-        fwr_id = client.find_firewall_rule(parsed_args.firewall_rule)['id']
+        fwr_id = client.find_firewall_rule(
+            parsed_args.firewall_rule, ignore_missing=False)['id']
         try:
             client.update_firewall_rule(fwr_id, **attrs)
         except Exception as e:

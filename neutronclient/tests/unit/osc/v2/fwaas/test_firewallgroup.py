@@ -215,7 +215,7 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
         parsed_args = self.check_parser(self.cmd, arglist, verifylist)
         headers, data = self.cmd.take_action(parsed_args)
         self.networkclient.find_firewall_policy.assert_called_once_with(
-            ingress_policy)
+            ingress_policy, ignore_missing=False)
 
         self.check_results(headers, data, request)
 
@@ -236,7 +236,7 @@ class TestCreateFirewallGroup(TestFirewallGroup, common.TestCreateFWaaS):
         headers, data = self.cmd.take_action(parsed_args)
 
         self.networkclient.find_firewall_policy.assert_called_once_with(
-            egress_policy)
+            egress_policy, ignore_missing=False)
         self.check_results(headers, data, request)
 
     def test_create_with_all_params(self):
@@ -398,15 +398,15 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
             # 1. Find specified firewall_group
             if self.networkclient.find_firewall_group.call_count == 1:
                 self.networkclient.find_firewall_group.assert_called_with(
-                    target)
+                    target, ignore_missing=False)
             # 2. Find specified 'ingress_firewall_policy'
             if self.networkclient.find_firewall_policy.call_count == 1:
                 self.networkclient.find_firewall_policy.assert_called_with(
-                    ingress_policy)
+                    ingress_policy, ignore_missing=False)
             # 3. Find specified 'ingress_firewall_policy'
             if self.networkclient.find_firewall_policy.call_count == 2:
                 self.networkclient.find_firewall_policy.assert_called_with(
-                    egress_policy)
+                    egress_policy, ignore_missing=False)
             return {'id': args[0]}
 
         self.networkclient.find_firewall_group.side_effect = _mock_fwg_policy
@@ -439,7 +439,7 @@ class TestSetFirewallGroup(TestFirewallGroup, common.TestSetFWaaS):
             # 1. Find specified firewall_group
             if self.networkclient.find_firewall_group.call_count in [1, 2]:
                 self.networkclient.find_firewall_group.assert_called_with(
-                    target)
+                    target, ignore_missing=False)
                 return {'id': args[0], 'ports': _fwg['ports']}
             # 2. Find specified 'port' #1
             if self.networkclient.find_port.call_count == 1:
@@ -687,7 +687,7 @@ class TestUnsetFirewallGroup(TestFirewallGroup, common.TestUnsetFWaaS):
             # 1. Find specified firewall_group
             if self.networkclient.find_firewall_group.call_count in [1, 2]:
                 self.networkclient.find_firewall_group.assert_called_with(
-                    target)
+                    target, ignore_missing=False)
                 return {'id': args[0], 'ports': _fwg['ports']}
             # 2. Find specified firewall_group and refer 'ports' attribute
             if self.networkclient.find_port.call_count == 2:
