@@ -14,6 +14,9 @@
 #    under the License.
 #
 
+# TODO(slaweq): remove it once "logging" OSC plugin will be moved to the
+# python-openstackclient repo
+
 FWG = 'firewall_group'
 FWGS = 'firewall_groups'
 FWP = 'firewall_policy'

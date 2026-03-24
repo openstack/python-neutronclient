@@ -1,0 +1,11 @@
+---
+deprecations:
+  - |
+    The Firewall as a Service (FWaaS) v2 OSC plugin commands have been moved
+    to ``python-openstackclient``. The FWaaS commands are no longer provided
+    by ``python-neutronclient``. Please use ``python-openstackclient`` for
+    the following commands:
+
+    * ``firewall group create/delete/list/set/show/unset``
+    * ``firewall group policy create/delete/list/set/show/unset/add rule/remove rule``
+    * ``firewall group rule create/delete/list/set/show/unset``
